@@ -1,12 +1,12 @@
 {
-  "scraped_at": "2026-06-23T05:22:38+00:00",
+  "scraped_at": "2026-06-23T06:15:03+00:00",
   "thermocline": {
     "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
     "dataset_id": "pmelTaoDyT",
     "depth_m": 150,
     "depth_range_m": {
-      "lower": 130,
-      "upper": 200
+      "lower": 140,
+      "upper": 160
     },
     "thresholds": {
       "warm_kelvin": 1.0,
@@ -21,24 +21,159 @@
       "latest_temp_c": 18.59,
       "latest_depth_m": 150.0,
       "latest_ts": "2026-05-31T12:00:00+00:00",
-      "delta_30d_c": -3.48,
+      "delta_30d_c": -5.47,
       "kelvin_signal": "cold-kelvin-wave",
-      "reading": "30-day cooling of -3.48 \u00b0C at ~150 m, central Ni\u00f1o 3.4. Surface cooling expected in 4\u20136 weeks."
+      "reading": "30-day cooling of -5.47 \u00b0C at ~150 m, central Ni\u00f1o 3.4. Surface cooling expected in 4\u20136 weeks."
     },
     "buoys": [
+      {
+        "station_id": "2n156e",
+        "label": "2\u00b0N 156\u00b0E",
+        "lat": 2.0,
+        "lon": 156.0,
+        "column": "156E",
+        "obs_count": 0,
+        "latest_temp_c": null,
+        "latest_depth_m": null,
+        "latest_ts": null,
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": null,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "0n156e",
+        "label": "0\u00b0N 156\u00b0E",
+        "lat": 0.0,
+        "lon": 156.0,
+        "column": "156E",
+        "obs_count": 0,
+        "latest_temp_c": null,
+        "latest_depth_m": null,
+        "latest_ts": null,
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": null,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "2s156e",
+        "label": "2\u00b0S 156\u00b0E",
+        "lat": -2.0,
+        "lon": 156.0,
+        "column": "156E",
+        "obs_count": 0,
+        "latest_temp_c": null,
+        "latest_depth_m": null,
+        "latest_ts": null,
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": null,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "2n165e",
+        "label": "2\u00b0N 165\u00b0E",
+        "lat": 2.0,
+        "lon": 165.0,
+        "column": "165E",
+        "obs_count": 53,
+        "latest_temp_c": 23.95,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 23.78,
+        "baseline_30d_mean_c": 27.58,
+        "delta_30d_c": -3.8,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "0n165e",
+        "label": "0\u00b0N 165\u00b0E",
+        "lat": 0.0,
+        "lon": 165.0,
+        "column": "165E",
+        "obs_count": 53,
+        "latest_temp_c": 22.42,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 22.18,
+        "baseline_30d_mean_c": 26.39,
+        "delta_30d_c": -4.21,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2s165e",
+        "label": "2\u00b0S 165\u00b0E",
+        "lat": -2.0,
+        "lon": 165.0,
+        "column": "165E",
+        "obs_count": 53,
+        "latest_temp_c": 25.77,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 25.23,
+        "baseline_30d_mean_c": 27.94,
+        "delta_30d_c": -2.71,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2n180",
+        "label": "2\u00b0N 180\u00b0",
+        "lat": 2.0,
+        "lon": 180.0,
+        "column": "180",
+        "obs_count": 53,
+        "latest_temp_c": 20.73,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 21.8,
+        "baseline_30d_mean_c": 26.22,
+        "delta_30d_c": -4.42,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "0n180",
+        "label": "0\u00b0N 180\u00b0",
+        "lat": 0.0,
+        "lon": 180.0,
+        "column": "180",
+        "obs_count": 53,
+        "latest_temp_c": 19.78,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 20.94,
+        "baseline_30d_mean_c": 27.8,
+        "delta_30d_c": -6.86,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2s180",
+        "label": "2\u00b0S 180\u00b0",
+        "lat": -2.0,
+        "lon": 180.0,
+        "column": "180",
+        "obs_count": 53,
+        "latest_temp_c": 25.29,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 24.21,
+        "baseline_30d_mean_c": 28.05,
+        "delta_30d_c": -3.84,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
       {
         "station_id": "2n170w",
         "label": "2\u00b0N 170\u00b0W",
         "lat": 2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 20.12,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 16.64,
-        "baseline_30d_mean_c": 20.63,
-        "delta_30d_c": -4.0,
+        "recent_7d_mean_c": 21.58,
+        "baseline_30d_mean_c": 27.01,
+        "delta_30d_c": -5.43,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -47,13 +182,13 @@
         "lat": 0.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 21.31,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 17.23,
-        "baseline_30d_mean_c": 22.07,
-        "delta_30d_c": -4.84,
+        "recent_7d_mean_c": 20.38,
+        "baseline_30d_mean_c": 27.39,
+        "delta_30d_c": -7.0,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -62,13 +197,13 @@
         "lat": -2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 24.0,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 18.26,
-        "baseline_30d_mean_c": 22.58,
-        "delta_30d_c": -4.32,
+        "recent_7d_mean_c": 22.74,
+        "baseline_30d_mean_c": 27.62,
+        "delta_30d_c": -4.88,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -77,13 +212,13 @@
         "lat": 2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 14.4,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 13.89,
-        "baseline_30d_mean_c": 16.83,
-        "delta_30d_c": -2.94,
+        "recent_7d_mean_c": 15.92,
+        "baseline_30d_mean_c": 21.45,
+        "delta_30d_c": -5.53,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -92,13 +227,13 @@
         "lat": 0.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 18.59,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 16.42,
-        "baseline_30d_mean_c": 19.9,
-        "delta_30d_c": -3.48,
+        "recent_7d_mean_c": 18.88,
+        "baseline_30d_mean_c": 24.35,
+        "delta_30d_c": -5.47,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -107,13 +242,28 @@
         "lat": -2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 20.76,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 15.82,
-        "baseline_30d_mean_c": 18.54,
-        "delta_30d_c": -2.71,
+        "recent_7d_mean_c": 18.6,
+        "baseline_30d_mean_c": 23.11,
+        "delta_30d_c": -4.51,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2n140w",
+        "label": "2\u00b0N 140\u00b0W",
+        "lat": 2.0,
+        "lon": -140.0,
+        "column": "140W",
+        "obs_count": 53,
+        "latest_temp_c": 14.35,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 14.73,
+        "baseline_30d_mean_c": 16.42,
+        "delta_30d_c": -1.7,
         "kelvin_signal": "cold-kelvin-wave"
       },
       {
@@ -122,29 +272,231 @@
         "lat": 0.0,
         "lon": -140.0,
         "column": "140W",
-        "obs_count": 106,
+        "obs_count": 53,
         "latest_temp_c": 18.71,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": 16.12,
-        "baseline_30d_mean_c": 17.17,
-        "delta_30d_c": -1.04,
+        "recent_7d_mean_c": 18.75,
+        "baseline_30d_mean_c": 19.76,
+        "delta_30d_c": -1.01,
         "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2s140w",
+        "label": "2\u00b0S 140\u00b0W",
+        "lat": -2.0,
+        "lon": -140.0,
+        "column": "140W",
+        "obs_count": 53,
+        "latest_temp_c": 16.14,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 15.76,
+        "baseline_30d_mean_c": 19.24,
+        "delta_30d_c": -3.48,
+        "kelvin_signal": "cold-kelvin-wave"
+      },
+      {
+        "station_id": "2n125w",
+        "label": "2\u00b0N 125\u00b0W",
+        "lat": 2.0,
+        "lon": -125.0,
+        "column": "125W",
+        "obs_count": 54,
+        "latest_temp_c": 13.5,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 13.62,
+        "baseline_30d_mean_c": 13.75,
+        "delta_30d_c": -0.13,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "0n125w",
+        "label": "0\u00b0N 125\u00b0W",
+        "lat": 0.0,
+        "lon": -125.0,
+        "column": "125W",
+        "obs_count": 54,
+        "latest_temp_c": 15.58,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 15.45,
+        "baseline_30d_mean_c": 15.95,
+        "delta_30d_c": -0.5,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "2s125w",
+        "label": "2\u00b0S 125\u00b0W",
+        "lat": -2.0,
+        "lon": -125.0,
+        "column": "125W",
+        "obs_count": 53,
+        "latest_temp_c": 13.23,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": 13.24,
+        "baseline_30d_mean_c": 13.46,
+        "delta_30d_c": -0.22,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "2n110w",
+        "label": "2\u00b0N 110\u00b0W",
+        "lat": 2.0,
+        "lon": -110.0,
+        "column": "110W",
+        "obs_count": 54,
+        "latest_temp_c": 13.31,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 13.53,
+        "baseline_30d_mean_c": 13.56,
+        "delta_30d_c": -0.03,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "0n110w",
+        "label": "0\u00b0N 110\u00b0W",
+        "lat": 0.0,
+        "lon": -110.0,
+        "column": "110W",
+        "obs_count": 54,
+        "latest_temp_c": 14.86,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 14.96,
+        "baseline_30d_mean_c": 14.82,
+        "delta_30d_c": 0.13,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "2s110w",
+        "label": "2\u00b0S 110\u00b0W",
+        "lat": -2.0,
+        "lon": -110.0,
+        "column": "110W",
+        "obs_count": 54,
+        "latest_temp_c": 12.76,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 12.78,
+        "baseline_30d_mean_c": 12.87,
+        "delta_30d_c": -0.09,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "2n95w",
+        "label": "2\u00b0N 95\u00b0W",
+        "lat": 2.0,
+        "lon": -95.0,
+        "column": "95W",
+        "obs_count": 54,
+        "latest_temp_c": 13.98,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 13.88,
+        "baseline_30d_mean_c": 14.27,
+        "delta_30d_c": -0.4,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "0n95w",
+        "label": "0\u00b0N 95\u00b0W",
+        "lat": 0.0,
+        "lon": -95.0,
+        "column": "95W",
+        "obs_count": 53,
+        "latest_temp_c": 16.06,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 15.26,
+        "baseline_30d_mean_c": 14.8,
+        "delta_30d_c": 0.46,
+        "kelvin_signal": "neutral"
+      },
+      {
+        "station_id": "2s95w",
+        "label": "2\u00b0S 95\u00b0W",
+        "lat": -2.0,
+        "lon": -95.0,
+        "column": "95W",
+        "obs_count": 54,
+        "latest_temp_c": 13.95,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-06-01T12:00:00+00:00",
+        "recent_7d_mean_c": 14.0,
+        "baseline_30d_mean_c": 13.95,
+        "delta_30d_c": 0.05,
+        "kelvin_signal": "neutral"
       }
     ],
     "by_longitude": {
+      "165E": {
+        "mean_temp_c": 23.73,
+        "n_buoys": 3
+      },
+      "180": {
+        "mean_temp_c": 22.32,
+        "n_buoys": 3
+      },
       "170W": {
-        "mean_temp_c": 17.38,
+        "mean_temp_c": 21.57,
         "n_buoys": 3
       },
       "155W": {
-        "mean_temp_c": 15.38,
+        "mean_temp_c": 17.8,
         "n_buoys": 3
       },
       "140W": {
-        "mean_temp_c": 16.12,
-        "n_buoys": 1
+        "mean_temp_c": 16.41,
+        "n_buoys": 3
+      },
+      "125W": {
+        "mean_temp_c": 14.1,
+        "n_buoys": 3
+      },
+      "110W": {
+        "mean_temp_c": 13.76,
+        "n_buoys": 3
+      },
+      "95W": {
+        "mean_temp_c": 14.38,
+        "n_buoys": 3
+      },
+      "156E": {
+        "mean_temp_c": null,
+        "n_buoys": 0
       }
-    }
+    },
+    "longitude_order": [
+      "156E",
+      "165E",
+      "180",
+      "170W",
+      "155W",
+      "140W",
+      "125W",
+      "110W",
+      "95W"
+    ],
+    "latitude_order": [
+      {
+        "key": "2N",
+        "label": "2\u00b0N",
+        "lat": 2.0
+      },
+      {
+        "key": "0N",
+        "label": "0\u00b0N",
+        "lat": 0.0
+      },
+      {
+        "key": "2S",
+        "label": "2\u00b0S",
+        "lat": -2.0
+      }
+    ]
   }
 }
