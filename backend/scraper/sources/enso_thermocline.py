@@ -1,47 +1,45 @@
-"""enso_thermocline.py — TAO/TRITON subsurface T at 150 m via PMEL ERDDAP.
+"""enso_thermocline.py — TAO/TRITON subsurface T at 150 m via NDBC.
 
-Phase 3 — depth-resolved subsurface temperature anomalies at the
-equatorial Pacific TAO/TRITON buoy network, complementing the WWV
-card (Phase 2). The two are different signals on different horizons:
+Phase 3 v3 — pivots off the dead-end ERDDAP path (PMEL decommissioned
+its instance + the PFEG/OSMC mirrors blacklist GHA egress IPs) to
+NDBC's flat-text realtime feed, which serves the same upstream buoy
+telemetry without a WAF in front of it.
 
-  • WWV (Phase 2): depth-integrated heat content, slow.
-    4-6 MONTH lead before SST. Tells you the reservoir is full.
-  • T-150m (this module): point measurements at the thermocline depth
-    where downwelling Kelvin waves propagate. 4-6 WEEK lead.
-    Tells you a slug of heat is propagating eastward NOW.
+  https://www.ndbc.noaa.gov/data/realtime2/{STATION_ID}.ocean
 
-When BOTH cards show warm anomalies, the surface is going to keep
-warming. When the thermocline cools while WWV stays high, the surface
-event is past its peak (the reservoir is draining without replenishment).
+Each .ocean file carries ~45 days of multi-depth temperature
+observations from one TAO buoy. We pull 7 specific stations all
+anchored INSIDE the Niño 3.4 box (5°N-5°S, 170°W-120°W) along three
+longitudes (170°W, 155°W, 140°W), filter to depths near 150 m
+(the Kelvin-wave depth), and compute a 30-day delta per station
+(recent 7-day mean minus 30-37-day-old 7-day mean). |Δ| ≥ 1.0 °C
+signals a Kelvin wave breaching that station.
 
-Data: NOAA PMEL ERDDAP `tabledap` — REST-y CSV endpoint where filters
-go in the URL as constraint expressions (e.g. `?latitude>=-1
-&latitude<=1&depth>=140&depth<=160&time>=2022-01-01`).
+  • WWV (Phase 2): depth-INTEGRATED reservoir, 4-6 MONTH lead
+  • This module:   depth-RESOLVED at the thermocline, 4-6 WEEK lead
+                   PLUS lat/lon coordinates so the buoys pin onto
+                   the ENSO risk map
 
-⚠ Network: ERDDAP at upwell.pmel.noaa.gov is reachable from GitHub
-Actions runners but NOT from the Claude Code sandbox (same outbound-
-allowlist gate). The fetcher runs on the runner; sandbox can only
-inspect what's already committed. The dry-run+diag protocol from
-Phases 1 and 2 applies here too.
+⚠ Network: NDBC at www.ndbc.noaa.gov IS reachable from GHA — verified
+via this run series. The .ocean realtime feeds are unauthenticated
+plain text. No proxy or workaround needed.
 
 Usage
 -----
     cd backend
     python -m scraper.sources.enso_thermocline              # preview
     python -m scraper.sources.enso_thermocline --write      # parse + write
-    python -m scraper.sources.enso_thermocline --diag       # log raw CSV
+    python -m scraper.sources.enso_thermocline --diag       # log raw .ocean head
 """
 from __future__ import annotations
 
 import argparse
-import csv
-import io
 import json
 import logging
+import re
 import sys
-from collections import defaultdict
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -52,299 +50,226 @@ ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 OUT_PATH = DATA_DIR / "enso_thermocline.json"
 
-# Multiple ERDDAP HOSTS — the v1 dispatch on 22 Jun 2026 surfaced
-# that `upwell.pmel.noaa.gov` no longer resolves (PMEL decommissioned
-# their ERDDAP instance ~2024 and the TAO/TRITON data migrated to
-# OSMC and the NMFS PFEG mirrors). Walk all known equivalent hosts.
-ERDDAP_HOSTS = [
-    # OSMC (Ocean Systems Monitoring Center) — took over TAO data
-    # management from PMEL ~2014. Most likely current home.
-    "https://osmc.noaa.gov/erddap",
-    # CoastWatch West Coast — long-running mirror of many PMEL datasets.
-    "https://coastwatch.pfeg.noaa.gov/erddap",
-    # NMFS PFEG Santa Cruz — sibling mirror to CoastWatch.
-    "https://upwell.pfeg.noaa.gov/erddap",
-    # Pacific Coastal & Marine ERDDAP — another candidate mirror.
-    "https://erddap.aoml.noaa.gov/hdb/erddap",
-    # Legacy PMEL — kept in case NOAA brings the service back.
-    "https://upwell.pmel.noaa.gov/erddap",
-]
+NDBC_BASE = "https://www.ndbc.noaa.gov/data/realtime2"
 
-# Multiple PMEL ERDDAP dataset IDs to try in order. The IDs survived
-# the host migration on most mirrors (they kept the same names for
-# backward compatibility), so the cross-product host × dataset
-# (5 × 5 = 25 candidates) covers a wide search space without a code
-# change when NOAA next reshuffles.
-DATASET_CANDIDATES = [
-    "pmelTaoMonT",       # Monthly subsurface T — most common ID
-    "pmelTaoMonsT",      # Variant naming
-    "pmelTaoMonTao",     # Older ID
-    "pmelTaoDyT",        # Daily fallback if monthly is dropped
-    "pmelTaoDySubsurfT",
-]
+# Niño 3.4-anchored TAO/TRITON buoys (NDBC station IDs from operator
+# blueprint). Layout: 3 longitudes × 3 latitudes ≈ 7 stations covering
+# the central-east equatorial Pacific where Kelvin waves surface first.
+# `longitude_e` is in 0-360 convention to match Phase 2 conventions;
+# `lon_negative` is the -180..+180 form used for Leaflet map pins.
+@dataclass(frozen=True)
+class BuoySite:
+    station_id:   str
+    lat:          float        # degrees north (negative = south)
+    lon_negative: float        # degrees east, -180..+180 (for Leaflet)
+    label:        str          # e.g. "0°N 155°W"
+    column:       str          # one of "170W", "155W", "140W"
 
-# Target depth (m) — 150 m is the canonical Kelvin-wave depth in the
-# equatorial Pacific (the thermocline sits at ~120-180m there). We
-# range-filter ±10 m because TAO buoys sample at discrete depths
-# (standard set: 1, 5, 10, 20, 40, 60, 80, 100, 120, 140, 180, 300, 500 m)
-# and the closest measurement to 150 m is usually 140 m or 180 m.
+    @property
+    def longitude_e(self) -> float:
+        """0..360 east convention (matches Phase 2 frontend)."""
+        return (self.lon_negative + 360) % 360
+
+
+NDBC_BUOYS: tuple[BuoySite, ...] = (
+    # 170°W column
+    BuoySite("51305",  2.0, -170.0, "2°N 170°W",  "170W"),
+    BuoySite("51010",  0.0, -170.0, "0°N 170°W",  "170W"),
+    BuoySite("51306", -2.0, -170.0, "2°S 170°W",  "170W"),
+    # 155°W column — 51023 is dead center of the Niño 3.4 box
+    BuoySite("51021",  2.0, -155.0, "2°N 155°W",  "155W"),
+    BuoySite("51023",  0.0, -155.0, "0°N 155°W",  "155W"),
+    BuoySite("51022", -2.0, -155.0, "2°S 155°W",  "155W"),
+    # 140°W column
+    BuoySite("51311",  0.0, -140.0, "0°N 140°W",  "140W"),
+)
+
+# Headline buoy — 0°N 155°W, the dead center of the Niño 3.4 box.
+# Kelvin waves crossing 155°W are typically 2-4 weeks from surfacing
+# in the Niño 3.4 SST signal we already track in Phase 1.
+HEADLINE_STATION_ID = "51023"
+
+# Depth window — TAO subsurface sensors sample at canonical depths
+# (1, 10, 20, 40, 60, 80, 100, 120, 140, 180, 300, 500 m). The
+# "150 m Kelvin wave depth" is bracketed by 140 and 180; we accept
+# anything in [130, 200] m and record the exact sensor depth in the
+# output so the frontend can show it.
 TARGET_DEPTH_M = 150
-DEPTH_LOWER = 140
-DEPTH_UPPER = 180
+DEPTH_LOWER_M  = 130
+DEPTH_UPPER_M  = 200
 
-# Equatorial Pacific buoy longitudes (PMEL convention: 0-360 east).
-# These are the five "anchor" sites along 0°N used in ENSO monitoring.
-# In each tuple: (PMEL 0-360 longitude, display label).
-EQ_BUOY_SITES = [
-    (165.0, "165°E"),   # Western Pacific
-    (180.0, "180°"),    # Date line
-    (190.0, "170°W"),   # Central
-    (220.0, "140°W"),   # Central-east (headline buoy for ENSO)
-    (250.0, "110°W"),   # Eastern
-]
-
-# How much history to pull. 5 years gives enough to compute a
-# trailing-12-month climatology per site AND show a 60-day evolution
-# on the frontend without re-fetching.
-HISTORY_START_DATE = "2021-01-01"
-
-# Headline buoy — 0°N, 140°W (PMEL longitude 220) — sits in the
-# central-east equatorial Pacific where Kelvin waves SURFACE before
-# breaching into the Niño 3.4 region. This is the buoy the alert
-# fires on.
-HEADLINE_BUOY_LON = 220.0
-
-# Kelvin-wave detection threshold (°C). Anomalies > +1 °C at 150m
-# historically precede a surface SST rise of comparable magnitude
-# 4-6 weeks later (see McPhaden 1999 and follow-ups). Conservative
-# enough that we don't fire on noise.
+# Kelvin-wave thresholds, °C. Δ-30d = (mean of last 7 days at this
+# buoy/depth) minus (mean of 30-37 days ago at the same buoy/depth).
+# |Δ| ≥ 1.0 °C is the McPhaden-era empirical threshold for a
+# qualifying downwelling/upwelling Kelvin event.
 KELVIN_WARM_THRESHOLD = 1.0
 KELVIN_COLD_THRESHOLD = -1.0
 
+# NDBC missing-value sentinel — appears as the literal string "MM"
+# in any column where the sensor failed for that observation.
+_MISSING_TOKEN = "MM"
+
 _BROWSER_HEADERS = {
     "User-Agent": "coffee-intel-map/enso-thermocline (https://github.com/loicscanu-ctrl/coffee-intel-map)",
-    "Accept": "text/csv, */*",
+    "Accept": "text/plain, */*",
 }
 
-# ERDDAP returns one of these names for the temperature column,
-# depending on the dataset variant. We don't pin the column name
-# in the URL — let the server send whatever it has — and then pick
-# the first column that smells like a temperature value.
-_TEMP_COLUMN_CANDIDATES = ("T_25", "T_20", "T", "temperature", "WTMP", "T_TEMP")
+# NDBC realtime data rows: YYYY MM DD hh mm DEPTH OTMP ... (whitespace-
+# delimited). Leading two `#` lines are header + units. A datetime
+# anchor at column 0 is a 4-digit year — use that to filter out
+# garbage lines (blank, partial, anything not starting with a year).
+_DATA_ROW_RE = re.compile(r"^\s*(?P<yr>(?:19|20)\d{2})\s+")
 
 
 # ── data model ──────────────────────────────────────────────────────────────
 
 
 @dataclass
-class ThermoclineSample:
-    month:           str        # "YYYY-MM"
-    longitude_e:     float      # PMEL 0-360 convention
-    site_label:      str        # e.g. "140°W"
-    depth_m:         float      # measured depth (often 140 or 180, near 150)
-    temp_c:          float      # raw temperature in °C
-    temp_anomaly_c:  float | None  # vs site's 12-month trailing mean
+class OceanObs:
+    """One depth-resolved measurement from a .ocean file."""
+    timestamp: datetime    # UTC
+    depth_m:   float
+    temp_c:    float
 
 
 # ── HTTP fetching ───────────────────────────────────────────────────────────
 
 
-def _fetch(url: str, *, timeout: int = 60) -> str | None:
-    """One GET. Returns text on 200, None on any error so one dataset
-    failing doesn't kill the run. ERDDAP responses can be slow on
-    larger queries — generous timeout."""
+def _fetch(url: str, *, timeout: int = 30) -> str | None:
+    """Plain GET, returns text on 200, None on any error. NDBC is a
+    stable government endpoint without WAF — failures here are
+    typically (a) buoy decommissioned, (b) intermittent server-side
+    glitches that the next dispatch picks up cleanly."""
     try:
         resp = requests.get(url, headers=_BROWSER_HEADERS, timeout=timeout)
     except requests.RequestException as e:
         logger.warning(f"[therm] GET {url} → request error: {e}")
         return None
     if resp.status_code != 200:
-        snippet = (resp.text or "")[:200]
-        logger.warning(f"[therm] GET {url} → HTTP {resp.status_code}: {snippet}")
+        logger.warning(f"[therm] GET {url} → HTTP {resp.status_code}")
         return None
     return resp.text
 
 
-def _build_query(host: str, dataset_id: str) -> str:
-    """ERDDAP tabledap CSV query for equatorial Pacific subsurface T.
-
-    Each filter is a constraint expression (NOT a key=value param).
-    We don't pin column names in the SELECT — let the server return
-    its full schema so the parser can find whichever temperature
-    column this dataset uses (variants: T_25, T_20, T, temperature).
-    """
-    return (
-        f"{host}/tabledap/{dataset_id}.csv"
-        f"?&latitude>=-1&latitude<=1"
-        f"&depth>={DEPTH_LOWER}&depth<={DEPTH_UPPER}"
-        f"&time>={HISTORY_START_DATE}"
-    )
+# ── parsers ─────────────────────────────────────────────────────────────────
 
 
-def _fetch_first_ok(
-    hosts: list[str],
-    datasets: list[str],
-) -> tuple[str | None, str | None]:
-    """Walk the host × dataset cross-product, return (csv_text,
-    "host/dataset_id") for the first 200 response. (None, None) when
-    all fail. Logs the winner so the operator sees which ERDDAP
-    server NOAA is currently serving TAO data from — useful when
-    PMEL/OSMC/NMFS reshuffle ownership again.
+def parse_ocean_file(text: str) -> list[OceanObs]:
+    """Parse one NDBC .ocean realtime feed. Format (from blueprint):
 
-    Outer loop is hosts (we'd rather find an alive ERDDAP server
-    that happens to use a less-preferred dataset ID than waste time
-    checking dead hosts with five different IDs each)."""
-    for host in hosts:
-        for ds in datasets:
-            url = _build_query(host, ds)
-            text = _fetch(url)
-            if text:
-                tag = f"{host}/{ds}"
-                logger.info(f"[therm] fetched OK: {tag} ({len(text):,} bytes)")
-                return text, tag
-    return None, None
+        #YY  MM DD hh mm DEPTH OTMP COND  SAL  O2% O2PPM ...
+        #yr  mo dy hr mn m     degC mS/cm psu  %   ppm   ...
+        2026 06 22 16 30 10.0  29.5 MM    MM   MM  MM    ...
+        2026 06 22 16 30 150.0 16.5 MM    MM   MM  MM    ...
 
+    The first two lines start with `#` and carry column names + units.
+    Data rows have one (timestamp, depth, temp) observation each;
+    a single buoy emits multiple rows per timestamp, one per sensor
+    depth. "MM" is the NDBC missing-value sentinel and gets dropped.
 
-# ── parsing ─────────────────────────────────────────────────────────────────
-
-
-def _nearest_site(longitude_e: float) -> tuple[float, str] | None:
-    """Bucket a raw buoy longitude into one of our 5 anchor sites.
-    PMEL serves longitudes in 0-360 east; sites are spaced ~30° apart.
-    A strict <15° tolerance assigns each measurement unambiguously —
-    points exactly halfway between two anchors (235°E sits 15° from
-    both 220 and 250) are dropped rather than mis-attributed."""
-    best, best_dist = None, 999.0
-    for site_lon, label in EQ_BUOY_SITES:
-        d = abs(longitude_e - site_lon)
-        if d < best_dist and d < 15:
-            best, best_dist = (site_lon, label), d
-    return best
-
-
-def _pick_temp_column(header: list[str]) -> int | None:
-    """Find the temperature column index in ERDDAP's header. Different
-    PMEL datasets use different names (T_25, T_20, T, temperature) but
-    they're all the same quantity — degrees C at the sampled depth."""
-    lower = [h.strip().lower() for h in header]
-    for cand in _TEMP_COLUMN_CANDIDATES:
-        if cand.lower() in lower:
-            return lower.index(cand.lower())
-    # Fallback: any column whose name starts with "t" and isn't time.
-    for i, h in enumerate(lower):
-        if h.startswith("t") and h not in ("time",):
-            return i
-    return None
-
-
-def _pick_col(header: list[str], names: tuple[str, ...]) -> int | None:
-    lower = [h.strip().lower() for h in header]
-    for n in names:
-        if n.lower() in lower:
-            return lower.index(n.lower())
-    return None
-
-
-def parse_erddap_csv(text: str) -> list[ThermoclineSample]:
-    """Parse an ERDDAP tabledap CSV response. The CSV layout is:
-        row 0: column names    (time, latitude, longitude, depth, T_25, …)
-        row 1: units            (UTC,  degrees_north, degrees_east, m, degree_C, …)
-        row 2+: data rows
-
-    For each data row we:
-      • Convert time to "YYYY-MM" (drop the day; the file is monthly).
-      • Bucket the longitude into one of our 5 anchor sites (±15°).
-      • Skip rows outside our anchor sites.
-      • Anomaly is computed later in _enrich_with_anomalies, not here.
-    """
-    reader = csv.reader(io.StringIO(text))
-    try:
-        header = next(reader)
-    except StopIteration:
-        return []
-    try:
-        next(reader)   # units row — skip
-    except StopIteration:
-        return []
-
-    i_time = _pick_col(header, ("time",))
-    i_lon  = _pick_col(header, ("longitude",))
-    i_dep  = _pick_col(header, ("depth",))
-    i_t    = _pick_temp_column(header)
-    if None in (i_time, i_lon, i_dep, i_t):
-        logger.warning(
-            f"[therm] missing required column — header={header} "
-            f"(time={i_time}, lon={i_lon}, depth={i_dep}, t={i_t})"
-        )
-        return []
-
-    out: list[ThermoclineSample] = []
-    for row in reader:
-        if len(row) <= max(i_time, i_lon, i_dep, i_t):
+    Only readings within the [DEPTH_LOWER_M, DEPTH_UPPER_M] window
+    are returned — that's the 150-m-ish band where Kelvin waves
+    propagate. Other depths are silently ignored (the chart doesn't
+    need them, and keeping the JSON small matters for static-asset
+    delivery)."""
+    out: list[OceanObs] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if not _DATA_ROW_RE.match(line):
+            continue
+        parts = line.split()
+        if len(parts) < 7:
             continue
         try:
-            t_iso = row[i_time]
-            lon   = float(row[i_lon])
-            depth = float(row[i_dep])
-            temp  = float(row[i_t])
-        except (ValueError, IndexError):
+            yr, mo, dd, hh, mn = (int(p) for p in parts[:5])
+            ts = datetime(yr, mo, dd, hh, mn, tzinfo=UTC)
+        except ValueError:
             continue
-        # PMEL ERDDAP serves time as ISO 8601: 2024-05-15T12:00:00Z.
-        # Take just YYYY-MM — these are monthly means anyway.
-        if len(t_iso) < 7:
+        depth_raw, temp_raw = parts[5], parts[6]
+        if depth_raw == _MISSING_TOKEN or temp_raw == _MISSING_TOKEN:
             continue
-        month = t_iso[:7]
-        site = _nearest_site(lon)
-        if site is None:
+        try:
+            depth = float(depth_raw)
+            temp  = float(temp_raw)
+        except ValueError:
             continue
-        site_lon, site_label = site
-        out.append(ThermoclineSample(
-            month=          month,
-            longitude_e=    site_lon,
-            site_label=     site_label,
-            depth_m=        depth,
-            temp_c=         round(temp, 2),
-            temp_anomaly_c= None,   # filled below
-        ))
+        if not (DEPTH_LOWER_M <= depth <= DEPTH_UPPER_M):
+            continue
+        out.append(OceanObs(timestamp=ts, depth_m=depth, temp_c=round(temp, 2)))
     return out
 
 
-def _enrich_with_anomalies(samples: list[ThermoclineSample]) -> list[ThermoclineSample]:
-    """Compute a simple anomaly per (site, month) by subtracting the
-    trailing-12-month mean at the same site. Cheap but reasonable —
-    a proper climatology would use a 30-year normal per calendar
-    month, but TAO data only goes back so far AND the trailing mean
-    captures the relative "is current month warmer than recent" signal
-    that the trader cares about. Earlier-than-12-month samples get
-    anomaly=None (insufficient baseline)."""
-    # Group by site (longitude); within each, by ascending month.
-    by_site: dict[float, list[ThermoclineSample]] = defaultdict(list)
-    for s in samples:
-        by_site[s.longitude_e].append(s)
-    for _lon, site_samples in by_site.items():
-        site_samples.sort(key=lambda s: s.month)
-        for i, s in enumerate(site_samples):
-            # Look back up to 12 months at the same site for baseline.
-            baseline_window = site_samples[max(0, i - 12): i]
-            if len(baseline_window) < 6:
-                # Not enough history yet — keep anomaly None.
-                continue
-            mean = sum(b.temp_c for b in baseline_window) / len(baseline_window)
-            s.temp_anomaly_c = round(s.temp_c - mean, 2)
-    return samples
+# ── per-buoy analysis ──────────────────────────────────────────────────────
+
+
+@dataclass
+class BuoyAnalysis:
+    site:               BuoySite
+    obs_count:          int
+    latest:             OceanObs | None
+    recent_7d_mean_c:   float | None
+    baseline_30d_mean_c: float | None
+    delta_30d_c:        float | None
+    kelvin_signal:      str
+
+
+def _classify_kelvin(delta_c: float | None) -> str:
+    if delta_c is None:
+        return "no-data"
+    if delta_c >= KELVIN_WARM_THRESHOLD:
+        return "warm-kelvin-wave"
+    if delta_c <= KELVIN_COLD_THRESHOLD:
+        return "cold-kelvin-wave"
+    return "neutral"
+
+
+def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
+    """Compute the Kelvin-wave signal from raw observations.
+
+    Signal = mean(last 7 days at 150-ish m) - mean(30-37 days ago,
+    same depth band). This is a delta vs. own-recent-history, not
+    an anomaly vs. climatology — sidesteps having to embed a per-
+    buoy 30-year baseline AND is more sensitive to the FAST signal
+    a Kelvin wave produces (warm slug arrives in days, not months).
+
+    Returns analysis with None values gracefully when the buoy has
+    insufficient history (sensor outage, recently re-commissioned,
+    etc.). The frontend shows 'no-data' in that slot rather than
+    skipping the buoy entirely — preserves the visual layout."""
+    if not obs:
+        return BuoyAnalysis(site, 0, None, None, None, None, "no-data")
+
+    obs_sorted = sorted(obs, key=lambda o: o.timestamp, reverse=True)
+    latest = obs_sorted[0]
+    now = datetime.now(UTC)
+
+    def _mean_in_window(start_days_ago: int, end_days_ago: int) -> float | None:
+        cutoff_end   = now - timedelta(days=start_days_ago)
+        cutoff_start = now - timedelta(days=end_days_ago)
+        vals = [o.temp_c for o in obs if cutoff_start <= o.timestamp <= cutoff_end]
+        return sum(vals) / len(vals) if vals else None
+
+    recent_mean   = _mean_in_window(0,  7)
+    baseline_mean = _mean_in_window(30, 37)
+
+    delta = None
+    if recent_mean is not None and baseline_mean is not None:
+        delta = round(recent_mean - baseline_mean, 2)
+
+    return BuoyAnalysis(
+        site=                site,
+        obs_count=           len(obs),
+        latest=              latest,
+        recent_7d_mean_c=    round(recent_mean,   2) if recent_mean   is not None else None,
+        baseline_30d_mean_c= round(baseline_mean, 2) if baseline_mean is not None else None,
+        delta_30d_c=         delta,
+        kelvin_signal=       _classify_kelvin(delta),
+    )
 
 
 # ── orchestration ──────────────────────────────────────────────────────────
-
-
-def _classify_kelvin(anomaly: float | None) -> str:
-    if anomaly is None:
-        return "unknown"
-    if anomaly >= KELVIN_WARM_THRESHOLD:
-        return "warm-kelvin-wave"
-    if anomaly <= KELVIN_COLD_THRESHOLD:
-        return "cold-kelvin-wave"
-    return "neutral"
 
 
 def _fmt_signed(v: float | None, fmt: str = "+.2f") -> str:
@@ -353,73 +278,107 @@ def _fmt_signed(v: float | None, fmt: str = "+.2f") -> str:
     return f"{v:{fmt}}"
 
 
-def build_payload(samples: list[ThermoclineSample], dataset_id: str | None) -> dict:
-    """Compose the JSON the frontend reads. Two views:
-      • `by_site` — latest reading at each of the 5 anchor longitudes,
-        for the across-Pacific snapshot (the "Kelvin wave is at this
-        longitude" visual).
-      • `headline_buoy` — full history at 0°N 140°W (the
-        central-east, where Kelvin waves surface first), for the
-        time-series chart."""
-    # Latest per site.
-    latest_per_site: dict[float, ThermoclineSample] = {}
-    for s in samples:
-        cur = latest_per_site.get(s.longitude_e)
-        if cur is None or s.month > cur.month:
-            latest_per_site[s.longitude_e] = s
-
-    by_site = []
-    for site_lon, site_label in EQ_BUOY_SITES:
-        s = latest_per_site.get(site_lon)
-        by_site.append({
-            "longitude_e":     site_lon,
-            "site_label":      site_label,
-            "month":           s.month            if s else None,
-            "temp_c":          s.temp_c           if s else None,
-            "temp_anomaly_c":  s.temp_anomaly_c   if s else None,
-            "kelvin_signal":   _classify_kelvin(s.temp_anomaly_c if s else None),
-        })
-
-    # Headline buoy time series — ascending month order.
-    headline_samples = sorted(
-        (s for s in samples if abs(s.longitude_e - HEADLINE_BUOY_LON) < 0.1),
-        key=lambda s: s.month,
+def _reading_text(an: BuoyAnalysis) -> str:
+    """Trader-readable interpretation text for the headline-buoy card."""
+    if an.latest is None:
+        return "No recent buoy telemetry — sensor may be offline."
+    if an.delta_30d_c is None:
+        return (
+            f"Latest T at ~{an.latest.depth_m:.0f} m: {an.latest.temp_c:.2f} °C. "
+            f"Trend baseline still building (need ≥30 days of data)."
+        )
+    if an.kelvin_signal == "warm-kelvin-wave":
+        return (
+            f"30-day warming of +{an.delta_30d_c:.2f} °C at ~{an.latest.depth_m:.0f} m, "
+            f"central Niño 3.4. Surface SST response expected in 4–6 weeks."
+        )
+    if an.kelvin_signal == "cold-kelvin-wave":
+        return (
+            f"30-day cooling of {an.delta_30d_c:.2f} °C at ~{an.latest.depth_m:.0f} m, "
+            f"central Niño 3.4. Surface cooling expected in 4–6 weeks."
+        )
+    return (
+        f"30-day change {_fmt_signed(an.delta_30d_c)} °C at ~{an.latest.depth_m:.0f} m — "
+        f"below the ±1.0 °C threshold that historically anchors a Kelvin-wave classification."
     )
-    headline_latest = headline_samples[-1] if headline_samples else None
+
+
+def build_payload(analyses: list[BuoyAnalysis]) -> dict:
+    """Compose the JSON the frontend reads. Carries everything the
+    card AND the risk map need:
+      • per-buoy: lat/lon + latest reading + Kelvin signal (for map pins)
+      • headline buoy: latest + reading text (for KPI strip)
+      • by_longitude: column averages (for west→east strip)
+    """
+    by_id = {a.site.station_id: a for a in analyses}
+    headline = by_id.get(HEADLINE_STATION_ID)
+
+    # Group by longitude column and compute the mean recent-7d
+    # temperature per column — gives the operator a quick read of the
+    # warm-pool migration across the basin without staring at 7 cards.
+    cols: dict[str, list[float]] = {}
+    for a in analyses:
+        if a.recent_7d_mean_c is not None:
+            cols.setdefault(a.site.column, []).append(a.recent_7d_mean_c)
+    by_longitude = {
+        col: {
+            "mean_temp_c": round(sum(vs) / len(vs), 2) if vs else None,
+            "n_buoys":     len(vs),
+        }
+        for col, vs in cols.items()
+    }
+    # Fill in columns even when no buoy reported, for stable frontend layout.
+    for site in NDBC_BUOYS:
+        by_longitude.setdefault(site.column, {"mean_temp_c": None, "n_buoys": 0})
 
     return {
         "scraped_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "thermocline": {
-            "source":         "NOAA PMEL TAO/TRITON via ERDDAP — subsurface T anomaly near 150 m, equatorial Pacific",
-            "winning_dataset": dataset_id,
-            "depth_m":        TARGET_DEPTH_M,
-            "depth_range_m":  {"lower": DEPTH_LOWER, "upper": DEPTH_UPPER},
+            "source":      "NOAA NDBC realtime TAO/TRITON .ocean feeds (Niño 3.4 anchor buoys)",
+            "source_base": NDBC_BASE,
+            "depth_m":     TARGET_DEPTH_M,
+            "depth_range_m": {"lower": DEPTH_LOWER_M, "upper": DEPTH_UPPER_M},
             "thresholds": {
                 "warm_kelvin": KELVIN_WARM_THRESHOLD,
                 "cold_kelvin": KELVIN_COLD_THRESHOLD,
             },
-            "lead_weeks": "4–6",
-            "headline_buoy": {
-                "longitude_e": HEADLINE_BUOY_LON,
-                "label":       "0°N 140°W",
-                "latest": {
-                    "month":          headline_latest.month            if headline_latest else None,
-                    "temp_c":         headline_latest.temp_c           if headline_latest else None,
-                    "temp_anomaly_c": headline_latest.temp_anomaly_c   if headline_latest else None,
-                    "kelvin_signal":  _classify_kelvin(
-                        headline_latest.temp_anomaly_c if headline_latest else None
-                    ),
-                },
-                "monthly": [
-                    {
-                        "month":          s.month,
-                        "temp_c":         s.temp_c,
-                        "temp_anomaly_c": s.temp_anomaly_c,
-                    }
-                    for s in headline_samples
-                ],
-            },
-            "by_site": by_site,
+            "lead_weeks":  "4–6",
+            "headline": (
+                {
+                    "station_id":    headline.site.station_id,
+                    "label":         headline.site.label,
+                    "lat":           headline.site.lat,
+                    "lon":           headline.site.lon_negative,
+                    "latest_temp_c": headline.latest.temp_c if headline.latest else None,
+                    "latest_depth_m": headline.latest.depth_m if headline.latest else None,
+                    "latest_ts":     headline.latest.timestamp.isoformat(timespec="seconds")
+                                     if headline.latest else None,
+                    "delta_30d_c":   headline.delta_30d_c,
+                    "kelvin_signal": headline.kelvin_signal,
+                    "reading":       _reading_text(headline),
+                }
+                if headline else None
+            ),
+            "buoys": [
+                {
+                    "station_id":    a.site.station_id,
+                    "label":         a.site.label,
+                    "lat":           a.site.lat,
+                    "lon":           a.site.lon_negative,
+                    "column":        a.site.column,
+                    "obs_count":     a.obs_count,
+                    "latest_temp_c": a.latest.temp_c if a.latest else None,
+                    "latest_depth_m": a.latest.depth_m if a.latest else None,
+                    "latest_ts":     a.latest.timestamp.isoformat(timespec="seconds")
+                                     if a.latest else None,
+                    "recent_7d_mean_c":    a.recent_7d_mean_c,
+                    "baseline_30d_mean_c": a.baseline_30d_mean_c,
+                    "delta_30d_c":   a.delta_30d_c,
+                    "kelvin_signal": a.kelvin_signal,
+                }
+                for a in analyses
+            ],
+            "by_longitude": by_longitude,
         },
     }
 
@@ -429,59 +388,58 @@ def _persist(doc: dict) -> None:
     OUT_PATH.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
 
 
-def run(*, write: bool, backfill: bool, diag: bool = False) -> int:
-    """Fetch CSV, parse, persist. backfill is informational only —
-    ERDDAP queries return the full history every request given the
-    same date range filter, so backfill and refresh are the same code
-    path. `--diag` dumps the raw CSV head/tail for format inspection."""
+def run(*, write: bool, diag: bool = False) -> int:
+    """Fetch each buoy's .ocean file, analyse, persist. NDBC realtime
+    files are independent per buoy — one buoy 404ing doesn't block
+    the others. We tolerate partial coverage gracefully (the JSON
+    still ships, the affected card shows 'no-data')."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    mode = "backfill" if backfill else "refresh"
-    logger.info(f"[therm] mode={mode}")
+    logger.info("[therm] mode=fetch via NDBC realtime2")
 
-    text, dataset_id = _fetch_first_ok(ERDDAP_HOSTS, DATASET_CANDIDATES)
-
-    if diag:
-        if text:
-            lines = text.splitlines()
-            head = "\n".join(lines[:8])
-            tail = "\n".join(lines[-5:])
-            logger.info(
-                f"[therm] --diag erddap csv ({len(lines)} lines, dataset={dataset_id})\n"
-                f"--- head ---\n{head}\n--- tail ---\n{tail}"
-            )
-        else:
-            logger.info("[therm] --diag erddap: <no CSV fetched>")
-
-    if not text:
-        logger.error("[therm] FATAL: ERDDAP unreachable across all dataset candidates")
-        return 1
-
-    samples = parse_erddap_csv(text)
-    if not samples:
-        logger.error("[therm] FATAL: 0 samples parsed — column-name drift? re-run with --diag")
-        return 1
-    samples = _enrich_with_anomalies(samples)
-
-    doc = build_payload(samples, dataset_id)
-    headline = doc["thermocline"]["headline_buoy"]["latest"]
-    by_site = doc["thermocline"]["by_site"]
-    logger.info(
-        f"[therm] {len(samples)} samples across {len({s.longitude_e for s in samples})} sites "
-        f"(headline 0°N 140°W {headline['month'] or '—'}: "
-        f"T={_fmt_signed(headline['temp_c'], fmt='+.2f')} °C, "
-        f"anom={_fmt_signed(headline['temp_anomaly_c'])} °C, "
-        f"signal={headline['kelvin_signal']})"
-    )
-    for s in by_site:
+    analyses: list[BuoyAnalysis] = []
+    for site in NDBC_BUOYS:
+        url = f"{NDBC_BASE}/{site.station_id}.ocean"
+        text = _fetch(url)
+        if not text:
+            logger.warning(f"[therm] {site.station_id} ({site.label}): no data")
+            analyses.append(analyse_buoy(site, []))
+            continue
+        if diag:
+            head = "\n".join(text.splitlines()[:8])
+            logger.info(f"[therm] --diag {site.station_id} head:\n{head}")
+        obs = parse_ocean_file(text)
+        an = analyse_buoy(site, obs)
+        analyses.append(an)
         logger.info(
-            f"[therm]   {s['site_label']:>6}: "
-            f"{s['month'] or '—'}  T={_fmt_signed(s['temp_c'], fmt='+5.2f')}  "
-            f"anom={_fmt_signed(s['temp_anomaly_c'])}  ({s['kelvin_signal']})"
+            f"[therm] {site.station_id} ({site.label}): "
+            f"{an.obs_count} obs in depth window, "
+            f"latest {an.latest.temp_c:.2f}°C @ {an.latest.depth_m:.0f}m "
+            if an.latest else
+            f"[therm] {site.station_id} ({site.label}): no 150m-ish observations"
+        )
+        if an.delta_30d_c is not None:
+            logger.info(
+                f"[therm]   Δ30d={_fmt_signed(an.delta_30d_c)}°C → {an.kelvin_signal}"
+            )
+
+    n_with_data = sum(1 for a in analyses if a.latest is not None)
+    if n_with_data == 0:
+        logger.error("[therm] FATAL: 0 buoys returned usable data")
+        return 1
+
+    doc = build_payload(analyses)
+    headline = doc["thermocline"]["headline"]
+    if headline:
+        logger.info(
+            f"[therm] headline 0°N 155°W (51023): "
+            f"T={_fmt_signed(headline['latest_temp_c'])}°C, "
+            f"Δ30d={_fmt_signed(headline['delta_30d_c'])}°C, "
+            f"signal={headline['kelvin_signal']}"
         )
 
     if write:
         _persist(doc)
-        logger.info(f"[therm] wrote {OUT_PATH}")
+        logger.info(f"[therm] wrote {OUT_PATH} ({n_with_data}/{len(NDBC_BUOYS)} buoys reporting)")
     else:
         logger.info("[therm] preview only — pass --write to persist")
     return 0
@@ -489,15 +447,12 @@ def run(*, write: bool, backfill: bool, diag: bool = False) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--write",    action="store_true", help="Persist parsed JSON")
-    ap.add_argument("--backfill", action="store_true",
-                    help="Operator-intent flag for the full-history seed run. "
-                         "Functionally identical to default refresh.")
-    ap.add_argument("--diag", action="store_true",
-                    help="Log head/tail of the fetched CSV so the operator "
-                         "can confirm the column names from the workflow log.")
+    ap.add_argument("--write", action="store_true", help="Persist parsed JSON")
+    ap.add_argument("--diag",  action="store_true",
+                    help="Log the head of each fetched .ocean file so the operator "
+                         "can confirm NDBC's format from the workflow log.")
     args = ap.parse_args()
-    return run(write=args.write, backfill=args.backfill, diag=args.diag)
+    return run(write=args.write, diag=args.diag)
 
 
 if __name__ == "__main__":
