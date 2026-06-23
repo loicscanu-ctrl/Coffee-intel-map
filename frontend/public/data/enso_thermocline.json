@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-23T05:01:01+00:00",
+  "scraped_at": "2026-06-23T05:15:27+00:00",
   "thermocline": {
     "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
     "dataset_id": "pmelTaoDyT",
@@ -32,12 +32,12 @@
         "lat": 2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 20.12,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 17.34,
+        "recent_7d_mean_c": 16.64,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -47,12 +47,12 @@
         "lat": 0.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 21.31,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 17.87,
+        "recent_7d_mean_c": 17.23,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -62,12 +62,12 @@
         "lat": -2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 24.0,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 18.4,
+        "recent_7d_mean_c": 18.26,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -77,12 +77,12 @@
         "lat": 2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 14.4,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 14.64,
+        "recent_7d_mean_c": 13.89,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -92,12 +92,12 @@
         "lat": 0.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 18.59,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 17.93,
+        "recent_7d_mean_c": 16.42,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -107,12 +107,12 @@
         "lat": -2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 136,
+        "obs_count": 56,
         "latest_temp_c": 20.76,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 16.69,
+        "recent_7d_mean_c": 15.82,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       },
@@ -122,28 +122,28 @@
         "lat": 0.0,
         "lon": -140.0,
         "column": "140W",
-        "obs_count": 134,
+        "obs_count": 56,
         "latest_temp_c": 18.71,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": 15.84,
+        "recent_7d_mean_c": 16.12,
+        "baseline_30d_mean_c": null,
         "delta_30d_c": null,
         "kelvin_signal": "no-data"
       }
     ],
     "by_longitude": {
       "170W": {
-        "mean_temp_c": null,
-        "n_buoys": 0
+        "mean_temp_c": 17.38,
+        "n_buoys": 3
       },
       "155W": {
-        "mean_temp_c": null,
-        "n_buoys": 0
+        "mean_temp_c": 15.38,
+        "n_buoys": 3
       },
       "140W": {
-        "mean_temp_c": null,
-        "n_buoys": 0
+        "mean_temp_c": 16.12,
+        "n_buoys": 1
       }
     }
   }
