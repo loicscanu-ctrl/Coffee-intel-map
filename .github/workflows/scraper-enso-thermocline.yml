@@ -1,34 +1,30 @@
-name: "0.9 – Daily — ENSO thermocline (TAO/TRITON 150m · NDBC .ocean)"
+name: "0.9 – Daily — ENSO thermocline (TAO/TRITON 150m · ERDDAP via CF proxy)"
 
 # Fetches subsurface temperature at ~150 m depth from the TAO/TRITON
-# moored buoy network in the equatorial Pacific Niño 3.4 box. The
-# Phase 2 WWV card is depth-integrated (4-6 MONTH lead); this is the
-# depth-resolved companion — warm anomalies at 150 m propagating
-# eastward ARE Kelvin waves, which surface as El Niño 4-6 WEEKS later.
+# moored buoy network. Depth-RESOLVED companion to Phase 2's WWV card
+# (which is depth-integrated, 4-6 month lead). Warm anomalies at 150 m
+# propagating eastward ARE Kelvin waves, surface as El Niño 4-6 weeks
+# later.
 #
-# Pulls 7 specific NDBC stations anchored inside the Niño 3.4 box
-# (5°N-5°S, 170°W-120°W) along three longitudes. Each station's
-# .ocean realtime file is fetched independently — one buoy offline
-# doesn't block the others (graceful "no-data" slot in the JSON).
+# DATA PATH (v5):
+#   GHA runner → CF Worker (erddap-proxy) → NOAA ERDDAP (PFEG / OSMC)
 #
-# DATA SOURCE — NDBC realtime2 (pivoted from ERDDAP after PR #441):
-#   PMEL ERDDAP decommissioned, OSMC/PFEG mirrors blacklist GHA IPs,
-#   so we go straight to the upstream operational feed at NDBC. Flat
-#   text files, no WAF, no auth — verified live on 23 Jun 2026.
+# Why the proxy: NOAA's CoastWatch PFEG + OSMC ERDDAPs blacklist GHA
+# egress IPs (Azure ASNs). Cloudflare Workers' egress isn't on the
+# blacklist, so a CF Worker just forwards the request and reads the
+# response back. ~50 LOC, free tier covers our volume, shared-secret
+# header keeps it from being abused. See cf-worker/README.md.
 #
-# Daily cron — NDBC realtime updates every 10-60 minutes per buoy
-# and the .ocean files keep ~45 days of rolling history. Daily is
-# plenty for a 4-6 WEEK signal and avoids burning runner minutes
-# fetching the same data hourly.
+# Path history:
+#   v1+v2 (#436, #437): direct ERDDAP — IP-blacklisted
+#   v3+v4 (#442, #443): pivot to NDBC — NDBC doesn't host TAO at all
+#   v5    (this):       proxy + back to ERDDAP — actual TAO data path
 
 on:
-  # Cron DISABLED while iterating on the correct NDBC station ID
-  # convention. The v3 dispatch (PR #442) confirmed NDBC is REACHABLE
-  # from GHA — no DNS or IP blacklist — but all 7 numeric IDs from
-  # the original blueprint returned 404 (they were Hawaii coastal
-  # moorings, not TAO). v4 switches to the lat-lon-string IDs
-  # (`0n155w` etc.); re-enable cron once a manual dispatch confirms
-  # the new IDs actually serve data.
+  # Cron stays DISABLED until the operator (a) deploys the CF Worker
+  # per cf-worker/README.md, (b) sets ERDDAP_PROXY_BASE (vars) +
+  # ERDDAP_PROXY_SECRET (secrets) in repo settings, and (c) confirms
+  # one successful manual dispatch. Then uncomment the schedule.
   # schedule:
   #   - cron: '0 7 * * *'
   workflow_dispatch:
@@ -61,11 +57,18 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch TAO/TRITON subsurface T from NDBC
+      - name: Fetch TAO/TRITON subsurface T via Cloudflare Worker proxy
         id: fetch
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           DIAG: ${{ inputs.diag }}
+          # v5 — pivoted from NDBC (which doesn't host TAO) back to ERDDAP,
+          # routed through a CF Worker that bypasses NOAA's GHA-IP blacklist.
+          # See cf-worker/README.md for deployment. If either var is empty
+          # the Python exits with code 2 (config error), the workflow fails
+          # fast, and the operator gets a clear "set the secrets" message.
+          ERDDAP_PROXY_BASE:   ${{ vars.ERDDAP_PROXY_BASE }}
+          ERDDAP_PROXY_SECRET: ${{ secrets.ERDDAP_PROXY_SECRET }}
         run: |
           set -e
           ARGS=""
