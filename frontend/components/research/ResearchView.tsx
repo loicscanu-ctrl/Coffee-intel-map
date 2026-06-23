@@ -8,16 +8,30 @@ import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
+import SignalsMethodology from "./methodology/SignalsMethodology";
+import FuturesMethodology from "./methodology/FuturesMethodology";
+import MacroMethodology from "./methodology/MacroMethodology";
+import SupplyMethodology from "./methodology/SupplyMethodology";
+import FarmerMethodology from "./methodology/FarmerMethodology";
+import FreightMethodology from "./methodology/FreightMethodology";
+import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
+import DemandDataMethodology from "./methodology/DemandDataMethodology";
 
-type Cat = "cot" | "weather" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "certstocks" | "demand";
+type Cat = "cot" | "signals" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "demand";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",         label: "COT & positioning" },
+  { id: "signals",     label: "Signals & forecasts" },
+  { id: "futures",     label: "Futures analytics" },
+  { id: "macro",       label: "Macro & FX" },
   { id: "weather",     label: "Weather" },
+  { id: "supply",      label: "Supply modelling" },
+  { id: "farmer",      label: "Farmer economics" },
   { id: "fertilizer",  label: "Fertilizer" },
   { id: "contracts",   label: "Contract rules" },
   { id: "agronomy",    label: "Agronomy" },
   { id: "logistics",   label: "Origin Logistics" },
   { id: "destination", label: "Destination In-store" },
+  { id: "freight",     label: "Freight & ports" },
   { id: "certstocks",  label: "Certified stocks" },
   { id: "demand",      label: "Demand modelling" },
 ];
@@ -1530,19 +1544,31 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <CotBacktestReport />
         </div>
       )}
+      {cat === "signals" && <SignalsMethodology />}
+      {cat === "futures" && <FuturesMethodology />}
+      {cat === "macro" && <MacroMethodology />}
       {cat === "weather" && (
         <div className="space-y-4">
           <EnsoExplainer />
+          <EnsoModelMethodology />
           <FrostRiskMethodology />
         </div>
       )}
+      {cat === "supply" && <SupplyMethodology />}
+      {cat === "farmer" && <FarmerMethodology />}
       {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
       {cat === "agronomy"  && <AgronomyArticles />}
       {cat === "logistics" && <OriginLogistics />}
       {cat === "destination" && <DestinationInstore />}
+      {cat === "freight" && <FreightMethodology />}
       {cat === "certstocks" && <CertifiedStocksMethodology />}
-      {cat === "demand" && <DemandArticles />}
+      {cat === "demand" && (
+        <div className="space-y-4">
+          <DemandArticles />
+          <DemandDataMethodology />
+        </div>
+      )}
     </>
   );
 }

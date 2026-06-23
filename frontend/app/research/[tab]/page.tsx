@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
 import ResearchView from "@/components/research/ResearchView";
 
-const VALID_TABS = ["cot", "weather", "fertilizer", "contracts", "agronomy", "logistics", "destination", "certstocks", "demand"] as const;
+const VALID_TABS = ["cot", "signals", "futures", "macro", "weather", "supply", "farmer", "fertilizer", "contracts", "agronomy", "logistics", "destination", "freight", "certstocks", "demand"] as const;
 type Cat = typeof VALID_TABS[number];
 
 export default async function ResearchTabPage({ params }: { params: Promise<{ tab: string }> }) {
