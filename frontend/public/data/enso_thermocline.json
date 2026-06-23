@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-23T05:15:27+00:00",
+  "scraped_at": "2026-06-23T05:22:38+00:00",
   "thermocline": {
     "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
     "dataset_id": "pmelTaoDyT",
@@ -21,9 +21,9 @@
       "latest_temp_c": 18.59,
       "latest_depth_m": 150.0,
       "latest_ts": "2026-05-31T12:00:00+00:00",
-      "delta_30d_c": null,
-      "kelvin_signal": "no-data",
-      "reading": "Latest T at ~150 m: 18.59 \u00b0C. Trend baseline still building (need \u226530 days of data)."
+      "delta_30d_c": -3.48,
+      "kelvin_signal": "cold-kelvin-wave",
+      "reading": "30-day cooling of -3.48 \u00b0C at ~150 m, central Ni\u00f1o 3.4. Surface cooling expected in 4\u20136 weeks."
     },
     "buoys": [
       {
@@ -32,14 +32,14 @@
         "lat": 2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 20.12,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 16.64,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 20.63,
+        "delta_30d_c": -4.0,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "0n170w",
@@ -47,14 +47,14 @@
         "lat": 0.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 21.31,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 17.23,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 22.07,
+        "delta_30d_c": -4.84,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "2s170w",
@@ -62,14 +62,14 @@
         "lat": -2.0,
         "lon": -170.0,
         "column": "170W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 24.0,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 18.26,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 22.58,
+        "delta_30d_c": -4.32,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "2n155w",
@@ -77,14 +77,14 @@
         "lat": 2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 14.4,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 13.89,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 16.83,
+        "delta_30d_c": -2.94,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "0n155w",
@@ -92,14 +92,14 @@
         "lat": 0.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 18.59,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 16.42,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 19.9,
+        "delta_30d_c": -3.48,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "2s155w",
@@ -107,14 +107,14 @@
         "lat": -2.0,
         "lon": -155.0,
         "column": "155W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 20.76,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 15.82,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 18.54,
+        "delta_30d_c": -2.71,
+        "kelvin_signal": "cold-kelvin-wave"
       },
       {
         "station_id": "0n140w",
@@ -122,14 +122,14 @@
         "lat": 0.0,
         "lon": -140.0,
         "column": "140W",
-        "obs_count": 56,
+        "obs_count": 106,
         "latest_temp_c": 18.71,
         "latest_depth_m": 150.0,
         "latest_ts": "2026-05-31T12:00:00+00:00",
         "recent_7d_mean_c": 16.12,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "baseline_30d_mean_c": 17.17,
+        "delta_30d_c": -1.04,
+        "kelvin_signal": "cold-kelvin-wave"
       }
     ],
     "by_longitude": {
