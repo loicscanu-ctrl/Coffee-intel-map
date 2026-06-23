@@ -44,6 +44,7 @@ import json
 import logging
 import os
 import sys
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -180,18 +181,31 @@ def _fetch_via_proxy(
     Returns (text, status_code). text is None on transport error.
     Status code surfaces so the caller can distinguish 401 (secret
     mismatch — operator action), 404 (dataset name wrong — try next
-    candidate), 5xx (upstream issue — retry next dispatch)."""
+    candidate), 5xx (upstream issue — retry once, then next candidate).
+
+    Retries ONCE on 5xx (most often CF Worker's 522 = PFEG took
+    longer than the 30s wall to respond). PFEG is intermittently
+    slow; the same dataset that 522'd at T often serves in <3s at
+    T+10s. Single retry catches the transient case without blowing
+    the workflow's 10-min total budget."""
     url = f"{proxy_base.rstrip('/')}/{path_and_query.lstrip('/')}"
     headers = {
         "x-proxy-secret": secret,
         "Accept": "application/json, text/csv, */*",
         "User-Agent": "coffee-intel-map/enso-thermocline (proxy client)",
     }
-    try:
-        resp = requests.get(url, headers=headers, timeout=timeout)
-    except requests.RequestException as e:
-        logger.warning(f"[therm] GET {url} → request error: {e}")
-        return None, 0
+    for attempt in (1, 2):
+        try:
+            resp = requests.get(url, headers=headers, timeout=timeout)
+        except requests.RequestException as e:
+            logger.warning(f"[therm] GET {url} → request error: {e}")
+            return None, 0
+        if resp.status_code < 500 or attempt == 2:
+            return resp.text, resp.status_code
+        logger.info(
+            f"[therm] {resp.status_code} on attempt 1 — sleeping 10s and retrying"
+        )
+        time.sleep(10)
     return resp.text, resp.status_code
 
 
