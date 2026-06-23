@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T00:39:45.639198Z",
+  "generated_at": "2026-06-23T01:43:56.922658Z",
   "count": 59,
   "workflows": [
     {
@@ -519,7 +519,7 @@
     },
     {
       "file": "scraper-enso-thermocline.yml",
-      "name": "0.9 \u2013 Daily \u2014 ENSO thermocline (TAO/TRITON 150m \u00b7 NDBC .ocean)",
+      "name": "0.9 \u2013 Daily \u2014 ENSO thermocline (TAO/TRITON 150m \u00b7 ERDDAP via CF proxy)",
       "triggers": [
         "workflow_dispatch"
       ],
