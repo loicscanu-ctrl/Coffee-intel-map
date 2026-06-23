@@ -5,11 +5,49 @@ import { RISK_META, type EnsoRiskPin, type RiskLevel } from "@/lib/enso";
 
 const LEVELS: RiskLevel[] = ["high", "moderate", "low"];
 
+// Phase 3 buoys layer — pulled lazily from /data/enso_thermocline.json
+// (same file the EnsoThermoclineCard reads). We re-derive the marker
+// styling from the buoy's kelvin_signal so the map and the card stay
+// visually consistent without a shared component prop.
+interface BuoyPin {
+  station_id:    string;
+  label:         string;
+  lat:           number;
+  lon:           number;
+  latest_temp_c: number | null;
+  latest_depth_m: number | null;
+  delta_30d_c:   number | null;
+  kelvin_signal: "warm-kelvin-wave" | "cold-kelvin-wave" | "neutral" | "no-data";
+}
+interface ThermoclineMinimal {
+  thermocline: { depth_m: number; lead_weeks: string; buoys: BuoyPin[] };
+}
+const BUOY_COLOR: Record<BuoyPin["kelvin_signal"], string> = {
+  "warm-kelvin-wave": "#ef4444",
+  "cold-kelvin-wave": "#3b82f6",
+  "neutral":          "#94a3b8",
+  "no-data":          "#64748b",
+};
+
 export default function EnsoRiskMap({ pins }: { pins: EnsoRiskPin[] }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const layersRef = useRef<Record<RiskLevel, LeafletLayerGroup | null>>({ high: null, moderate: null, low: null });
+  const buoyLayerRef = useRef<LeafletLayerGroup | null>(null);
   const [hidden, setHidden] = useState<Set<RiskLevel>>(() => new Set());
+  const [buoysHidden, setBuoysHidden] = useState(false);
+  const [buoyData, setBuoyData] = useState<BuoyPin[]>([]);
+
+  // Pull thermocline buoys from the same JSON the card reads. Silent
+  // fallback when missing — map still shows the crop-risk pins.
+  useEffect(() => {
+    fetch("/data/enso_thermocline.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: ThermoclineMinimal | null) => {
+        if (d?.thermocline?.buoys) setBuoyData(d.thermocline.buoys);
+      })
+      .catch(() => { /* no buoy layer, map degrades silently */ });
+  }, []);
 
   const summary = useMemo(() => {
     const s: Record<RiskLevel, number> = { high: 0, moderate: 0, low: 0 };
@@ -57,6 +95,11 @@ export default function EnsoRiskMap({ pins }: { pins: EnsoRiskPin[] }) {
       }
       LEVELS.forEach((lvl) => groups[lvl].addTo(map));
       layersRef.current = groups;
+
+      // Buoy layer is empty at map-build time; populated by the
+      // separate effect once /data/enso_thermocline.json arrives.
+      const buoyLayer = Leaflet.layerGroup().addTo(map);
+      buoyLayerRef.current = buoyLayer;
     });
 
     return () => {
@@ -65,6 +108,45 @@ export default function EnsoRiskMap({ pins }: { pins: EnsoRiskPin[] }) {
       mapInstanceRef.current = null;
     };
   }, [pins]);
+
+  // Populate / refresh the buoy layer whenever the JSON loads.
+  // Squares (not circles) distinguish buoys from the round risk pins;
+  // popup shows the latest T-150m + 30-day delta + Kelvin classification.
+  useEffect(() => {
+    const layer = buoyLayerRef.current;
+    if (!layer || buoyData.length === 0) return;
+    let cancelled = false;
+    import("leaflet").then((L) => {
+      if (cancelled) return;
+      const Leaflet: typeof L = ((L as unknown as { default?: typeof L }).default) || L;
+      layer.clearLayers();
+      for (const b of buoyData) {
+        const color = BUOY_COLOR[b.kelvin_signal];
+        // Square marker via divIcon — clearly distinct from the
+        // circle risk pins at the same zoom level.
+        Leaflet.marker([b.lat, b.lon], {
+          icon: Leaflet.divIcon({
+            className: "",
+            html: `<div style="width:10px;height:10px;background:${color};border:1.5px solid #1e293b;box-shadow:0 0 0 1px ${color};"></div>`,
+            iconSize: [10, 10],
+            iconAnchor: [5, 5],
+          }),
+        })
+          .bindPopup(
+            `<b>TAO ${b.station_id}</b> · ${b.label}<br/>` +
+            (b.latest_temp_c != null
+              ? `T-${b.latest_depth_m?.toFixed(0) ?? "150"}m: <b>${b.latest_temp_c.toFixed(2)} °C</b><br/>`
+              : `<i>No recent telemetry</i><br/>`) +
+            (b.delta_30d_c != null
+              ? `Δ30d: <b style="color:${color}">${b.delta_30d_c >= 0 ? "+" : ""}${b.delta_30d_c.toFixed(2)} °C</b><br/>`
+              : "") +
+            `Signal: <b style="color:${color}">${b.kelvin_signal.replace(/-/g, " ")}</b>`
+          )
+          .addTo(layer);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [buoyData]);
 
   // Toggle level layers on/off.
   useEffect(() => {
@@ -78,6 +160,15 @@ export default function EnsoRiskMap({ pins }: { pins: EnsoRiskPin[] }) {
       if (!isHidden && !map.hasLayer(group)) group.addTo(map);
     });
   }, [hidden]);
+
+  // Toggle buoy layer.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const layer = buoyLayerRef.current;
+    if (!map || !layer) return;
+    if (buoysHidden && map.hasLayer(layer)) map.removeLayer(layer);
+    if (!buoysHidden && !map.hasLayer(layer)) layer.addTo(map);
+  }, [buoysHidden]);
 
   const toggle = (lvl: RiskLevel) =>
     setHidden((prev) => {
@@ -113,9 +204,26 @@ export default function EnsoRiskMap({ pins }: { pins: EnsoRiskPin[] }) {
               </button>
             );
           })}
+          {/* Buoy toggle — only shown when the JSON loaded */}
+          {buoyData.length > 0 && (
+            <button
+              onClick={() => setBuoysHidden((b) => !b)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded border transition ${
+                buoysHidden ? "border-slate-700 text-slate-600" : "border-slate-600 text-slate-200"
+              }`}
+              title={buoysHidden ? "Show TAO buoys" : "Hide TAO buoys"}
+            >
+              <span
+                className="inline-block w-2.5 h-2.5"
+                style={{ background: buoysHidden ? "transparent" : "#94a3b8", border: `1px solid #94a3b8` }}
+              />
+              TAO buoys ({buoyData.length})
+            </button>
+          )}
         </div>
       </div>
       <div ref={mapRef} className="w-full rounded-md overflow-hidden" style={{ height: 360, background: "#0f172a" }} />
     </div>
   );
 }
+

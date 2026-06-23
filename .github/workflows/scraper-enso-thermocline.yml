@@ -1,51 +1,38 @@
-name: "0.9 – Weekly — ENSO thermocline (TAO/TRITON 150m · NOAA PMEL ERDDAP)"
+name: "0.9 – Daily — ENSO thermocline (TAO/TRITON 150m · NDBC .ocean)"
 
 # Fetches subsurface temperature at ~150 m depth from the TAO/TRITON
-# moored buoy network in the equatorial Pacific. The trader signal:
-# warm anomalies at 150 m propagating eastward along the equator ARE
-# Kelvin waves, which surface as El Niño 4-6 WEEKS later. This is
-# the fast-horizon complement to the Phase 2 WWV card (4-6 months).
+# moored buoy network in the equatorial Pacific Niño 3.4 box. The
+# Phase 2 WWV card is depth-integrated (4-6 MONTH lead); this is the
+# depth-resolved companion — warm anomalies at 150 m propagating
+# eastward ARE Kelvin waves, which surface as El Niño 4-6 WEEKS later.
 #
-# Reads from the PMEL ERDDAP `tabledap` REST endpoint. Multiple
-# dataset IDs tried in order — PMEL renames datasets occasionally
-# (the Phase 2 PMEL URL 404'd because of just such a rename); the
-# URL-candidate pattern rides through that without code changes.
+# Pulls 7 specific NDBC stations anchored inside the Niño 3.4 box
+# (5°N-5°S, 170°W-120°W) along three longitudes. Each station's
+# .ocean realtime file is fetched independently — one buoy offline
+# doesn't block the others (graceful "no-data" slot in the JSON).
 #
-# WHY a workflow: ERDDAP at upwell.pmel.noaa.gov is reachable from
-# GitHub Actions runners but NOT from the Claude Code sandbox.
-# Fetcher runs on runner; sandbox can only inspect what's committed.
+# DATA SOURCE — NDBC realtime2 (pivoted from ERDDAP after PR #441):
+#   PMEL ERDDAP decommissioned, OSMC/PFEG mirrors blacklist GHA IPs,
+#   so we go straight to the upstream operational feed at NDBC. Flat
+#   text files, no WAF, no auth — verified live on 23 Jun 2026.
+#
+# Daily cron — NDBC realtime updates every 10-60 minutes per buoy
+# and the .ocean files keep ~45 days of rolling history. Daily is
+# plenty for a 4-6 WEEK signal and avoids burning runner minutes
+# fetching the same data hourly.
 
 on:
-  # Cron DISABLED — Phase 3 v1+v2 dispatches surfaced that NOAA's
-  # remaining ERDDAP servers (OSMC, AOML, PFEG mirrors) either
-  # blacklist GitHub Actions egress IPs (HTTP 403) or don't host
-  # the PMEL TAO datasets (HTTP 404 "unknown datasetID"). The
-  # canonical PMEL ERDDAP (upwell.pmel.noaa.gov) is decommissioned
-  # (DNS NXDOMAIN). Without a Cloudflare-Worker proxy to route
-  # around the IP blacklist, ERDDAP-based TAO fetching is blocked.
-  #
-  # The workflow stays as workflow_dispatch-only so the operator
-  # can experiment with new ERDDAP host/dataset combos manually
-  # without firing the Telegram alert on every scheduled run.
-  # schedule:
-  #   - cron: '0 7 * * 2'
+  schedule:
+    - cron: '0 7 * * *'     # Every day at 07:00 UTC
   workflow_dispatch:
     inputs:
-      mode:
-        description: "Run mode — backfill (seed) or refresh (incremental). Functionally identical for ERDDAP."
-        required: false
-        default: refresh
-        type: choice
-        options:
-          - refresh
-          - backfill
       dry_run:
         description: "Preview only (no commit). Default false = apply."
         required: false
         default: false
         type: boolean
       diag:
-        description: "Dump head/tail of fetched ERDDAP CSV to the log (debug column drift)."
+        description: "Log the head of each fetched .ocean file (debug format drift)."
         required: false
         default: false
         type: boolean
@@ -67,32 +54,21 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch TAO/TRITON subsurface T
+      - name: Fetch TAO/TRITON subsurface T from NDBC
         id: fetch
         env:
-          MODE: ${{ inputs.mode || 'refresh' }}
           DRY_RUN: ${{ inputs.dry_run }}
           DIAG: ${{ inputs.diag }}
         run: |
           set -e
-          if [ "$DRY_RUN" = "true" ]; then
-            ARGS=""
-          else
-            ARGS="--write"
-          fi
-          if [ "$MODE" = "backfill" ]; then
-            ARGS="$ARGS --backfill"
+          ARGS=""
+          if [ "$DRY_RUN" != "true" ]; then
+            ARGS="$ARGS --write"
           fi
           if [ "$DIAG" = "true" ]; then
             ARGS="$ARGS --diag"
           fi
           cd backend
-          # Single attempt — same rationale as Phase 2 v2: the Python
-          # walks the dataset-ID candidate list internally and fails
-          # fast on deterministic 404s. Re-dispatching after a
-          # transient outage is cheap; burning 10 min on retry sleeps
-          # for a structural failure is not. Weekly cron handles the
-          # next-attempt cadence.
           PYTHONPATH=. python -m scraper.sources.enso_thermocline $ARGS
 
       - name: Commit updated enso_thermocline.json if changed
@@ -110,7 +86,7 @@ jobs:
             echo "No thermocline change."
             exit 0
           fi
-          git commit -m "data: ENSO thermocline (TAO/TRITON 150m) refresh $(date -u +%Y-%m-%d) [skip ci]"
+          git commit -m "data: ENSO thermocline (TAO/TRITON 150m via NDBC) refresh $(date -u +%Y-%m-%d) [skip ci]"
           git pull --rebase --autostash --strategy-option=theirs origin main
           git push origin main
 
@@ -122,4 +98,4 @@ jobs:
         run: |
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=🚨 ${{ github.workflow }} failed (PMEL ERDDAP likely unreachable or schema drifted) — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
+            -d "text=🚨 ${{ github.workflow }} failed (NDBC unreachable or all 7 buoys offline) — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
