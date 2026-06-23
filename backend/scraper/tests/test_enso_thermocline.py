@@ -316,7 +316,7 @@ def test_build_payload_includes_west_to_east_longitude_order():
     assert order == list(therm.COLUMN_ORDER_W_TO_E)
     # And that order really is west-to-east (low east-degrees first).
     east_degrees = [
-        min((s.longitude_e for s in therm.NDBC_BUOYS if s.column == c))
+        min(s.longitude_e for s in therm.NDBC_BUOYS if s.column == c)
         for c in order
     ]
     assert east_degrees == sorted(east_degrees)
