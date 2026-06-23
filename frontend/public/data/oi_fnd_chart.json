@@ -1814,7 +1814,12 @@
         },
         {
           "day": -1,
+          "oi": 1265,
           "price": 275.1
+        },
+        {
+          "day": 0,
+          "price": 277.0
         }
       ]
     },
@@ -1825,196 +1830,29 @@
       "data": [
         {
           "day": -45,
+          "oi": 96831,
           "price": 267.8
+        },
+        {
+          "day": -44,
+          "price": 267.0
         }
       ]
     }
   ],
   "arabica_front_spread": {
-    "frontSym": "KCN26",
-    "nextSym": "KCU26",
-    "frontLabel": "N26",
-    "nextLabel": "U26",
+    "frontSym": "KCU26",
+    "nextSym": "KCZ26",
+    "frontLabel": "U26",
+    "nextLabel": "Z26",
     "data": [
       {
         "day": -45,
-        "spread": 10.65
+        "spread": 9.9
       },
       {
         "day": -44,
-        "spread": 10.6
-      },
-      {
-        "day": -43,
-        "spread": 10.75
-      },
-      {
-        "day": -42,
-        "spread": 12.0
-      },
-      {
-        "day": -41,
-        "spread": 9.8
-      },
-      {
-        "day": -40,
-        "spread": 9.7
-      },
-      {
-        "day": -39,
-        "spread": 10.1
-      },
-      {
-        "day": -38,
-        "spread": 10.45
-      },
-      {
-        "day": -37,
-        "spread": 10.2
-      },
-      {
-        "day": -36,
-        "spread": 10.5
-      },
-      {
-        "day": -35,
-        "spread": 9.3
-      },
-      {
-        "day": -34,
-        "spread": 9.35
-      },
-      {
-        "day": -33,
-        "spread": 7.75
-      },
-      {
-        "day": -32,
-        "spread": 8.1
-      },
-      {
-        "day": -31,
-        "spread": 7.65
-      },
-      {
-        "day": -30,
-        "spread": 7.45
-      },
-      {
-        "day": -29,
-        "spread": 7.35
-      },
-      {
-        "day": -28,
-        "spread": 7.35
-      },
-      {
-        "day": -27,
-        "spread": 7.35
-      },
-      {
-        "day": -26,
-        "spread": 6.8
-      },
-      {
-        "day": -25,
-        "spread": 7.45
-      },
-      {
-        "day": -24,
-        "spread": 8.0
-      },
-      {
-        "day": -23,
-        "spread": 7.8
-      },
-      {
-        "day": -22,
-        "spread": 7.9
-      },
-      {
-        "day": -21,
-        "spread": 7.55
-      },
-      {
-        "day": -20,
-        "spread": 7.55
-      },
-      {
-        "day": -19,
-        "spread": 7.65
-      },
-      {
-        "day": -18,
-        "spread": 7.75
-      },
-      {
-        "day": -17,
-        "spread": 7.55
-      },
-      {
-        "day": -16,
-        "spread": 6.9
-      },
-      {
-        "day": -15,
-        "spread": 6.4
-      },
-      {
-        "day": -14,
-        "spread": 6.35
-      },
-      {
-        "day": -13,
-        "spread": 5.5
-      },
-      {
-        "day": -12,
-        "spread": 4.75
-      },
-      {
-        "day": -11,
-        "spread": 4.4
-      },
-      {
-        "day": -10,
-        "spread": 4.25
-      },
-      {
-        "day": -9,
-        "spread": 3.5
-      },
-      {
-        "day": -8,
-        "spread": 3.8
-      },
-      {
-        "day": -7,
-        "spread": 3.7
-      },
-      {
-        "day": -6,
-        "spread": 3.8
-      },
-      {
-        "day": -5,
-        "spread": 3.75
-      },
-      {
-        "day": -4,
-        "spread": 4.45
-      },
-      {
-        "day": -3,
-        "spread": 5.95
-      },
-      {
-        "day": -2,
-        "spread": 7.3
-      },
-      {
-        "day": -1,
-        "spread": 7.3
+        "spread": 11.0
       }
     ]
   },
@@ -4305,7 +4143,12 @@
         },
         {
           "day": -4,
+          "oi": 7214,
           "price": 3640.0
+        },
+        {
+          "day": -3,
+          "price": 3589.0
         }
       ]
     }
@@ -4475,6 +4318,10 @@
       {
         "day": -4,
         "spread": 48.0
+      },
+      {
+        "day": -3,
+        "spread": 47.0
       }
     ]
   }
