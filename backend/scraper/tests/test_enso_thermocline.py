@@ -58,14 +58,14 @@ def test_buoy_site_longitude_e_converts_negative_lon_to_0_360():
     """Frontend / Phase 2 use 0..360 east convention; map pins use
     -180..+180. The dataclass holds the negative form and computes
     the positive on demand."""
-    site = therm.BuoySite("51023", 0.0, -155.0, "0°N 155°W", "155W")
+    site = therm.BuoySite("0n155w", 0.0, -155.0, "0°N 155°W", "155W")
     assert site.lon_negative == -155.0
     assert site.longitude_e  == 205.0      # 360 - 155
 
 
 def test_ndbc_buoy_catalog_has_seven_anchor_sites():
     """Sanity check on the operator-supplied buoy list — exactly 7
-    stations split across 3 longitude columns, headline 51023 at
+    stations split across 3 longitude columns, headline 0n155w at
     0°N 155°W (dead center of the Niño 3.4 box)."""
     assert len(therm.NDBC_BUOYS) == 7
     columns = {s.column for s in therm.NDBC_BUOYS}
@@ -129,7 +129,7 @@ def _make_obs(days_ago: int, temp_c: float, depth_m: float = 150.0) -> therm.Oce
     )
 
 
-_SITE = therm.BuoySite("51023", 0.0, -155.0, "0°N 155°W", "155W")
+_SITE = therm.BuoySite("0n155w", 0.0, -155.0, "0°N 155°W", "155W")
 
 
 def test_analyse_buoy_classifies_warm_kelvin_on_positive_delta():
@@ -199,7 +199,7 @@ def test_build_payload_emits_seven_buoy_slots_for_stable_layout():
     doc = therm.build_payload(analyses)
     assert len(doc["thermocline"]["buoys"]) == 7
     assert {b["station_id"] for b in doc["thermocline"]["buoys"]} == {
-        "51305", "51010", "51306", "51021", "51023", "51022", "51311",
+        "2n170w", "0n170w", "2s170w", "2n155w", "0n155w", "2s155w", "0n140w",
     }
 
 
@@ -216,7 +216,7 @@ def test_build_payload_surfaces_headline_buoy_for_kpi_strip():
             analyses.append(therm.analyse_buoy(site, []))
     doc = therm.build_payload(analyses)
     headline = doc["thermocline"]["headline"]
-    assert headline["station_id"]     == "51023"
+    assert headline["station_id"]     == "0n155w"
     assert headline["label"]          == "0°N 155°W"
     assert headline["lat"]            == 0.0
     assert headline["lon"]            == -155.0
@@ -230,9 +230,9 @@ def test_build_payload_by_longitude_averages_columns():
     lets the operator SEE the wave migrating eastward without
     staring at 7 individual cards."""
     # Two warm buoys at 155°W column, one cold at 140°W column.
-    site_155_a = next(s for s in therm.NDBC_BUOYS if s.station_id == "51021")
-    site_155_b = next(s for s in therm.NDBC_BUOYS if s.station_id == "51023")
-    site_140   = next(s for s in therm.NDBC_BUOYS if s.station_id == "51311")
+    site_155_a = next(s for s in therm.NDBC_BUOYS if s.station_id == "2n155w")
+    site_155_b = next(s for s in therm.NDBC_BUOYS if s.station_id == "0n155w")
+    site_140   = next(s for s in therm.NDBC_BUOYS if s.station_id == "0n140w")
     analyses = [
         therm.analyse_buoy(site_155_a, [_make_obs(d, 18.0) for d in range(0, 7)]),
         therm.analyse_buoy(site_155_b, [_make_obs(d, 17.0) for d in range(0, 7)]),

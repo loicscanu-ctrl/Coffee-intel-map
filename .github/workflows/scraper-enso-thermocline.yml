@@ -22,8 +22,15 @@ name: "0.9 – Daily — ENSO thermocline (TAO/TRITON 150m · NDBC .ocean)"
 # fetching the same data hourly.
 
 on:
-  schedule:
-    - cron: '0 7 * * *'     # Every day at 07:00 UTC
+  # Cron DISABLED while iterating on the correct NDBC station ID
+  # convention. The v3 dispatch (PR #442) confirmed NDBC is REACHABLE
+  # from GHA — no DNS or IP blacklist — but all 7 numeric IDs from
+  # the original blueprint returned 404 (they were Hawaii coastal
+  # moorings, not TAO). v4 switches to the lat-lon-string IDs
+  # (`0n155w` etc.); re-enable cron once a manual dispatch confirms
+  # the new IDs actually serve data.
+  # schedule:
+  #   - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
