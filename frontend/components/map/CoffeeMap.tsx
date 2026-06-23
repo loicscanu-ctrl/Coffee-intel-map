@@ -6,6 +6,16 @@ import { cachedFetchStatic } from "@/lib/api";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
 import { centroidFor, DEST } from "@/components/demand/imports-lab/centroids";
+import {
+  HUB_LL,
+  ORIGIN_LL,
+  ORIGIN_COLOR,
+  IN_HUB_COUNTRIES,
+  aggregateByHub,
+  FREIGHT_PORT_LL,
+  freightArcColor,
+  type FreightRoute,
+} from "@/lib/mapFlows";
 import { useUrlState } from "@/lib/useUrlState";
 
 // Curved arc (quadratic bezier sampled to a polyline) between two [lat,lng]
@@ -251,8 +261,19 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
   const flowLayerRef = useRef<LeafletLayerGroup | null>(null);
   const [flowDest, setFlowDest] = useUrlState<string>("flows", "off", (raw) =>
     ["off", "US", "EU"].includes(raw) ? raw : "off");
+  // Export-flow overlay: arcs from a producing-origin centroid to its
+  // destination-hub gravity points. One-of: off / BR / VN / ID. Independent
+  // of the import-flow toggle so the user can layer them.
+  const exportFlowLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const [exportOrigin, setExportOrigin] = useUrlState<string>("xflows", "off", (raw) =>
+    ["off", "BR", "VN", "ID"].includes(raw) ? raw : "off");
+  // Freight-flow overlay: arcs for the 7 routes in freight.json (one per
+  // origin→destination pair, coloured by WoW change). Toggle is on/off.
+  const freightFlowLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const [freightFlow, setFreightFlow] = useUrlState<string>("fflows", "off", (raw) =>
+    ["off", "on"].includes(raw) ? raw : "off");
   const [originPrices, setOriginPrices] = useState<OriginPrice[]>([]);
-  const [freightData, setFreightData] = useState<{ routes: { id: string; rate: number; prev: number }[] } | null>(null);
+  const [freightData, setFreightData] = useState<{ routes: FreightRoute[] } | null>(null);
 
   // Permanent price labels for origin pins. Fetch latest_prices + live RC/KC.
   // Acaphe: try /api/live (Redis, updated every 15 min) first; fall back to
@@ -681,6 +702,143 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
     return () => { cancelled = true; };
   }, [flowDest]);
 
+  // ── Export-flow arcs (origin centroid → destination hub anchors) ─────────
+  // For Brazil (Cecafe Portuguese country names), Vietnam (VN Customs
+  // titlecase English) and Indonesia (Comex uppercase English). Each origin
+  // routes through its own hub-grouping table so the upstream name
+  // alphabets stay isolated.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let cancelled = false;
+    if (exportFlowLayerRef.current) { exportFlowLayerRef.current.remove(); exportFlowLayerRef.current = null; }
+    if (exportOrigin === "off") return;
+    import("leaflet").then(async (L) => {
+      if (cancelled) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+
+      // Sum recent-window volume per destination country in the origin's
+      // own name alphabet, then aggregate to hubs. We pick a recent window
+      // that matches each origin's natural cadence so a country only
+      // sourcing in one season doesn't get over-weighted.
+      let perCountry: Record<string, number> = {};
+      let hubMap: Record<string, string[]> = {};
+      let toKt: (raw: number) => number = (v) => v / 1000;     // default: kg → kt
+      let label = "";
+      try {
+        if (exportOrigin === "BR") {
+          const r = await fetch("/data/cecafe.json");
+          if (!r.ok) throw new Error("cecafe fetch failed");
+          const d: { by_country?: { months?: string[]; countries?: Record<string, Record<string, number>> } } = await r.json();
+          const months = d.by_country?.months ?? [];
+          for (const [c, mv] of Object.entries(d.by_country?.countries ?? {})) {
+            perCountry[c] = months.reduce((s, m) => s + (mv[m] ?? 0), 0);
+          }
+          hubMap = HUB_COUNTRIES;
+          toKt   = (bags) => bags * 60 / 1e6;   // 60kg bags → kt
+          label  = "Brazil exports (Cecafe, YTD)";
+        } else if (exportOrigin === "VN") {
+          const r = await fetch("/data/vn_export_destination_port.json");
+          if (!r.ok) throw new Error("vn fetch failed");
+          const d: { monthly_by_country?: Record<string, Record<string, number>> } = await r.json();
+          const months = Object.keys(d.monthly_by_country ?? {}).sort().slice(-12);
+          for (const m of months) {
+            for (const [c, v] of Object.entries((d.monthly_by_country ?? {})[m] ?? {})) {
+              perCountry[c] = (perCountry[c] ?? 0) + v;
+            }
+          }
+          hubMap = VN_HUB_COUNTRIES;
+          // VN file already stores MT; convert MT → kt (÷1000).
+          toKt  = (mt) => mt / 1000;
+          label = "Vietnam exports (VN Customs, last 12 months)";
+        } else if (exportOrigin === "ID") {
+          const r = await fetch("/data/indonesia_exports.json");
+          if (!r.ok) throw new Error("indonesia fetch failed");
+          const d: { series?: Array<{ by_destination?: Array<{ country?: string; kg?: number }> }> } = await r.json();
+          const series = d.series ?? [];
+          for (const m of series.slice(-12)) {
+            for (const x of m.by_destination ?? []) {
+              if (x.country == null) continue;
+              perCountry[x.country] = (perCountry[x.country] ?? 0) + (x.kg ?? 0);
+            }
+          }
+          hubMap = IN_HUB_COUNTRIES;
+          toKt   = (kg) => kg / 1e6;
+          label  = "Indonesia exports (BPS Comex, last 12 months)";
+        }
+      } catch { perCountry = {}; }
+      if (cancelled || !mapInstanceRef.current) return;
+
+      const rows = aggregateByHub(perCountry, hubMap);
+      if (rows.length === 0) return;
+      const maxV = Math.max(...rows.map(r => r.volume), 1);
+      const color = ORIGIN_COLOR[exportOrigin as "BR" | "VN" | "ID"];
+      const originLL = ORIGIN_LL[exportOrigin as "BR" | "VN" | "ID"];
+      const lg = Leaflet.layerGroup();
+
+      // Origin anchor dot
+      Leaflet.circleMarker(originLL, { radius: 7, color, weight: 2, fillColor: color, fillOpacity: 0.9 })
+        .bindTooltip(label, { direction: "top" })
+        .addTo(lg);
+
+      for (const row of rows) {
+        const hubLL = HUB_LL[row.hub];
+        if (!hubLL) continue;
+        const ratio = Math.sqrt(row.volume / maxV);
+        const w  = 1 + 6 * ratio;
+        const kt = toKt(row.volume);
+        Leaflet.polyline(flowArc(originLL, hubLL), { color, weight: w, opacity: 0.55, lineCap: "round" })
+          .bindTooltip(`${row.hub}: ${kt.toFixed(kt >= 10 ? 0 : 1)} kt`, { sticky: true })
+          .addTo(lg);
+        Leaflet.circleMarker(hubLL, { radius: 2 + 4 * ratio, color, weight: 1, fillColor: color, fillOpacity: 0.65 })
+          .bindTooltip(row.hub, { direction: "top" })
+          .addTo(lg);
+      }
+      lg.addTo(map);
+      exportFlowLayerRef.current = lg;
+    });
+    return () => { cancelled = true; };
+  }, [exportOrigin]);
+
+  // ── Freight-flow arcs (port → port, one per route in freight.json) ──────
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let cancelled = false;
+    if (freightFlowLayerRef.current) { freightFlowLayerRef.current.remove(); freightFlowLayerRef.current = null; }
+    if (freightFlow === "off" || !freightData) return;
+    import("leaflet").then((L) => {
+      if (cancelled) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+      const routes = (freightData.routes ?? []) as FreightRoute[];
+      const maxRate = Math.max(...routes.map(r => r.rate ?? 0), 1);
+      const lg = Leaflet.layerGroup();
+      for (const rt of routes) {
+        const from = FREIGHT_PORT_LL[rt.from];
+        const to   = FREIGHT_PORT_LL[rt.to];
+        if (!from || !to) continue;
+        const color = freightArcColor(rt.rate, rt.prev);
+        const w     = 1.5 + 4 * Math.sqrt((rt.rate ?? 0) / maxRate);
+        const pct   = (rt.prev && rt.prev > 0) ? ((rt.rate - rt.prev) / rt.prev) * 100 : null;
+        const wow   = pct == null ? "—" : `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
+        const proxyTag = rt.proxy ? " (proxy)" : "";
+        Leaflet.polyline(flowArc(from, to, 0.22), { color, weight: w, opacity: 0.7, lineCap: "round" })
+          .bindTooltip(
+            `<div style="font-family:monospace;font-size:11px">
+               <div style="color:#cbd5e1;font-weight:600">${rt.from} → ${rt.to}${proxyTag}</div>
+               <div style="color:#e2e8f0">$${(rt.rate ?? 0).toLocaleString()}/${rt.unit ?? "FEU"}</div>
+               <div style="color:${color}">WoW ${wow}</div>
+             </div>`,
+            { sticky: true },
+          )
+          .addTo(lg);
+      }
+      lg.addTo(map);
+      freightFlowLayerRef.current = lg;
+    });
+    return () => { cancelled = true; };
+  }, [freightFlow, freightData]);
+
   // Origin-price permanent labels: standalone markers at hardcoded
   // producer-region coordinates. Independent of the CountryIntel pins,
   // so labels appear even if that DB table is empty or uses unexpected
@@ -748,7 +906,7 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
         const base = freightData.routes.find(r => r.id === baseId);
         if (!base) return;
         const rate = Math.round(base.rate * multiplier);
-        const prev = Math.round(base.prev * multiplier);
+        const prev = Math.round((base.prev ?? 0) * multiplier);
         const pct  = prev > 0 ? ((rate - prev) / prev * 100) : 0;
         const sign  = pct >= 0 ? "▲" : "▼";
         const color = pct > 0 ? "#22c55e" : pct < 0 ? "#ef4444" : "#94a3b8";
@@ -812,6 +970,59 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
               }}
             >
               {d === "off" ? "Off" : d}
+            </button>
+          ))}
+        </div>
+
+        {/* Export-flow toggle (origins where we have destination detail) */}
+        <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 4, background: "#1e293b", border: "1px solid #475569", borderRadius: 4, padding: "3px 6px", fontFamily: "monospace" }}>
+          <span style={{ fontSize: 9, color: "#64748b" }}>Export flows</span>
+          {(["off", "BR", "VN", "ID"] as const).map((d) => {
+            const accent = d === "BR" ? ORIGIN_COLOR.BR
+                        : d === "VN" ? ORIGIN_COLOR.VN
+                        : d === "ID" ? ORIGIN_COLOR.ID
+                        : "#64748b";
+            return (
+              <button
+                key={d}
+                onClick={() => setExportOrigin(d)}
+                style={{
+                  fontSize: 9,
+                  padding: "2px 6px",
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  border: "1px solid " + (exportOrigin === d ? accent : "transparent"),
+                  background: exportOrigin === d ? "#0f172a" : "transparent",
+                  color: exportOrigin === d ? accent : "#94a3b8",
+                  fontFamily: "monospace",
+                }}
+              >
+                {d === "off" ? "Off" : d}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Freight-flow toggle (port → port arcs from freight.json) */}
+        <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 4, background: "#1e293b", border: "1px solid #475569", borderRadius: 4, padding: "3px 6px", fontFamily: "monospace" }}>
+          <span style={{ fontSize: 9, color: "#64748b" }}>Freight flows</span>
+          {(["off", "on"] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setFreightFlow(d)}
+              style={{
+                fontSize: 9,
+                padding: "2px 6px",
+                borderRadius: 3,
+                cursor: "pointer",
+                border: "1px solid " + (freightFlow === d ? "#06b6d4" : "transparent"),
+                background: freightFlow === d ? "#0f172a" : "transparent",
+                color: freightFlow === d ? "#22d3ee" : "#94a3b8",
+                fontFamily: "monospace",
+                textTransform: "capitalize",
+              }}
+            >
+              {d}
             </button>
           ))}
         </div>
