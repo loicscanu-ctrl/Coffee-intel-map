@@ -1,5 +1,71 @@
 [
   {
+    "id": 7318,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-19",
+    "body": "ICE-EU RC Open Interest changed by +935 over the last session, with -1,121 on nearby two contracts and +2,056 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-19\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +935 over the last session, with -1,121 on nearby two contracts and +2,056 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-23T03:24:38.691997",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +935 over the last session, with -1,121 on nearby two contracts and +2,056 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7317,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-22",
+    "body": "RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,998 lots.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260622_103056.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,998 lots.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-23T03:23:40.527845",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,998 lots.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7316,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-22",
+    "body": "KC Arabica certified stocks shifted by -1,075 bags today, bringing global visible exchange inventory to 393,937 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260622.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -1,075 bags today, bringing global visible exchange inventory to 393,937 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-23T03:23:37.435187",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -1,075 bags today, bringing global visible exchange inventory to 393,937 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 7315,
     "title": "World Bank Population \u2013 2026-06-23",
     "body": "Tracked 14 countries for demand-tab per-capita normalization.",
@@ -3583,52 +3649,5 @@
     ],
     "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 319.45, \"oi\": 176, \"mty\": \"2026-07-23\"}",
     "pub_date": "2026-06-14T03:03:17.340591"
-  },
-  {
-    "id": 7017,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-14",
-    "body": "Ocean freight market: FCL \u202220'ST",
-    "source": "Searates",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "logistics",
-      "freight"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-14T03:03:12.415250"
-  },
-  {
-    "id": 7014,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-11",
-    "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,594.00 (+131) OI:21,029 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,525.00 (+130) OI:54,290",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "robusta"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3594, \"chg\": 131, \"oi\": 21029, \"volume\": 6947, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3525, \"chg\": 130, \"oi\": 54290, \"volume\": 21135, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3452, \"chg\": 124, \"oi\": 14040, \"volume\": 5066, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3390, \"chg\": 121, \"oi\": 7009, \"volume\": 924, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3354, \"chg\": 117, \"oi\": 2974, \"volume\": 266, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3332, \"chg\": 114, \"oi\": 1500, \"volume\": 102, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3315, \"chg\": 113, \"oi\": 630, \"volume\": 15, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3299, \"chg\": 113, \"oi\": 355, \"volume\": 1, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3283, \"chg\": 113, \"oi\": 205, \"volume\": 0, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-12\"}",
-    "pub_date": "2026-06-14T03:03:08.468435"
-  },
-  {
-    "id": 7013,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-11",
-    "body": "Front (Coffee (Jul '26)): 257.20 (+3.25) OI:31,983 | 2nd (Coffee (Sep '26)): 253.40 (+3.15) OI:92,816",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "arabica"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 257.2, \"chg\": 3.25, \"oi\": 31983, \"volume\": 14420, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 253.4, \"chg\": 3.15, \"oi\": 92816, \"volume\": 21906, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 246.45, \"chg\": 3.25, \"oi\": 50454, \"volume\": 6913, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 244.2, \"chg\": 3.35, \"oi\": 18231, \"volume\": 2399, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 244.15, \"chg\": 3.4, \"oi\": 6608, \"volume\": 1047, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 244.6, \"chg\": 3.55, \"oi\": 4586, \"volume\": 655, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 244.2, \"chg\": 3.6, \"oi\": 1911, \"volume\": 419, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 243.4, \"chg\": 3.4, \"oi\": 3364, \"volume\": 188, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 243.1, \"chg\": 3.35, \"oi\": 732, \"volume\": 19, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-12\"}",
-    "pub_date": "2026-06-14T03:03:06.852325"
   }
 ]
