@@ -933,8 +933,55 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
 
-      {/* ── Basemap switcher panel ─────────────────────────────────────── */}
-      <div style={{ position: "absolute", top: 8, left: 8, zIndex: 1000 }}>
+      {/* ── Basemap switcher + flow toggles (bottom-left cluster) ─────── */}
+      {/* Container is bottom-anchored, so the basemap dropdown (rendered
+          first in source order, before the Map Style button) appears ABOVE
+          the rest of the stack and grows upward into free space — the
+          always-visible Map Style + toggle bars visually stay put at the
+          bottom edge when the dropdown opens/closes. */}
+      <div style={{ position: "absolute", bottom: 8, left: 8, zIndex: 1000 }}>
+        {showBasemapPanel && (
+          <div
+            style={{
+              marginBottom: 4,
+              background: "#0f172a",
+              border: "1px solid #334155",
+              borderRadius: 6,
+              padding: 8,
+              width: 200,
+            }}
+          >
+            <div style={{ fontSize: 9, color: "#64748b", marginBottom: 6, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Basemap
+            </div>
+            {BASEMAPS.map((bm) => (
+              <button
+                key={bm.id}
+                onClick={() => { setActiveBasemap(bm.id); setShowBasemapPanel(false); }}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  background: activeBasemap === bm.id ? "#1e3a5f" : "transparent",
+                  border: activeBasemap === bm.id ? "1px solid #3b82f6" : "1px solid transparent",
+                  borderRadius: 4,
+                  padding: "5px 8px",
+                  marginBottom: 3,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                }}
+              >
+                <div style={{ fontSize: 11, color: activeBasemap === bm.id ? "#93c5fd" : "#cbd5e1", fontWeight: 600 }}>
+                  {bm.label}
+                </div>
+                <div style={{ fontSize: 9, color: "#64748b", marginTop: 1 }}>
+                  {bm.desc}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
         <button
           onClick={() => setShowBasemapPanel((v) => !v)}
           style={{
@@ -1026,48 +1073,6 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
             </button>
           ))}
         </div>
-
-        {showBasemapPanel && (
-          <div
-            style={{
-              marginTop: 4,
-              background: "#0f172a",
-              border: "1px solid #334155",
-              borderRadius: 6,
-              padding: 8,
-              width: 200,
-            }}
-          >
-            <div style={{ fontSize: 9, color: "#64748b", marginBottom: 6, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Basemap
-            </div>
-            {BASEMAPS.map((bm) => (
-              <button
-                key={bm.id}
-                onClick={() => { setActiveBasemap(bm.id); setShowBasemapPanel(false); }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  background: activeBasemap === bm.id ? "#1e3a5f" : "transparent",
-                  border: activeBasemap === bm.id ? "1px solid #3b82f6" : "1px solid transparent",
-                  borderRadius: 4,
-                  padding: "5px 8px",
-                  marginBottom: 3,
-                  cursor: "pointer",
-                  fontFamily: "monospace",
-                }}
-              >
-                <div style={{ fontSize: 11, color: activeBasemap === bm.id ? "#93c5fd" : "#cbd5e1", fontWeight: 600 }}>
-                  {bm.label}
-                </div>
-                <div style={{ fontSize: 9, color: "#64748b", marginTop: 1 }}>
-                  {bm.desc}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
