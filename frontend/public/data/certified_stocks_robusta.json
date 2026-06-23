@@ -4921,19 +4921,6 @@
       }
     },
     {
-      "date": "2026-06-17",
-      "cut_off_date": null,
-      "total_lots_certified": 0,
-      "total_bags_60kg_equivalent": 0,
-      "non_tend_lots": 0,
-      "suspended_lots": 0,
-      "lots_graded_today": 51,
-      "lots_sold_today": 0,
-      "lots_bought_today": 0,
-      "tenders_today": 0,
-      "by_port_lots": {}
-    },
-    {
       "date": "2026-06-18",
       "cut_off_date": "2026-06-17",
       "total_lots_certified": 4032,

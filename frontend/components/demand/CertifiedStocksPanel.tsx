@@ -1539,7 +1539,10 @@ function _buildRobustaActivity(d: RobustaJson | null, unit: Unit): ActivityEvent
   }
   // Decertification — per port from day-over-day lot delta (outflow = prev +
   // passed − cur); origin is IMPLIED by the port's dominant tenderable origin.
-  const snaps = d?.snapshots ?? [];
+  // Only diff snapshots that actually carry a stock report — a day with a
+  // missing report (empty by_port_lots) would otherwise read the whole stock
+  // as decertified, then "recertified" the next day (see 2026-06-17).
+  const snaps = (d?.snapshots ?? []).filter(s => Object.keys(s.by_port_lots ?? {}).length > 0);
   const poh = d?.port_origin_history ?? {};
   for (let i = 1; i < snaps.length; i++) {
     const s = snaps[i]; const prev = snaps[i - 1];
