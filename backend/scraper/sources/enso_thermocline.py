@@ -126,11 +126,15 @@ KELVIN_COLD_THRESHOLD = -1.0
 # against the proxy directly to discover what the upstream actually
 # carries (then adds the right ID to this list).
 DATASET_CANDIDATES = (
-    "pmelTaoMonT",         # PMEL monthly subsurface T (canonical)
-    "pmelTaoDyT",          # PMEL daily subsurface T
-    "pmelTaoMonsT",        # PMEL monthly variant
-    "pmelTaoMonTao",       # Older alias
-    "pmelTaoSites",        # Site-level aggregator
+    "pmelTaoDyT",          # PMEL daily subsurface T — preferred: gives
+                           # enough timestamps for the Δ-30d rolling
+                           # 7-day-mean Kelvin-wave detection.
+    "pmelTaoMonT",         # Monthly fallback: card still renders the
+                           # latest 150m temps but Kelvin signal is
+                           # 'no-data' (only ~4 obs/site in lookback).
+    "pmelTaoMonsT",        # PMEL monthly variant.
+    "pmelTaoMonTao",       # Older alias.
+    "pmelTaoSites",        # Site-level aggregator.
 )
 
 # ERDDAP temperature column candidates — datasets across versions
