@@ -28,9 +28,9 @@ _ERDDAP_JSON = json.dumps({
             # 0°N 155°W — baseline window (30-37 days ago)
             ["2026-05-22T12:00:00Z", 0.0, 205.0, 150.0, 16.0],
             ["2026-05-21T12:00:00Z", 0.0, 205.0, 150.0, 16.1],
-            # 0°N 140°W (lon_e = 220) — depth 180 m (still in window)
-            ["2026-06-22T12:00:00Z", 0.0, 220.0, 180.0, 14.5],
-            # 0°N 170°W (lon_e = 190) — depth 140 m (still in window)
+            # 0°N 140°W (lon_e = 220) — depth 160 m (upper edge of window)
+            ["2026-06-22T12:00:00Z", 0.0, 220.0, 160.0, 14.5],
+            # 0°N 170°W (lon_e = 190) — depth 140 m (lower edge of window)
             ["2026-06-22T12:00:00Z", 0.0, 190.0, 140.0, 18.7],
             # Off-window depth — dropped at parse time
             ["2026-06-22T12:00:00Z", 0.0, 205.0, 500.0, 8.0],
@@ -64,12 +64,24 @@ def test_buoy_site_longitude_e_converts_negative_lon_to_0_360():
     assert site.longitude_e  == 205.0
 
 
-def test_buoy_catalog_has_seven_anchor_sites():
-    assert len(therm.NDBC_BUOYS) == 7
-    assert {s.column for s in therm.NDBC_BUOYS} == {"170W", "155W", "140W"}
+def test_buoy_catalog_covers_full_tao_triton_array():
+    """3 latitudes (2°N / 0°N / 2°S — Niño 3.4 inner core) × 9 longitudes
+    (156°E through 95°W) = 27 anchor sites. Headline is dead-center."""
+    assert len(therm.NDBC_BUOYS) == 27
+    assert {s.column for s in therm.NDBC_BUOYS} == {
+        "156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
+    }
+    assert {s.lat for s in therm.NDBC_BUOYS} == {2.0, 0.0, -2.0}
     h = next(s for s in therm.NDBC_BUOYS if s.station_id == therm.HEADLINE_STATION_ID)
     assert h.lat == 0.0
     assert h.lon_negative == -155.0
+
+
+def test_column_order_w_to_e_runs_asia_to_americas():
+    """West-to-east order so the card grid reads like a map: Asia-side
+    columns leftmost (lower east-degrees), Americas-side rightmost."""
+    expected = ("156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W")
+    assert therm.COLUMN_ORDER_W_TO_E == expected
 
 
 # ── _nearest_site bucketer ───────────────────────────────────────────────
@@ -103,9 +115,9 @@ def test_nearest_site_drops_observations_far_from_any_anchor():
 
 
 def test_parse_erddap_json_returns_observations_in_depth_window():
-    """The parser MUST drop depths outside [130, 200] m — that's the
-    Kelvin-wave depth band. A 500 m abyssal reading sneaking through
-    would contaminate the per-buoy mean."""
+    """The parser MUST drop depths outside the configured band — that's
+    the Kelvin-wave depth band around 150 m. A 500 m abyssal reading
+    sneaking through would contaminate the per-buoy mean."""
     obs = therm.parse_erddap_json(_ERDDAP_JSON)
     assert all(therm.DEPTH_LOWER_M <= o.depth_m <= therm.DEPTH_UPPER_M for o in obs)
     # 6 in-window rows × 1 dropped (500m) × 1 kept (Atlantic, dropped later by bucketer)
@@ -278,21 +290,36 @@ def test_build_tabledap_query_includes_lat_lon_depth_and_time_constraints():
     assert q.startswith("pmelTaoMonT.json?")
     assert "latitude>=" in q and "latitude<=" in q
     assert "longitude>=" in q and "longitude<=" in q
-    assert "depth>=130" in q and "depth<=200" in q
+    assert f"depth>={therm.DEPTH_LOWER_M}" in q and f"depth<={therm.DEPTH_UPPER_M}" in q
     assert "time>=2024-01-01" in q
 
 
 # ── payload assembly ─────────────────────────────────────────────────────
 
 
-def test_build_payload_emits_stable_seven_buoy_layout():
-    """Even buoys with zero observations get a slot — frontend layout
-    stays consistent across runs (offline buoy shows 'no-data' in
-    its card slot, doesn't disappear)."""
+def test_build_payload_emits_stable_full_array_layout():
+    """Every BuoySite gets a slot, even ones with zero observations —
+    frontend layout stays consistent across runs (an offline buoy
+    shows 'no-data' in its grid cell instead of disappearing)."""
     analyses = [therm.analyse_buoy(s, []) for s in therm.NDBC_BUOYS]
     doc = therm.build_payload(analyses, "pmelTaoMonT")
-    assert len(doc["thermocline"]["buoys"]) == 7
+    assert len(doc["thermocline"]["buoys"]) == len(therm.NDBC_BUOYS)
     assert doc["thermocline"]["dataset_id"] == "pmelTaoMonT"
+
+
+def test_build_payload_includes_west_to_east_longitude_order():
+    """Frontend reads longitude_order straight from the payload to lay
+    out the mini-map without re-deriving geographic order from labels."""
+    analyses = [therm.analyse_buoy(s, []) for s in therm.NDBC_BUOYS]
+    doc = therm.build_payload(analyses, "pmelTaoMonT")
+    order = doc["thermocline"]["longitude_order"]
+    assert order == list(therm.COLUMN_ORDER_W_TO_E)
+    # And that order really is west-to-east (low east-degrees first).
+    east_degrees = [
+        min((s.longitude_e for s in therm.NDBC_BUOYS if s.column == c))
+        for c in order
+    ]
+    assert east_degrees == sorted(east_degrees)
 
 
 def test_build_payload_surfaces_headline_buoy():
@@ -318,10 +345,14 @@ def test_build_payload_surfaces_headline_buoy():
 
 def test_build_payload_carries_lat_lon_for_map_pins():
     """The risk map's buoy overlay layer reads `lat`/`lon` directly
-    from each buoy slot — no separate coordinate lookup table."""
+    from each buoy slot — no separate coordinate lookup table. lons
+    are in Leaflet's -180..+180 convention (positive for east of
+    Greenwich, negative for west)."""
     analyses = [therm.analyse_buoy(s, []) for s in therm.NDBC_BUOYS]
     doc = therm.build_payload(analyses, None)
     for b in doc["thermocline"]["buoys"]:
         assert "lat" in b and "lon" in b
         assert -5 <= b["lat"] <=  5
-        assert -180 <= b["lon"] <= -130
+        # Spans 156°E (positive) through 95°W (negative) — the full
+        # operational TAO/TRITON array.
+        assert -180 <= b["lon"] <= 180

@@ -19,6 +19,9 @@ import { useEffect, useState } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Tooltip,
 } from "recharts";
+import {
+  ENSO_DEFAULT_RANGE, rangeMonths, type EnsoTimeRange,
+} from "@/lib/ensoTimeRange";
 
 interface WwvMonthly { month: string; wwv_anomaly: number; }
 
@@ -37,10 +40,6 @@ interface SubsurfacePayload {
     monthly: WwvMonthly[];
   };
 }
-
-// Two years of context — wide enough to show the regime turn, narrow
-// enough to keep the bars legible against the small card height.
-const MONTHS_TO_PLOT = 36;
 
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 
@@ -76,7 +75,13 @@ const SIGNAL_META = {
   },
 } as const;
 
-export default function EnsoSubsurfaceCard() {
+interface Props {
+  /** Time window for the chart slice. Defaults to 2Y if the parent
+      hasn't wired the shared selector yet. */
+  range?: EnsoTimeRange;
+}
+
+export default function EnsoSubsurfaceCard({ range = ENSO_DEFAULT_RANGE }: Props) {
   const [data, setData] = useState<SubsurfacePayload | null>(null);
   const [missing, setMissing] = useState(false);
 
@@ -97,7 +102,10 @@ export default function EnsoSubsurfaceCard() {
   }
 
   const { wwv } = data;
-  const recent = wwv.monthly.slice(-MONTHS_TO_PLOT);
+  // Window the WWV series. null = show the full 1980→now history.
+  const months = rangeMonths(range);
+  const sliceN = months == null ? wwv.monthly.length : months;
+  const recent = wwv.monthly.slice(-sliceN);
   const chartData = recent.map((r) => ({
     month: r.month,
     label: monthAbbr(r.month),
@@ -166,7 +174,7 @@ export default function EnsoSubsurfaceCard() {
             <XAxis
               dataKey="label" tick={{ fontSize: 7, fill: "#64748b" }}
               axisLine={false} tickLine={false}
-              interval={Math.floor(MONTHS_TO_PLOT / 6)}
+              interval={Math.max(1, Math.floor(sliceN / 6))}
             />
             <YAxis
               tick={{ fontSize: 7, fill: "#64748b" }}

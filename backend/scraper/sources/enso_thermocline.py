@@ -79,37 +79,89 @@ class BuoySite:
 # Same 7 anchor sites as v4 — Kelvin-wave-detection geometry is geographic,
 # not source-specific. The string IDs are kept for display continuity with
 # the v4 card layout; ERDDAP queries filter on lat/lon directly.
+# Anchor sites span the operational TAO/TRITON array across the
+# equatorial Pacific. 3 latitudes (2°N / 0°N / 2°S — the inner Niño 3.4
+# core) × 9 longitudes (156°E warm pool → 95°W cold tongue). Listed
+# west-to-east by longitude so the card's natural iteration order
+# already reads like a map (Asia on the left, Americas on the right).
+# Not every (lat, lon) cell has an active mooring; the missing ones
+# render as placeholders in the UI and just produce no-data backend-side.
 NDBC_BUOYS: tuple[BuoySite, ...] = (
-    BuoySite("2n170w",  2.0, -170.0, "2°N 170°W",  "170W"),
-    BuoySite("0n170w",  0.0, -170.0, "0°N 170°W",  "170W"),
-    BuoySite("2s170w", -2.0, -170.0, "2°S 170°W",  "170W"),
-    BuoySite("2n155w",  2.0, -155.0, "2°N 155°W",  "155W"),
-    BuoySite("0n155w",  0.0, -155.0, "0°N 155°W",  "155W"),
-    BuoySite("2s155w", -2.0, -155.0, "2°S 155°W",  "155W"),
-    BuoySite("0n140w",  0.0, -140.0, "0°N 140°W",  "140W"),
+    # 156°E — TRITON, warm-pool fringe
+    BuoySite("2n156e",   2.0,  156.0, "2°N 156°E",  "156E"),
+    BuoySite("0n156e",   0.0,  156.0, "0°N 156°E",  "156E"),
+    BuoySite("2s156e",  -2.0,  156.0, "2°S 156°E",  "156E"),
+    # 165°E — TRITON, western Pacific
+    BuoySite("2n165e",   2.0,  165.0, "2°N 165°E",  "165E"),
+    BuoySite("0n165e",   0.0,  165.0, "0°N 165°E",  "165E"),
+    BuoySite("2s165e",  -2.0,  165.0, "2°S 165°E",  "165E"),
+    # 180° (dateline) — TAO
+    BuoySite("2n180",    2.0,  180.0, "2°N 180°",   "180"),
+    BuoySite("0n180",    0.0,  180.0, "0°N 180°",   "180"),
+    BuoySite("2s180",   -2.0,  180.0, "2°S 180°",   "180"),
+    # 170°W — TAO
+    BuoySite("2n170w",   2.0, -170.0, "2°N 170°W",  "170W"),
+    BuoySite("0n170w",   0.0, -170.0, "0°N 170°W",  "170W"),
+    BuoySite("2s170w",  -2.0, -170.0, "2°S 170°W",  "170W"),
+    # 155°W — TAO, Niño 3.4 centre
+    BuoySite("2n155w",   2.0, -155.0, "2°N 155°W",  "155W"),
+    BuoySite("0n155w",   0.0, -155.0, "0°N 155°W",  "155W"),
+    BuoySite("2s155w",  -2.0, -155.0, "2°S 155°W",  "155W"),
+    # 140°W — TAO
+    BuoySite("2n140w",   2.0, -140.0, "2°N 140°W",  "140W"),
+    BuoySite("0n140w",   0.0, -140.0, "0°N 140°W",  "140W"),
+    BuoySite("2s140w",  -2.0, -140.0, "2°S 140°W",  "140W"),
+    # 125°W — TAO
+    BuoySite("2n125w",   2.0, -125.0, "2°N 125°W",  "125W"),
+    BuoySite("0n125w",   0.0, -125.0, "0°N 125°W",  "125W"),
+    BuoySite("2s125w",  -2.0, -125.0, "2°S 125°W",  "125W"),
+    # 110°W — TAO, Niño 1+2 fringe
+    BuoySite("2n110w",   2.0, -110.0, "2°N 110°W",  "110W"),
+    BuoySite("0n110w",   0.0, -110.0, "0°N 110°W",  "110W"),
+    BuoySite("2s110w",  -2.0, -110.0, "2°S 110°W",  "110W"),
+    # 95°W — TAO, cold-tongue terminus
+    BuoySite("2n95w",    2.0,  -95.0, "2°N 95°W",   "95W"),
+    BuoySite("0n95w",    0.0,  -95.0, "0°N 95°W",   "95W"),
+    BuoySite("2s95w",   -2.0,  -95.0, "2°S 95°W",   "95W"),
 )
 HEADLINE_STATION_ID = "0n155w"
+
+# Longitude columns in west→east order (low east-degrees to high).
+# Derived from NDBC_BUOYS so adding/removing sites doesn't break the
+# UI ordering. Frontend consumes this list directly so it doesn't have
+# to re-derive geographic order from string labels.
+COLUMN_ORDER_W_TO_E: tuple[str, ...] = tuple(
+    sorted(
+        {s.column for s in NDBC_BUOYS},
+        key=lambda c: min(s.longitude_e for s in NDBC_BUOYS if s.column == c),
+    )
+)
 
 
 # ── query parameters ────────────────────────────────────────────────────────
 
 
 # Sensor depth window — TAO buoys sample at canonical depths
-# (1, 10, 20, 40, 60, 80, 100, 120, 140, 180, 300, 500 m). The
-# "150 m Kelvin wave depth" is bracketed by 140 and 180; we
-# accept anything in [130, 200] and record the exact depth.
+# (1, 10, 20, 40, 60, 80, 100, 120, 140, 180, 300, 500 m). Tighten
+# the band to ±10 m around the 150 m Kelvin-wave depth: with 27
+# anchor sites across 9 longitude columns, accepting the full
+# [130, 200] depth band was returning ~1.2 MB of mostly-null rows
+# and routinely hitting CF Worker's 30 s wall. ±10 m captures the
+# single 140 m or 150 m sample without the rest of the column.
 TARGET_DEPTH_M = 150
-DEPTH_LOWER_M  = 130
-DEPTH_UPPER_M  = 200
+DEPTH_LOWER_M  = 140
+DEPTH_UPPER_M  = 160
 
-# Lat window — ±3° covers our anchor sites (±2° lat) with a small buffer
-# in case ERDDAP records the buoy positions with offset precision.
+# Lat window — ±3° covers the inner-core anchor sites (±2° lat)
+# with a small buffer for buoy position drift.
 LAT_LOWER = -3.0
 LAT_UPPER =  3.0
 
-# Lon window — covers 170°W (190°E) to 140°W (220°E) with a buffer.
-LON_LOWER_E = 185.0
-LON_UPPER_E = 225.0
+# Lon window — spans the full TAO/TRITON array we ship pins for:
+# 156°E (warm pool) eastward through 95°W (cold-tongue terminus).
+# Both bounds in degrees-east (0-360 ERDDAP convention).
+LON_LOWER_E = 150.0     # buffer below 156°E
+LON_UPPER_E = 270.0     # buffer above 95°W (=265°E)
 
 # Time window. Must cover:
 #   * Recent 7d-mean window (anchored on latest obs):    7 days
@@ -487,6 +539,19 @@ def build_payload(
                 for a in analyses
             ],
             "by_longitude": by_longitude,
+            # West-to-east longitude column order. Frontend uses this
+            # to lay out the mini-map (Asia-side columns on the left,
+            # Americas-side on the right) without re-deriving order
+            # from string labels.
+            "longitude_order": list(COLUMN_ORDER_W_TO_E),
+            # Latitude rows for the grid, north-to-south. Static set;
+            # included so the frontend can render placeholders for
+            # cells where no mooring exists at (lat, lon).
+            "latitude_order": [
+                {"key": "2N", "label": "2°N", "lat":  2.0},
+                {"key": "0N", "label": "0°N", "lat":  0.0},
+                {"key": "2S", "label": "2°S", "lat": -2.0},
+            ],
         },
     }
 
