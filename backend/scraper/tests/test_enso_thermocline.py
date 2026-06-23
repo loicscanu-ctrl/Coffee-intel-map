@@ -6,6 +6,8 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime, timedelta
 
+import pytest
+
 from scraper.sources import enso_thermocline as therm
 
 # Real-shape ERDDAP tabledap JSON response. tabledap returns the
@@ -223,6 +225,48 @@ def test_proxy_env_returns_both_when_set(monkeypatch):
     monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://noaa-proxy.test.workers.dev")
     monkeypatch.setenv("ERDDAP_PROXY_SECRET", "secret-x")
     assert therm._proxy_env() == ("https://noaa-proxy.test.workers.dev", "secret-x")
+
+
+class _StubResp:
+    def __init__(self, status: int, text: str = ""):
+        self.status_code = status
+        self.text = text
+
+
+def test_fetch_via_proxy_retries_once_on_5xx(monkeypatch):
+    """PFEG is intermittently slow → CF Worker returns 522. A single
+    retry after a short backoff catches the transient case (same
+    dataset that timed out at T often serves in <3s at T+10s) without
+    blowing the workflow's overall budget. Two attempts max."""
+    responses = iter([_StubResp(522, "timeout"), _StubResp(200, '{"table":{}}')])
+    sleeps: list[float] = []
+    monkeypatch.setattr(therm.requests, "get", lambda *a, **k: next(responses))
+    monkeypatch.setattr(therm.time, "sleep", sleeps.append)
+    text, status = therm._fetch_via_proxy(
+        "https://noaa-proxy.test.workers.dev", "s", "pmelTaoDyT.json?&time>=2024-01-01",
+    )
+    assert status == 200
+    assert text == '{"table":{}}'
+    assert sleeps == [10]
+
+
+def test_fetch_via_proxy_does_not_retry_on_4xx(monkeypatch):
+    """4xx is a "wrong dataset / bad request" signal, not a transient
+    upstream blip. Don't burn a retry on it — fall through immediately
+    so the caller can try the next dataset candidate."""
+    calls = {"n": 0}
+
+    def fake_get(*a, **k):
+        calls["n"] += 1
+        return _StubResp(404, "not found")
+
+    monkeypatch.setattr(therm.requests, "get", fake_get)
+    monkeypatch.setattr(therm.time, "sleep", lambda _: pytest.fail("should not sleep"))
+    text, status = therm._fetch_via_proxy(
+        "https://noaa-proxy.test.workers.dev", "s", "pmelTaoMonsT.json?&time>=2024-01-01",
+    )
+    assert status == 404
+    assert calls["n"] == 1
 
 
 def test_build_tabledap_query_includes_lat_lon_depth_and_time_constraints():
