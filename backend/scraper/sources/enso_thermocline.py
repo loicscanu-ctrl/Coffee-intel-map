@@ -20,13 +20,8 @@ so the frontend card + risk-map pin layer don't need updating.
 
 ENV VARS
 --------
-  ERDDAP_PROXY_BASE    — required, e.g. "https://erddap-proxy.acct.workers.dev"
+  ERDDAP_PROXY_BASE    — required, e.g. "https://noaa-proxy.acct.workers.dev"
   ERDDAP_PROXY_SECRET  — required, matches PROXY_SECRET on the Worker
-
-  Aliases (used if the ERDDAP_PROXY_* pair isn't set): BPS_WORKER_URL /
-  BPS_WORKER_SECRET. These let us reuse repo secrets from an earlier
-  Cloudflare Worker attempt without forcing the operator to recreate
-  them.
 
 Missing either: the fetcher exits cleanly with status code 2 and
 a clear log line. The frontend card degrades silently (same
@@ -159,26 +154,11 @@ class OceanObs:
 
 
 def _proxy_env() -> tuple[str | None, str | None]:
-    """Reads the proxy URL + shared secret the workflow passes through.
-
-    Accepts two name pairs so we can reuse the existing repo secrets
-    (BPS_WORKER_*) from an earlier Cloudflare Worker attempt without
-    forcing the operator to recreate them:
-
-      preferred:  ERDDAP_PROXY_BASE / ERDDAP_PROXY_SECRET
-      fallback:   BPS_WORKER_URL    / BPS_WORKER_SECRET
-
-    Returning None for either means the proxy isn't configured — caller
-    exits cleanly with a guidance message rather than silently 401'ing.
-    """
-    base = (
-        os.environ.get("ERDDAP_PROXY_BASE", "").strip()
-        or os.environ.get("BPS_WORKER_URL", "").strip()
-    )
-    secret = (
-        os.environ.get("ERDDAP_PROXY_SECRET", "").strip()
-        or os.environ.get("BPS_WORKER_SECRET", "").strip()
-    )
+    """Reads the two env vars the workflow passes through. Returning
+    None for either means the proxy isn't configured — caller exits
+    cleanly with a guidance message rather than silently 401'ing."""
+    base = os.environ.get("ERDDAP_PROXY_BASE", "").strip()
+    secret = os.environ.get("ERDDAP_PROXY_SECRET", "").strip()
     return (base or None, secret or None)
 
 
@@ -488,10 +468,9 @@ def run(*, write: bool, diag: bool = False) -> int:
     """Fetch via the proxy, parse, persist. Exit codes:
         0 — success (data written or previewed cleanly)
         1 — fetch/parse failure across all dataset candidates
-        2 — proxy not configured (neither ERDDAP_PROXY_BASE/SECRET nor
-            the BPS_WORKER_URL/SECRET fallback pair is set). Distinct
-            exit code so the workflow can treat this as a configuration
-            error vs a real fetch issue.
+        2 — proxy not configured (ERDDAP_PROXY_BASE / ERDDAP_PROXY_SECRET
+            env vars missing). Distinct exit code so the workflow can
+            treat this as a configuration error vs a real fetch issue.
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logger.info("[therm] mode=fetch via Cloudflare Worker proxy → ERDDAP")
@@ -499,9 +478,8 @@ def run(*, write: bool, diag: bool = False) -> int:
     proxy_base, secret = _proxy_env()
     if not proxy_base or not secret:
         logger.error(
-            "[therm] FATAL: ERDDAP proxy not configured. Set "
-            "ERDDAP_PROXY_BASE+ERDDAP_PROXY_SECRET (or the legacy "
-            "BPS_WORKER_URL+BPS_WORKER_SECRET fallback). "
+            "[therm] FATAL: ERDDAP proxy not configured. "
+            "Set ERDDAP_PROXY_BASE and ERDDAP_PROXY_SECRET env vars. "
             "Deploy guide: cf-worker/README.md"
         )
         return 2

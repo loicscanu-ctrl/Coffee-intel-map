@@ -211,45 +211,18 @@ def test_proxy_env_returns_none_for_missing_or_empty(monkeypatch):
     aren't set yet (operator forgot to wire up secrets). The fetcher
     should detect that cleanly via _proxy_env returning Nones, exit
     with code 2, and NOT crash."""
-    for var in ("ERDDAP_PROXY_BASE", "ERDDAP_PROXY_SECRET",
-                "BPS_WORKER_URL",    "BPS_WORKER_SECRET"):
+    for var in ("ERDDAP_PROXY_BASE", "ERDDAP_PROXY_SECRET"):
         monkeypatch.delenv(var, raising=False)
     assert therm._proxy_env() == (None, None)
     monkeypatch.setenv("ERDDAP_PROXY_BASE",   "  ")
     monkeypatch.setenv("ERDDAP_PROXY_SECRET", "")
-    monkeypatch.setenv("BPS_WORKER_URL",      "")
-    monkeypatch.setenv("BPS_WORKER_SECRET",   "")
     assert therm._proxy_env() == (None, None)
 
 
 def test_proxy_env_returns_both_when_set(monkeypatch):
-    for var in ("BPS_WORKER_URL", "BPS_WORKER_SECRET"):
-        monkeypatch.delenv(var, raising=False)
-    monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://erddap-proxy.test.workers.dev")
+    monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://noaa-proxy.test.workers.dev")
     monkeypatch.setenv("ERDDAP_PROXY_SECRET", "secret-x")
-    assert therm._proxy_env() == ("https://erddap-proxy.test.workers.dev", "secret-x")
-
-
-def test_proxy_env_falls_back_to_bps_worker_names(monkeypatch):
-    """Repo already has BPS_WORKER_URL + BPS_WORKER_SECRET from an
-    earlier Worker attempt. Reuse those instead of forcing the operator
-    to recreate identical secrets under new names."""
-    for var in ("ERDDAP_PROXY_BASE", "ERDDAP_PROXY_SECRET"):
-        monkeypatch.delenv(var, raising=False)
-    monkeypatch.setenv("BPS_WORKER_URL",    "https://bps-proxy.test.workers.dev")
-    monkeypatch.setenv("BPS_WORKER_SECRET", "legacy-secret")
-    assert therm._proxy_env() == ("https://bps-proxy.test.workers.dev", "legacy-secret")
-
-
-def test_proxy_env_prefers_erddap_names_over_bps_fallback(monkeypatch):
-    """If both pairs are set, the canonical ERDDAP_PROXY_* names win —
-    so a clean migration that sets the new names overrides the legacy
-    ones without needing to delete them."""
-    monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://erddap-proxy.new.workers.dev")
-    monkeypatch.setenv("ERDDAP_PROXY_SECRET", "new-secret")
-    monkeypatch.setenv("BPS_WORKER_URL",      "https://bps-proxy.old.workers.dev")
-    monkeypatch.setenv("BPS_WORKER_SECRET",   "old-secret")
-    assert therm._proxy_env() == ("https://erddap-proxy.new.workers.dev", "new-secret")
+    assert therm._proxy_env() == ("https://noaa-proxy.test.workers.dev", "secret-x")
 
 
 def test_build_tabledap_query_includes_lat_lon_depth_and_time_constraints():
