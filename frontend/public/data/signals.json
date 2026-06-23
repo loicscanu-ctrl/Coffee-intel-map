@@ -289,6 +289,42 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "AGRO_colombia_Caldas_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=160.7]"
+    },
+    {
+      "id": "AGRO_vn_Dak_Nong_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=54.4]"
+    },
+    {
+      "id": "AGRO_vn_Kon_Tum_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=62.3]"
     }
   ],
   "history": [
@@ -2705,5 +2741,5 @@
       "priceLDN": 3598
     }
   ],
-  "generatedAt": "2026-06-22T22:50:39.300Z"
+  "generatedAt": "2026-06-23T06:01:59.257Z"
 }

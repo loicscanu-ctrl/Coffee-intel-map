@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-22T07:14:15+00:00",
+  "generated_at": "2026-06-23T06:01:59+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,25 +12,12 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 149.9
+            "forecast_7d_rain": 160.7
           }
         }
       ]
     },
     "vn": {
-      "Lam Dong": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.17,
-            "forecast_7d_rain": 73.1
-          }
-        }
-      ],
       "Dak Nong": [
         {
           "threat_id": "blossom_drop",
@@ -40,7 +27,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.26,
-            "forecast_7d_rain": 56.8
+            "forecast_7d_rain": 54.4
           }
         }
       ],
@@ -53,19 +40,19 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.45,
-            "forecast_7d_rain": 52.5
+            "forecast_7d_rain": 62.3
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 4,
+    "total_alerts": 3,
     "by_severity": {
-      "watch": 4
+      "watch": 3
     },
     "by_threat": {
-      "blossom_drop": 4
+      "blossom_drop": 3
     }
   }
 }
