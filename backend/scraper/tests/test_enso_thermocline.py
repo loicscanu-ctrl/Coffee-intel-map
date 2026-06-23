@@ -211,8 +211,8 @@ def test_proxy_env_returns_none_for_missing_or_empty(monkeypatch):
     aren't set yet (operator forgot to wire up secrets). The fetcher
     should detect that cleanly via _proxy_env returning Nones, exit
     with code 2, and NOT crash."""
-    monkeypatch.delenv("ERDDAP_PROXY_BASE",   raising=False)
-    monkeypatch.delenv("ERDDAP_PROXY_SECRET", raising=False)
+    for var in ("ERDDAP_PROXY_BASE", "ERDDAP_PROXY_SECRET"):
+        monkeypatch.delenv(var, raising=False)
     assert therm._proxy_env() == (None, None)
     monkeypatch.setenv("ERDDAP_PROXY_BASE",   "  ")
     monkeypatch.setenv("ERDDAP_PROXY_SECRET", "")
@@ -220,9 +220,9 @@ def test_proxy_env_returns_none_for_missing_or_empty(monkeypatch):
 
 
 def test_proxy_env_returns_both_when_set(monkeypatch):
-    monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://erddap-proxy.test.workers.dev")
+    monkeypatch.setenv("ERDDAP_PROXY_BASE",   "https://noaa-proxy.test.workers.dev")
     monkeypatch.setenv("ERDDAP_PROXY_SECRET", "secret-x")
-    assert therm._proxy_env() == ("https://erddap-proxy.test.workers.dev", "secret-x")
+    assert therm._proxy_env() == ("https://noaa-proxy.test.workers.dev", "secret-x")
 
 
 def test_build_tabledap_query_includes_lat_lon_depth_and_time_constraints():

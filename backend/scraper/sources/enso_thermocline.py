@@ -20,7 +20,7 @@ so the frontend card + risk-map pin layer don't need updating.
 
 ENV VARS
 --------
-  ERDDAP_PROXY_BASE    — required, e.g. "https://erddap-proxy.acct.workers.dev"
+  ERDDAP_PROXY_BASE    — required, e.g. "https://noaa-proxy.acct.workers.dev"
   ERDDAP_PROXY_SECRET  — required, matches PROXY_SECRET on the Worker
 
 Missing either: the fetcher exits cleanly with status code 2 and
@@ -189,9 +189,15 @@ def _build_tabledap_query(dataset_id: str, start_date: str) -> str:
     onto the proxy base. We don't pin the temperature column in the
     SELECT — let ERDDAP return its full schema so the parser can
     locate the temp field by name. JSON output for cleaner parsing
-    than CSV's units row."""
+    than CSV's units row.
+
+    Leading '&' on the constraint string is REQUIRED by ERDDAP when
+    there's no SELECT clause: it tells the parser "constraints start
+    here, the column-list was empty (i.e. return all)." Without it
+    ERDDAP returns HTTP 400 'All constraints must be preceded by &'.
+    """
     constraints = (
-        f"latitude>={LAT_LOWER}&latitude<={LAT_UPPER}"
+        f"&latitude>={LAT_LOWER}&latitude<={LAT_UPPER}"
         f"&longitude>={LON_LOWER_E}&longitude<={LON_UPPER_E}"
         f"&depth>={DEPTH_LOWER_M}&depth<={DEPTH_UPPER_M}"
         f"&time>={start_date}"
