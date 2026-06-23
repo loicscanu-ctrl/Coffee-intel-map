@@ -64,11 +64,18 @@ jobs:
           DIAG: ${{ inputs.diag }}
           # v5 — pivoted from NDBC (which doesn't host TAO) back to ERDDAP,
           # routed through a CF Worker that bypasses NOAA's GHA-IP blacklist.
-          # See cf-worker/README.md for deployment. If either var is empty
+          # See cf-worker/README.md for deployment. If neither pair is set
           # the Python exits with code 2 (config error), the workflow fails
           # fast, and the operator gets a clear "set the secrets" message.
           ERDDAP_PROXY_BASE:   ${{ vars.ERDDAP_PROXY_BASE }}
           ERDDAP_PROXY_SECRET: ${{ secrets.ERDDAP_PROXY_SECRET }}
+          # Legacy fallback names — reused from an earlier CF Worker attempt
+          # whose secrets are still in the repo. The fetcher prefers the
+          # ERDDAP_PROXY_* pair and falls through to these if those aren't
+          # set, so we don't force the operator to recreate identical
+          # secrets under new names.
+          BPS_WORKER_URL:    ${{ secrets.BPS_WORKER_URL }}
+          BPS_WORKER_SECRET: ${{ secrets.BPS_WORKER_SECRET }}
         run: |
           set -e
           ARGS=""
