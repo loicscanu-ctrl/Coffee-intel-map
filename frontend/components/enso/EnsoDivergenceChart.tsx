@@ -24,6 +24,9 @@ import {
   ComposedChart, Bar, Line, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import {
+  ENSO_DEFAULT_RANGE, rangeMonths, type EnsoTimeRange,
+} from "@/lib/ensoTimeRange";
 
 interface Nino34Weekly { week_ending: string; sst_anomaly: number; }
 interface SoiMonthly   { month: string;       soi: number; }
@@ -42,10 +45,6 @@ interface IndicesPayload {
   };
 }
 
-// 24 months of context = ~104 weeks of Niño 3.4. Wide enough to show
-// the regime turn, narrow enough that the bars stay legible.
-const WEEKS_TO_PLOT = 104;
-
 const TT_STYLE = { background: "#1e293b", border: "1px solid #334155", borderRadius: 6, fontSize: 10 };
 
 function monthAbbr(iso: string): string {
@@ -55,7 +54,13 @@ function monthAbbr(iso: string): string {
   return `${names[parseInt(mo) - 1]}'${yr.slice(2)}`;
 }
 
-export default function EnsoDivergenceChart() {
+interface Props {
+  /** Time window for the chart slice. Defaults to 2Y if the parent
+      hasn't wired the shared selector yet. */
+  range?: EnsoTimeRange;
+}
+
+export default function EnsoDivergenceChart({ range = ENSO_DEFAULT_RANGE }: Props) {
   const [data, setData] = useState<IndicesPayload | null>(null);
   const [missing, setMissing] = useState(false);
 
@@ -84,7 +89,11 @@ export default function EnsoDivergenceChart() {
   const soiByMonth: Record<string, number> = {};
   for (const r of data.soi.monthly) soiByMonth[r.month] = -r.soi;   // invert sign
 
-  const recent = data.nino34.weekly.slice(-WEEKS_TO_PLOT);
+  // Window the weekly Niño 3.4 series. ~4.345 weeks per month; null
+  // means "no slice" so the chart shows the full 1981→now history.
+  const months = rangeMonths(range);
+  const weeksToPlot = months == null ? data.nino34.weekly.length : Math.ceil(months * 4.345);
+  const recent = data.nino34.weekly.slice(-weeksToPlot);
   const chartData = recent.map((r) => {
     const yyyymm = r.week_ending.slice(0, 7);
     const soiInv = soiByMonth[yyyymm];
@@ -161,7 +170,7 @@ export default function EnsoDivergenceChart() {
           <ComposedChart data={chartData} margin={{ top: 4, right: 38, left: -8, bottom: 0 }}>
             <XAxis
               dataKey="label" tick={{ fontSize: 7, fill: "#64748b" }}
-              axisLine={false} tickLine={false} interval={Math.floor(WEEKS_TO_PLOT / 8)}
+              axisLine={false} tickLine={false} interval={Math.max(1, Math.floor(weeksToPlot / 8))}
             />
             <YAxis
               yAxisId="sst" orientation="left"

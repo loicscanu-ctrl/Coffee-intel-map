@@ -40,6 +40,8 @@ interface BuoySlot {
 
 interface ColumnAvg { mean_temp_c: number | null; n_buoys: number; }
 
+interface LatRow { key: "2N" | "0N" | "2S"; label: string; lat: number; }
+
 interface ThermoclinePayload {
   scraped_at: string;
   thermocline: {
@@ -59,8 +61,10 @@ interface ThermoclinePayload {
       kelvin_signal:  BuoySlot["kelvin_signal"];
       reading:        string;
     } | null;
-    buoys:           BuoySlot[];
-    by_longitude:    Record<string, ColumnAvg>;
+    buoys:            BuoySlot[];
+    by_longitude:     Record<string, ColumnAvg>;
+    longitude_order?: string[];      // backend supplies west-to-east order
+    latitude_order?:  LatRow[];      // backend supplies N-to-S row order
   };
 }
 
@@ -71,12 +75,33 @@ const SIGNAL_META = {
   "no-data":          { color: "#64748b", label: "NO DATA"           },
 } as const;
 
-const COLUMN_ORDER = ["170W", "155W", "140W"] as const;
-const COLUMN_LABEL: Record<string, string> = {
-  "170W": "170°W",
-  "155W": "155°W",
-  "140W": "140°W",
-};
+// Fallbacks for the day the backend payload pre-dates the
+// longitude_order / latitude_order additions (we degrade gracefully).
+const DEFAULT_COLUMN_ORDER = [
+  "156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
+] as const;
+const DEFAULT_LAT_ORDER: LatRow[] = [
+  { key: "2N", label: "2°N", lat:  2 },
+  { key: "0N", label: "0°N", lat:  0 },
+  { key: "2S", label: "2°S", lat: -2 },
+];
+
+// Pretty-printer for column keys. Backend stores them as compact
+// strings like "170W" / "156E" / "180" — these expand them with
+// the degree symbol for the column header strip.
+function columnLabel(col: string): string {
+  if (col === "180") return "180°";
+  const dir = col.slice(-1);                  // "E" or "W"
+  const deg = col.slice(0, -1);
+  return `${deg}°${dir}`;
+}
+
+function latKeyOf(lat: number): "2N" | "0N" | "2S" | null {
+  if (lat ===  2) return "2N";
+  if (lat ===  0) return "0N";
+  if (lat === -2) return "2S";
+  return null;
+}
 
 function tsAge(ts: string | null): string {
   if (!ts) return "—";
@@ -113,15 +138,21 @@ export default function EnsoThermoclineCard() {
     ? SIGNAL_META[headline.kelvin_signal] ?? SIGNAL_META["no-data"]
     : SIGNAL_META["no-data"];
 
-  // Buoys grouped by longitude column for the 7-station grid below.
-  const buoysByColumn: Record<string, BuoySlot[]> = {};
+  // Buoys keyed by (latitude_row, longitude_column) so the grid below
+  // renders as a literal mini-map: rows = lat (N→S), cols = lon (W→E).
+  // Each (row, col) lookup is either a buoy or undefined (placeholder).
+  const buoysByCell: Record<string, BuoySlot | undefined> = {};
   for (const b of t.buoys) {
-    (buoysByColumn[b.column] = buoysByColumn[b.column] ?? []).push(b);
+    const rk = latKeyOf(b.lat);
+    if (rk) buoysByCell[`${rk}|${b.column}`] = b;
   }
-  // Within each column, sort north-to-south for a stable visual layout.
-  for (const col of Object.keys(buoysByColumn)) {
-    buoysByColumn[col].sort((a, b) => b.lat - a.lat);
-  }
+
+  // Prefer the orders the backend ships (geographic west→east, north→south).
+  // Falls back to a static list only if a pre-v6 JSON shows up.
+  const columnOrder = (t.longitude_order ?? [...DEFAULT_COLUMN_ORDER]).filter(
+    (c) => Object.values(buoysByCell).some((b) => b?.column === c),
+  );
+  const rowOrder = t.latitude_order ?? DEFAULT_LAT_ORDER;
 
   return (
     <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 space-y-3">
@@ -173,13 +204,18 @@ export default function EnsoThermoclineCard() {
         </div>
       </div>
 
-      {/* West-to-east 3-column mean strip — basin-scale propagation */}
-      <div className="grid grid-cols-3 gap-1 text-[10px] font-mono">
-        {COLUMN_ORDER.map((col) => {
+      {/* West-to-east column-mean strip — visualises basin-scale propagation.
+          Column count auto-scales with how many longitude bands have any
+          buoys reporting; one cell per column. */}
+      <div
+        className="grid gap-1 text-[10px] font-mono"
+        style={{ gridTemplateColumns: `repeat(${columnOrder.length}, minmax(0, 1fr))` }}
+      >
+        {columnOrder.map((col) => {
           const c = t.by_longitude[col];
           return (
             <div key={col} className="bg-slate-900 rounded px-2 py-1.5 border border-slate-700">
-              <div className="text-slate-500 text-[8px]">{COLUMN_LABEL[col]} · {c?.n_buoys ?? 0} buoys</div>
+              <div className="text-slate-500 text-[8px]">{columnLabel(col)} · {c?.n_buoys ?? 0} buoys</div>
               <div className="font-bold text-[13px] text-slate-200">
                 {c?.mean_temp_c != null
                   ? `${c.mean_temp_c.toFixed(1)} °C`
@@ -191,44 +227,68 @@ export default function EnsoThermoclineCard() {
         })}
       </div>
 
-      {/* 7-station grid — per-buoy snapshot with lat/lon for map correlation */}
+      {/* TAO/TRITON mini-map. Rows = latitude (N→S), cols = longitude (W→E)
+          so each cell sits where the buoy physically is on the equatorial
+          Pacific — Asia-side moorings on the left, Americas-side on the
+          right. Empty (lat, lon) cells render as dashed placeholders to
+          keep the grid a tidy rectangle. */}
       <div className="space-y-1">
-        {COLUMN_ORDER.map((col) => {
-          const rows = buoysByColumn[col] ?? [];
-          if (!rows.length) return null;
-          return (
-            <div key={col} className="grid grid-cols-[60px_repeat(3,1fr)] gap-1 text-[10px] font-mono">
-              <div className="bg-slate-900 rounded px-1.5 py-1 border border-slate-700 text-slate-400 self-stretch flex items-center justify-center font-bold">
-                {COLUMN_LABEL[col]}
-              </div>
-              {/* Always render 3 cells per row, padding with placeholders if a
-                  longitude column has fewer than 3 buoys. */}
-              {[0, 1, 2].map((i) => {
-                const b = rows[i];
-                if (!b) {
-                  return <div key={i} className="bg-slate-900/40 rounded border border-slate-700/40" />;
-                }
-                const sig = SIGNAL_META[b.kelvin_signal] ?? SIGNAL_META["no-data"];
+        {/* Column header strip (longitude labels). Lat-label gutter is
+            the first track so headers align with the data cells below. */}
+        <div
+          className="grid gap-1 text-[9px] font-mono text-slate-500"
+          style={{
+            gridTemplateColumns: `40px repeat(${columnOrder.length}, minmax(0, 1fr))`,
+          }}
+        >
+          <div />
+          {columnOrder.map((col) => (
+            <div key={col} className="text-center">{columnLabel(col)}</div>
+          ))}
+        </div>
+        {rowOrder.map((row) => (
+          <div
+            key={row.key}
+            className="grid gap-1 text-[10px] font-mono"
+            style={{
+              gridTemplateColumns: `40px repeat(${columnOrder.length}, minmax(0, 1fr))`,
+            }}
+          >
+            <div className="bg-slate-900 rounded px-1.5 py-1 border border-slate-700 text-slate-400 flex items-center justify-center font-bold">
+              {row.label}
+            </div>
+            {columnOrder.map((col) => {
+              const b = buoysByCell[`${row.key}|${col}`];
+              if (!b) {
                 return (
-                  <div key={b.station_id} className="bg-slate-900 rounded px-2 py-1.5 border border-slate-700">
-                    <div className="flex items-baseline justify-between">
-                      <div className="text-slate-500 text-[8px]">{b.label.replace(` ${COLUMN_LABEL[col]}`, "")} · {b.station_id}</div>
-                      <div className="text-[8px]" style={{ color: sig.color }}>●</div>
-                    </div>
-                    <div className="font-bold text-[12px]" style={{ color: sig.color }}>
-                      {b.latest_temp_c != null ? `${b.latest_temp_c.toFixed(2)}` : "—"}
-                    </div>
-                    <div className="text-slate-600 text-[8px]">
-                      Δ30d {b.delta_30d_c != null
-                        ? `${b.delta_30d_c >= 0 ? "+" : ""}${b.delta_30d_c.toFixed(2)}`
-                        : "—"} · {b.obs_count} obs
-                    </div>
+                  <div
+                    key={col}
+                    className="bg-slate-900/40 rounded border border-dashed border-slate-700/40 flex items-center justify-center text-slate-700 text-[8px]"
+                  >
+                    no buoy
                   </div>
                 );
-              })}
-            </div>
-          );
-        })}
+              }
+              const sig = SIGNAL_META[b.kelvin_signal] ?? SIGNAL_META["no-data"];
+              return (
+                <div key={b.station_id} className="bg-slate-900 rounded px-1.5 py-1 border border-slate-700">
+                  <div className="flex items-baseline justify-between">
+                    <div className="text-slate-500 text-[8px]">{b.station_id}</div>
+                    <div className="text-[8px]" style={{ color: sig.color }}>●</div>
+                  </div>
+                  <div className="font-bold text-[11px]" style={{ color: sig.color }}>
+                    {b.latest_temp_c != null ? `${b.latest_temp_c.toFixed(2)}` : "—"}
+                  </div>
+                  <div className="text-slate-600 text-[8px]">
+                    Δ30d {b.delta_30d_c != null
+                      ? `${b.delta_30d_c >= 0 ? "+" : ""}${b.delta_30d_c.toFixed(2)}`
+                      : "—"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       <div className="text-[9px] text-slate-600 leading-snug">

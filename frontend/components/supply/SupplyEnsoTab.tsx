@@ -14,8 +14,10 @@ import EnsoAnalogChart from "@/components/enso/EnsoAnalogChart";
 import EnsoDivergenceChart from "@/components/enso/EnsoDivergenceChart";
 import EnsoSubsurfaceCard from "@/components/enso/EnsoSubsurfaceCard";
 import EnsoThermoclineCard from "@/components/enso/EnsoThermoclineCard";
+import EnsoTimeRangeSelector from "@/components/enso/EnsoTimeRangeSelector";
 import EnsoRiskTable from "@/components/enso/EnsoRiskTable";
 import { PHASE_META, phaseLabel, type EnsoData } from "@/lib/enso";
+import { ENSO_DEFAULT_RANGE, type EnsoTimeRange } from "@/lib/ensoTimeRange";
 
 const EnsoRiskMap = dynamic(() => import("@/components/enso/EnsoRiskMap"), {
   ssr: false,
@@ -56,6 +58,11 @@ function PhaseSummary({ data }: { data: EnsoData }) {
 export default function SupplyEnsoTab() {
   const [data, setData] = useState<EnsoData | null>(null);
   const [error, setError] = useState(false);
+  // Shared time window for the Niño 3.4 + SOI divergence chart and
+  // the WWV subsurface card. The thermocline card has no historical
+  // series yet (live ~75-day window only) so it isn't driven by the
+  // selector — when the climatology backfill ships, it'll join.
+  const [range, setRange] = useState<EnsoTimeRange>(ENSO_DEFAULT_RANGE);
 
   useEffect(() => {
     fetch("/data/enso.json")
@@ -77,8 +84,11 @@ export default function SupplyEnsoTab() {
       {data && (
         <>
           <PhaseSummary data={data} />
-          <EnsoDivergenceChart />
-          <EnsoSubsurfaceCard />
+          <div className="flex justify-end">
+            <EnsoTimeRangeSelector value={range} onChange={setRange} />
+          </div>
+          <EnsoDivergenceChart range={range} />
+          <EnsoSubsurfaceCard range={range} />
           <EnsoThermoclineCard />
           <EnsoForecastPlume forecast={data.oni_forecast} />
           <EnsoAnalogChart current={data.current_window} analogs={data.analogs} />
