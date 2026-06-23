@@ -71,23 +71,31 @@ class BuoySite:
         return (self.lon_negative + 360) % 360
 
 
+# NDBC station IDs for TAO/TRITON use the lat-lon-string convention
+# (e.g. `0n155w` = Equator, 155°W), NOT the 5-digit numeric IDs the
+# initial blueprint listed (those turned out to be Hawaii coastal
+# moorings — all 7 returned HTTP 404 on the v3 dispatch). The
+# lat-lon scheme is NDBC's documented TAO ID format and is preserved
+# even after the 2014 array degradation. We also cover the 110°W line
+# because TAO has historically maintained those moorings longer than
+# the western lines — gives the operator more chances of a live buoy.
 NDBC_BUOYS: tuple[BuoySite, ...] = (
     # 170°W column
-    BuoySite("51305",  2.0, -170.0, "2°N 170°W",  "170W"),
-    BuoySite("51010",  0.0, -170.0, "0°N 170°W",  "170W"),
-    BuoySite("51306", -2.0, -170.0, "2°S 170°W",  "170W"),
-    # 155°W column — 51023 is dead center of the Niño 3.4 box
-    BuoySite("51021",  2.0, -155.0, "2°N 155°W",  "155W"),
-    BuoySite("51023",  0.0, -155.0, "0°N 155°W",  "155W"),
-    BuoySite("51022", -2.0, -155.0, "2°S 155°W",  "155W"),
-    # 140°W column
-    BuoySite("51311",  0.0, -140.0, "0°N 140°W",  "140W"),
+    BuoySite("2n170w",  2.0, -170.0, "2°N 170°W",  "170W"),
+    BuoySite("0n170w",  0.0, -170.0, "0°N 170°W",  "170W"),
+    BuoySite("2s170w", -2.0, -170.0, "2°S 170°W",  "170W"),
+    # 155°W column — 0n155w is dead center of the Niño 3.4 box
+    BuoySite("2n155w",  2.0, -155.0, "2°N 155°W",  "155W"),
+    BuoySite("0n155w",  0.0, -155.0, "0°N 155°W",  "155W"),
+    BuoySite("2s155w", -2.0, -155.0, "2°S 155°W",  "155W"),
+    # 140°W column — historically the most reliable equatorial line
+    BuoySite("0n140w",  0.0, -140.0, "0°N 140°W",  "140W"),
 )
 
 # Headline buoy — 0°N 155°W, the dead center of the Niño 3.4 box.
 # Kelvin waves crossing 155°W are typically 2-4 weeks from surfacing
 # in the Niño 3.4 SST signal we already track in Phase 1.
-HEADLINE_STATION_ID = "51023"
+HEADLINE_STATION_ID = "0n155w"
 
 # Depth window — TAO subsurface sensors sample at canonical depths
 # (1, 10, 20, 40, 60, 80, 100, 120, 140, 180, 300, 500 m). The
