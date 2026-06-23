@@ -110,12 +110,16 @@ LAT_UPPER =  3.0
 LON_LOWER_E = 185.0
 LON_UPPER_E = 225.0
 
-# Time window — Δ-30d needs 37 days minimum (recent 7d window + 30d
-# offset to the baseline window). 50 days gives buffer for ~2 weeks
-# of upstream latency. Was 90 originally but ~200KB daily responses
-# routinely hit Cloudflare Worker's 30s wall-clock on slow PFEG load;
-# halving the request size keeps the fetch under the wall on bad days.
-HISTORY_DAYS = 50
+# Time window. Must cover:
+#   * Recent 7d-mean window (anchored on latest obs):    7 days
+#   * Offset to the 30-37d-ago baseline window:         30 days
+#   * Upstream latency (TAO daily lags ~3 weeks):       21 days
+#   * Buffer for sparse/jagged reporting:               ~7 days
+# 75 days hits all four. Was 90 originally but 200KB responses
+# hit CF Worker's 30s wall under slow PFEG load. Was tried at 50
+# but that put the baseline window before the fetch start_date
+# → Δ30d=None across the board.
+HISTORY_DAYS = 75
 
 # Kelvin-wave thresholds, °C — unchanged from v3/v4. Δ-30d = mean of
 # last 7 days minus mean of 30-37 days ago at the same site/depth band.
