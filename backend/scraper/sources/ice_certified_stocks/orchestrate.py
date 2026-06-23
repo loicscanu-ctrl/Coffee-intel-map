@@ -751,8 +751,13 @@ def run(days_back: int = 30, write: bool = True, merge: bool = True,
         gradings_today = [g for g in gradings_all if g["date"] == d.isoformat()]
         snap = _robusta_snapshot(d, robusta_stocks.get(d), gradings_today,
                                   iss_recv_all.get(d), tenders_all.get(d))
-        # Drop empty snapshots (no data at all).
-        if any(v for k, v in snap.items() if k not in ("date",)):
+        # Only keep snapshots that carry an actual stock report. A day with
+        # grading/flow activity but a MISSING stock report would otherwise store
+        # zero stock (by_port_lots={}), and the day-over-day stock diff would
+        # read the whole certified stock as "decertified" (this produced the
+        # phantom 2026-06-17 decertification of ~4,000 lots). Such days' grading
+        # and flow activity still live in recent_activity, so nothing is lost.
+        if snap.get("by_port_lots"):
             robusta_snapshots.append(snap)
     # Latest is the most recent day with stock_report data.
     robusta_latest_date = max(robusta_stocks.keys(), default=None)
