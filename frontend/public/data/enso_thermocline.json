@@ -1,0 +1,150 @@
+{
+  "scraped_at": "2026-06-23T05:01:01+00:00",
+  "thermocline": {
+    "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
+    "dataset_id": "pmelTaoDyT",
+    "depth_m": 150,
+    "depth_range_m": {
+      "lower": 130,
+      "upper": 200
+    },
+    "thresholds": {
+      "warm_kelvin": 1.0,
+      "cold_kelvin": -1.0
+    },
+    "lead_weeks": "4\u20136",
+    "headline": {
+      "station_id": "0n155w",
+      "label": "0\u00b0N 155\u00b0W",
+      "lat": 0.0,
+      "lon": -155.0,
+      "latest_temp_c": 18.59,
+      "latest_depth_m": 150.0,
+      "latest_ts": "2026-05-31T12:00:00+00:00",
+      "delta_30d_c": null,
+      "kelvin_signal": "no-data",
+      "reading": "Latest T at ~150 m: 18.59 \u00b0C. Trend baseline still building (need \u226530 days of data)."
+    },
+    "buoys": [
+      {
+        "station_id": "2n170w",
+        "label": "2\u00b0N 170\u00b0W",
+        "lat": 2.0,
+        "lon": -170.0,
+        "column": "170W",
+        "obs_count": 136,
+        "latest_temp_c": 20.12,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 17.34,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "0n170w",
+        "label": "0\u00b0N 170\u00b0W",
+        "lat": 0.0,
+        "lon": -170.0,
+        "column": "170W",
+        "obs_count": 136,
+        "latest_temp_c": 21.31,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 17.87,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "2s170w",
+        "label": "2\u00b0S 170\u00b0W",
+        "lat": -2.0,
+        "lon": -170.0,
+        "column": "170W",
+        "obs_count": 136,
+        "latest_temp_c": 24.0,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 18.4,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "2n155w",
+        "label": "2\u00b0N 155\u00b0W",
+        "lat": 2.0,
+        "lon": -155.0,
+        "column": "155W",
+        "obs_count": 136,
+        "latest_temp_c": 14.4,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 14.64,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "0n155w",
+        "label": "0\u00b0N 155\u00b0W",
+        "lat": 0.0,
+        "lon": -155.0,
+        "column": "155W",
+        "obs_count": 136,
+        "latest_temp_c": 18.59,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 17.93,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "2s155w",
+        "label": "2\u00b0S 155\u00b0W",
+        "lat": -2.0,
+        "lon": -155.0,
+        "column": "155W",
+        "obs_count": 136,
+        "latest_temp_c": 20.76,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 16.69,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      },
+      {
+        "station_id": "0n140w",
+        "label": "0\u00b0N 140\u00b0W",
+        "lat": 0.0,
+        "lon": -140.0,
+        "column": "140W",
+        "obs_count": 134,
+        "latest_temp_c": 18.71,
+        "latest_depth_m": 150.0,
+        "latest_ts": "2026-05-31T12:00:00+00:00",
+        "recent_7d_mean_c": null,
+        "baseline_30d_mean_c": 15.84,
+        "delta_30d_c": null,
+        "kelvin_signal": "no-data"
+      }
+    ],
+    "by_longitude": {
+      "170W": {
+        "mean_temp_c": null,
+        "n_buoys": 0
+      },
+      "155W": {
+        "mean_temp_c": null,
+        "n_buoys": 0
+      },
+      "140W": {
+        "mean_temp_c": null,
+        "n_buoys": 0
+      }
+    }
+  }
+}
