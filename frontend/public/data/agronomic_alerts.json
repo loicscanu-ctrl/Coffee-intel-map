@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T06:01:59+00:00",
+  "generated_at": "2026-06-24T05:59:38+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,12 +12,40 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 160.7
+            "forecast_7d_rain": 112.4
+          }
+        }
+      ]
+    },
+    "ethiopia": {
+      "Kaffa": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.2,
+            "forecast_7d_rain": 51.5
           }
         }
       ]
     },
     "vn": {
+      "Lam Dong": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.17,
+            "forecast_7d_rain": 72.9
+          }
+        }
+      ],
       "Dak Nong": [
         {
           "threat_id": "blossom_drop",
@@ -27,7 +55,20 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.26,
-            "forecast_7d_rain": 54.4
+            "forecast_7d_rain": 73.7
+          }
+        }
+      ],
+      "Gia Lai": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.55,
+            "forecast_7d_rain": 55.8
           }
         }
       ],
@@ -40,19 +81,19 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.45,
-            "forecast_7d_rain": 62.3
+            "forecast_7d_rain": 84.3
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 3,
+    "total_alerts": 6,
     "by_severity": {
-      "watch": 3
+      "watch": 6
     },
     "by_threat": {
-      "blossom_drop": 3
+      "blossom_drop": 6
     }
   }
 }
