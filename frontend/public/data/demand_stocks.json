@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T06:35:40.775758Z",
+  "generated_at": "2026-06-24T06:32:37.787095Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -12551,8 +12551,14 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-23",
+    "last_updated": "2026-06-24",
     "countries": {
+      "eu": {
+        "name": "European Union",
+        "iso3": "EUU",
+        "latest_year": "2024",
+        "latest_population": 450228188
+      },
       "japan": {
         "name": "Japan",
         "iso3": "JPN",
