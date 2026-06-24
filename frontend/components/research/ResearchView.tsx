@@ -9,6 +9,7 @@ import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
 import SignalsMethodology from "./methodology/SignalsMethodology";
+import NewsSentimentMethodology from "./methodology/NewsSentimentMethodology";
 import FuturesMethodology from "./methodology/FuturesMethodology";
 import MacroMethodology from "./methodology/MacroMethodology";
 import SupplyMethodology from "./methodology/SupplyMethodology";
@@ -17,10 +18,11 @@ import FreightMethodology from "./methodology/FreightMethodology";
 import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
 
-type Cat = "cot" | "signals" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "demand";
+type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "demand";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",         label: "COT & positioning" },
   { id: "signals",     label: "Signals & forecasts" },
+  { id: "sentiment",   label: "News & sentiment" },
   { id: "futures",     label: "Futures analytics" },
   { id: "macro",       label: "Macro & FX" },
   { id: "weather",     label: "Weather" },
@@ -1545,6 +1547,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
         </div>
       )}
       {cat === "signals" && <SignalsMethodology />}
+      {cat === "sentiment" && <NewsSentimentMethodology />}
       {cat === "futures" && <FuturesMethodology />}
       {cat === "macro" && <MacroMethodology />}
       {cat === "weather" && (
