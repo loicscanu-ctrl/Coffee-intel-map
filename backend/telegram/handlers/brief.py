@@ -632,7 +632,7 @@ def _brazil_daily_block(daily: dict | None) -> str:
     p_sol  = prior("soluvel")
 
     lines = [
-        f"<b>Brazil daily reg</b> ({month}/{day}): {total:,} bags",
+        f"<b>Brazil daily reg</b> ({month}-{day}): {total:,} bags",
         "MoM:",
     ]
     for lbl, cur, prv in [("Arabica", arab, p_arab), ("Conilon", con, p_con), ("Soluble", sol, p_sol)]:
