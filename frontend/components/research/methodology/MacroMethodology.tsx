@@ -28,17 +28,19 @@ export default function MacroMethodology() {
           ["PEN 0.047", "", "CAD 0.046 · KRW 0.045 · GBP 0.038", ""],
         ]}
       />
-      <Fml>{`ΔI(day) = Σ ( daily_return_i × weight_i )        over all exporters + importers
-index   = (1 + ΔI).cumprod() × 100               base 100, re-anchored over a rolling 365-day window
-Z       = (index − μ) / σ                          μ,σ over a trailing 252-day window of the level`}</Fml>
+      <Fml>{`s_i     = daily return of currency i's strength vs USD (+ = the currency gained)
+ΔI(day) = Σ_exporters (+ w_i · s_i)  −  Σ_importers ( w_j · s_j )
+index   = (1 + ΔI).cumprod() × 100        base 100, re-anchored over a rolling 365-day window
+Z       = (index − μ) / σ                  μ,σ over a trailing 252-day window of the level`}</Fml>
       <Highlight>
-        <strong>Read the sign with care.</strong> The narrative is &ldquo;exporter currency stronger → index up.&rdquo;
-        But in the code every pair is summed with the same sign and the tickers are quoted <em>local-per-USD</em> (only
-        EUR is inverted to USD-per-EUR). The mechanical effect is the reverse for the dollar-quoted majors: a{" "}
-        <em>stronger</em> BRL (fewer BRL per USD) actually pushes the index <em>down</em>, while a stronger EUR pushes it
-        up. Treat the CCI as a consistent daily aggregate of the basket and lean on the <strong>z-score</strong> (rich/
-        cheap vs its own 252-day history) rather than over-reading the level&rsquo;s direction. The Guatemalan quetzal
-        sits in the FX feed at weight 0 — a reference rate for converting ANACAFE café-oro prices, not a basket member.
+        <strong>Sign convention.</strong> A stronger <em>producer</em> currency (Real, Dong, Peso…) lifts origin costs in
+        USD terms, so it pushes the index <strong>up</strong> (bullish); a stronger <em>consumer</em> currency (Euro,
+        Yen…) makes coffee cheaper for that market, so it pushes the index <strong>down</strong> (bearish). The raw FX
+        feeds arrive in mixed orientations (USD-per-EUR for the euro, local-per-USD for the rest), so each return is
+        first normalised to a strength return before its weight and group sign are applied — this is what keeps the
+        index coherent. Lean on the <strong>z-score</strong> (rich/cheap vs the trailing 252-day history) for the cleanest
+        read. The Guatemalan quetzal sits in the FX feed at weight 0 — a reference rate for converting ANACAFE café-oro
+        prices, not a basket member.
       </Highlight>
 
       <H2>2 · FX time series — the exporter / importer framing</H2>

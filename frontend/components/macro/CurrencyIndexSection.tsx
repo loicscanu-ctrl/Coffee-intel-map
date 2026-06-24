@@ -78,7 +78,8 @@ export default function CurrencyIndexSection() {
         </div>
         <p className="text-xs text-slate-400 mt-1 max-w-3xl">
           Weighted composite of producing/consuming currency pairs.{" "}
-          <span className="font-mono text-slate-200">ΔI = Σ w_Ex,i · ΔC_Ex,i + Σ w_Im,j · ΔC_Im,j</span>.
+          <span className="font-mono text-slate-200">ΔI = Σ w_Ex,i · s_Ex,i − Σ w_Im,j · s_Im,j</span>{" "}
+          (s = strength vs USD; producer + bullish, consumer − bearish).
           Base = 100. Z-score over trailing {252}-day window. Updated daily after US close.
         </p>
         <p className="text-[10px] text-slate-500 mt-0.5">
