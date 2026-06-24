@@ -4,11 +4,21 @@ Computes the daily Coffee Currency Index (CCI) — a DXY-replication framework
 tracking the net FX impact on coffee trade from producing and consuming nations.
 
 Formula:
-    ΔI = Σ w_Ex,i × ΔC_Ex,i  +  Σ w_Im,j × ΔC_Im,j
+    ΔI = Σ w_Ex,i × s_Ex,i  −  Σ w_Im,j × s_Im,j
 
 Where:
-    - Exporters: currency vs USD, positive = exporter currency stronger = bullish coffee
-    - Importers: currency vs USD, positive = importer currency stronger = bearish coffee (cheaper for them)
+    - s = the daily return of each currency's STRENGTH vs USD (positive = the
+      currency strengthened against the dollar that day).
+    - Exporters carry a + sign: a stronger producer currency lifts origin costs
+      in USD terms → bullish coffee → index up.
+    - Importers carry a − sign: a stronger consumer currency makes coffee cheaper
+      for that market → bearish → index down.
+
+    The raw FX series are stored in mixed orientations (USD-per-EUR for the
+    six-letter EURUSD ticker, local-per-USD for the plain three-letter tickers),
+    so each return is first normalised to a strength return via _strength_sign()
+    before the weight and group sign are applied. This is what keeps the index
+    economically coherent (a stronger Real pushes it up, a stronger Euro down).
 
 Timing: daily close-to-close % change for all FX pairs.
 
@@ -73,8 +83,9 @@ FX_HISTORY_DAYS = 365  # ~1 year of daily closes per pair
 
 EXPORTERS = [
     # (yfinance ticker, display name, normalized weight)
-    # Ticker format: XXXUSD=X means "how many USD per 1 unit of XXX"
-    # Positive daily return → exporter currency stronger → bullish for coffee
+    # NB: the plain 3-letter tickers below are stored local-per-USD, so a raw
+    # positive return means the currency WEAKENED. _strength_sign() flips them
+    # back to a strength return before the index applies the + exporter sign.
     ("BRL=X",  "Brazilian Real",    0.513),
     ("VND=X",  "Vietnamese Dong",   0.262),
     ("COP=X",  "Colombian Peso",    0.128),
@@ -83,8 +94,9 @@ EXPORTERS = [
 ]
 
 IMPORTERS = [
-    # Ticker format: XXXUSD=X means "how many USD per 1 unit of XXX"
-    # Positive daily return → importer currency stronger → bearish for coffee (cheaper for them)
+    # EURUSD=X is stored USD-per-EUR (a raw positive return already means a
+    # stronger Euro); the plain 3-letter tickers are local-per-USD and get
+    # flipped by _strength_sign(). The index then applies the − importer sign.
     ("EURUSD=X", "Euro",          0.673),
     ("JPY=X",    "Japanese Yen",  0.095),
     ("CHF=X",    "Swiss Franc",   0.052),
@@ -123,6 +135,23 @@ def _ticker_to_currency(ticker: str) -> tuple[str, bool]:
     if len(t) == 6 and t.endswith("USD"):
         return t[:3].lower(), True
     return t.lower(), False
+
+
+def _strength_sign(ticker: str) -> int:
+    """Convert a stored daily return into a 'currency strength vs USD' return.
+
+    The stored series orientation (see _fetch_all_closes) is mixed:
+      invert=True  → USD-per-foreign  → a +return already means the currency
+                     strengthened against the dollar, so keep it (+1).
+      invert=False → local-per-USD    → a +return means MORE local units per USD,
+                     i.e. the currency *weakened*, so flip the sign (−1).
+
+    Multiplying a raw return by this factor yields a strength return that is
+    positive when (and only when) the currency gained on the dollar — the single
+    convention the index is built on.
+    """
+    _, invert = _ticker_to_currency(ticker)
+    return 1 if invert else -1
 
 
 def _fetch_one_date(date_str: str, wanted: set[str]) -> dict[str, float] | None:
@@ -223,14 +252,17 @@ def _compute_index_series(
 
     df = pd.DataFrame(all_series).dropna(how="all")
 
-    # Weighted daily ΔI
+    # Weighted daily ΔI. Each raw return is normalised to a strength return via
+    # _strength_sign(), then exporters add (+) and importers subtract (−) so the
+    # index rises when producer currencies strengthen and falls when consumer
+    # currencies strengthen.
     delta_i = pd.Series(0.0, index=df.index)
     for ticker, _, w in EXPORTERS:
         if ticker in df.columns:
-            delta_i += df[ticker].fillna(0) * w
+            delta_i += df[ticker].fillna(0) * (w * _strength_sign(ticker))
     for ticker, _, w in IMPORTERS:
         if ticker in df.columns:
-            delta_i += df[ticker].fillna(0) * w
+            delta_i += df[ticker].fillna(0) * (-w * _strength_sign(ticker))
 
     # Cumulative index starting at 100
     index_series = (1 + delta_i).cumprod() * 100
@@ -280,32 +312,36 @@ def main():
     # ── Per-currency contributions (today only) ────────────────────────────────
     currency_details = []
 
-    def _today_return(ticker: str, returns: dict[str, pd.Series]) -> float | None:
+    def _today_strength(ticker: str, returns: dict[str, pd.Series]) -> float | None:
+        """Today's % strength change vs USD (positive = the currency gained)."""
         s = returns.get(ticker)
         if s is None or s.empty:
             return None
-        return _safe_float(s.iloc[-1] * 100)  # in %
+        return _safe_float(s.iloc[-1] * 100 * _strength_sign(ticker))  # in %, strength-signed
 
+    # daily_chg is the currency's strength move vs USD (positive = stronger).
+    # contribution is its signed impact on the index: + for exporters, − for
+    # importers — so a stronger Real reads bullish and a stronger Euro bearish.
     for ticker, name, w in EXPORTERS:
-        ret = _today_return(ticker, exporter_returns)
+        chg = _today_strength(ticker, exporter_returns)
         currency_details.append({
             "ticker":       ticker,
             "name":         name,
             "type":         "export",
             "weight":       w,
-            "daily_chg":    ret,
-            "contribution": _safe_float(ret * w / 100) if ret is not None else None,
+            "daily_chg":    chg,
+            "contribution": _safe_float(chg * w / 100) if chg is not None else None,
         })
 
     for ticker, name, w in IMPORTERS:
-        ret = _today_return(ticker, importer_returns)
+        chg = _today_strength(ticker, importer_returns)
         currency_details.append({
             "ticker":       ticker,
             "name":         name,
             "type":         "import",
             "weight":       w,
-            "daily_chg":    ret,
-            "contribution": _safe_float(ret * w / 100) if ret is not None else None,
+            "daily_chg":    chg,
+            "contribution": _safe_float(-chg * w / 100) if chg is not None else None,
         })
 
     total_delta_i = sum(
