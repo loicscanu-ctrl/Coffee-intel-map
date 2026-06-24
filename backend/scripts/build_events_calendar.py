@@ -176,14 +176,19 @@ def build_events(year: int = 2026) -> list[dict]:
             "notes":    f"KC (Arabica) {date(year, month, 1).strftime('%b %Y')} contract — watch for max-OI roll into the next month in the prior 17 business days.",
         })
 
-    # ICE RC FND
+    # ICE Robusta FND. The active Robusta contract is the 10-tonne RM
+    # series (since the 5-T RC was phased out for active trading); the
+    # rest of the brief pipeline reads RMN26 / RMU26 / ... from
+    # futures_chain.json and latest_prices.json, so the FND title must
+    # match that symbol or the user sees a phantom contract here that
+    # appears nowhere else in the morning brief.
     for letter, month in RC_MONTHS.items():
         d = _fnd_rc(year, month)
         out.append({
             "date":     d.isoformat(),
             "category": "fnd",
-            "title":    f"RC{letter}{str(year)[-2:]} First Notice Day",
-            "notes":    f"RC (Robusta) {date(year, month, 1).strftime('%b %Y')} contract — watch for max-OI roll into the next month in the prior 26 business days.",
+            "title":    f"RM{letter}{str(year)[-2:]} First Notice Day",
+            "notes":    f"RM (Robusta 10-T) {date(year, month, 1).strftime('%b %Y')} contract — watch for max-OI roll into the next month in the prior 26 business days.",
         })
 
     # Vietnam Customs — monthly statistical bulletin, ~25th of the month.

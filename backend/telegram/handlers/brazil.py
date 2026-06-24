@@ -53,7 +53,7 @@ def handle(args: str, context: dict) -> str:
     total = arab + con + sol
 
     lines = [
-        f"<b>Brazil Daily Registrations</b> ({month}/{day})",
+        f"<b>Brazil Daily Registrations</b> ({month}-{day})",
         f"Total: {total:,} bags",
         "",
         "MoM change (same day):",
