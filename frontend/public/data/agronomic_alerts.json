@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-24T05:59:38+00:00",
+  "generated_at": "2026-06-25T05:59:35+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,22 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 112.4
-          }
-        }
-      ]
-    },
-    "ethiopia": {
-      "Kaffa": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.2,
-            "forecast_7d_rain": 51.5
+            "forecast_7d_rain": 112.7
           }
         }
       ]
@@ -42,7 +27,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.17,
-            "forecast_7d_rain": 72.9
+            "forecast_7d_rain": 88.4
           }
         }
       ],
@@ -55,7 +40,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.26,
-            "forecast_7d_rain": 73.7
+            "forecast_7d_rain": 78.7
           }
         }
       ],
@@ -68,7 +53,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.55,
-            "forecast_7d_rain": 55.8
+            "forecast_7d_rain": 61.9
           }
         }
       ],
@@ -81,19 +66,19 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.45,
-            "forecast_7d_rain": 84.3
+            "forecast_7d_rain": 74.0
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 6,
+    "total_alerts": 5,
     "by_severity": {
-      "watch": 6
+      "watch": 5
     },
     "by_threat": {
-      "blossom_drop": 6
+      "blossom_drop": 5
     }
   }
 }
