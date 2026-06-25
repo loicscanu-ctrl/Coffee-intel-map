@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-25T10:18:26+00:00",
+  "scraped_at": "2026-06-25T12:24:38+00:00",
   "thermocline": {
     "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
     "dataset_id": "pmelTaoDyT",
@@ -39,7 +39,9 @@
         "recent_7d_mean_c": null,
         "baseline_30d_mean_c": null,
         "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "kelvin_signal": "no-data",
+        "window_min_c": null,
+        "window_max_c": null
       },
       {
         "station_id": "0n156e",
@@ -54,7 +56,9 @@
         "recent_7d_mean_c": null,
         "baseline_30d_mean_c": null,
         "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "kelvin_signal": "no-data",
+        "window_min_c": null,
+        "window_max_c": null
       },
       {
         "station_id": "2s156e",
@@ -69,7 +73,9 @@
         "recent_7d_mean_c": null,
         "baseline_30d_mean_c": null,
         "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "kelvin_signal": "no-data",
+        "window_min_c": null,
+        "window_max_c": null
       },
       {
         "station_id": "2n165e",
@@ -84,7 +90,9 @@
         "recent_7d_mean_c": 23.78,
         "baseline_30d_mean_c": 27.58,
         "delta_30d_c": -3.8,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 23.01,
+        "window_max_c": 28.56
       },
       {
         "station_id": "0n165e",
@@ -99,7 +107,9 @@
         "recent_7d_mean_c": 22.18,
         "baseline_30d_mean_c": 26.39,
         "delta_30d_c": -4.21,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 19.58,
+        "window_max_c": 29.11
       },
       {
         "station_id": "2s165e",
@@ -114,7 +124,9 @@
         "recent_7d_mean_c": 25.23,
         "baseline_30d_mean_c": 27.94,
         "delta_30d_c": -2.71,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 24.57,
+        "window_max_c": 28.98
       },
       {
         "station_id": "2n180",
@@ -129,7 +141,9 @@
         "recent_7d_mean_c": 21.8,
         "baseline_30d_mean_c": 26.22,
         "delta_30d_c": -4.42,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 20.73,
+        "window_max_c": 27.08
       },
       {
         "station_id": "0n180",
@@ -144,7 +158,9 @@
         "recent_7d_mean_c": 20.94,
         "baseline_30d_mean_c": 27.8,
         "delta_30d_c": -6.86,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 19.78,
+        "window_max_c": 28.03
       },
       {
         "station_id": "2s180",
@@ -159,7 +175,9 @@
         "recent_7d_mean_c": 24.21,
         "baseline_30d_mean_c": 28.05,
         "delta_30d_c": -3.84,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 23.07,
+        "window_max_c": 28.39
       },
       {
         "station_id": "2n170w",
@@ -174,7 +192,9 @@
         "recent_7d_mean_c": 21.58,
         "baseline_30d_mean_c": 27.01,
         "delta_30d_c": -5.43,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 20.12,
+        "window_max_c": 27.3
       },
       {
         "station_id": "0n170w",
@@ -189,7 +209,9 @@
         "recent_7d_mean_c": 20.38,
         "baseline_30d_mean_c": 27.39,
         "delta_30d_c": -7.0,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 19.35,
+        "window_max_c": 27.71
       },
       {
         "station_id": "2s170w",
@@ -204,7 +226,9 @@
         "recent_7d_mean_c": 22.74,
         "baseline_30d_mean_c": 27.62,
         "delta_30d_c": -4.88,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 21.24,
+        "window_max_c": 27.99
       },
       {
         "station_id": "2n155w",
@@ -219,7 +243,9 @@
         "recent_7d_mean_c": 15.92,
         "baseline_30d_mean_c": 21.45,
         "delta_30d_c": -5.53,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 14.4,
+        "window_max_c": 24.91
       },
       {
         "station_id": "0n155w",
@@ -234,7 +260,9 @@
         "recent_7d_mean_c": 18.88,
         "baseline_30d_mean_c": 24.35,
         "delta_30d_c": -5.47,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 17.57,
+        "window_max_c": 26.18
       },
       {
         "station_id": "2s155w",
@@ -249,7 +277,9 @@
         "recent_7d_mean_c": 18.6,
         "baseline_30d_mean_c": 23.11,
         "delta_30d_c": -4.51,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 16.79,
+        "window_max_c": 25.38
       },
       {
         "station_id": "2n140w",
@@ -264,7 +294,9 @@
         "recent_7d_mean_c": 14.73,
         "baseline_30d_mean_c": 16.42,
         "delta_30d_c": -1.7,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 14.11,
+        "window_max_c": 20.25
       },
       {
         "station_id": "0n140w",
@@ -279,7 +311,9 @@
         "recent_7d_mean_c": null,
         "baseline_30d_mean_c": null,
         "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "kelvin_signal": "no-data",
+        "window_min_c": null,
+        "window_max_c": null
       },
       {
         "station_id": "2s140w",
@@ -294,7 +328,9 @@
         "recent_7d_mean_c": 15.76,
         "baseline_30d_mean_c": 19.24,
         "delta_30d_c": -3.48,
-        "kelvin_signal": "cold-kelvin-wave"
+        "kelvin_signal": "cold-kelvin-wave",
+        "window_min_c": 14.12,
+        "window_max_c": 22.47
       },
       {
         "station_id": "2n125w",
@@ -309,7 +345,9 @@
         "recent_7d_mean_c": 13.62,
         "baseline_30d_mean_c": 13.75,
         "delta_30d_c": -0.13,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 13.1,
+        "window_max_c": 14.38
       },
       {
         "station_id": "0n125w",
@@ -324,7 +362,9 @@
         "recent_7d_mean_c": null,
         "baseline_30d_mean_c": null,
         "delta_30d_c": null,
-        "kelvin_signal": "no-data"
+        "kelvin_signal": "no-data",
+        "window_min_c": null,
+        "window_max_c": null
       },
       {
         "station_id": "2s125w",
@@ -339,7 +379,9 @@
         "recent_7d_mean_c": 13.24,
         "baseline_30d_mean_c": 13.46,
         "delta_30d_c": -0.22,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 12.9,
+        "window_max_c": 14.82
       },
       {
         "station_id": "2n110w",
@@ -354,7 +396,9 @@
         "recent_7d_mean_c": 13.53,
         "baseline_30d_mean_c": 13.56,
         "delta_30d_c": -0.03,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 13.11,
+        "window_max_c": 14.19
       },
       {
         "station_id": "0n110w",
@@ -369,7 +413,9 @@
         "recent_7d_mean_c": 14.96,
         "baseline_30d_mean_c": 14.82,
         "delta_30d_c": 0.13,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 13.72,
+        "window_max_c": 16.3
       },
       {
         "station_id": "2s110w",
@@ -384,7 +430,9 @@
         "recent_7d_mean_c": 12.78,
         "baseline_30d_mean_c": 12.87,
         "delta_30d_c": -0.09,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 12.73,
+        "window_max_c": 13.48
       },
       {
         "station_id": "2n95w",
@@ -399,7 +447,9 @@
         "recent_7d_mean_c": 13.88,
         "baseline_30d_mean_c": 14.27,
         "delta_30d_c": -0.4,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 13.78,
+        "window_max_c": 14.6
       },
       {
         "station_id": "0n95w",
@@ -414,7 +464,9 @@
         "recent_7d_mean_c": 15.26,
         "baseline_30d_mean_c": 14.8,
         "delta_30d_c": 0.46,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 14.16,
+        "window_max_c": 16.06
       },
       {
         "station_id": "2s95w",
@@ -429,7 +481,9 @@
         "recent_7d_mean_c": 14.0,
         "baseline_30d_mean_c": 13.95,
         "delta_30d_c": 0.05,
-        "kelvin_signal": "neutral"
+        "kelvin_signal": "neutral",
+        "window_min_c": 13.5,
+        "window_max_c": 14.31
       }
     ],
     "by_longitude": {
