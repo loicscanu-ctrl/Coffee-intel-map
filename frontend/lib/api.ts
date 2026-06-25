@@ -204,6 +204,10 @@ export interface MacroCotEntry {
   close_price: number | null;
   gross_exposure_usd: number | null;
   net_exposure_usd: number | null;
+  // Exchange initial margin × lots (RJO Brien guide eff. 3/14/2026).
+  // = (mm_long + mm_short) × outright_rate + mm_spread × spread_rate.
+  // Surfaces in Step1GlobalFlow as the "Initial Margin" KPI.
+  initial_margin_usd: number | null;
 }
 
 export interface MacroCotWeek {

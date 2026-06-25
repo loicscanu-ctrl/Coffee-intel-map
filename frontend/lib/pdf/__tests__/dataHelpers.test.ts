@@ -109,6 +109,7 @@ function makeWeek(
       net_exposure_usd: c.close_price != null
         ? (c.mm_long - c.mm_short) * c.close_price * 1000
         : null,
+      initial_margin_usd: null,
     })),
   };
 }
