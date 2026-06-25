@@ -1,64 +1,64 @@
 {
-  "generated_at": "2026-06-24T06:32:38.650837Z",
+  "generated_at": "2026-06-25T03:17:14.942912Z",
   "tickers": [
     {
       "label": "KCN26",
-      "value": "287.95 (+10.95)",
+      "value": "291.55 (+3.60)",
       "category": "futures"
     },
     {
       "label": "RMN26",
-      "value": "3,580 (-9)",
+      "value": "3,707 (+127)",
       "category": "futures"
     },
     {
       "label": "B3 4/5 Jul '26",
-      "value": "347.95 USD/sac",
+      "value": "352.70 USD/sac",
       "category": "futures"
     },
     {
       "label": "VN FAQ",
-      "value": "88.600 VND ($3,375)",
+      "value": "88.700 VND ($3,379)",
       "category": "physical"
     },
     {
       "label": "CON T7",
-      "value": "960,00 BRL ($3,093)",
+      "value": "980,00 BRL ($3,144)",
       "category": "physical"
     },
     {
       "label": "UGA S15",
-      "value": "172.00 ($3,792)",
+      "value": "172.63 ($3,806)",
       "category": "physical"
     },
     {
       "label": "GT SHB",
-      "value": "Q1,967.99 ($5,694)",
+      "value": "Q1,994.68 ($5,769)",
       "category": "physical"
     },
     {
       "label": "USD/BRL",
-      "value": "5.1735",
+      "value": "5.1954",
       "category": "fx"
     },
     {
       "label": "USD/VND",
-      "value": "26252",
+      "value": "26253",
       "category": "fx"
     },
     {
       "label": "USD/IDR",
-      "value": "17873",
+      "value": "17978",
       "category": "fx"
     },
     {
       "label": "USD/HNL",
-      "value": "26.7715",
+      "value": "26.7287",
       "category": "fx"
     },
     {
       "label": "USD/UGX",
-      "value": "3640",
+      "value": "3651",
       "category": "fx"
     }
   ]
