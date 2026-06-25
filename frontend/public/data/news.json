@@ -1,7 +1,7 @@
 [
   {
     "id": 7399,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-25",
+    "title": "Ethiopia Agronomic Status – 2026-06-25",
     "body": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -19,11 +19,15 @@
       "text": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: 2 growing regions flagged at agronomic risk"
   },
   {
     "id": 7398,
-    "title": "Uganda Agronomic Status \u2013 2026-06-25",
+    "title": "Uganda Agronomic Status – 2026-06-25",
     "body": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -41,11 +45,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 1 growing region flagged at agronomic risk"
   },
   {
     "id": 7397,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-25",
+    "title": "Indonesia Agronomic Status – 2026-06-25",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -63,12 +71,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7396,
-    "title": "Honduras Agronomic Status \u2013 2026-06-25",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-25",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -79,18 +91,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-25T05:59:33.731284",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7395,
-    "title": "Colombia Agronomic Status \u2013 2026-06-25",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-25",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -101,18 +117,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-25T05:59:33.285173",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7394,
-    "title": "Brazil Agronomic Status \u2013 2026-06-25",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-25",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -123,17 +143,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-25T05:59:31.135419",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7393,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-23",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-23",
     "body": "ICE-EU RC Open Interest changed by -431 over the last session, with -1,114 on nearby two contracts and +683 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -151,11 +175,15 @@
       "text": "ICE-EU RC Open Interest changed by -431 over the last session, with -1,114 on nearby two contracts and +683 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
   },
   {
     "id": 7392,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-23",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-23",
     "body": "IFUS KC Open Interest changed by -840 over the last session, with -1,546 on nearby two contracts and +706 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -173,11 +201,15 @@
       "text": "IFUS KC Open Interest changed by -840 over the last session, with -1,546 on nearby two contracts and +706 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7391,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-24",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-24",
     "body": "RC Robusta certified stocks shifted by -9 lots today, bringing global visible exchange inventory to 3,986 lots.",
     "source": "ICE",
     "category": "supply",
@@ -199,7 +231,7 @@
   },
   {
     "id": 7390,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-24",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-24",
     "body": "KC Arabica certified stocks shifted by -3,954 bags today, bringing global visible exchange inventory to 388,956 bags.",
     "source": "ICE",
     "category": "supply",
@@ -221,7 +253,7 @@
   },
   {
     "id": 7389,
-    "title": "World Bank Population \u2013 2026-06-25",
+    "title": "World Bank Population – 2026-06-25",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
     "source": "World Bank",
     "category": "demand",
@@ -237,7 +269,7 @@
   },
   {
     "id": 7388,
-    "title": "Fertilizer Prices \u2013 2026-06",
+    "title": "Fertilizer Prices – 2026-06",
     "body": null,
     "source": "World Bank",
     "category": "supply",
@@ -250,11 +282,14 @@
       "brazil"
     ],
     "meta": "{\"urea_monthly\": [409.25, 392.5, 415.4, 472.0, 725.63, 856.88, 770.5], \"dap_monthly\": [708.25, 627.5, 619.2, 626.5, 658.25, 725.25, 769.5], \"kcl_monthly\": [353.75, 358.33, 366.0, 372.5, 380.63, 401.25, 405.0], \"urea_history\": [{\"month\": \"2021-06\", \"price\": 393.2}, {\"month\": \"2021-07\", \"price\": 441.5}, {\"month\": \"2021-08\", \"price\": 446.9}, {\"month\": \"2021-09\", \"price\": 418.8}, {\"month\": \"2021-10\", \"price\": 695.0}, {\"month\": \"2021-11\", \"price\": 900.5}, {\"month\": \"2021-12\", \"price\": 890.0}, {\"month\": \"2022-01\", \"price\": 846.4}, {\"month\": \"2022-02\", \"price\": 744.2}, {\"month\": \"2022-03\", \"price\": 872.5}, {\"month\": \"2022-04\", \"price\": 925.0}, {\"month\": \"2022-05\", \"price\": 707.5}, {\"month\": \"2022-06\", \"price\": 690.0}, {\"month\": \"2022-07\", \"price\": 601.0}, {\"month\": \"2022-08\", \"price\": 591.2}, {\"month\": \"2022-09\", \"price\": 678.0}, {\"month\": \"2022-10\", \"price\": 636.2}, {\"month\": \"2022-11\", \"price\": 588.8}, {\"month\": \"2022-12\", \"price\": 519.4}, {\"month\": \"2023-01\", \"price\": 443.8}, {\"month\": \"2023-02\", \"price\": 357.5}, {\"month\": \"2023-03\", \"price\": 313.5}, {\"month\": \"2023-04\", \"price\": 313.4}, {\"month\": \"2023-05\", \"price\": 329.2}, {\"month\": \"2023-06\", \"price\": 287.5}, {\"month\": \"2023-07\", \"price\": 334.6}, {\"month\": \"2023-08\", \"price\": 385.6}, {\"month\": \"2023-09\", \"price\": 380.0}, {\"month\": \"2023-10\", \"price\": 411.4}, {\"month\": \"2023-11\", \"price\": 385.5}, {\"month\": \"2023-12\", \"price\": 354.0}, {\"month\": \"2024-01\", \"price\": 335.4}, {\"month\": \"2024-02\", \"price\": 351.2}, {\"month\": \"2024-03\", \"price\": 330.0}, {\"month\": \"2024-04\", \"price\": 320.0}, {\"month\": \"2024-05\", \"price\": 284.8}, {\"month\": \"2024-06\", \"price\": 336.2}, {\"month\": \"2024-07\", \"price\": 342.5}, {\"month\": \"2024-08\", \"price\": 342.5}, {\"month\": \"2024-09\", \"price\": 337.5}, {\"month\": \"2024-10\", \"price\": 374.8}, {\"month\": \"2024-11\", \"price\": 352.3}, {\"month\": \"2024-12\", \"price\": 352.0}, {\"month\": \"2025-01\", \"price\": 380.5}, {\"month\": \"2025-02\", \"price\": 436.5}, {\"month\": \"2025-03\", \"price\": 394.5}, {\"month\": \"2025-04\", \"price\": 386.9}, {\"month\": \"2025-05\", \"price\": 392.0}, {\"month\": \"2025-06\", \"price\": 420.5}, {\"month\": \"2025-07\", \"price\": 496.0}, {\"month\": \"2025-08\", \"price\": 507.7}, {\"month\": \"2025-09\", \"price\": 461.1}, {\"month\": \"2025-10\", \"price\": 394.4}, {\"month\": \"2025-11\", \"price\": 409.2}, {\"month\": \"2025-12\", \"price\": 392.5}, {\"month\": \"2026-01\", \"price\": 415.4}, {\"month\": \"2026-02\", \"price\": 472.0}, {\"month\": \"2026-03\", \"price\": 725.6}, {\"month\": \"2026-04\", \"price\": 856.9}, {\"month\": \"2026-05\", \"price\": 770.5}], \"dap_history\": [{\"month\": \"2021-06\", \"price\": 604.8}, {\"month\": \"2021-07\", \"price\": 613.0}, {\"month\": \"2021-08\", \"price\": 603.1}, {\"month\": \"2021-09\", \"price\": 643.8}, {\"month\": \"2021-10\", \"price\": 672.9}, {\"month\": \"2021-11\", \"price\": 726.7}, {\"month\": \"2021-12\", \"price\": 745.0}, {\"month\": \"2022-01\", \"price\": 699.4}, {\"month\": \"2022-02\", \"price\": 747.1}, {\"month\": \"2022-03\", \"price\": 938.1}, {\"month\": \"2022-04\", \"price\": 954.0}, {\"month\": \"2022-05\", \"price\": 842.5}, {\"month\": \"2022-06\", \"price\": 783.8}, {\"month\": \"2022-07\", \"price\": 784.0}, {\"month\": \"2022-08\", \"price\": 749.4}, {\"month\": \"2022-09\", \"price\": 752.0}, {\"month\": \"2022-10\", \"price\": 725.0}, {\"month\": \"2022-11\", \"price\": 665.6}, {\"month\": \"2022-12\", \"price\": 625.0}, {\"month\": \"2023-01\", \"price\": 631.0}, {\"month\": \"2023-02\", \"price\": 612.5}, {\"month\": \"2023-03\", \"price\": 606.0}, {\"month\": \"2023-04\", \"price\": 637.0}, {\"month\": \"2023-05\", \"price\": 510.0}, {\"month\": \"2023-06\", \"price\": 454.6}, {\"month\": \"2023-07\", \"price\": 458.8}, {\"month\": \"2023-08\", \"price\": 528.8}, {\"month\": \"2023-09\", \"price\": 527.9}, {\"month\": \"2023-10\", \"price\": 534.8}, {\"month\": \"2023-11\", \"price\": 535.6}, {\"month\": \"2023-12\", \"price\": 563.8}, {\"month\": \"2024-01\", \"price\": 596.2}, {\"month\": \"2024-02\", \"price\": 583.8}, {\"month\": \"2024-03\", \"price\": 617.5}, {\"month\": \"2024-04\", \"price\": 545.0}, {\"month\": \"2024-05\", \"price\": 522.0}, {\"month\": \"2024-06\", \"price\": 543.0}, {\"month\": \"2024-07\", \"price\": 539.4}, {\"month\": \"2024-08\", \"price\": 546.0}, {\"month\": \"2024-09\", \"price\": 554.8}, {\"month\": \"2024-10\", \"price\": 573.4}, {\"month\": \"2024-11\", \"price\": 574.5}, {\"month\": \"2024-12\", \"price\": 568.3}, {\"month\": \"2025-01\", \"price\": 582.7}, {\"month\": \"2025-02\", \"price\": 603.8}, {\"month\": \"2025-03\", \"price\": 615.1}, {\"month\": \"2025-04\", \"price\": 635.0}, {\"month\": \"2025-05\", \"price\": 669.2}, {\"month\": \"2025-06\", \"price\": 715.4}, {\"month\": \"2025-07\", \"price\": 736.0}, {\"month\": \"2025-08\", \"price\": 795.1}, {\"month\": \"2025-09\", \"price\": 780.6}, {\"month\": \"2025-10\", \"price\": 754.0}, {\"month\": \"2025-11\", \"price\": 708.2}, {\"month\": \"2025-12\", \"price\": 627.5}, {\"month\": \"2026-01\", \"price\": 619.2}, {\"month\": \"2026-02\", \"price\": 626.5}, {\"month\": \"2026-03\", \"price\": 658.2}, {\"month\": \"2026-04\", \"price\": 725.2}, {\"month\": \"2026-05\", \"price\": 769.5}], \"kcl_history\": [{\"month\": \"2021-06\", \"price\": 462.5}, {\"month\": \"2021-07\", \"price\": 633.0}, {\"month\": \"2021-08\", \"price\": 695.0}, {\"month\": \"2021-09\", \"price\": 736.2}, {\"month\": \"2021-10\", \"price\": 782.0}, {\"month\": \"2021-11\", \"price\": 806.9}, {\"month\": \"2021-12\", \"price\": 807.5}, {\"month\": \"2022-01\", \"price\": 785.6}, {\"month\": \"2022-02\", \"price\": 791.9}, {\"month\": \"2022-03\", \"price\": 977.5}, {\"month\": \"2022-04\", \"price\": 1202.0}, {\"month\": \"2022-05\", \"price\": 1170.0}, {\"month\": \"2022-06\", \"price\": 1101.9}, {\"month\": \"2022-07\", \"price\": 1013.0}, {\"month\": \"2022-08\", \"price\": 888.8}, {\"month\": \"2022-09\", \"price\": 731.0}, {\"month\": \"2022-10\", \"price\": 622.5}, {\"month\": \"2022-11\", \"price\": 563.1}, {\"month\": \"2022-12\", \"price\": 513.8}, {\"month\": \"2023-01\", \"price\": 508.8}, {\"month\": \"2023-02\", \"price\": 496.9}, {\"month\": \"2023-03\", \"price\": 453.0}, {\"month\": \"2023-04\", \"price\": 407.5}, {\"month\": \"2023-05\", \"price\": 372.5}, {\"month\": \"2023-06\", \"price\": 328.0}, {\"month\": \"2023-07\", \"price\": 341.2}, {\"month\": \"2023-08\", \"price\": 353.1}, {\"month\": \"2023-09\", \"price\": 352.0}, {\"month\": \"2023-10\", \"price\": 341.9}, {\"month\": \"2023-11\", \"price\": 331.9}, {\"month\": \"2023-12\", \"price\": 311.9}, {\"month\": \"2024-01\", \"price\": 296.2}, {\"month\": \"2024-02\", \"price\": 289.4}, {\"month\": \"2024-03\", \"price\": 300.5}, {\"month\": \"2024-04\", \"price\": 305.0}, {\"month\": \"2024-05\", \"price\": 307.0}, {\"month\": \"2024-06\", \"price\": 310.0}, {\"month\": \"2024-07\", \"price\": 300.6}, {\"month\": \"2024-08\", \"price\": 294.0}, {\"month\": \"2024-09\", \"price\": 286.9}, {\"month\": \"2024-10\", \"price\": 278.1}, {\"month\": \"2024-11\", \"price\": 281.0}, {\"month\": \"2024-12\", \"price\": 292.5}, {\"month\": \"2025-01\", \"price\": 302.0}, {\"month\": \"2025-02\", \"price\": 318.8}, {\"month\": \"2025-03\", \"price\": 336.2}, {\"month\": \"2025-04\", \"price\": 351.9}, {\"month\": \"2025-05\", \"price\": 362.5}, {\"month\": \"2025-06\", \"price\": 363.1}, {\"month\": \"2025-07\", \"price\": 362.5}, {\"month\": \"2025-08\", \"price\": 356.5}, {\"month\": \"2025-09\", \"price\": 352.5}, {\"month\": \"2025-10\", \"price\": 352.0}, {\"month\": \"2025-11\", \"price\": 353.8}, {\"month\": \"2025-12\", \"price\": 358.3}, {\"month\": \"2026-01\", \"price\": 366.0}, {\"month\": \"2026-02\", \"price\": 372.5}, {\"month\": \"2026-03\", \"price\": 380.6}, {\"month\": \"2026-04\", \"price\": 401.2}, {\"month\": \"2026-05\", \"price\": 405.0}], \"last_data_month\": \"May-2026\"}",
-    "pub_date": "2026-06-25T03:05:35.143736"
+    "pub_date": "2026-06-25T03:05:35.143736",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 70.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 7387,
-    "title": "ENSO ONI \u2013 2026-06",
+    "title": "ENSO ONI – 2026-06",
     "body": null,
     "source": "NOAA CPC",
     "category": "supply",
@@ -266,11 +301,15 @@
       "brazil"
     ],
     "meta": "{\"oni_history\": [{\"month\": \"Nov-24\", \"value\": -0.3}, {\"month\": \"Dec-24\", \"value\": -0.42}, {\"month\": \"Jan-25\", \"value\": -0.45}, {\"month\": \"Feb-25\", \"value\": -0.24}, {\"month\": \"Mar-25\", \"value\": -0.06}, {\"month\": \"Apr-25\", \"value\": 0.02}, {\"month\": \"May-25\", \"value\": -0.02}, {\"month\": \"Jun-25\", \"value\": -0.04}, {\"month\": \"Jul-25\", \"value\": -0.14}, {\"month\": \"Aug-25\", \"value\": -0.28}, {\"month\": \"Sep-25\", \"value\": -0.4}, {\"month\": \"Oct-25\", \"value\": -0.51}, {\"month\": \"Nov-25\", \"value\": -0.55}, {\"month\": \"Dec-25\", \"value\": -0.54}, {\"month\": \"Jan-26\", \"value\": -0.37}, {\"month\": \"Feb-26\", \"value\": -0.14, \"preliminary\": true}, {\"month\": \"Mar-26\", \"value\": 0.13, \"preliminary\": true}, {\"month\": \"Apr-26\", \"value\": 0.48, \"preliminary\": true}]}",
-    "pub_date": "2026-06-25T03:05:29.305058"
+    "pub_date": "2026-06-25T03:05:29.305058",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "ONI +0.48 (Apr-26) — mild phase, no supply trigger"
   },
   {
     "id": 7386,
-    "title": "Ethiopia ECX Coffee Price \u2013 2026-06-25",
+    "title": "Ethiopia ECX Coffee Price – 2026-06-25",
     "body": "ECX auction price: 300.00 ETB/kg as of 2026-06-25.",
     "source": "ECX",
     "category": "supply",
@@ -287,8 +326,8 @@
   },
   {
     "id": 7385,
-    "title": "Guatemala ANACAFE Precios de Referencia \u2013 2026-06-25",
-    "body": "ANACAFE caf\u00e9 oro reference prices (GTQ/quintal): Prima Lavado Q1,926.07, Duro Q1,971.81, Estrictamente Duro Q1,994.68. USD\u2192GTQ 7.62327. NY 'C' 291.55. [rendered]",
+    "title": "Guatemala ANACAFE Precios de Referencia – 2026-06-25",
+    "body": "ANACAFE café oro reference prices (GTQ/quintal): Prima Lavado Q1,926.07, Duro Q1,971.81, Estrictamente Duro Q1,994.68. USD→GTQ 7.62327. NY 'C' 291.55. [rendered]",
     "source": "ANACAFE",
     "category": "supply",
     "lat": 14.6349,
@@ -305,7 +344,7 @@
   },
   {
     "id": 7384,
-    "title": "Colombia FNC Precio Interno \u2013 2026-06-25",
+    "title": "Colombia FNC Precio Interno – 2026-06-25",
     "body": "FNC internal purchase price: 2,165,000 COP/carga (125 kg) as of 2026-06-25.",
     "source": "FNC",
     "category": "supply",
@@ -322,7 +361,7 @@
   },
   {
     "id": 7383,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-25",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-25",
     "body": "B3 Arabica 4/5 settlement: 352.70 USD/sac | OI: 155 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -340,8 +379,8 @@
   },
   {
     "id": 7372,
-    "title": "Uganda Screen 15 \u2013 2026-06-25",
-    "body": "Uganda Fine Robusta Screen 15 price: 172.63 US\u00a2/lb \u00b7 Arabica: Wugar 268.95, Drugar 249.95",
+    "title": "Uganda Screen 15 – 2026-06-25",
+    "body": "Uganda Fine Robusta Screen 15 price: 172.63 US¢/lb · Arabica: Wugar 268.95, Drugar 249.95",
     "source": "UCDA",
     "category": "supply",
     "lat": 1.3733,
@@ -356,8 +395,8 @@
   },
   {
     "id": 7371,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-25",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-25",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -371,8 +410,8 @@
   },
   {
     "id": 7370,
-    "title": "ICE COT Robusta Coffee (London) \u2013 2026-06-16",
-    "body": "Report: 2026-06-16 | OI: 107,329 | MM net: +30,100 (L:43,762 S:13,662 Sp:11,146 \u0394L:+11,823 \u0394S:-3,904) | PMPU L:22,991 S:54,474 | Swap L:3,120 S:9,843 | Other L:10,008 S:4,287 | NR L:8,020 S:5,635",
+    "title": "ICE COT Robusta Coffee (London) – 2026-06-16",
+    "body": "Report: 2026-06-16 | OI: 107,329 | MM net: +30,100 (L:43,762 S:13,662 Sp:11,146 ΔL:+11,823 ΔS:-3,904) | PMPU L:22,991 S:54,474 | Swap L:3,120 S:9,843 | Other L:10,008 S:4,287 | NR L:8,020 S:5,635",
     "source": "ICE",
     "category": "general",
     "lat": 0.0,
@@ -385,15 +424,19 @@
     "meta": "{\"report_date\": \"2026-06-16\", \"open_interest\": 107329, \"pmpu\": {\"long\": 22991, \"short\": 54474, \"d_long\": -3244, \"d_short\": 14678}, \"swap\": {\"long\": 3120, \"short\": 9843, \"spread\": 1736, \"d_long\": -913, \"d_short\": 1102}, \"mm\": {\"long\": 43762, \"short\": 13662, \"spread\": 11146, \"d_long\": 11823, \"d_short\": -3904, \"d_spread\": -1085}, \"other\": {\"long\": 10008, \"short\": 4287, \"spread\": 6546, \"d_long\": 2883, \"d_short\": -742}, \"nr\": {\"long\": 8020, \"short\": 5635, \"d_long\": -180, \"d_short\": -765}, \"_commentary\": {\"text\": \"CFTC Release for London Robusta (RC):\\n  \\u2022 Total OI up +10,354 WoW\\n  \\u2022 Industry Long decreased by 3,244 lots\\n  \\u2022 Industry Short increased by 14,678 lots\\n  \\u2022 Managed Money increased their net exposure by 15,727 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
     "pub_date": "2026-06-25T03:03:23.039504",
     "commentary": {
-      "text": "CFTC Release for London Robusta (RC):\n  \u2022 Total OI up +10,354 WoW\n  \u2022 Industry Long decreased by 3,244 lots\n  \u2022 Industry Short increased by 14,678 lots\n  \u2022 Managed Money increased their net exposure by 15,727 contracts.",
+      "text": "CFTC Release for London Robusta (RC):\n  • Total OI up +10,354 WoW\n  • Industry Long decreased by 3,244 lots\n  • Industry Short increased by 14,678 lots\n  • Managed Money increased their net exposure by 15,727 contracts.",
       "hasUpdate": true,
       "isLatestTradingDay": false
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "MM net +15,727 lots (RM robusta, funds buying)"
   },
   {
     "id": 7369,
-    "title": "CFTC COT Coffee C (NY Arabica) \u2013 2026-06-16",
-    "body": "Report: 2026-06-16 | OI: 193,019 | MM net: +14,007 (L:40,455 S:26,448 Sp:34,505 \u0394L:-731 \u0394S:-2,875) | PMPU L:47,480 S:62,694 | Swap L:25,744 S:19,019 | Other L:10,144 S:14,945 | NR L:7,105 S:7,822",
+    "title": "CFTC COT Coffee C (NY Arabica) – 2026-06-16",
+    "body": "Report: 2026-06-16 | OI: 193,019 | MM net: +14,007 (L:40,455 S:26,448 Sp:34,505 ΔL:-731 ΔS:-2,875) | PMPU L:47,480 S:62,694 | Swap L:25,744 S:19,019 | Other L:10,144 S:14,945 | NR L:7,105 S:7,822",
     "source": "CFTC",
     "category": "general",
     "lat": 0.0,
@@ -406,14 +449,18 @@
     "meta": "{\"report_date\": \"2026-06-16\", \"open_interest\": 193019, \"pmpu\": {\"long\": 47480, \"short\": 62694, \"d_long\": -11718, \"d_short\": -5812}, \"swap\": {\"long\": 25744, \"short\": 19019, \"spread\": 3799, \"d_long\": 319, \"d_short\": -2883}, \"mm\": {\"long\": 40455, \"short\": 26448, \"spread\": 34505, \"d_long\": -731, \"d_short\": -2875, \"d_spread\": -5129}, \"other\": {\"long\": 10144, \"short\": 14945, \"spread\": 23787, \"d_long\": -110, \"d_short\": -996}, \"nr\": {\"long\": 7105, \"short\": 7822, \"d_long\": -1642, \"d_short\": -1316}, \"_commentary\": {\"text\": \"CFTC Release for NY Arabica (KC):\\n  \\u2022 Total OI down -20,500 WoW\\n  \\u2022 Industry Long decreased by 11,718 lots\\n  \\u2022 Industry Short decreased by 5,812 lots\\n  \\u2022 Managed Money increased their net exposure by 2,144 contracts.\", \"hasUpdate\": true, \"isLatestTradingDay\": false}}",
     "pub_date": "2026-06-25T03:03:22.598381",
     "commentary": {
-      "text": "CFTC Release for NY Arabica (KC):\n  \u2022 Total OI down -20,500 WoW\n  \u2022 Industry Long decreased by 11,718 lots\n  \u2022 Industry Short decreased by 5,812 lots\n  \u2022 Managed Money increased their net exposure by 2,144 contracts.",
+      "text": "CFTC Release for NY Arabica (KC):\n  • Total OI down -20,500 WoW\n  • Industry Long decreased by 11,718 lots\n  • Industry Short decreased by 5,812 lots\n  • Managed Money increased their net exposure by 2,144 contracts.",
       "hasUpdate": true,
       "isLatestTradingDay": false
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "MM net +2,144 lots (KC arabica)"
   },
   {
     "id": 7368,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-23",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-23",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,707.00 (+127) OI:1,118 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,605.00 (+49) OI:59,879",
     "source": "Barchart",
     "category": "general",
@@ -425,11 +472,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3707, \"chg\": 127, \"oi\": 1118, \"volume\": 1567, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3605, \"chg\": 49, \"oi\": 59879, \"volume\": 11213, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3554, \"chg\": 44, \"oi\": 16843, \"volume\": 7129, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3513, \"chg\": 40, \"oi\": 8446, \"volume\": 1849, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3480, \"chg\": 37, \"oi\": 3428, \"volume\": 1045, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3456, \"chg\": 35, \"oi\": 1454, \"volume\": 193, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3436, \"chg\": 33, \"oi\": 782, \"volume\": 46, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3417, \"chg\": 32, \"oi\": 419, \"volume\": 31, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3397, \"chg\": 28, \"oi\": 407, \"volume\": 25, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-24\"}",
-    "pub_date": "2026-06-25T03:03:21.715276"
+    "pub_date": "2026-06-25T03:03:21.715276",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 +3.4% on the day"
   },
   {
     "id": 7367,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-23",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-23",
     "body": "Front (Coffee (Jul '26)): 291.55 (+3.6) OI:1,018 | 2nd (Coffee (Sep '26)): 277.20 (+1.25) OI:94,534",
     "source": "Barchart",
     "category": "general",
@@ -441,11 +492,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 291.55, \"chg\": 3.6, \"oi\": 1018, \"volume\": 76, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 277.2, \"chg\": 1.25, \"oi\": 94534, \"volume\": 25014, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 263.85, \"chg\": 1.9, \"oi\": 51272, \"volume\": 16145, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 258.9, \"chg\": 2.35, \"oi\": 17822, \"volume\": 7492, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 259.15, \"chg\": 2.2, \"oi\": 7959, \"volume\": 2220, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 260.5, \"chg\": 2.05, \"oi\": 5570, \"volume\": 1180, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 261.8, \"chg\": 2.05, \"oi\": 3303, \"volume\": 991, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 263.15, \"chg\": 2.15, \"oi\": 4308, \"volume\": 477, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 264.1, \"chg\": 2.35, \"oi\": 831, \"volume\": 90, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-24\"}",
-    "pub_date": "2026-06-25T03:03:20.833513"
+    "pub_date": "2026-06-25T03:03:20.833513",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 +1.2% on the day"
   },
   {
     "id": 7366,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-25",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-25",
     "body": "Brazil coffee export data: Issuance | 2,489,859 | 1.5",
     "source": "Cecafe",
     "category": "supply",
@@ -456,11 +511,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-25T03:03:11.767588"
+    "pub_date": "2026-06-25T03:03:11.767588",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports +1.5% YoY (within noise band)"
   },
   {
     "id": 7365,
-    "title": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-25",
+    "title": "Brazil Arabica Price (Noticiasagricolas) – 2026-06-25",
     "body": "Arabica coffee price: R$ 5.20",
     "source": "Noticiasagricolas",
     "category": "supply",
@@ -476,7 +535,7 @@
   },
   {
     "id": 7364,
-    "title": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-25",
+    "title": "Conilon Tipo 7 (Cooabriel) – 2026-06-25",
     "body": "Conilon Tipo 7 price: R$ 980,00/saca (24/06/2026)",
     "source": "Cooabriel",
     "category": "supply",
@@ -492,7 +551,7 @@
   },
   {
     "id": 7363,
-    "title": "USD/UGX FX Rate \u2013 2026-06-25",
+    "title": "USD/UGX FX Rate – 2026-06-25",
     "body": "USD/UGX FX Rate price: 3651",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -507,7 +566,7 @@
   },
   {
     "id": 7362,
-    "title": "USD/HNL FX Rate \u2013 2026-06-25",
+    "title": "USD/HNL FX Rate – 2026-06-25",
     "body": "USD/HNL FX Rate price: 26.7287",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -522,7 +581,7 @@
   },
   {
     "id": 7361,
-    "title": "USD/IDR FX Rate \u2013 2026-06-25",
+    "title": "USD/IDR FX Rate – 2026-06-25",
     "body": "USD/IDR FX Rate price: 17978",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -537,7 +596,7 @@
   },
   {
     "id": 7360,
-    "title": "USD/VND FX Rate \u2013 2026-06-25",
+    "title": "USD/VND FX Rate – 2026-06-25",
     "body": "USD/VND FX Rate price: 26253",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -552,7 +611,7 @@
   },
   {
     "id": 7359,
-    "title": "USD/BRL FX Rate \u2013 2026-06-25",
+    "title": "USD/BRL FX Rate – 2026-06-25",
     "body": "USD/BRL FX Rate price: 5.1954",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -567,7 +626,7 @@
   },
   {
     "id": 7358,
-    "title": "Vietnam Robusta \u2013 2026-06-25",
+    "title": "Vietnam Robusta – 2026-06-25",
     "body": "Vietnam Robusta price: 88.700 VND/kg",
     "source": "Giacaphe",
     "category": "supply",
@@ -613,7 +672,7 @@
   },
   {
     "id": 7357,
-    "title": "German Kaffeesteuer Revenue \u2013 2026-05",
+    "title": "German Kaffeesteuer Revenue – 2026-05",
     "body": "Macro Demand Signal: German Kaffeesteuer revenue for 2026-05 settled at 84,668 Tsd. EUR, marking a -20.0% shift against the prior month and -7.6% vs. last year.",
     "source": "Bundesfinanzministerium",
     "category": "demand",
@@ -631,11 +690,14 @@
       "text": "Macro Demand Signal: German Kaffeesteuer revenue for 2026-05 settled at 84,668 Tsd. EUR, marking a -20.0% shift against the prior month and -7.6% vs. last year.",
       "hasUpdate": true,
       "isLatestTradingDay": false
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 70.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 7356,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-24",
+    "title": "Ethiopia Agronomic Status – 2026-06-24",
     "body": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -653,11 +715,15 @@
       "text": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: 2 growing regions flagged at agronomic risk"
   },
   {
     "id": 7355,
-    "title": "Uganda Agronomic Status \u2013 2026-06-24",
+    "title": "Uganda Agronomic Status – 2026-06-24",
     "body": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -675,11 +741,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 1 growing region flagged at agronomic risk"
   },
   {
     "id": 7354,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-24",
+    "title": "Indonesia Agronomic Status – 2026-06-24",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -697,12 +767,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7353,
-    "title": "Honduras Agronomic Status \u2013 2026-06-24",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-24",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -713,18 +787,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-24T05:59:35.207253",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7352,
-    "title": "Colombia Agronomic Status \u2013 2026-06-24",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-24",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -735,18 +813,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-24T05:59:34.557123",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7351,
-    "title": "Brazil Agronomic Status \u2013 2026-06-24",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-24",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -757,17 +839,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-24T05:59:31.414394",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7350,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-23",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-23",
     "body": "RC Robusta certified stocks shifted by -3 lots today, bringing global visible exchange inventory to 3,995 lots.",
     "source": "ICE",
     "category": "supply",
@@ -789,7 +875,7 @@
   },
   {
     "id": 7349,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-23",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-23",
     "body": "KC Arabica certified stocks shifted by -1,027 bags today, bringing global visible exchange inventory to 392,910 bags.",
     "source": "ICE",
     "category": "supply",
@@ -811,7 +897,7 @@
   },
   {
     "id": 7348,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-22",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-22",
     "body": "ICE-EU RC Open Interest changed by -5,267 over the last session, with -5,275 on nearby two contracts and +8 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -829,11 +915,15 @@
       "text": "ICE-EU RC Open Interest changed by -5,267 over the last session, with -5,275 on nearby two contracts and +8 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
   },
   {
     "id": 7347,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-22",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-22",
     "body": "IFUS KC Open Interest changed by -623 over the last session, with -998 on nearby two contracts and +375 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -851,11 +941,15 @@
       "text": "IFUS KC Open Interest changed by -623 over the last session, with -998 on nearby two contracts and +375 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7339,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-24",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-24",
     "body": "B3 Arabica 4/5 settlement: 347.95 USD/sac | OI: 155 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -869,12 +963,15 @@
       "b3"
     ],
     "meta": "{\"label_month\": \"Jul '26\", \"usd_sac\": 347.95, \"oi\": 155, \"mty\": \"2026-07-23\"}",
-    "pub_date": "2026-06-24T03:03:21.610201"
+    "pub_date": "2026-06-24T03:03:21.610201",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 7338,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-24",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-24",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -888,7 +985,7 @@
   },
   {
     "id": 7335,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-22",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-22",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,580.00 (-9) OI:2,541 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,556.00 (+14) OI:59,570",
     "source": "Barchart",
     "category": "general",
@@ -900,11 +997,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3580, \"chg\": -9, \"oi\": 2541, \"volume\": 2589, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3556, \"chg\": 14, \"oi\": 59570, \"volume\": 12357, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3510, \"chg\": 19, \"oi\": 16415, \"volume\": 4451, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3473, \"chg\": 20, \"oi\": 8306, \"volume\": 1770, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3443, \"chg\": 20, \"oi\": 3322, \"volume\": 446, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3421, \"chg\": 18, \"oi\": 1437, \"volume\": 124, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3403, \"chg\": 17, \"oi\": 793, \"volume\": 44, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3385, \"chg\": 17, \"oi\": 416, \"volume\": 15, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3369, \"chg\": 16, \"oi\": 407, \"volume\": 1, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-23\"}",
-    "pub_date": "2026-06-24T03:03:17.109129"
+    "pub_date": "2026-06-24T03:03:17.109129",
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 -0.3% on the day"
   },
   {
     "id": 7334,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-22",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-22",
     "body": "Front (Coffee (Jul '26)): 287.95 (+10.95) OI:1,106 | 2nd (Coffee (Sep '26)): 275.95 (+8.95) OI:95,992",
     "source": "Barchart",
     "category": "general",
@@ -916,11 +1017,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 287.95, \"chg\": 10.95, \"oi\": 1106, \"volume\": 157, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 275.95, \"chg\": 8.95, \"oi\": 95992, \"volume\": 25598, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 261.95, \"chg\": 5.95, \"oi\": 52349, \"volume\": 16729, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 256.55, \"chg\": 4.55, \"oi\": 17274, \"volume\": 7637, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 256.95, \"chg\": 4.8, \"oi\": 7791, \"volume\": 3967, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 258.45, \"chg\": 5.5, \"oi\": 5490, \"volume\": 3600, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 259.75, \"chg\": 6.25, \"oi\": 2720, \"volume\": 2725, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 261, \"chg\": 7.8, \"oi\": 3908, \"volume\": 1232, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 261.75, \"chg\": 8.65, \"oi\": 827, \"volume\": 143, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-23\"}",
-    "pub_date": "2026-06-24T03:03:15.913856"
+    "pub_date": "2026-06-24T03:03:15.913856",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 +3.8% on the day"
   },
   {
     "id": 7333,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-24",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-24",
     "body": "Brazil coffee export data: Issuance | 2,307,898 | -0.6",
     "source": "Cecafe",
     "category": "supply",
@@ -931,11 +1036,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-24T03:03:03.388292"
+    "pub_date": "2026-06-24T03:03:03.388292",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -0.6% YoY (within noise band)"
   },
   {
     "id": 7330,
-    "title": "USD/UGX FX Rate \u2013 2026-06-24",
+    "title": "USD/UGX FX Rate – 2026-06-24",
     "body": "USD/UGX FX Rate price: 3640",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -950,7 +1059,7 @@
   },
   {
     "id": 7329,
-    "title": "USD/HNL FX Rate \u2013 2026-06-24",
+    "title": "USD/HNL FX Rate – 2026-06-24",
     "body": "USD/HNL FX Rate price: 26.7715",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -965,7 +1074,7 @@
   },
   {
     "id": 7328,
-    "title": "USD/IDR FX Rate \u2013 2026-06-24",
+    "title": "USD/IDR FX Rate – 2026-06-24",
     "body": "USD/IDR FX Rate price: 17873",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -980,7 +1089,7 @@
   },
   {
     "id": 7327,
-    "title": "USD/VND FX Rate \u2013 2026-06-24",
+    "title": "USD/VND FX Rate – 2026-06-24",
     "body": "USD/VND FX Rate price: 26252",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -991,11 +1100,14 @@
       "vietnam"
     ],
     "meta": null,
-    "pub_date": "2026-06-24T03:02:46.644278"
+    "pub_date": "2026-06-24T03:02:46.644278",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 85.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 7326,
-    "title": "USD/BRL FX Rate \u2013 2026-06-24",
+    "title": "USD/BRL FX Rate – 2026-06-24",
     "body": "USD/BRL FX Rate price: 5.1735",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1010,8 +1122,8 @@
   },
   {
     "id": 7375,
-    "title": "Body Count\u2019s Now In The Coffee House\u2026",
-    "body": "It\u2019s been almost four decades since the legendary Heavy Metal disruptors fired the shots that altered music culture forever; and now they\u2019re taking on coffee culture.",
+    "title": "Body Count’s Now In The Coffee House…",
+    "body": "It’s been almost four decades since the legendary Heavy Metal disruptors fired the shots that altered music culture forever; and now they’re taking on coffee culture.",
     "source": "Sprudge",
     "category": "general",
     "lat": null,
@@ -1070,7 +1182,7 @@
   },
   {
     "id": 7324,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-23",
+    "title": "Ethiopia Agronomic Status – 2026-06-23",
     "body": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1088,11 +1200,15 @@
       "text": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: 2 growing regions flagged at agronomic risk"
   },
   {
     "id": 7323,
-    "title": "Uganda Agronomic Status \u2013 2026-06-23",
+    "title": "Uganda Agronomic Status – 2026-06-23",
     "body": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1110,11 +1226,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 1 growing region flagged at agronomic risk"
   },
   {
     "id": 7322,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-23",
+    "title": "Indonesia Agronomic Status – 2026-06-23",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1132,12 +1252,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7321,
-    "title": "Honduras Agronomic Status \u2013 2026-06-23",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-23",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -1148,18 +1272,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-23T06:01:57.240812",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7320,
-    "title": "Colombia Agronomic Status \u2013 2026-06-23",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-23",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -1170,18 +1298,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-23T06:01:56.787098",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7319,
-    "title": "Brazil Agronomic Status \u2013 2026-06-23",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-23",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -1192,17 +1324,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-23T06:01:54.595849",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7318,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-19",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-19",
     "body": "ICE-EU RC Open Interest changed by +935 over the last session, with -1,121 on nearby two contracts and +2,056 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
     "source": "ICE",
     "category": "futures",
@@ -1220,11 +1356,15 @@
       "text": "ICE-EU RC Open Interest changed by +935 over the last session, with -1,121 on nearby two contracts and +2,056 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7317,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-22",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-22",
     "body": "RC Robusta certified stocks shifted by 0 lots today, bringing global visible exchange inventory to 3,998 lots.",
     "source": "ICE",
     "category": "supply",
@@ -1246,7 +1386,7 @@
   },
   {
     "id": 7316,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-22",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-22",
     "body": "KC Arabica certified stocks shifted by -1,075 bags today, bringing global visible exchange inventory to 393,937 bags.",
     "source": "ICE",
     "category": "supply",
@@ -1268,7 +1408,7 @@
   },
   {
     "id": 7308,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-23",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-23",
     "body": "B3 Arabica 4/5 settlement: 333.45 USD/sac | OI: 138 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -1286,8 +1426,8 @@
   },
   {
     "id": 7307,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-23",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-23",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -1301,7 +1441,7 @@
   },
   {
     "id": 7306,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-23",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-23",
     "body": "Brazil coffee export data: Issuance | 2,151,370 | -2.4",
     "source": "Cecafe",
     "category": "supply",
@@ -1312,11 +1452,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-23T03:03:18.095413"
+    "pub_date": "2026-06-23T03:03:18.095413",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -2.4% YoY (within noise band)"
   },
   {
     "id": 7301,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-19",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-19",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,589.00 (-51) OI:7,214 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,542.00 (-50) OI:60,172",
     "source": "Barchart",
     "category": "general",
@@ -1328,11 +1472,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3589, \"chg\": -51, \"oi\": 7214, \"volume\": 6084, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3542, \"chg\": -50, \"oi\": 60172, \"volume\": 16382, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3491, \"chg\": -64, \"oi\": 16673, \"volume\": 7094, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3453, \"chg\": -69, \"oi\": 8133, \"volume\": 2459, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3423, \"chg\": -70, \"oi\": 3245, \"volume\": 506, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3403, \"chg\": -69, \"oi\": 1447, \"volume\": 123, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3386, \"chg\": -69, \"oi\": 787, \"volume\": 93, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3368, \"chg\": -69, \"oi\": 404, \"volume\": 41, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3353, \"chg\": -65, \"oi\": 399, \"volume\": 10, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-22\"}",
-    "pub_date": "2026-06-23T03:03:13.228914"
+    "pub_date": "2026-06-23T03:03:13.228914",
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 -1.4% on the day"
   },
   {
     "id": 7300,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-19",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-19",
     "body": "Front (Coffee (Jul '26)): 277.00 (+1.9) OI:1,265 | 2nd (Coffee (Sep '26)): 267.00 (-0.8) OI:96,831",
     "source": "Barchart",
     "category": "general",
@@ -1344,11 +1492,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 277, \"chg\": 1.9, \"oi\": 1265, \"volume\": 279, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 267, \"chg\": -0.8, \"oi\": 96831, \"volume\": 19450, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 256, \"chg\": -1.9, \"oi\": 52242, \"volume\": 11113, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 252, \"chg\": -2.4, \"oi\": 17566, \"volume\": 5687, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 252.15, \"chg\": -2.4, \"oi\": 7582, \"volume\": 2180, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 252.95, \"chg\": -2.25, \"oi\": 5669, \"volume\": 1417, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 253.5, \"chg\": -2, \"oi\": 2367, \"volume\": 903, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 253.2, \"chg\": -1.3, \"oi\": 3758, \"volume\": 272, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 253.1, \"chg\": -0.85, \"oi\": 800, \"volume\": 50, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-22\"}",
-    "pub_date": "2026-06-23T03:03:12.123859"
+    "pub_date": "2026-06-23T03:03:12.123859",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 +0.7% on the day"
   },
   {
     "id": 7299,
-    "title": "USD/UGX FX Rate \u2013 2026-06-23",
+    "title": "USD/UGX FX Rate – 2026-06-23",
     "body": "USD/UGX FX Rate price: 3635",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1363,7 +1515,7 @@
   },
   {
     "id": 7298,
-    "title": "USD/HNL FX Rate \u2013 2026-06-23",
+    "title": "USD/HNL FX Rate – 2026-06-23",
     "body": "USD/HNL FX Rate price: 26.7708",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1378,7 +1530,7 @@
   },
   {
     "id": 7297,
-    "title": "USD/IDR FX Rate \u2013 2026-06-23",
+    "title": "USD/IDR FX Rate – 2026-06-23",
     "body": "USD/IDR FX Rate price: 17864",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1393,7 +1545,7 @@
   },
   {
     "id": 7296,
-    "title": "USD/VND FX Rate \u2013 2026-06-23",
+    "title": "USD/VND FX Rate – 2026-06-23",
     "body": "USD/VND FX Rate price: 26236",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1408,7 +1560,7 @@
   },
   {
     "id": 7295,
-    "title": "USD/BRL FX Rate \u2013 2026-06-23",
+    "title": "USD/BRL FX Rate – 2026-06-23",
     "body": "USD/BRL FX Rate price: 5.1478",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1438,7 +1590,7 @@
   },
   {
     "id": 7293,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-22",
+    "title": "Ethiopia Agronomic Status – 2026-06-22",
     "body": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1456,11 +1608,15 @@
       "text": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: 2 growing regions flagged at agronomic risk"
   },
   {
     "id": 7292,
-    "title": "Uganda Agronomic Status \u2013 2026-06-22",
+    "title": "Uganda Agronomic Status – 2026-06-22",
     "body": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1478,11 +1634,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 1 growing region flagged at agronomic risk"
   },
   {
     "id": 7291,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-22",
+    "title": "Indonesia Agronomic Status – 2026-06-22",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1500,12 +1660,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7290,
-    "title": "Honduras Agronomic Status \u2013 2026-06-22",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-22",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -1516,18 +1680,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-22T07:14:12.500121",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7289,
-    "title": "Colombia Agronomic Status \u2013 2026-06-22",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-22",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -1538,18 +1706,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-22T07:14:11.904897",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7288,
-    "title": "Brazil Agronomic Status \u2013 2026-06-22",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-22",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -1560,17 +1732,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-22T07:14:08.937467",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7287,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-19",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-19",
     "body": "RC Robusta certified stocks shifted by -34 lots today, bringing global visible exchange inventory to 3,998 lots.",
     "source": "ICE",
     "category": "supply",
@@ -1592,7 +1768,7 @@
   },
   {
     "id": 7286,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-19",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-19",
     "body": "KC Arabica certified stocks shifted by +745 bags today, bringing global visible exchange inventory to 395,012 bags. 1100 lots graded.",
     "source": "ICE",
     "category": "supply",
@@ -1614,7 +1790,7 @@
   },
   {
     "id": 7285,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-18",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-18",
     "body": "ICE-EU RC Open Interest changed by -2,462 over the last session, with -2,491 on nearby two contracts and +29 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -1632,11 +1808,15 @@
       "text": "ICE-EU RC Open Interest changed by -2,462 over the last session, with -2,491 on nearby two contracts and +29 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7284,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-18",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-18",
     "body": "IFUS KC Open Interest changed by 0 over the last session, with 0 on nearby two contracts and 0 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -1654,11 +1834,15 @@
       "text": "IFUS KC Open Interest changed by 0 over the last session, with 0 on nearby two contracts and 0 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
   },
   {
     "id": 7276,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-22",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-22",
     "body": "B3 Arabica 4/5 settlement: 330.95 USD/sac | OI: 138 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -1676,7 +1860,7 @@
   },
   {
     "id": 7273,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-18",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-18",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,640.00 (-45) OI:8,444 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,592.00 (-37) OI:60,063",
     "source": "Barchart",
     "category": "general",
@@ -1688,11 +1872,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3640, \"chg\": -45, \"oi\": 8444, \"volume\": 2013, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3592, \"chg\": -37, \"oi\": 60063, \"volume\": 10157, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3555, \"chg\": -32, \"oi\": 15290, \"volume\": 5464, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3522, \"chg\": -23, \"oi\": 7475, \"volume\": 1460, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3493, \"chg\": -21, \"oi\": 3238, \"volume\": 206, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3472, \"chg\": -21, \"oi\": 1439, \"volume\": 74, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3455, \"chg\": -21, \"oi\": 785, \"volume\": 35, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3437, \"chg\": -24, \"oi\": 406, \"volume\": 30, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3418, \"chg\": -27, \"oi\": 399, \"volume\": 19, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-19\"}",
-    "pub_date": "2026-06-22T03:03:22.899372"
+    "pub_date": "2026-06-22T03:03:22.899372",
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 -1.2% on the day"
   },
   {
     "id": 7272,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-18",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-18",
     "body": "Front (Coffee (Jul '26)): 275.10 (-2.75) OI:5,036 | 2nd (Coffee (Sep '26)): 267.80 (-4.1) OI:96,140",
     "source": "Barchart",
     "category": "general",
@@ -1704,11 +1892,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 275.1, \"chg\": -2.75, \"oi\": 5036, \"volume\": 5284, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 267.8, \"chg\": -4.1, \"oi\": 96140, \"volume\": 25520, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 257.9, \"chg\": -5.25, \"oi\": 52180, \"volume\": 12319, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 254.4, \"chg\": -5.45, \"oi\": 17611, \"volume\": 4631, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 254.55, \"chg\": -5.25, \"oi\": 7342, \"volume\": 2428, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 255.2, \"chg\": -5.05, \"oi\": 4869, \"volume\": 1986, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 255.5, \"chg\": -4.35, \"oi\": 2183, \"volume\": 612, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 254.5, \"chg\": -4.05, \"oi\": 3629, \"volume\": 278, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 253.95, \"chg\": -4.1, \"oi\": 779, \"volume\": 32, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-19\"}",
-    "pub_date": "2026-06-22T03:03:21.804998"
+    "pub_date": "2026-06-22T03:03:21.804998",
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 -1.0% on the day"
   },
   {
     "id": 7271,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-22",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-22",
     "body": "Brazil coffee export data: Issuance | 1,993,903 | -4.2",
     "source": "Cecafe",
     "category": "supply",
@@ -1719,11 +1911,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-22T03:03:10.819572"
+    "pub_date": "2026-06-22T03:03:10.819572",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -4.2% YoY (within noise band)"
   },
   {
     "id": 7268,
-    "title": "USD/UGX FX Rate \u2013 2026-06-22",
+    "title": "USD/UGX FX Rate – 2026-06-22",
     "body": "USD/UGX FX Rate price: 3651",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1738,7 +1934,7 @@
   },
   {
     "id": 7267,
-    "title": "USD/HNL FX Rate \u2013 2026-06-22",
+    "title": "USD/HNL FX Rate – 2026-06-22",
     "body": "USD/HNL FX Rate price: 27.0544",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1753,7 +1949,7 @@
   },
   {
     "id": 7266,
-    "title": "USD/IDR FX Rate \u2013 2026-06-22",
+    "title": "USD/IDR FX Rate – 2026-06-22",
     "body": "USD/IDR FX Rate price: 17789",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1768,7 +1964,7 @@
   },
   {
     "id": 7265,
-    "title": "USD/VND FX Rate \u2013 2026-06-22",
+    "title": "USD/VND FX Rate – 2026-06-22",
     "body": "USD/VND FX Rate price: 26421",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1783,7 +1979,7 @@
   },
   {
     "id": 7264,
-    "title": "USD/BRL FX Rate \u2013 2026-06-22",
+    "title": "USD/BRL FX Rate – 2026-06-22",
     "body": "USD/BRL FX Rate price: 5.1559",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -1828,7 +2024,7 @@
   },
   {
     "id": 7382,
-    "title": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
+    "title": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
     "body": "A weekly curated selection of coffee from the Sprudge Roaster's Village.",
     "source": "Sprudge",
     "category": "demand",
@@ -1843,7 +2039,7 @@
   },
   {
     "id": 7262,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-21",
+    "title": "Ethiopia Agronomic Status – 2026-06-21",
     "body": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1861,11 +2057,15 @@
       "text": "Agronomic Status Update: Ethiopia (Limu, Harrar) is currently flagged as at drought risk. Forecasted rainfall of 92mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 34.3.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: 2 growing regions flagged at agronomic risk"
   },
   {
     "id": 7261,
-    "title": "Uganda Agronomic Status \u2013 2026-06-21",
+    "title": "Uganda Agronomic Status – 2026-06-21",
     "body": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1883,11 +2083,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka) is currently flagged as at drought risk. Forecasted rainfall of 51mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 39.2.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 1 growing region flagged at agronomic risk"
   },
   {
     "id": 7260,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-21",
+    "title": "Indonesia Agronomic Status – 2026-06-21",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -1905,12 +2109,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7259,
-    "title": "Honduras Agronomic Status \u2013 2026-06-21",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-21",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -1921,18 +2129,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-21T06:44:42.640453",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7258,
-    "title": "Colombia Agronomic Status \u2013 2026-06-21",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-21",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -1943,18 +2155,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-21T06:44:42.043250",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7257,
-    "title": "Brazil Agronomic Status \u2013 2026-06-21",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-21",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -1965,17 +2181,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-21T06:44:38.972239",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7249,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-21",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-21",
     "body": "B3 Arabica 4/5 settlement: 330.95 USD/sac | OI: 138 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -1993,8 +2213,8 @@
   },
   {
     "id": 7248,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-21",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-21",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -2008,7 +2228,7 @@
   },
   {
     "id": 7247,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-21",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-21",
     "body": "Brazil coffee export data: Issuance | 1,993,903 | -4.2",
     "source": "Cecafe",
     "category": "supply",
@@ -2019,11 +2239,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-21T03:03:05.315312"
+    "pub_date": "2026-06-21T03:03:05.315312",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -4.2% YoY (within noise band)"
   },
   {
     "id": 7240,
-    "title": "USD/UGX FX Rate \u2013 2026-06-21",
+    "title": "USD/UGX FX Rate – 2026-06-21",
     "body": "USD/UGX FX Rate price: 3651",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2038,7 +2262,7 @@
   },
   {
     "id": 7239,
-    "title": "USD/HNL FX Rate \u2013 2026-06-21",
+    "title": "USD/HNL FX Rate – 2026-06-21",
     "body": "USD/HNL FX Rate price: 27.0544",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2053,7 +2277,7 @@
   },
   {
     "id": 7238,
-    "title": "USD/IDR FX Rate \u2013 2026-06-21",
+    "title": "USD/IDR FX Rate – 2026-06-21",
     "body": "USD/IDR FX Rate price: 17789",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2068,7 +2292,7 @@
   },
   {
     "id": 7237,
-    "title": "USD/VND FX Rate \u2013 2026-06-21",
+    "title": "USD/VND FX Rate – 2026-06-21",
     "body": "USD/VND FX Rate price: 26421",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2083,7 +2307,7 @@
   },
   {
     "id": 7236,
-    "title": "USD/BRL FX Rate \u2013 2026-06-21",
+    "title": "USD/BRL FX Rate – 2026-06-21",
     "body": "USD/BRL FX Rate price: 5.1559",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2098,7 +2322,7 @@
   },
   {
     "id": 7234,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-20",
+    "title": "Ethiopia Agronomic Status – 2026-06-20",
     "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2116,11 +2340,15 @@
       "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: no regions flagged at risk"
   },
   {
     "id": 7233,
-    "title": "Uganda Agronomic Status \u2013 2026-06-20",
+    "title": "Uganda Agronomic Status – 2026-06-20",
     "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2138,11 +2366,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: no regions flagged at risk"
   },
   {
     "id": 7232,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-20",
+    "title": "Indonesia Agronomic Status – 2026-06-20",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2160,12 +2392,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7231,
-    "title": "Honduras Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-20",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -2176,18 +2412,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-20T06:12:37.427346",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7230,
-    "title": "Colombia Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-20",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -2198,18 +2438,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-20T06:12:36.764752",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7229,
-    "title": "Brazil Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-20",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -2220,17 +2464,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-20T06:12:33.561122",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7219,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-20",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-20",
     "body": "B3 Arabica 4/5 settlement: 330.95 USD/sac | OI: 138 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -2248,8 +2496,8 @@
   },
   {
     "id": 7218,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-20",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-20",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -2263,7 +2511,7 @@
   },
   {
     "id": 7210,
-    "title": "USD/UGX FX Rate \u2013 2026-06-20",
+    "title": "USD/UGX FX Rate – 2026-06-20",
     "body": "USD/UGX FX Rate price: 3670",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2278,7 +2526,7 @@
   },
   {
     "id": 7209,
-    "title": "USD/HNL FX Rate \u2013 2026-06-20",
+    "title": "USD/HNL FX Rate – 2026-06-20",
     "body": "USD/HNL FX Rate price: 27.1092",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2293,7 +2541,7 @@
   },
   {
     "id": 7208,
-    "title": "USD/IDR FX Rate \u2013 2026-06-20",
+    "title": "USD/IDR FX Rate – 2026-06-20",
     "body": "USD/IDR FX Rate price: 17786",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2308,7 +2556,7 @@
   },
   {
     "id": 7207,
-    "title": "USD/VND FX Rate \u2013 2026-06-20",
+    "title": "USD/VND FX Rate – 2026-06-20",
     "body": "USD/VND FX Rate price: 26473",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2323,7 +2571,7 @@
   },
   {
     "id": 7206,
-    "title": "USD/BRL FX Rate \u2013 2026-06-20",
+    "title": "USD/BRL FX Rate – 2026-06-20",
     "body": "USD/BRL FX Rate price: 5.1557",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2383,7 +2631,7 @@
   },
   {
     "id": 7223,
-    "title": "Team USA\u2019s Secret Weapon At The World Cup? Defender And Resident Barista Joe Scally",
+    "title": "Team USA’s Secret Weapon At The World Cup? Defender And Resident Barista Joe Scally",
     "body": "Truly a World Cup of Joe.",
     "source": "Sprudge",
     "category": "general",
@@ -2398,7 +2646,7 @@
   },
   {
     "id": 7204,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-19",
+    "title": "Ethiopia Agronomic Status – 2026-06-19",
     "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2416,11 +2664,15 @@
       "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: no regions flagged at risk"
   },
   {
     "id": 7203,
-    "title": "Uganda Agronomic Status \u2013 2026-06-19",
+    "title": "Uganda Agronomic Status – 2026-06-19",
     "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2438,11 +2690,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: no regions flagged at risk"
   },
   {
     "id": 7202,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-19",
+    "title": "Indonesia Agronomic Status – 2026-06-19",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2460,12 +2716,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7201,
-    "title": "Honduras Agronomic Status \u2013 2026-06-19",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-19",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -2476,18 +2736,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-19T06:58:44.413191",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7200,
-    "title": "Colombia Agronomic Status \u2013 2026-06-19",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-19",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -2498,18 +2762,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-19T06:58:43.753058",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7199,
-    "title": "Brazil Agronomic Status \u2013 2026-06-19",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-19",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -2520,17 +2788,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-19T06:58:40.470139",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7198,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-18",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-18",
     "body": "RC Robusta certified stocks shifted by +4,032 lots today, bringing global visible exchange inventory to 4,032 lots. 57 lots graded.",
     "source": "ICE",
     "category": "supply",
@@ -2552,7 +2824,7 @@
   },
   {
     "id": 7197,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-18",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-18",
     "body": "KC Arabica certified stocks shifted by -1,904 bags today, bringing global visible exchange inventory to 394,267 bags.",
     "source": "ICE",
     "category": "supply",
@@ -2574,7 +2846,7 @@
   },
   {
     "id": 7196,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-17",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-17",
     "body": "ICE-EU RC Open Interest changed by -7,328 over the last session, with -7,752 on nearby two contracts and +424 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -2592,11 +2864,15 @@
       "text": "ICE-EU RC Open Interest changed by -7,328 over the last session, with -7,752 on nearby two contracts and +424 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7195,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-17",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-17",
     "body": "IFUS KC Open Interest changed by -3,250 over the last session, with -3,699 on nearby two contracts and +449 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -2614,11 +2890,15 @@
       "text": "IFUS KC Open Interest changed by -3,250 over the last session, with -3,699 on nearby two contracts and +449 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7189,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-19",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-19",
     "body": "B3 Arabica 4/5 settlement: 330.95 USD/sac | OI: 78 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -2636,8 +2916,8 @@
   },
   {
     "id": 7184,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-19",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-19",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -2651,7 +2931,7 @@
   },
   {
     "id": 7181,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-17",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-17",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,685.00 (+5) OI:10,140 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,629.00 (+7) OI:60,858",
     "source": "Barchart",
     "category": "general",
@@ -2663,11 +2943,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3685, \"chg\": 5, \"oi\": 10140, \"volume\": 3806, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3629, \"chg\": 7, \"oi\": 60858, \"volume\": 17949, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3587, \"chg\": 13, \"oi\": 15369, \"volume\": 7519, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3545, \"chg\": 20, \"oi\": 7504, \"volume\": 1935, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3514, \"chg\": 20, \"oi\": 3093, \"volume\": 551, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3493, \"chg\": 19, \"oi\": 1439, \"volume\": 90, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3476, \"chg\": 17, \"oi\": 792, \"volume\": 47, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3461, \"chg\": 17, \"oi\": 407, \"volume\": 32, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3445, \"chg\": 17, \"oi\": 399, \"volume\": 11, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-18\"}",
-    "pub_date": "2026-06-19T03:03:32.423342"
+    "pub_date": "2026-06-19T03:03:32.423342",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 +0.1% on the day"
   },
   {
     "id": 7180,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-17",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-17",
     "body": "Front (Coffee (Jul '26)): 275.10 (-2.75) OI:5,036 | 2nd (Coffee (Sep '26)): 267.80 (-4.1) OI:96,140",
     "source": "Barchart",
     "category": "general",
@@ -2679,11 +2963,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 275.1, \"chg\": -2.75, \"oi\": 5036, \"volume\": 5284, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 267.8, \"chg\": -4.1, \"oi\": 96140, \"volume\": 25520, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 257.9, \"chg\": -5.25, \"oi\": 52180, \"volume\": 12319, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 254.4, \"chg\": -5.45, \"oi\": 17611, \"volume\": 4631, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 254.55, \"chg\": -5.25, \"oi\": 7342, \"volume\": 2428, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 255.2, \"chg\": -5.05, \"oi\": 4869, \"volume\": 1986, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 255.5, \"chg\": -4.35, \"oi\": 2183, \"volume\": 612, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 254.5, \"chg\": -4.05, \"oi\": 3629, \"volume\": 278, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 253.95, \"chg\": -4.1, \"oi\": 779, \"volume\": 32, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-18\"}",
-    "pub_date": "2026-06-19T03:03:31.114606"
+    "pub_date": "2026-06-19T03:03:31.114606",
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 -1.0% on the day"
   },
   {
     "id": 7179,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-19",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-19",
     "body": "Brazil coffee export data: Issuance | 1,858,710 | -4.6",
     "source": "Cecafe",
     "category": "supply",
@@ -2694,11 +2982,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-19T03:03:18.491750"
+    "pub_date": "2026-06-19T03:03:18.491750",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -4.6% YoY (within noise band)"
   },
   {
     "id": 7176,
-    "title": "USD/UGX FX Rate \u2013 2026-06-19",
+    "title": "USD/UGX FX Rate – 2026-06-19",
     "body": "USD/UGX FX Rate price: 3629",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2713,7 +3005,7 @@
   },
   {
     "id": 7175,
-    "title": "USD/HNL FX Rate \u2013 2026-06-19",
+    "title": "USD/HNL FX Rate – 2026-06-19",
     "body": "USD/HNL FX Rate price: 26.7643",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2728,7 +3020,7 @@
   },
   {
     "id": 7174,
-    "title": "USD/IDR FX Rate \u2013 2026-06-19",
+    "title": "USD/IDR FX Rate – 2026-06-19",
     "body": "USD/IDR FX Rate price: 17766",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2743,7 +3035,7 @@
   },
   {
     "id": 7173,
-    "title": "USD/VND FX Rate \u2013 2026-06-19",
+    "title": "USD/VND FX Rate – 2026-06-19",
     "body": "USD/VND FX Rate price: 26267",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2758,7 +3050,7 @@
   },
   {
     "id": 7172,
-    "title": "USD/BRL FX Rate \u2013 2026-06-19",
+    "title": "USD/BRL FX Rate – 2026-06-19",
     "body": "USD/BRL FX Rate price: 5.1523",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -2818,7 +3110,7 @@
   },
   {
     "id": 7170,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-18",
+    "title": "Ethiopia Agronomic Status – 2026-06-18",
     "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2836,11 +3128,15 @@
       "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: no regions flagged at risk"
   },
   {
     "id": 7169,
-    "title": "Uganda Agronomic Status \u2013 2026-06-18",
+    "title": "Uganda Agronomic Status – 2026-06-18",
     "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2858,11 +3154,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: no regions flagged at risk"
   },
   {
     "id": 7168,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-18",
+    "title": "Indonesia Agronomic Status – 2026-06-18",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -2880,12 +3180,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7167,
-    "title": "Honduras Agronomic Status \u2013 2026-06-18",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-18",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -2896,18 +3200,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-18T06:39:00.612464",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7166,
-    "title": "Colombia Agronomic Status \u2013 2026-06-18",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-18",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -2918,18 +3226,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-18T06:39:00.060484",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7165,
-    "title": "Brazil Agronomic Status \u2013 2026-06-18",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-18",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -2940,17 +3252,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-18T06:38:57.112326",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7164,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-17",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-17",
     "body": "RC Robusta certified stocks shifted by -6 lots today, bringing global visible exchange inventory to 3,985 lots. 51 lots graded.",
     "source": "ICE",
     "category": "supply",
@@ -2972,7 +3288,7 @@
   },
   {
     "id": 7163,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-17",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-17",
     "body": "KC Arabica certified stocks shifted by -786 bags today, bringing global visible exchange inventory to 396,171 bags.",
     "source": "ICE",
     "category": "supply",
@@ -2994,7 +3310,7 @@
   },
   {
     "id": 7162,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-16",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-16",
     "body": "ICE-EU RC Open Interest changed by +1,121 over the last session, with -347 on nearby two contracts and +1,468 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
     "source": "ICE",
     "category": "futures",
@@ -3012,11 +3328,15 @@
       "text": "ICE-EU RC Open Interest changed by +1,121 over the last session, with -347 on nearby two contracts and +1,468 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7161,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-16",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-16",
     "body": "IFUS KC Open Interest changed by -4,131 over the last session, with -5,494 on nearby two contracts and +1,363 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -3034,11 +3354,15 @@
       "text": "IFUS KC Open Interest changed by -4,131 over the last session, with -5,494 on nearby two contracts and +1,363 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7154,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-18",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-18",
     "body": "B3 Arabica 4/5 settlement: 336.85 USD/sac | OI: 81 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -3056,8 +3380,8 @@
   },
   {
     "id": 7151,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-18",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-18",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -3071,7 +3395,7 @@
   },
   {
     "id": 7150,
-    "title": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-18",
+    "title": "Brazil Coffee Exports (Cecafe) – 2026-06-18",
     "body": "Brazil coffee export data: Issuance | 1,729,283 | -4.6",
     "source": "Cecafe",
     "category": "supply",
@@ -3082,11 +3406,15 @@
       "brazil"
     ],
     "meta": null,
-    "pub_date": "2026-06-18T03:03:15.893208"
+    "pub_date": "2026-06-18T03:03:15.893208",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil exports -4.6% YoY (within noise band)"
   },
   {
     "id": 7145,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-16",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-16",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,680.00 (+11) OI:18,709 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,622.00 (+24) OI:60,041",
     "source": "Barchart",
     "category": "general",
@@ -3098,11 +3426,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3680, \"chg\": 11, \"oi\": 18709, \"volume\": 7208, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3622, \"chg\": 24, \"oi\": 60041, \"volume\": 21116, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3574, \"chg\": 29, \"oi\": 15322, \"volume\": 6277, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3525, \"chg\": 31, \"oi\": 7125, \"volume\": 1385, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3494, \"chg\": 35, \"oi\": 3060, \"volume\": 431, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3474, \"chg\": 37, \"oi\": 1468, \"volume\": 114, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3459, \"chg\": 36, \"oi\": 798, \"volume\": 13, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3444, \"chg\": 36, \"oi\": 407, \"volume\": 1, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3428, \"chg\": 36, \"oi\": 399, \"volume\": 0, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-17\"}",
-    "pub_date": "2026-06-18T03:03:09.288154"
+    "pub_date": "2026-06-18T03:03:09.288154",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 +0.3% on the day"
   },
   {
     "id": 7144,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-16",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-16",
     "body": "Front (Coffee (Jul '26)): 277.85 (+0.6) OI:8,766 | 2nd (Coffee (Sep '26)): 271.90 (-0.9) OI:96,109",
     "source": "Barchart",
     "category": "general",
@@ -3114,11 +3446,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 277.85, \"chg\": 0.6, \"oi\": 8766, \"volume\": 5413, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 271.9, \"chg\": -0.9, \"oi\": 96109, \"volume\": 26342, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 263.15, \"chg\": -0.45, \"oi\": 51949, \"volume\": 12516, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 259.85, \"chg\": 0.1, \"oi\": 17584, \"volume\": 4425, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 259.8, \"chg\": 0.4, \"oi\": 7235, \"volume\": 1618, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 260.25, \"chg\": 0.5, \"oi\": 4824, \"volume\": 601, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 259.85, \"chg\": 0.7, \"oi\": 2179, \"volume\": 257, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 258.55, \"chg\": 0.35, \"oi\": 3599, \"volume\": 102, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 258.05, \"chg\": 0.1, \"oi\": 774, \"volume\": 16, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-17\"}",
-    "pub_date": "2026-06-18T03:03:08.375432"
+    "pub_date": "2026-06-18T03:03:08.375432",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 +0.2% on the day"
   },
   {
     "id": 7143,
-    "title": "USD/UGX FX Rate \u2013 2026-06-18",
+    "title": "USD/UGX FX Rate – 2026-06-18",
     "body": "USD/UGX FX Rate price: 3650",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3133,7 +3469,7 @@
   },
   {
     "id": 7142,
-    "title": "USD/HNL FX Rate \u2013 2026-06-18",
+    "title": "USD/HNL FX Rate – 2026-06-18",
     "body": "USD/HNL FX Rate price: 26.7469",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3148,7 +3484,7 @@
   },
   {
     "id": 7141,
-    "title": "USD/IDR FX Rate \u2013 2026-06-18",
+    "title": "USD/IDR FX Rate – 2026-06-18",
     "body": "USD/IDR FX Rate price: 17797",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3163,7 +3499,7 @@
   },
   {
     "id": 7140,
-    "title": "USD/VND FX Rate \u2013 2026-06-18",
+    "title": "USD/VND FX Rate – 2026-06-18",
     "body": "USD/VND FX Rate price: 26228",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3178,7 +3514,7 @@
   },
   {
     "id": 7139,
-    "title": "USD/BRL FX Rate \u2013 2026-06-18",
+    "title": "USD/BRL FX Rate – 2026-06-18",
     "body": "USD/BRL FX Rate price: 5.0800",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3223,7 +3559,7 @@
   },
   {
     "id": 7137,
-    "title": "UN WPP 18+ Population \u2013 2026-06-17",
+    "title": "UN WPP 18+ Population – 2026-06-17",
     "body": "Tracked 4 countries for coffee-drinking-age cohort projection.",
     "source": "UN WPP",
     "category": "demand",
@@ -3240,7 +3576,7 @@
   },
   {
     "id": 7136,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-17",
+    "title": "Ethiopia Agronomic Status – 2026-06-17",
     "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -3258,11 +3594,15 @@
       "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: no regions flagged at risk"
   },
   {
     "id": 7135,
-    "title": "Uganda Agronomic Status \u2013 2026-06-17",
+    "title": "Uganda Agronomic Status – 2026-06-17",
     "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -3280,11 +3620,15 @@
       "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: no regions flagged at risk"
   },
   {
     "id": 7134,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-17",
+    "title": "Indonesia Agronomic Status – 2026-06-17",
     "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
@@ -3302,12 +3646,16 @@
       "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
   },
   {
     "id": 7133,
-    "title": "Honduras Agronomic Status \u2013 2026-06-17",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "title": "Honduras Agronomic Status – 2026-06-17",
+    "body": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 14.07,
@@ -3318,18 +3666,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-17T07:02:25.073760",
     "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Honduras (El Paraíso, Copán, Santa Bárbara, Montecillos, Agalta) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
   },
   {
     "id": 7132,
-    "title": "Colombia Agronomic Status \u2013 2026-06-17",
-    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "title": "Colombia Agronomic Status – 2026-06-17",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": 4.71,
@@ -3340,18 +3692,22 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-17T07:02:24.615612",
     "commentary": {
-      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nariño) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
   },
   {
     "id": 7131,
-    "title": "Brazil Agronomic Status \u2013 2026-06-17",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "title": "Brazil Agronomic Status – 2026-06-17",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
     "source": "Open-Meteo + NOAA STAR",
     "category": "supply",
     "lat": -15.78,
@@ -3362,17 +3718,21 @@
       "agronomic",
       "auto-commentary"
     ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
     "pub_date": "2026-06-17T07:02:21.937206",
     "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Espírito Santo, Paraná) is currently flagged as normal.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
   },
   {
     "id": 7130,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-15",
+    "title": "ICE-EU RC Daily OI Snapshot – 2026-06-15",
     "body": "ICE-EU RC Open Interest changed by +759 over the last session, with +440 on nearby two contracts and +319 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
     "source": "ICE",
     "category": "futures",
@@ -3390,11 +3750,15 @@
       "text": "ICE-EU RC Open Interest changed by +759 over the last session, with +440 on nearby two contracts and +319 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7129,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-15",
+    "title": "IFUS KC Daily OI Snapshot – 2026-06-15",
     "body": "IFUS KC Open Interest changed by -5,189 over the last session, with -5,455 on nearby two contracts and +266 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
     "source": "ICE",
     "category": "futures",
@@ -3412,11 +3776,15 @@
       "text": "IFUS KC Open Interest changed by -5,189 over the last session, with -5,455 on nearby two contracts and +266 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
       "hasUpdate": true,
       "isLatestTradingDay": true
-    }
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
   },
   {
     "id": 7128,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-16",
+    "title": "ICE RC Robusta Certified Stocks – 2026-06-16",
     "body": "RC Robusta certified stocks shifted by +134 lots today, bringing global visible exchange inventory to 3,991 lots.",
     "source": "ICE",
     "category": "supply",
@@ -3438,7 +3806,7 @@
   },
   {
     "id": 7127,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-16",
+    "title": "ICE KC Arabica Certified Stocks – 2026-06-16",
     "body": "KC Arabica certified stocks shifted by -285 bags today, bringing global visible exchange inventory to 396,957 bags.",
     "source": "ICE",
     "category": "supply",
@@ -3460,7 +3828,7 @@
   },
   {
     "id": 7125,
-    "title": "AJCA Japan Coffee Data \u2013 2026-06-17",
+    "title": "AJCA Japan Coffee Data – 2026-06-17",
     "body": "AJCA Japan 2025: imports=359382 MT, consumption=397272 MT",
     "source": "AJCA",
     "category": "demand",
@@ -3476,7 +3844,7 @@
   },
   {
     "id": 7120,
-    "title": "B3 ICF Arabica (Jul '26) \u2013 2026-06-17",
+    "title": "B3 ICF Arabica (Jul '26) – 2026-06-17",
     "body": "B3 Arabica 4/5 settlement: 345.35 USD/sac | OI: 208 contracts | Expiry: 2026-07-23",
     "source": "B3",
     "category": "supply",
@@ -3494,8 +3862,8 @@
   },
   {
     "id": 7116,
-    "title": "Ocean Freight Rates (Searates) \u2013 2026-06-17",
-    "body": "Ocean freight market: FCL \u202220'ST",
+    "title": "Ocean Freight Rates (Searates) – 2026-06-17",
+    "body": "Ocean freight market: FCL •20'ST",
     "source": "Searates",
     "category": "general",
     "lat": 0.0,
@@ -3509,7 +3877,7 @@
   },
   {
     "id": 7113,
-    "title": "ICE London Robusta (RM) Futures \u2013 2026-06-15",
+    "title": "ICE London Robusta (RM) Futures – 2026-06-15",
     "body": "Front (Robusta Coffee 10-T (Jul '26)): 3,669.00 (+62) OI:19,208 | 2nd (Robusta Coffee 10-T (Sep '26)): 3,598.00 (+69) OI:59,889",
     "source": "Barchart",
     "category": "general",
@@ -3521,11 +3889,15 @@
       "robusta"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Robusta Coffee 10-T (Jul '26)\", \"expiry\": \"2026-07-27\", \"last\": 3669, \"chg\": 62, \"oi\": 19208, \"volume\": 5960, \"symbol\": \"RMN26\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '26)\", \"expiry\": \"2026-09-24\", \"last\": 3598, \"chg\": 69, \"oi\": 59889, \"volume\": 19773, \"symbol\": \"RMU26\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '26)\", \"expiry\": \"2026-11-24\", \"last\": 3545, \"chg\": 79, \"oi\": 14575, \"volume\": 6235, \"symbol\": \"RMX26\"}, {\"contract\": \"Robusta Coffee 10-T (Jan '27)\", \"expiry\": \"2027-01-25\", \"last\": 3494, \"chg\": 85, \"oi\": 6715, \"volume\": 2297, \"symbol\": \"RMF27\"}, {\"contract\": \"Robusta Coffee 10-T (Mar '27)\", \"expiry\": \"2027-03-23\", \"last\": 3459, \"chg\": 84, \"oi\": 2964, \"volume\": 1392, \"symbol\": \"RMH27\"}, {\"contract\": \"Robusta Coffee 10-T (May '27)\", \"expiry\": \"2027-05-24\", \"last\": 3437, \"chg\": 85, \"oi\": 1517, \"volume\": 353, \"symbol\": \"RMK27\"}, {\"contract\": \"Robusta Coffee 10-T (Jul '27)\", \"expiry\": \"2027-07-26\", \"last\": 3423, \"chg\": 86, \"oi\": 746, \"volume\": 379, \"symbol\": \"RMN27\"}, {\"contract\": \"Robusta Coffee 10-T (Sep '27)\", \"expiry\": \"2027-09-24\", \"last\": 3408, \"chg\": 87, \"oi\": 389, \"volume\": 341, \"symbol\": \"RMU27\"}, {\"contract\": \"Robusta Coffee 10-T (Nov '27)\", \"expiry\": \"2027-11-24\", \"last\": 3392, \"chg\": 88, \"oi\": 205, \"volume\": 262, \"symbol\": \"RMX27\"}], \"quote_date\": \"2026-06-16\"}",
-    "pub_date": "2026-06-17T03:02:55.939315"
+    "pub_date": "2026-06-17T03:02:55.939315",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "RMN26 +1.7% on the day"
   },
   {
     "id": 7112,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-06-15",
+    "title": "ICE NY Arabica (KC) Futures – 2026-06-15",
     "body": "Front (Coffee (Jul '26)): 277.25 (+14.3) OI:15,292 | 2nd (Coffee (Sep '26)): 272.80 (+13.6) OI:95,077",
     "source": "Barchart",
     "category": "general",
@@ -3537,11 +3909,15 @@
       "arabica"
     ],
     "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 277.25, \"chg\": 14.3, \"oi\": 15292, \"volume\": 10419, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 272.8, \"chg\": 13.6, \"oi\": 95077, \"volume\": 30653, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 263.6, \"chg\": 11.85, \"oi\": 50936, \"volume\": 14085, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 259.75, \"chg\": 10.6, \"oi\": 17933, \"volume\": 5317, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 259.4, \"chg\": 10.3, \"oi\": 6979, \"volume\": 1755, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 259.75, \"chg\": 10.15, \"oi\": 4554, \"volume\": 894, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 259.15, \"chg\": 9.8, \"oi\": 2099, \"volume\": 357, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 258.2, \"chg\": 9.85, \"oi\": 3543, \"volume\": 339, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 257.95, \"chg\": 9.9, \"oi\": 737, \"volume\": 55, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-06-16\"}",
-    "pub_date": "2026-06-17T03:02:55.024322"
+    "pub_date": "2026-06-17T03:02:55.024322",
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "KCN26 +5.2% on the day"
   },
   {
     "id": 7109,
-    "title": "USD/UGX FX Rate \u2013 2026-06-17",
+    "title": "USD/UGX FX Rate – 2026-06-17",
     "body": "USD/UGX FX Rate price: 3679",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3556,7 +3932,7 @@
   },
   {
     "id": 7108,
-    "title": "USD/HNL FX Rate \u2013 2026-06-17",
+    "title": "USD/HNL FX Rate – 2026-06-17",
     "body": "USD/HNL FX Rate price: 26.7555",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3571,7 +3947,7 @@
   },
   {
     "id": 7107,
-    "title": "USD/IDR FX Rate \u2013 2026-06-17",
+    "title": "USD/IDR FX Rate – 2026-06-17",
     "body": "USD/IDR FX Rate price: 17726",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3586,7 +3962,7 @@
   },
   {
     "id": 7106,
-    "title": "USD/VND FX Rate \u2013 2026-06-17",
+    "title": "USD/VND FX Rate – 2026-06-17",
     "body": "USD/VND FX Rate price: 26168",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3601,7 +3977,7 @@
   },
   {
     "id": 7105,
-    "title": "USD/BRL FX Rate \u2013 2026-06-17",
+    "title": "USD/BRL FX Rate – 2026-06-17",
     "body": "USD/BRL FX Rate price: 5.0672",
     "source": "ExchangeRate-API",
     "category": "general",
@@ -3616,8 +3992,8 @@
   },
   {
     "id": 7103,
-    "title": "Retail Coffee CPI \u2013 2026-06-16",
-    "body": "Retail coffee CPI YoY \u2014 US: +2.57%, EU: +18.40%, Brazil: +3.86%",
+    "title": "Retail Coffee CPI – 2026-06-16",
+    "body": "Retail coffee CPI YoY — US: +2.57%, EU: +18.40%, Brazil: +3.86%",
     "source": "Retail CPI",
     "category": "demand",
     "lat": 0.0,
@@ -3632,8 +4008,8 @@
   },
   {
     "id": 7102,
-    "title": "US CPI \u2013 2026-06-16",
-    "body": "US CPI (CPI-U) \u2014 Headline: +2.7% YoY, Core: +2.6% YoY",
+    "title": "US CPI – 2026-06-16",
+    "body": "US CPI (CPI-U) — Headline: +2.7% YoY, Core: +2.6% YoY",
     "source": "US CPI",
     "category": "macro",
     "lat": 0.0,

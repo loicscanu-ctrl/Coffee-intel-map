@@ -146,6 +146,18 @@ export interface NewsItem {
   lng?: number | null;
   /** Free-form JSON or URL stored by scrapers; consumers handle as opaque string. */
   meta?: string | null;
+  /** Gemini- or rule-classified bull/bear verdict for this headline.
+   *  Present whenever EITHER the deterministic classifier (`classify_sentiment.py`,
+   *  covering ICE OI / COT / agronomic / Cecafe / Barchart / ENSO) fired OR
+   *  the Gemini classifier saw it in its most-recent batch. Consumers should
+   *  render the pill only when present. */
+  sentiment?: "Bullish" | "Bearish" | "Neutral";
+  sentiment_confidence?: number;
+  /** Which path produced the verdict — "deterministic" for rule-based,
+   *  "gemini" for LLM. Useful for trust calibration in tooltips. */
+  sentiment_method?: "deterministic" | "gemini";
+  /** Short rule-fired explanation; only emitted for `sentiment_method === "deterministic"`. */
+  sentiment_reason?: string;
 }
 
 export async function fetchNews(category?: string): Promise<NewsItem[]> {
