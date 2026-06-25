@@ -1,7 +1,7 @@
 {
   "date": "2026-06-16",
   "scoreNY": 5,
-  "scoreLDN": 1,
+  "scoreLDN": 2,
   "signals": [
     {
       "id": "CP3",
@@ -247,15 +247,15 @@
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
-      "id": "CS6",
-      "name": "Inversion Easing",
+      "id": "CS5",
+      "name": "Deepening Inversion",
       "category": "CS",
       "categoryLabel": "Curve Structure",
       "market": "LDN",
-      "severity": "warn",
-      "score": -1,
+      "severity": "alert",
+      "score": 2,
       "magnitude": "large",
-      "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
+      "text": "RC backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window."
     },
     {
       "id": "OB3",
@@ -300,66 +300,6 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-    },
-    {
-      "id": "AGRO_colombia_Caldas_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=112.7]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=88.4]"
-    },
-    {
-      "id": "AGRO_vn_Dak_Nong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=78.7]"
-    },
-    {
-      "id": "AGRO_vn_Gia_Lai_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=61.9]"
-    },
-    {
-      "id": "AGRO_vn_Kon_Tum_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=74.0]"
     }
   ],
   "history": [
@@ -2726,15 +2666,15 @@
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
-          "id": "CS6",
-          "name": "Inversion Easing",
+          "id": "CS5",
+          "name": "Deepening Inversion",
           "category": "CS",
           "categoryLabel": "Curve Structure",
           "market": "LDN",
-          "severity": "warn",
-          "score": -1,
+          "severity": "alert",
+          "score": 2,
           "magnitude": "large",
-          "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
+          "text": "RC backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window."
         },
         {
           "id": "OB3",
@@ -2782,10 +2722,10 @@
         }
       ],
       "scoreNY": 5,
-      "scoreLDN": 1,
+      "scoreLDN": 2,
       "priceNY": 272.8,
       "priceLDN": 3598
     }
   ],
-  "generatedAt": "2026-06-25T05:59:35.712Z"
+  "generatedAt": "2026-06-25T06:35:50.150Z"
 }
