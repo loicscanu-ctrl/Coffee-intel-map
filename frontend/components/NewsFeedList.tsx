@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchNews } from "@/lib/api";
+import SentimentPill from "@/components/news/SentimentPill";
 
 interface NewsItem {
   id: number;
@@ -10,6 +11,8 @@ interface NewsItem {
   category: string;
   tags: string[];
   pub_date: string;
+  sentiment?: "Bullish" | "Bearish" | "Neutral";
+  sentiment_confidence?: number;
 }
 
 const BADGE_COLORS: Record<string, string> = {
@@ -73,9 +76,18 @@ export default function NewsFeedList({ category, filterFn, emptyMessage, title, 
           >
             <div className="flex items-start justify-between gap-2 mb-1">
               <span className="font-semibold text-white text-sm leading-snug">{item.title}</span>
-              <span className={`text-xs px-2 py-0.5 rounded capitalize shrink-0 ${BADGE_COLORS[item.category] ?? BADGE_COLORS.general}`}>
-                {item.category}
-              </span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {item.sentiment && (
+                  <SentimentPill
+                    sentiment={item.sentiment}
+                    confidence={item.sentiment_confidence}
+                    variant="label"
+                  />
+                )}
+                <span className={`text-xs px-2 py-0.5 rounded capitalize ${BADGE_COLORS[item.category] ?? BADGE_COLORS.general}`}>
+                  {item.category}
+                </span>
+              </div>
             </div>
             {item.body && (
               <p className="text-slate-400 text-xs leading-relaxed mt-1">

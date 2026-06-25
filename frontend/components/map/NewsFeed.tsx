@@ -1,8 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchNews, type NewsItem } from "@/lib/api";
+import SentimentPill from "@/components/news/SentimentPill";
 
 const CATEGORIES = ["all", "supply", "demand", "macro", "general"];
+// Sentiment filter exposes the Gemini classification surface. "any" = no
+// filter; "classified" = anything Gemini scored (vs. older items still
+// awaiting classification); the three verdicts narrow further.
+const SENT_FILTERS = ["any", "classified", "Bullish", "Bearish", "Neutral"] as const;
+type SentFilter = typeof SENT_FILTERS[number];
 
 const BORDER_COLORS: Record<string, string> = {
   supply: "border-red-500",
@@ -135,6 +141,7 @@ interface NewsFeedProps {
 export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
   const [items, setItems] = useState<NewsItem[]>(initialNews);
   const [filter, setFilter] = useState("all");
+  const [sentFilter, setSentFilter] = useState<SentFilter>("any");
 
   useEffect(() => {
     if (initialNews.length === 0) {
@@ -148,13 +155,19 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
     return new Date(item.pub_date ?? 0).getTime();
   }
 
-  const filtered = (filter === "all" ? items : items.filter((i) => i.category === filter))
+  const filtered = items
+    .filter((i) => filter === "all" || i.category === filter)
+    .filter((i) => {
+      if (sentFilter === "any")        return true;
+      if (sentFilter === "classified") return i.sentiment != null;
+      return i.sentiment === sentFilter;
+    })
     .slice()
     .sort((a, b) => itemDate(b) - itemDate(a));
 
   return (
     <div className="h-48 border-t border-slate-700 bg-slate-900/90 flex flex-col shrink-0">
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-700 shrink-0">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-700 shrink-0 flex-wrap">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
@@ -166,6 +179,21 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
             }`}
           >
             {cat}
+          </button>
+        ))}
+        <span className="w-px h-4 bg-slate-700 mx-1" />
+        {SENT_FILTERS.map((sf) => (
+          <button
+            key={sf}
+            onClick={() => setSentFilter(sf)}
+            className={`text-xs px-2 py-1 rounded transition-colors ${
+              sentFilter === sf
+                ? "bg-amber-700/80 text-amber-100"
+                : "text-slate-400 hover:text-amber-300"
+            }`}
+            title={sf === "classified" ? "Show only items the Gemini classifier scored" : undefined}
+          >
+            {sf}
           </button>
         ))}
       </div>
@@ -187,6 +215,11 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
               key={item.id}
               className={`border-l-2 pl-3 text-xs ${BORDER_COLORS[item.category] || "border-gray-500"}`}
             >
+              {item.sentiment && (
+                <span className="mr-1.5 align-middle">
+                  <SentimentPill sentiment={item.sentiment} confidence={item.sentiment_confidence} />
+                </span>
+              )}
               <span className="font-bold text-white">{item.title}</span>
               {dataLabel && (
                 <span className="text-amber-400 ml-1.5 font-mono">: {dataLabel}</span>

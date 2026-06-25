@@ -146,6 +146,12 @@ export interface NewsItem {
   lng?: number | null;
   /** Free-form JSON or URL stored by scrapers; consumers handle as opaque string. */
   meta?: string | null;
+  /** Gemini-classified bull/bear verdict for this headline — present when the
+   *  per-headline classifier (quant_report.json["sentiment"]["items"]) saw it
+   *  in its most-recent ~25-item batch. Older items fall through with no
+   *  sentiment fields; consumers should render the pill only when present. */
+  sentiment?: "Bullish" | "Bearish" | "Neutral";
+  sentiment_confidence?: number;
 }
 
 export async function fetchNews(category?: string): Promise<NewsItem[]> {
