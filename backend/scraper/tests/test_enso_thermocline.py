@@ -215,6 +215,22 @@ def test_analyse_buoy_empty_input():
     assert a.obs_count     == 0
     assert a.latest        is None
     assert a.kelvin_signal == "no-data"
+    assert a.window_min_c  is None
+    assert a.window_max_c  is None
+
+
+def test_analyse_buoy_records_window_min_max():
+    """min/max over the fetched window let the card show where today's
+    reading sits inside the recent envelope (range bar visualization).
+    Anything inside the obs list counts — we don't filter for a sub-
+    window, the bar reflects everything we asked ERDDAP for."""
+    obs = [_obs(0, 19.5), _obs(10, 18.0), _obs(20, 21.2), _obs(40, 17.4)]
+    a = therm.analyse_buoy(_SITE, obs)
+    assert a.window_min_c == 17.4
+    assert a.window_max_c == 21.2
+    # And single-obs case → min == max.
+    a1 = therm.analyse_buoy(_SITE, [_obs(0, 20.0)])
+    assert a1.window_min_c == 20.0 == a1.window_max_c
 
 
 # ── proxy config + fetch ─────────────────────────────────────────────────

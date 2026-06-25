@@ -36,6 +36,13 @@ interface BuoySlot {
   baseline_30d_mean_c: number | null;
   delta_30d_c:       number | null;
   kelvin_signal:     "warm-kelvin-wave" | "cold-kelvin-wave" | "neutral" | "no-data";
+  // Min/max temperature across the fetched window (~75 days). Lets
+  // the cell render a thin range bar with a marker at latest_temp_c
+  // so the eye picks up "near top / near bottom of recent range"
+  // without having to read numbers. Optional for backwards-compat
+  // with JSON written before this field was added.
+  window_min_c?:     number | null;
+  window_max_c?:     number | null;
 }
 
 interface ColumnAvg { mean_temp_c: number | null; n_buoys: number; }
@@ -101,6 +108,38 @@ function latKeyOf(lat: number): "2N" | "0N" | "2S" | null {
   if (lat ===  0) return "0N";
   if (lat === -2) return "2S";
   return null;
+}
+
+// Thin horizontal "where in the recent window does today's reading
+// sit" bar. Slate background = full window range, blue→red gradient
+// = cold edge → warm edge, white tick = current latest. Renders null
+// if we don't have a meaningful range (no data / single observation
+// so min == max).
+function RangeBar({
+  current, min, max,
+}: { current: number | null; min: number | null; max: number | null }) {
+  if (current == null || min == null || max == null || max <= min) return null;
+  const pct = Math.max(0, Math.min(1, (current - min) / (max - min))) * 100;
+  return (
+    <div className="mt-0.5">
+      <div
+        className="relative h-1 rounded-sm overflow-hidden"
+        title={`Recent range ${min.toFixed(1)}–${max.toFixed(1)}°C · now ${current.toFixed(2)}°C`}
+        style={{
+          background: "linear-gradient(to right, #3b82f6 0%, #1e293b 50%, #ef4444 100%)",
+        }}
+      >
+        <div
+          className="absolute top-0 bottom-0 bg-white"
+          style={{ left: `calc(${pct}% - 1px)`, width: 2 }}
+        />
+      </div>
+      <div className="flex justify-between text-[7px] text-slate-600 leading-none mt-0.5 font-mono">
+        <span>{min.toFixed(1)}</span>
+        <span>{max.toFixed(1)}</span>
+      </div>
+    </div>
+  );
 }
 
 function tsAge(ts: string | null): string {
@@ -279,7 +318,12 @@ export default function EnsoThermoclineCard() {
                   <div className="font-bold text-[11px]" style={{ color: sig.color }}>
                     {b.latest_temp_c != null ? `${b.latest_temp_c.toFixed(2)}` : "—"}
                   </div>
-                  <div className="text-slate-600 text-[8px]">
+                  <RangeBar
+                    current={b.latest_temp_c}
+                    min={b.window_min_c ?? null}
+                    max={b.window_max_c ?? null}
+                  />
+                  <div className="text-slate-600 text-[8px] mt-0.5">
                     Δ30d {b.delta_30d_c != null
                       ? `${b.delta_30d_c >= 0 ? "+" : ""}${b.delta_30d_c.toFixed(2)}`
                       : "—"}

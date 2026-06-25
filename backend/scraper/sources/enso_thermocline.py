@@ -381,6 +381,14 @@ class BuoyAnalysis:
     baseline_30d_mean_c:  float | None
     delta_30d_c:          float | None
     kelvin_signal:        str
+    # Min/max temperature observed at this buoy across the fetched
+    # window (HISTORY_DAYS = 75 days at present). Lets the card show
+    # where today's reading sits inside the recent envelope — a tiny
+    # range bar with a marker at `latest.temp_c`. Not a multi-year
+    # climatology (that's the natural next piece); just "warmest and
+    # coldest we've seen since the lookback started".
+    window_min_c:         float | None
+    window_max_c:         float | None
 
 
 def _classify_kelvin(delta_c: float | None) -> str:
@@ -406,7 +414,7 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
     site to no-data even when there's plenty of usable data.
     """
     if not obs:
-        return BuoyAnalysis(site, 0, None, None, None, None, "no-data")
+        return BuoyAnalysis(site, 0, None, None, None, None, "no-data", None, None)
     obs_sorted = sorted(obs, key=lambda o: o.timestamp, reverse=True)
     latest = obs_sorted[0]
     anchor = latest.timestamp
@@ -423,6 +431,8 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
     if recent_mean is not None and baseline_mean is not None:
         delta = round(recent_mean - baseline_mean, 2)
 
+    temps = [o.temp_c for o in obs]
+
     return BuoyAnalysis(
         site=                site,
         obs_count=           len(obs),
@@ -431,6 +441,8 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
         baseline_30d_mean_c= round(baseline_mean, 2) if baseline_mean is not None else None,
         delta_30d_c=         delta,
         kelvin_signal=       _classify_kelvin(delta),
+        window_min_c=        round(min(temps), 2),
+        window_max_c=        round(max(temps), 2),
     )
 
 
@@ -535,6 +547,8 @@ def build_payload(
                     "baseline_30d_mean_c": a.baseline_30d_mean_c,
                     "delta_30d_c":   a.delta_30d_c,
                     "kelvin_signal": a.kelvin_signal,
+                    "window_min_c":  a.window_min_c,
+                    "window_max_c":  a.window_max_c,
                 }
                 for a in analyses
             ],
