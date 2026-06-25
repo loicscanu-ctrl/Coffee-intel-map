@@ -85,7 +85,7 @@ const SIGNAL_META = {
 // Fallbacks for the day the backend payload pre-dates the
 // longitude_order / latitude_order additions (we degrade gracefully).
 const DEFAULT_COLUMN_ORDER = [
-  "156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
+  "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
 ] as const;
 const DEFAULT_LAT_ORDER: LatRow[] = [
   { key: "2N", label: "2°N", lat:  2 },
@@ -244,12 +244,16 @@ export default function EnsoThermoclineCard() {
       </div>
 
       {/* West-to-east column-mean strip — visualises basin-scale propagation.
-          Column count auto-scales with how many longitude bands have any
-          buoys reporting; one cell per column. */}
+          Uses the same 40px lat-label gutter + N-column track as the buoy
+          mini-map below so each column-mean tile sits directly above its
+          per-buoy column. */}
       <div
         className="grid gap-1 text-[10px] font-mono"
-        style={{ gridTemplateColumns: `repeat(${columnOrder.length}, minmax(0, 1fr))` }}
+        style={{
+          gridTemplateColumns: `40px repeat(${columnOrder.length}, minmax(0, 1fr))`,
+        }}
       >
+        <div />
         {columnOrder.map((col) => {
           const c = t.by_longitude[col];
           return (

@@ -65,11 +65,13 @@ def test_buoy_site_longitude_e_converts_negative_lon_to_0_360():
 
 
 def test_buoy_catalog_covers_full_tao_triton_array():
-    """3 latitudes (2°N / 0°N / 2°S — Niño 3.4 inner core) × 9 longitudes
-    (156°E through 95°W) = 27 anchor sites. Headline is dead-center."""
-    assert len(therm.NDBC_BUOYS) == 27
+    """3 latitudes (2°N / 0°N / 2°S — Niño 3.4 inner core) × 8 longitudes
+    (165°E through 95°W — 156°E TRITON sites were decommissioned and
+    returned no PFEG data, so the column was dropped) = 24 anchor
+    sites. Headline is dead-center."""
+    assert len(therm.NDBC_BUOYS) == 24
     assert {s.column for s in therm.NDBC_BUOYS} == {
-        "156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
+        "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W",
     }
     assert {s.lat for s in therm.NDBC_BUOYS} == {2.0, 0.0, -2.0}
     h = next(s for s in therm.NDBC_BUOYS if s.station_id == therm.HEADLINE_STATION_ID)
@@ -80,7 +82,7 @@ def test_buoy_catalog_covers_full_tao_triton_array():
 def test_column_order_w_to_e_runs_asia_to_americas():
     """West-to-east order so the card grid reads like a map: Asia-side
     columns leftmost (lower east-degrees), Americas-side rightmost."""
-    expected = ("156E", "165E", "180", "170W", "155W", "140W", "125W", "110W", "95W")
+    expected = ("165E", "180", "170W", "155W", "140W", "125W", "110W", "95W")
     assert therm.COLUMN_ORDER_W_TO_E == expected
 
 

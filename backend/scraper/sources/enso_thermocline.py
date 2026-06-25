@@ -81,16 +81,15 @@ class BuoySite:
 # the v4 card layout; ERDDAP queries filter on lat/lon directly.
 # Anchor sites span the operational TAO/TRITON array across the
 # equatorial Pacific. 3 latitudes (2°N / 0°N / 2°S — the inner Niño 3.4
-# core) × 9 longitudes (156°E warm pool → 95°W cold tongue). Listed
+# core) × 8 longitudes (165°E warm pool → 95°W cold tongue). Listed
 # west-to-east by longitude so the card's natural iteration order
 # already reads like a map (Asia on the left, Americas on the right).
 # Not every (lat, lon) cell has an active mooring; the missing ones
 # render as placeholders in the UI and just produce no-data backend-side.
+# (156°E was tried but PFEG returns nothing — TRITON's westernmost
+# moorings have been decommissioned, so the column was dropped to
+# avoid an empty card column.)
 NDBC_BUOYS: tuple[BuoySite, ...] = (
-    # 156°E — TRITON, warm-pool fringe
-    BuoySite("2n156e",   2.0,  156.0, "2°N 156°E",  "156E"),
-    BuoySite("0n156e",   0.0,  156.0, "0°N 156°E",  "156E"),
-    BuoySite("2s156e",  -2.0,  156.0, "2°S 156°E",  "156E"),
     # 165°E — TRITON, western Pacific
     BuoySite("2n165e",   2.0,  165.0, "2°N 165°E",  "165E"),
     BuoySite("0n165e",   0.0,  165.0, "0°N 165°E",  "165E"),
@@ -157,10 +156,10 @@ DEPTH_UPPER_M  = 160
 LAT_LOWER = -3.0
 LAT_UPPER =  3.0
 
-# Lon window — spans the full TAO/TRITON array we ship pins for:
-# 156°E (warm pool) eastward through 95°W (cold-tongue terminus).
+# Lon window — spans the operational TAO/TRITON array we ship pins for:
+# 165°E (western Pacific) eastward through 95°W (cold-tongue terminus).
 # Both bounds in degrees-east (0-360 ERDDAP convention).
-LON_LOWER_E = 150.0     # buffer below 156°E
+LON_LOWER_E = 160.0     # buffer below 165°E
 LON_UPPER_E = 270.0     # buffer above 95°W (=265°E)
 
 # Time window. Must cover:
