@@ -27,29 +27,29 @@ def test_norm_title_handles_none_and_empty():
     assert news_mod._norm_title("   ") == ""
 
 
-def test_load_sentiment_index_handles_missing_file(tmp_path, monkeypatch):
+def test_load_gemini_index_handles_missing_file(tmp_path, monkeypatch):
     """Quant workflow hasn't run yet → return {} not crash."""
     monkeypatch.setattr(news_mod, "OUT_DIR", tmp_path)
-    assert news_mod._load_sentiment_index() == {}
+    assert news_mod._load_gemini_index() == {}
 
 
-def test_load_sentiment_index_handles_unavailable_block(tmp_path, monkeypatch):
+def test_load_gemini_index_handles_unavailable_block(tmp_path, monkeypatch):
     """Quant ran but Gemini was disabled → return {} not crash."""
     monkeypatch.setattr(news_mod, "OUT_DIR", tmp_path)
     (tmp_path / "quant_report.json").write_text(json.dumps({
         "sentiment": {"available": False, "reason": "no GEMINI_API_KEY"},
     }))
-    assert news_mod._load_sentiment_index() == {}
+    assert news_mod._load_gemini_index() == {}
 
 
-def test_load_sentiment_index_handles_malformed_json(tmp_path, monkeypatch):
+def test_load_gemini_index_handles_malformed_json(tmp_path, monkeypatch):
     """Crashed mid-write or hand-edited → return {} not raise."""
     monkeypatch.setattr(news_mod, "OUT_DIR", tmp_path)
     (tmp_path / "quant_report.json").write_text("not valid json {")
-    assert news_mod._load_sentiment_index() == {}
+    assert news_mod._load_gemini_index() == {}
 
 
-def test_load_sentiment_index_keys_normalize_source_and_title(tmp_path, monkeypatch):
+def test_load_gemini_index_keys_normalize_source_and_title(tmp_path, monkeypatch):
     monkeypatch.setattr(news_mod, "OUT_DIR", tmp_path)
     (tmp_path / "quant_report.json").write_text(json.dumps({
         "sentiment": {
@@ -60,7 +60,7 @@ def test_load_sentiment_index_keys_normalize_source_and_title(tmp_path, monkeypa
             ],
         }
     }))
-    idx = news_mod._load_sentiment_index()
+    idx = news_mod._load_gemini_index()
     # Both keys use lowercase source + normalized title; the spaces around
     # "VN price drops" are collapsed, the case is folded.
     assert ("cecafe",  "brazil exports up") in idx
@@ -69,7 +69,7 @@ def test_load_sentiment_index_keys_normalize_source_and_title(tmp_path, monkeypa
     assert idx[("giacaphe", "vn price drops")]["confidence"] == 65
 
 
-def test_load_sentiment_index_drops_items_missing_required_fields(tmp_path, monkeypatch):
+def test_load_gemini_index_drops_items_missing_required_fields(tmp_path, monkeypatch):
     """Items without a headline shouldn't pollute the lookup with empty keys."""
     monkeypatch.setattr(news_mod, "OUT_DIR", tmp_path)
     (tmp_path / "quant_report.json").write_text(json.dumps({
@@ -82,5 +82,5 @@ def test_load_sentiment_index_drops_items_missing_required_fields(tmp_path, monk
             ],
         }
     }))
-    idx = news_mod._load_sentiment_index()
+    idx = news_mod._load_gemini_index()
     assert list(idx.keys()) == [("y", "real headline")]

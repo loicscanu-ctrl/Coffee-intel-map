@@ -5,32 +5,32 @@ from datetime import datetime, timedelta
 from models import (
     NewsItem,
 )
+from scraper.classify_sentiment import classify_news_item
 from scraper.commentary import extract_commentary_from_meta
 from scraper.exporters.base import OUT_DIR
 from scraper.validate_export import safe_write_json
 
 
 def _norm_title(s: str | None) -> str:
-    """Match key for stitching sentiment classifications onto news rows.
+    """Match key for stitching Gemini sentiment classifications onto news rows.
 
     The Gemini classifier (scraper.quant_model.sentiment) truncates titles
     to 200 chars before sending them to the model and stores the same
     truncated form in quant_report.json["sentiment"]["items"][i]["headline"].
     Normalising both sides to lowercased, whitespace-collapsed, 200-char
-    prefix lets us join the two layers without an id (the sentiment
-    output doesn't carry NewsItem.id).
+    prefix lets us join the two layers without an id (the Gemini output
+    doesn't carry NewsItem.id).
     """
     return " ".join((s or "").strip().split())[:200].lower()
 
 
-def _load_sentiment_index() -> dict[tuple[str, str], dict]:
-    """Load latest per-headline classifications from quant_report.json,
+def _load_gemini_index() -> dict[tuple[str, str], dict]:
+    """Load latest per-headline Gemini classifications from quant_report.json,
     keyed by (source_lower, normalized_title) for O(1) join below.
 
     Returns an empty dict on any failure — quant_report.json is produced
     by a separate workflow and may legitimately be missing on a fresh
-    repo or before the first quant run lands. The news exporter degrades
-    to "no sentiment fields" rather than failing.
+    repo or before the first quant run lands.
     """
     try:
         path = OUT_DIR / "quant_report.json"
@@ -59,12 +59,23 @@ def export_news(db) -> None:
     """Publish the recent news feed as a static file so the Map tab's News Feed
     works on the static site (the live /api/news backend isn't deployed).
 
-    Each item is additionally stamped with `sentiment` + `sentiment_confidence`
-    when the latest quant_report.json carries a Bull/Bear/Neutral verdict for
-    that (source, headline). The classifier covers the ~25 most recent
-    coffee-tagged headlines per run (see scraper.quant_model.sentiment), so
-    older items in the feed land without sentiment fields by design — the
-    NewsFeed UI renders pills only when present.
+    Per-item sentiment stamping uses a two-layer policy:
+
+      1. **Deterministic rules** (scraper.classify_sentiment) cover the
+         quantitative slice — ICE OI snapshots, agronomic alerts, futures
+         snapshots, Cecafe daily exports, COT releases, ENSO ONI. These
+         have direction encoded in `body` or `meta` and don't need an
+         LLM. ~50% of the feed gets a verdict this way, instantly, free.
+      2. **Gemini classifier** (quant_model.sentiment, joined via the
+         static quant_report.json) fills the qualitative remainder —
+         Sprudge build-outs, analyst pieces, single-day price labels
+         without a delta in the title/body, etc.
+
+    Each emitted item carries a `sentiment_method` field
+    ("deterministic" | "gemini") so the frontend / downstream consumers
+    can tell which path produced the verdict — useful for trust
+    calibration ("rule-based with cited reason" vs "LLM judgment").
+    Deterministic items also carry a short `sentiment_reason` string.
     """
     cutoff = datetime.utcnow() - timedelta(days=90)
     rows = (
@@ -74,9 +85,10 @@ def export_news(db) -> None:
         .limit(200)
         .all()
     )
-    sent_index = _load_sentiment_index()
+    gemini_index = _load_gemini_index()
     items = []
-    n_with_sent = 0
+    n_det = 0
+    n_gem = 0
     for r in rows:
         item = {
             "id": r.id,
@@ -93,13 +105,23 @@ def export_news(db) -> None:
         commentary = extract_commentary_from_meta(r.meta)
         if commentary is not None:
             item["commentary"] = commentary
-        # Stitch per-headline sentiment classification when available.
-        sent_key = ((r.source or "").strip().lower(), _norm_title(r.title))
-        sent_match = sent_index.get(sent_key)
-        if sent_match and sent_match.get("sentiment"):
-            item["sentiment"]            = sent_match["sentiment"]
-            item["sentiment_confidence"] = sent_match.get("confidence")
-            n_with_sent += 1
+
+        # ── Sentiment: deterministic rules first, Gemini fallback ────────────
+        det = classify_news_item(item)
+        if det is not None:
+            item["sentiment"]            = det["sentiment"]
+            item["sentiment_confidence"] = det["confidence"]
+            item["sentiment_method"]     = "deterministic"
+            item["sentiment_reason"]     = det["reason"]
+            n_det += 1
+        else:
+            gem_key = ((r.source or "").strip().lower(), _norm_title(r.title))
+            gem = gemini_index.get(gem_key)
+            if gem and gem.get("sentiment"):
+                item["sentiment"]            = gem["sentiment"]
+                item["sentiment_confidence"] = gem.get("confidence")
+                item["sentiment_method"]     = "gemini"
+                n_gem += 1
         items.append(item)
     safe_write_json(
         OUT_DIR / "news.json",
@@ -109,5 +131,5 @@ def export_news(db) -> None:
     n_commentary = sum(1 for it in items if "commentary" in it)
     print(
         f"  news.json → {len(items)} items ({n_commentary} with commentary, "
-        f"{n_with_sent} with sentiment)"
+        f"{n_det} deterministic + {n_gem} Gemini sentiment)"
     )

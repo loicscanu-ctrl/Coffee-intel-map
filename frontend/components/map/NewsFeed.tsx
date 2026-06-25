@@ -217,7 +217,12 @@ export default function NewsFeed({ initialNews = [] }: NewsFeedProps) {
             >
               {item.sentiment && (
                 <span className="mr-1.5 align-middle">
-                  <SentimentPill sentiment={item.sentiment} confidence={item.sentiment_confidence} />
+                  <SentimentPill
+                    sentiment={item.sentiment}
+                    confidence={item.sentiment_confidence}
+                    method={item.sentiment_method}
+                    reason={item.sentiment_reason}
+                  />
                 </span>
               )}
               <span className="font-bold text-white">{item.title}</span>

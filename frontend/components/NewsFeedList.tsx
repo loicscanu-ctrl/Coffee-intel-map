@@ -13,6 +13,8 @@ interface NewsItem {
   pub_date: string;
   sentiment?: "Bullish" | "Bearish" | "Neutral";
   sentiment_confidence?: number;
+  sentiment_method?: "deterministic" | "gemini";
+  sentiment_reason?: string;
 }
 
 const BADGE_COLORS: Record<string, string> = {
@@ -81,6 +83,8 @@ export default function NewsFeedList({ category, filterFn, emptyMessage, title, 
                   <SentimentPill
                     sentiment={item.sentiment}
                     confidence={item.sentiment_confidence}
+                    method={item.sentiment_method}
+                    reason={item.sentiment_reason}
                     variant="label"
                   />
                 )}
