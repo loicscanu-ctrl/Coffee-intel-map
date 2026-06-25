@@ -61,20 +61,23 @@ export default function Step1GlobalFlow({
   const macroKpis = useMemo(() => {
     if (!macroData.length) return null;
     const weekTotals = (week: MacroCotWeek) => {
-      let g = 0, n = 0;
+      let g = 0, n = 0, im = 0;
       for (const c of week.commodities) {
-        g += c.gross_exposure_usd ?? 0;
-        n += c.net_exposure_usd   ?? 0;
+        g  += c.gross_exposure_usd ?? 0;
+        n  += c.net_exposure_usd   ?? 0;
+        im += c.initial_margin_usd ?? 0;
       }
-      return { gross: g, net: n };
+      return { gross: g, net: n, margin: im };
     };
     const cur  = weekTotals(macroData[macroData.length - 1]);
     const prev = macroData.length >= 2 ? weekTotals(macroData[macroData.length - 2]) : null;
     return {
       totalGross: cur.gross,
       netExp:     cur.net,
-      grossWoW:   prev ? cur.gross - prev.gross : null,
-      netWoW:     prev ? cur.net   - prev.net   : null,
+      initialMgn: cur.margin,
+      grossWoW:   prev ? cur.gross  - prev.gross  : null,
+      netWoW:     prev ? cur.net    - prev.net    : null,
+      marginWoW:  prev ? cur.margin - prev.margin : null,
       date:       macroData[macroData.length - 1].date,
     };
   }, [macroData]);
@@ -170,6 +173,16 @@ export default function Step1GlobalFlow({
         const netOiTotal    = sumAttr("netOiEffectB");
         const netPxTotal    = sumAttr("netPriceEffectB");
 
+        // "Initial Margin" formats with whichever scale fits — billions for
+        // the full-complex total, millions for any future per-sector slice.
+        const fmtMgn = (v: number) =>
+          v >= 1e9 ? `$${(v / 1e9).toFixed(2)}B`
+          : v >= 1e6 ? `$${(v / 1e6).toFixed(0)}M`
+          : `$${(v / 1e3).toFixed(0)}k`;
+        const fmtMgnWoW = (v: number | null) =>
+          v == null ? "—"
+          : Math.abs(v) >= 1e9 ? `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`
+          : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e6).toFixed(0)}M`;
         const kpis = [
           { label: "Gross Exposure",     value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
           { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: wowColor(macroKpis.grossWoW) },
@@ -179,6 +192,12 @@ export default function Step1GlobalFlow({
           { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: wowColor(macroKpis.netWoW) },
           { label: "Net OI Δ",           value: fmtAttr(netOiTotal),         color: wowColor(netOiTotal) },
           { label: "Net Px Δ",           value: fmtAttr(netPxTotal),         color: wowColor(netPxTotal) },
+          // Initial margin = (mm_long+mm_short)·outright_rate + mm_spread·spread_rate.
+          // Sources the per-symbol margin rates from the RJO Brien guide eff. 3/14/2026
+          // (see COMMODITY_SPECS in macro_cot.py). Gives a "$ of speculative cash
+          // actually posted" read alongside the notional gross/net columns.
+          { label: "Initial Margin",     value: fmtMgn(macroKpis.initialMgn), color: "#fbbf24" },
+          { label: "Initial Margin WoW", value: fmtMgnWoW(macroKpis.marginWoW), color: wowColor(macroKpis.marginWoW) },
         ];
         return (
           <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>

@@ -108,6 +108,20 @@ def export_macro_cot(db) -> None:
             )
 
         cv = close_price * spec["contract_unit"] if close_price else None
+        # Initial margin = lots × exchange initial-margin rate. The MM gross
+        # leg (long + short) pays the outright rate; the MM spread leg pays
+        # the (much smaller) calendar-spread rate. RJO margin guide eff.
+        # 3/14/2026 sources both rates (see COMMODITY_SPECS comment in
+        # macro_cot.py). None when the spec is missing a margin entry —
+        # which currently doesn't happen (all 28 entries populated) but
+        # the guard keeps the export resilient if a future entry forgets.
+        m_out = spec.get("margin_outright_usd")
+        m_spd = spec.get("margin_spread_usd")
+        initial_margin_usd = (
+            (mm_long + mm_short) * m_out + mm_spread * m_spd
+            if m_out is not None and m_spd is not None
+            else None
+        )
         entry = {
             "symbol":             row.symbol,
             "sector":             spec["sector"],
@@ -119,6 +133,7 @@ def export_macro_cot(db) -> None:
             "close_price":        close_price,
             "gross_exposure_usd": (mm_long + mm_short) * cv if cv else None,
             "net_exposure_usd":   (mm_long - mm_short) * cv if cv else None,
+            "initial_margin_usd": initial_margin_usd,
         }
         weeks.setdefault(row.date, []).append(entry)
 
