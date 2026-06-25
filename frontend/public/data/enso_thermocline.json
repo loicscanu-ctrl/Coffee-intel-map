@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-06-25T12:24:38+00:00",
+  "scraped_at": "2026-06-25T12:49:01+00:00",
   "thermocline": {
     "source": "NOAA ERDDAP TAO/TRITON via Cloudflare Worker proxy",
     "dataset_id": "pmelTaoDyT",
@@ -26,57 +26,6 @@
       "reading": "30-day cooling of -5.47 \u00b0C at ~150 m, central Ni\u00f1o 3.4. Surface cooling expected in 4\u20136 weeks."
     },
     "buoys": [
-      {
-        "station_id": "2n156e",
-        "label": "2\u00b0N 156\u00b0E",
-        "lat": 2.0,
-        "lon": 156.0,
-        "column": "156E",
-        "obs_count": 0,
-        "latest_temp_c": null,
-        "latest_depth_m": null,
-        "latest_ts": null,
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data",
-        "window_min_c": null,
-        "window_max_c": null
-      },
-      {
-        "station_id": "0n156e",
-        "label": "0\u00b0N 156\u00b0E",
-        "lat": 0.0,
-        "lon": 156.0,
-        "column": "156E",
-        "obs_count": 0,
-        "latest_temp_c": null,
-        "latest_depth_m": null,
-        "latest_ts": null,
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data",
-        "window_min_c": null,
-        "window_max_c": null
-      },
-      {
-        "station_id": "2s156e",
-        "label": "2\u00b0S 156\u00b0E",
-        "lat": -2.0,
-        "lon": 156.0,
-        "column": "156E",
-        "obs_count": 0,
-        "latest_temp_c": null,
-        "latest_depth_m": null,
-        "latest_ts": null,
-        "recent_7d_mean_c": null,
-        "baseline_30d_mean_c": null,
-        "delta_30d_c": null,
-        "kelvin_signal": "no-data",
-        "window_min_c": null,
-        "window_max_c": null
-      },
       {
         "station_id": "2n165e",
         "label": "2\u00b0N 165\u00b0E",
@@ -518,14 +467,9 @@
       "95W": {
         "mean_temp_c": 14.38,
         "n_buoys": 3
-      },
-      "156E": {
-        "mean_temp_c": null,
-        "n_buoys": 0
       }
     },
     "longitude_order": [
-      "156E",
       "165E",
       "180",
       "170W",
