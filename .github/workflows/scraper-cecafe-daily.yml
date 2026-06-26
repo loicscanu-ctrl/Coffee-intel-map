@@ -2,20 +2,25 @@ name: "1.7 – Cecafe Daily Registration"
 
 on:
   schedule:
-    # Single daily window at 17:00 UTC (14:00 Brasília). Chosen as the LATE
-    # window deliberately: Cecafe publishes the day's resumo at a variable
-    # hour, and the afternoon run is the most likely to catch the page after
-    # it has advanced to the current day (an earlier run often finds
-    # yesterday's data still showing — see the "page reference date ==
-    # last stored, nothing new to commit" diag in the log).
+    # TWO daily windows. The LATE window (17:00 UTC = 14:00 Brasília) is the
+    # primary catch — Cecafé publishes the day's resumo at a variable hour,
+    # often only by afternoon Brasília time. The EARLY window (02:00 UTC =
+    # 23:00 prior-day Brasília) is a pre-brief catch — Cecafé sometimes
+    # publishes late-evening Brazil time, and without an early run the
+    # 03:09 UTC morning brief inherits whatever stale page state the prior
+    # afternoon's scrape captured (observed 2026-06-26: brief shipped
+    # 2-day-old Brazil reg data because Thu's data hadn't published by the
+    # Thu 17:00 UTC scrape).
     #
     # History: this used to be three windows (09/13/17 UTC) as a hedge
     # against Cecafe's edge refusing GH Actions IPs for 30+ min stretches.
-    # The patchright browser-render path (added June 2026) now clears the
+    # The patchright browser-render path (added June 2026) cleared the
     # bot-challenge wall reliably, so the extra windows became redundant
-    # cost (each spins up a headless chromium). Trimmed to one on the
-    # owner's call. workflow_dispatch stays for manual catch-up / one-offs.
-    - cron: '0 17 * * *'
+    # cost; we trimmed to one. Re-adding ONE morning window (not three)
+    # gives us pre-brief freshness without re-burning the cost of the
+    # afternoon retries. workflow_dispatch stays for manual catch-up.
+    - cron: '0 2 * * *'    # early — pre-brief catch (late-Brazil-evening publishes)
+    - cron: '0 17 * * *'   # late  — primary Cecafé-close window
   workflow_dispatch:
 
 concurrency:
