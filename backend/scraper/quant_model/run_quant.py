@@ -21,8 +21,44 @@ from scraper.quant_model import sentiment as sentiment_mod
 from scraper.quant_model import robusta_factors as factors_mod
 from scraper.validate_export import safe_write_json
 
-ROOT     = Path(__file__).resolve().parents[3]
-OUT_PATH = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+ROOT      = Path(__file__).resolve().parents[3]
+OUT_PATH  = ROOT / "frontend" / "public" / "data" / "quant_report.json"
+HIST_PATH = ROOT / "frontend" / "public" / "data" / "sentiment_history.json"
+
+
+def _append_sentiment_history(sent: dict) -> None:
+    """Append today's sentiment snapshot to a rolling daily history so the UI can
+    chart the net-sentiment trend. One record per day (re-running replaces the
+    same date); keeps ~1 year. No-op when the section is unavailable."""
+    if not sent.get("available"):
+        return
+    date = (sent.get("scraped_at", "") or "")[:10]
+    if not date:
+        return
+    record = {
+        "date":               date,
+        "net_index":          sent.get("net_index", 0.0),
+        "overall_sentiment":  sent.get("overall_sentiment", "Neutral"),
+        "overall_confidence": sent.get("overall_confidence", 50.0),
+        "bull":               sent.get("bull_count", 0),
+        "bear":               sent.get("bear_count", 0),
+        "neutral":            sent.get("neutral_count", 0),
+        "total":              sent.get("total", 0),
+    }
+    history: list = []
+    if HIST_PATH.exists():
+        try:
+            with open(HIST_PATH, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except Exception:
+            history = []
+    history = [h for h in history if h.get("date") != date]
+    history.append(record)
+    history.sort(key=lambda h: h.get("date", ""))
+    history = history[-365:]
+    with open(HIST_PATH, "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"  Sentiment history → {len(history)} days ({HIST_PATH.name})")
 
 
 def main() -> None:
@@ -69,6 +105,8 @@ def main() -> None:
     existing["sentiment"]       = sent
     existing["robusta_factors"] = factors
     existing["scraped_at"]      = datetime.utcnow().isoformat() + "Z"
+
+    _append_sentiment_history(sent)
 
     safe_write_json(
         OUT_PATH, existing,
