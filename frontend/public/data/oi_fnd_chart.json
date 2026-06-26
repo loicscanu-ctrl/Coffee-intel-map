@@ -1819,7 +1819,7 @@
         },
         {
           "day": 0,
-          "oi": 1018,
+          "oi": 962,
           "price": 277.0
         }
       ]
@@ -1846,7 +1846,12 @@
         },
         {
           "day": -42,
+          "oi": 93251,
           "price": 277.2
+        },
+        {
+          "day": -41,
+          "price": 276.4
         }
       ]
     }
@@ -1872,6 +1877,10 @@
       {
         "day": -42,
         "spread": 13.35
+      },
+      {
+        "day": -41,
+        "spread": 13.0
       }
     ]
   },
@@ -4177,7 +4186,12 @@
         },
         {
           "day": -1,
+          "oi": 407,
           "price": 3707.0
+        },
+        {
+          "day": 0,
+          "price": 3756.0
         }
       ]
     },
@@ -4188,188 +4202,29 @@
       "data": [
         {
           "day": -45,
+          "oi": 60062,
           "price": 3605.0
+        },
+        {
+          "day": -44,
+          "price": 3662.0
         }
       ]
     }
   ],
   "robusta_front_spread": {
-    "frontSym": "RMN26",
-    "nextSym": "RMU26",
-    "frontLabel": "N26",
-    "nextLabel": "U26",
+    "frontSym": "RMU26",
+    "nextSym": "RMX26",
+    "frontLabel": "U26",
+    "nextLabel": "X26",
     "data": [
       {
         "day": -45,
-        "spread": 86.0
+        "spread": 51.0
       },
       {
         "day": -44,
-        "spread": 80.0
-      },
-      {
-        "day": -43,
-        "spread": 84.0
-      },
-      {
-        "day": -42,
-        "spread": 89.0
-      },
-      {
-        "day": -41,
-        "spread": 85.0
-      },
-      {
-        "day": -40,
-        "spread": 83.0
-      },
-      {
-        "day": -39,
-        "spread": 89.0
-      },
-      {
-        "day": -38,
-        "spread": 89.0
-      },
-      {
-        "day": -37,
-        "spread": 81.0
-      },
-      {
-        "day": -36,
-        "spread": 97.0
-      },
-      {
-        "day": -35,
-        "spread": 111.0
-      },
-      {
-        "day": -34,
-        "spread": 112.0
-      },
-      {
-        "day": -33,
-        "spread": 122.0
-      },
-      {
-        "day": -32,
-        "spread": 119.0
-      },
-      {
-        "day": -31,
-        "spread": 120.0
-      },
-      {
-        "day": -30,
-        "spread": 115.0
-      },
-      {
-        "day": -29,
-        "spread": 120.0
-      },
-      {
-        "day": -28,
-        "spread": 131.0
-      },
-      {
-        "day": -27,
-        "spread": 137.0
-      },
-      {
-        "day": -26,
-        "spread": 114.0
-      },
-      {
-        "day": -25,
-        "spread": 134.0
-      },
-      {
-        "day": -22,
-        "spread": 142.0
-      },
-      {
-        "day": -21,
-        "spread": 133.0
-      },
-      {
-        "day": -20,
-        "spread": 139.0
-      },
-      {
-        "day": -19,
-        "spread": 129.0
-      },
-      {
-        "day": -18,
-        "spread": 123.0
-      },
-      {
-        "day": -17,
-        "spread": 127.0
-      },
-      {
-        "day": -16,
-        "spread": 93.0
-      },
-      {
-        "day": -15,
-        "spread": 82.0
-      },
-      {
-        "day": -14,
-        "spread": 83.0
-      },
-      {
-        "day": -13,
-        "spread": 73.0
-      },
-      {
-        "day": -12,
-        "spread": 63.0
-      },
-      {
-        "day": -11,
-        "spread": 57.0
-      },
-      {
-        "day": -10,
-        "spread": 68.0
-      },
-      {
-        "day": -9,
         "spread": 69.0
-      },
-      {
-        "day": -8,
-        "spread": 78.0
-      },
-      {
-        "day": -7,
-        "spread": 71.0
-      },
-      {
-        "day": -6,
-        "spread": 58.0
-      },
-      {
-        "day": -5,
-        "spread": 56.0
-      },
-      {
-        "day": -4,
-        "spread": 48.0
-      },
-      {
-        "day": -3,
-        "spread": 47.0
-      },
-      {
-        "day": -2,
-        "spread": 24.0
-      },
-      {
-        "day": -1,
-        "spread": 102.0
       }
     ]
   }
