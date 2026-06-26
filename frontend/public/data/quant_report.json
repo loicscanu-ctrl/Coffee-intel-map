@@ -228,285 +228,124 @@
       }
     ]
   },
-  "scraped_at": "2026-06-26T22:45:49.957497+00:00",
+  "scraped_at": "2026-06-26T22:46:21.298908Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-25T22:56:27.733065Z",
+    "scraped_at": "2026-06-26T22:46:19.701720Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 86.6,
-    "bull_count": 0,
+    "overall_confidence": 96.2,
+    "net_index": 20.0,
+    "bull_count": 3,
     "bear_count": 0,
-    "neutral_count": 25,
-    "total": 25,
+    "neutral_count": 9,
+    "total": 12,
     "items": [
       {
-        "headline": "Ethiopia Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "agronomic",
-          "auto-commentary",
-          "weather",
-          "ethiopia"
-        ]
-      },
-      {
-        "headline": "Uganda Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "agronomic",
-          "auto-commentary",
-          "uganda",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Indonesia Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "indonesia",
-          "agronomic",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Honduras Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "agronomic",
-          "honduras",
-          "auto-commentary",
-          "weather"
-        ]
-      },
-      {
-        "headline": "Colombia Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "agronomic",
-          "auto-commentary",
-          "weather",
-          "colombia"
-        ]
-      },
-      {
-        "headline": "Brazil Agronomic Status \u2013 2026-06-25",
-        "source": "Open-Meteo + NOAA STAR",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "agronomic",
-          "auto-commentary",
-          "brazil",
-          "weather"
-        ]
-      },
-      {
-        "headline": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-23",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "auto-commentary",
-          "robusta",
-          "daily-oi"
-        ]
-      },
-      {
-        "headline": "IFUS KC Daily OI Snapshot \u2013 2026-06-23",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "auto-commentary",
-          "arabica",
-          "daily-oi"
-        ]
-      },
-      {
-        "headline": "World Bank Population \u2013 2026-06-25",
-        "source": "World Bank",
-        "sentiment": "Neutral",
-        "confidence": 70.0,
-        "tags": [
-          "population",
-          "demand",
-          "world-bank"
-        ]
-      },
-      {
-        "headline": "Fertilizer Prices \u2013 2026-06",
-        "source": "World Bank",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "fertilizer",
-          "supply",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "ENSO ONI \u2013 2026-06",
-        "source": "NOAA CPC",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "enso",
-          "supply",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "Ethiopia ECX Coffee Price \u2013 2026-06-25",
-        "source": "ECX",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "arabica",
-          "ethiopia",
-          "ecx"
-        ]
-      },
-      {
-        "headline": "Guatemala ANACAFE Precios de Referencia \u2013 2026-06-25",
-        "source": "ANACAFE",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "guatemala",
-          "arabica",
-          "precio-referencia",
-          "anacafe"
-        ]
-      },
-      {
-        "headline": "Colombia FNC Precio Interno \u2013 2026-06-25",
-        "source": "FNC",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "fnc",
-          "precio-interno",
-          "colombia"
-        ]
-      },
-      {
-        "headline": "B3 ICF Arabica (Jul '26) \u2013 2026-06-25",
-        "source": "B3",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "b3",
-          "brazil",
-          "arabica"
-        ]
-      },
-      {
-        "headline": "Uganda Screen 15 \u2013 2026-06-25",
-        "source": "UCDA",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "uganda",
-          "robusta"
-        ]
-      },
-      {
-        "headline": "ICE COT Robusta Coffee (London) \u2013 2026-06-16",
-        "source": "ICE",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "cot",
-          "robusta"
-        ]
-      },
-      {
-        "headline": "CFTC COT Coffee C (NY Arabica) \u2013 2026-06-16",
-        "source": "CFTC",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "cot",
-          "arabica"
-        ]
-      },
-      {
-        "headline": "ICE London Robusta (RM) Futures \u2013 2026-06-23",
-        "source": "Barchart",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "robusta"
-        ]
-      },
-      {
-        "headline": "ICE NY Arabica (KC) Futures \u2013 2026-06-23",
-        "source": "Barchart",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "arabica"
-        ]
-      },
-      {
-        "headline": "Brazil Coffee Exports (Cecafe) \u2013 2026-06-25",
-        "source": "Cecafe",
-        "sentiment": "Neutral",
+        "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
         "confidence": 80.0,
         "tags": [
-          "brazil",
-          "exports"
+          "sprudge"
         ]
       },
       {
-        "headline": "Brazil Arabica Price (Noticiasagricolas) \u2013 2026-06-25",
-        "source": "Noticiasagricolas",
+        "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
+        "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 90.0,
         "tags": [
-          "brazil",
-          "arabica"
+          "sprudge"
         ]
       },
       {
-        "headline": "Conilon Tipo 7 (Cooabriel) \u2013 2026-06-25",
-        "source": "Cooabriel",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "conilon",
-          "brazil"
-        ]
-      },
-      {
-        "headline": "USD/VND FX Rate \u2013 2026-06-25",
-        "source": "ExchangeRate-API",
-        "sentiment": "Neutral",
+        "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
         "confidence": 80.0,
         "tags": [
-          "fx",
-          "vietnam"
+          "sprudge"
         ]
       },
       {
-        "headline": "USD/BRL FX Rate \u2013 2026-06-25",
-        "source": "ExchangeRate-API",
+        "headline": "Jill Hoff Of Monogram Coffee Is The 2026 Canada Barista Champion",
+        "source": "Sprudge",
         "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
         "confidence": 80.0,
         "tags": [
-          "fx",
-          "brazil"
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Here Are The Winners Of The 2026 US Barista Championship",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The 2026 US Barista Championship: Finals",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Here Are The Semi-Finalists For The 2026 US Barista Championship",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 98.0,
+        "tags": [
+          "sprudge"
         ]
       }
     ]
@@ -514,5 +353,13 @@
   "robusta_factors": {
     "available": false,
     "reason": "robusta crashed: 'CotWeekly' object has no attribute 'mm_long'"
+  },
+  "sentiment_calibration": {
+    "available": false,
+    "warmup": true,
+    "reason": "accumulating \u2014 1/8 paired days",
+    "n": 1,
+    "min_sample": 8,
+    "horizon_days": 5
   }
 }
