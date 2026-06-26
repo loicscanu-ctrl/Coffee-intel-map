@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T05:32:08.041497Z",
+  "generated_at": "2026-06-26T08:00:14.765946Z",
   "count": 59,
   "workflows": [
     {
@@ -383,6 +383,7 @@
         "workflow_dispatch"
       ],
       "crons": [
+        "0 2 * * *",
         "0 17 * * *"
       ],
       "workflow_run_deps": [],
