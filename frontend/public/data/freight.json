@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21",
+  "updated": "2026-06-26",
   "routes": [
     {
       "id": "vn-eu",
@@ -23,7 +23,7 @@
       "id": "vn-us",
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
-      "rate": 5742,
+      "rate": 6174,
       "prev": 4836,
       "unit": "USD/FEU",
       "proxy": false
@@ -66,13 +66,6 @@
     }
   ],
   "history": [
-    {
-      "date": "2026-04-02",
-      "vn-eu": 2863,
-      "br-eu": 1661,
-      "et-eu": 2004,
-      "vn-us": 2184
-    },
     {
       "date": "2026-04-03",
       "vn-eu": 2863,
@@ -569,6 +562,13 @@
       "br-eu": 2750,
       "et-eu": 3319,
       "vn-us": 5742
+    },
+    {
+      "date": "2026-06-26",
+      "vn-eu": 4741,
+      "br-eu": 2750,
+      "et-eu": 3319,
+      "vn-us": 6174
     }
   ]
 }
