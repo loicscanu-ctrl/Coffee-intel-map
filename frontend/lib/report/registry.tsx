@@ -494,6 +494,14 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     Component: dynamic(() => import("@/components/macro/FertilizerInputsPanel"), { ssr: false, loading }),
     width: "half",
   },
+  {
+    id: "news_sentiment",
+    label: "News Sentiment Index",
+    category: "Macro",
+    description: "Net coffee-news sentiment (−100…+100), confidence-weighted bullish minus bearish, with daily trend.",
+    Component: dynamic(() => import("@/components/report/charts/SentimentReport"), { ssr: false, loading }),
+    width: "half",
+  },
 ];
 
 export const REPORT_CATEGORIES: ReportCategory[] = ["Futures", "Freight", "Supply", "Demand", "Macro"];

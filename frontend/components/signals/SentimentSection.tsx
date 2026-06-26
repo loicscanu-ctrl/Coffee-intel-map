@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fmtAgo } from "@/lib/formatters";
+import SentimentTrend from "./SentimentTrend";
 
 interface SentimentItem {
   headline: string;
@@ -62,7 +63,7 @@ export default function SentimentSection() {
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded">Section 5</span>
           <h2 className="text-base font-bold text-white">Coffee News Sentiment Analysis</h2>
-          <span className="text-[10px] text-slate-500">Claude AI · NLP classification · Confidence scoring</span>
+          <span className="text-[10px] text-slate-500">Google Gemini · NLP classification · Confidence scoring</span>
         </div>
         <p className="text-xs text-slate-400 mt-1 max-w-3xl">
           AI classifies recent coffee news headlines into discrete sentiment signals:{" "}
@@ -76,6 +77,10 @@ export default function SentimentSection() {
         </p>
       </div>
 
+      {/* Dedicated visual — net-sentiment gauge + daily trend. Self-fetches, so
+          it renders even while the headline cards load or are unavailable. */}
+      <SentimentTrend />
+
       {loading && (
         <div className="text-xs text-slate-500 animate-pulse py-8 text-center">Loading sentiment data…</div>
       )}
@@ -85,7 +90,7 @@ export default function SentimentSection() {
           <div className="text-sm text-slate-400">Sentiment analysis not yet available</div>
           <div className="text-[10px] text-slate-600">{data?.reason}</div>
           <div className="text-[10px] text-slate-600 mt-1">
-            Add <code className="text-slate-400">ANTHROPIC_API_KEY</code> to GitHub Actions secrets to enable.
+            Add <code className="text-slate-400">GEMINI_API_KEY</code> to GitHub Actions secrets to enable.
           </div>
         </div>
       )}
@@ -126,15 +131,17 @@ export default function SentimentSection() {
             <div className="bg-slate-900 rounded-lg p-4 space-y-1.5">
               <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Methodology</div>
               <p className="text-[10px] text-slate-400 leading-relaxed">
-                Recent coffee news headlines scored by Claude (Haiku) via a single structured prompt.
+                Recent coffee <em>news</em> headlines (editorial feeds only — data snapshots excluded)
+                scored by Google Gemini via a single structured prompt.
                 Confidence reflects the model&apos;s self-reported certainty per headline.
-                Overall signal uses confidence-weighted majority vote.
+                Overall signal uses a confidence-weighted majority vote; the net index is
+                confidence-weighted bullish minus bearish pressure.
               </p>
               <div className="pt-1 space-y-1 font-mono text-[10px] text-slate-500">
                 <div>P(Bullish | headline)</div>
                 <div>P(Bearish | headline)</div>
                 <div>P(Neutral | headline)</div>
-                <div className="text-slate-600">Model: claude-haiku-4-5</div>
+                <div className="text-slate-600">Model: gemini-2.5-flash</div>
               </div>
             </div>
           </div>

@@ -21,6 +21,24 @@ RSS_FEEDS = [
         "source":   "Sprudge",
         "default_category": "general",
     },
+    # Trade/market-focused feeds — heavier on price-, crop- and export-relevant
+    # headlines than the culture feeds above, so the sentiment classifier has
+    # genuinely directional news to score. A dead feed just logs and is skipped.
+    {
+        "url":      "https://www.comunicaffe.com/feed/",
+        "source":   "Comunicaffe",
+        "default_category": "macro",
+    },
+    {
+        "url":      "https://dailycoffeenews.com/feed/",
+        "source":   "Daily Coffee News",
+        "default_category": "supply",
+    },
+    {
+        "url":      "https://www.globalcoffeereport.com/feed/",
+        "source":   "Global Coffee Report",
+        "default_category": "macro",
+    },
 ]
 
 # Keywords → category override (checked against title + summary, case-insensitive)

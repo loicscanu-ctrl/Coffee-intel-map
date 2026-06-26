@@ -353,6 +353,18 @@ const fertilizer: Builder = async () => {
     + `${rising >= 2 ? "Broad fertilizer cost pressure squeezes farmer margins and feeds into next-cycle break-even economics." : "Easing input costs support producer margins into the next application window."}`;
 };
 
+// ── News sentiment (quant_report.json → sentiment) ────────────────────────────
+const newsSentiment: Builder = async () => {
+  const d = await load<{ sentiment?: { available?: boolean; net_index?: number; overall_sentiment?: string; overall_confidence?: number; bull_count?: number; bear_count?: number; neutral_count?: number; total?: number } }>("/data/quant_report.json");
+  const s = d?.sentiment;
+  if (!s?.available || !s.total) return null;
+  const net = s.net_index ?? ((s.bull_count ?? 0) - (s.bear_count ?? 0)) / (s.total || 1) * 100;
+  const lean = net > 8 ? "bullish" : net < -8 ? "bearish" : "balanced/neutral";
+  return `Coffee-news sentiment is **net ${net > 0 ? "+" : ""}${net.toFixed(0)}** (${lean}) across **${s.total}** editorial headlines — `
+    + `${s.bull_count ?? 0} bullish / ${s.bear_count ?? 0} bearish / ${s.neutral_count ?? 0} neutral, lead class **${s.overall_sentiment}** at ${(s.overall_confidence ?? 0).toFixed(0)}% confidence. `
+    + `A confidence-weighted read of how the latest news flow leans for KC/RC prices.`;
+};
+
 // ── ENSO (enso.json) ──────────────────────────────────────────────────────────
 const enso: Builder = async () => {
   const d = await load<{ phase?: string; intensity?: string; oni?: number; forecast_direction?: string; analogs?: { year?: number }[] }>("/data/enso.json");
@@ -460,6 +472,7 @@ const INSIGHTS: Record<string, Builder> = {
   coffee_currency_index: currency,
   origin_farmgate_prices: farmgate,
   fertilizer_inputs: fertilizer,
+  news_sentiment: newsSentiment,
   // Vietnam exports (cecafe-style not available — handled generically)
 };
 
