@@ -46,6 +46,49 @@ def _sign(n: float | int, fmt: str = ",.0f") -> str:
     return f"{n:+{fmt}}"
 
 
+def _staleness_tag(data_date: str | date | datetime | None, today: date | None = None) -> str:
+    """Return a short inline tag like " (2d old)" when `data_date` is more
+    than one day behind `today`; empty string when fresh (today or yesterday).
+
+    Used inline next to date-bearing section headers (Brazil daily reg, NY
+    certified, London certified) so the reader sees at a glance when the
+    figures aren't from yesterday's session. The threshold of >1 day matches
+    the brief's "morning" cadence: it fires before today's data could
+    realistically have settled, so yesterday's data is the expected case,
+    not a staleness signal.
+
+    Weekend / business-day awareness is intentionally NOT in scope here —
+    a Monday brief showing Friday data IS technically 3d old; the tag fires
+    truthfully and the operator (who knows Cecafé/ICE don't publish weekends)
+    discounts mentally. Encoding weekend rules per-source here would just
+    push the brittleness around.
+    """
+    if data_date is None:
+        return ""
+    # Parse into date if string/datetime
+    if isinstance(data_date, str):
+        s = data_date.strip()
+        if not s:
+            return ""
+        try:
+            # Accept YYYY-MM-DD or ISO datetime; strip time / tz if any.
+            d = date.fromisoformat(s[:10])
+        except ValueError:
+            return ""
+    elif isinstance(data_date, datetime):
+        d = data_date.date()
+    elif isinstance(data_date, date):
+        d = data_date
+    else:
+        return ""
+    if today is None:
+        today = datetime.now(UTC).date()
+    gap = (today - d).days
+    if gap <= 1:
+        return ""
+    return f" <i>({gap}d old)</i>"
+
+
 # ── Futures (RC + KC) — price + spread ────────────────────────────────────────
 
 def _front_two(market_contracts: list[dict]) -> tuple[dict | None, dict | None]:
@@ -631,8 +674,9 @@ def _brazil_daily_block(daily: dict | None) -> str:
     p_con  = prior("conillon")
     p_sol  = prior("soluvel")
 
+    data_date = f"{month}-{int(day):02d}"
     lines = [
-        f"<b>Brazil daily reg</b> ({month}-{day}): {total:,} bags",
+        f"<b>Brazil daily reg</b> ({data_date}){_staleness_tag(data_date)}: {total:,} bags",
         "MoM:",
     ]
     for lbl, cur, prv in [("Arabica", arab, p_arab), ("Conilon", con, p_con), ("Soluble", sol, p_sol)]:
@@ -758,7 +802,7 @@ def _cert_arabica_section(doc: dict | None) -> str:
     origins = _arabica_origin_top(cur)
     report_date = cur.get("report_date") or cur.get("date") or ""
 
-    lines = [f"<b>New York</b>: {report_date}"]
+    lines = [f"<b>New York</b>: {report_date}{_staleness_tag(report_date)}"]
     if graded or failed:
         # Only list top origins when ACTUAL grading happened today — that's
         # when the origin attribution is meaningful (which countries supplied
@@ -794,7 +838,7 @@ def _cert_robusta_section(doc: dict | None) -> str:
     report_date = cur.get("cut_off_date") or cur.get("date") or ""
 
     lines = [
-        f"<b>London</b>: {report_date}",
+        f"<b>London</b>: {report_date}{_staleness_tag(report_date)}",
         f"Grading: {graded:,} lots graded",
     ]
     if prev and prev.get("total_lots_certified") is not None:
