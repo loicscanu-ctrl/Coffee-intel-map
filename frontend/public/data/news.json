@@ -1,5 +1,101 @@
 [
   {
+    "id": 7426,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-24",
+    "body": "ICE-EU RC Open Interest changed by -360 over the last session, with -528 on nearby two contracts and +168 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-24\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by -360 over the last session, with -528 on nearby two contracts and +168 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-26T03:35:16.675431",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by -360 over the last session, with -528 on nearby two contracts and +168 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 7425,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-24",
+    "body": "IFUS KC Open Interest changed by +453 over the last session, with -1,339 on nearby two contracts and +1,792 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-24\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by +453 over the last session, with -1,339 on nearby two contracts and +1,792 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-26T03:35:13.264630",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by +453 over the last session, with -1,339 on nearby two contracts and +1,792 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 7424,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-25",
+    "body": "RC Robusta certified stocks shifted by -20 lots today, bringing global visible exchange inventory to 3,966 lots. 46 lots graded.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260625_103118.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by -20 lots today, bringing global visible exchange inventory to 3,966 lots. 46 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-26T03:34:22.032312",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by -20 lots today, bringing global visible exchange inventory to 3,966 lots. 46 lots graded.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7423,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-25",
+    "body": "KC Arabica certified stocks shifted by -3,765 bags today, bringing global visible exchange inventory to 385,191 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260625.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -3,765 bags today, bringing global visible exchange inventory to 385,191 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-26T03:34:19.018337",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -3,765 bags today, bringing global visible exchange inventory to 385,191 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 7422,
     "title": "World Bank Population \u2013 2026-06-26",
     "body": "Tracked 14 countries for demand-tab per-capita normalization.",
@@ -3933,91 +4029,5 @@
     "sentiment_confidence": 62.0,
     "sentiment_method": "deterministic",
     "sentiment_reason": "OI snapshot: no decisive technical view"
-  },
-  {
-    "id": 7129,
-    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-15",
-    "body": "IFUS KC Open Interest changed by -5,189 over the last session, with -5,455 on nearby two contracts and +266 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
-    "source": "ICE",
-    "category": "futures",
-    "lat": 40.74,
-    "lng": -74.05,
-    "tags": [
-      "daily-oi",
-      "arabica",
-      "futures",
-      "auto-commentary"
-    ],
-    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-15\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -5,189 over the last session, with -5,455 on nearby two contracts and +266 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-17T03:24:51.001122",
-    "commentary": {
-      "text": "IFUS KC Open Interest changed by -5,189 over the last session, with -5,455 on nearby two contracts and +266 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 62.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "OI snapshot: no decisive technical view"
-  },
-  {
-    "id": 7128,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-16",
-    "body": "RC Robusta certified stocks shifted by +134 lots today, bringing global visible exchange inventory to 3,991 lots.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "rc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260616_103033.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by +134 lots today, bringing global visible exchange inventory to 3,991 lots.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-17T03:24:02.258059",
-    "commentary": {
-      "text": "RC Robusta certified stocks shifted by +134 lots today, bringing global visible exchange inventory to 3,991 lots.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 7127,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-16",
-    "body": "KC Arabica certified stocks shifted by -285 bags today, bringing global visible exchange inventory to 396,957 bags.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "kc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260616.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -285 bags today, bringing global visible exchange inventory to 396,957 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-17T03:23:59.631113",
-    "commentary": {
-      "text": "KC Arabica certified stocks shifted by -285 bags today, bringing global visible exchange inventory to 396,957 bags.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 7125,
-    "title": "AJCA Japan Coffee Data \u2013 2026-06-17",
-    "body": "AJCA Japan 2025: imports=359382 MT, consumption=397272 MT",
-    "source": "AJCA",
-    "category": "demand",
-    "lat": 35.689,
-    "lng": 139.692,
-    "tags": [
-      "japan",
-      "demand",
-      "imports"
-    ],
-    "meta": "{\"source\": \"AJCA\", \"source_url\": \"https://www.ajca.or.jp/data/\", \"last_updated\": \"2026-06-17\", \"latest_year\": \"2025\", \"latest_consumption_mt\": 397272, \"latest_imports_mt\": 359382, \"latest_stocks_mt\": null, \"prev_imports_mt\": null, \"prev_consumption_mt\": null, \"prev_stocks_mt\": null, \"imports_yoy_pct\": null, \"consumption_yoy_pct\": null, \"stocks_yoy_pct\": null, \"monthly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"monthly_exports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"supply_demand_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"yearly_imports_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"pdf_index\": [{\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-jukyu202604.pdf\", \"kind\": \"data-jukyu\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-yunyu-suii2025.pdf\", \"kind\": \"data-yunyu-suii\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-24-2025-2.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-24-202604.pdf\", \"kind\": \"data-24\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-gc-yunyuryo-tanka2025.pdf\", \"kind\": \"data-gc-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/03/data-rcic-yunyuryo-tanka2025.pdf\", \"kind\": \"data-rcic-yunyuryo-tanka\", \"upload_year\": \"2026\", \"upload_month\": \"03\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2025/09/data7-import-nama2024.pdf\", \"kind\": \"data7-import-nama\", \"upload_year\": \"2025\", \"upload_month\": \"09\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-gc2025.pdf\", \"kind\": \"data7-import-gc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-rc2025.pdf\", \"kind\": \"data7-import-rc\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-ic2025.pdf\", \"kind\": \"data7-import-ic\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-import-other2025.pdf\", \"kind\": \"data7-import-other\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/data7-export2025.pdf\", \"kind\": \"data7-export\", \"upload_year\": \"2026\", \"upload_month\": \"05\", \"data_period\": null}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/data-decaf202604.pdf\", \"kind\": \"data-decaf\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\", \"kind\": \"j-import\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}, {\"url\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-export202604.pdf\", \"kind\": \"j-export\", \"upload_year\": \"2026\", \"upload_month\": \"06\", \"data_period\": \"202604\"}], \"latest_origin_breakdown\": [{\"country\": \"Vietnam\", \"imports_mt\": 110}, {\"country\": \"Indonesia\", \"imports_mt\": 118}, {\"country\": \"India\", \"imports_mt\": 123}, {\"country\": \"Yemen\", \"imports_mt\": 149}, {\"country\": \"Mexico\", \"imports_mt\": 305}, {\"country\": \"Guatemala\", \"imports_mt\": 306}, {\"country\": \"Honduras\", \"imports_mt\": 307}, {\"country\": \"El Salvador\", \"imports_mt\": 309}, {\"country\": \"Nicaragua\", \"imports_mt\": 310}, {\"country\": \"Costa Rica\", \"imports_mt\": 311}, {\"country\": \"Colombia\", \"imports_mt\": 401}, {\"country\": \"Peru\", \"imports_mt\": 407}, {\"country\": \"Brazil\", \"imports_mt\": 410}, {\"country\": \"Rwanda\", \"imports_mt\": 526}, {\"country\": \"Ethiopia\", \"imports_mt\": 538}, {\"country\": \"Kenya\", \"imports_mt\": 541}, {\"country\": \"Uganda\", \"imports_mt\": 542}, {\"country\": \"Tanzania\", \"imports_mt\": 543}, {\"country\": \"Papua New Guinea\", \"imports_mt\": 602}], \"latest_origin_pdf\": \"https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-import202604.pdf\"}",
-    "pub_date": "2026-06-17T03:06:09.895634"
   }
 ]
