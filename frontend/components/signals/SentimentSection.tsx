@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { fmtAgo } from "@/lib/formatters";
 import SentimentTrend from "./SentimentTrend";
+import SentimentCalibration from "./SentimentCalibration";
 
 interface SentimentItem {
   headline: string;
@@ -77,9 +78,13 @@ export default function SentimentSection() {
         </p>
       </div>
 
-      {/* Dedicated visual — net-sentiment gauge + daily trend. Self-fetches, so
-          it renders even while the headline cards load or are unavailable. */}
-      <SentimentTrend />
+      {/* Dedicated visuals — net-sentiment gauge + daily trend, and the
+          calibration of that signal against realized KC/RC moves. Both
+          self-fetch, so they render independently of the headline cards. */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <SentimentTrend />
+        <SentimentCalibration />
+      </div>
 
       {loading && (
         <div className="text-xs text-slate-500 animate-pulse py-8 text-center">Loading sentiment data…</div>
