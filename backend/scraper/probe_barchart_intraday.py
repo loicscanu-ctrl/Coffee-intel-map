@@ -52,18 +52,22 @@ async def _probe() -> dict:
                     const h = { credentials: 'include',
                                 headers: { 'x-xsrf-token': xsrf, 'accept': 'application/json, text/plain, */*' } };
 
-                    // Endpoint variants to try, per symbol.
-                    const symbols = ['RMU26', 'KCU26', 'RM*0', 'KC*0'];
+                    // Depth test: how far back does Barchart serve 15-min RM?
+                    const symbols = ['RMU26', 'KCU26'];
                     const builders = {
-                      'queryminutes.ashx': (s) =>
+                      'qm-400': (s) =>
                         'https://www.barchart.com/proxies/timeseries/queryminutes.ashx?symbol='
                         + encodeURIComponent(s)
                         + '&interval=15&maxrecords=400&order=asc&volume=contract&contractroll=combined',
-                      'core-api/historical': (s) =>
-                        'https://www.barchart.com/proxies/core-api/v1/historical/get?symbol='
+                      'qm-20000': (s) =>
+                        'https://www.barchart.com/proxies/timeseries/queryminutes.ashx?symbol='
                         + encodeURIComponent(s)
-                        + '&type=minutes&interval=15&maxRecords=400&order=asc'
-                        + '&fields=' + encodeURIComponent('tradeTime,openPrice,highPrice,lowPrice,lastPrice'),
+                        + '&interval=15&maxrecords=20000&order=asc&volume=contract&contractroll=combined',
+                      'qm-20000-start2024': (s) =>
+                        'https://www.barchart.com/proxies/timeseries/queryminutes.ashx?symbol='
+                        + encodeURIComponent(s)
+                        + '&interval=15&maxrecords=20000&order=asc&volume=contract&contractroll=combined'
+                        + '&start=20240101000000',
                     };
 
                     const results = {};
