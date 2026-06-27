@@ -1,9 +1,11 @@
 import os
 import sys
+from datetime import datetime
 from types import SimpleNamespace
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
+from scraper.quant_model.backfill_sentiment import _bucket_by_day
 from scraper.quant_model.sentiment import _aggregate, _filter_news
 
 
@@ -79,3 +81,17 @@ def test_empty_aggregate_is_neutral():
     assert agg["overall_sentiment"] == "Neutral"
     assert agg["net_index"] == 0.0
     assert agg["total"] == 0
+
+
+# ── backfill day-bucketing ────────────────────────────────────────────────────
+def test_bucket_by_day_groups_on_publication_date():
+    rows = [
+        SimpleNamespace(pub_date=datetime(2026, 6, 18, 9, 0), title="a"),
+        SimpleNamespace(pub_date=datetime(2026, 6, 18, 17, 0), title="b"),
+        SimpleNamespace(pub_date=datetime(2026, 6, 17, 12, 0), title="c"),
+        SimpleNamespace(pub_date=None, title="no-date"),  # skipped
+    ]
+    by_day = _bucket_by_day(rows)
+    assert set(by_day) == {"2026-06-18", "2026-06-17"}
+    assert len(by_day["2026-06-18"]) == 2
+    assert len(by_day["2026-06-17"]) == 1

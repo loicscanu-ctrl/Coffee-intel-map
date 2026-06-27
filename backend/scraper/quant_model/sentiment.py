@@ -144,20 +144,21 @@ def _aggregate(items_out: list[dict]) -> dict:
     }
 
 
-def run(db) -> dict:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return {"available": False, "reason": "GEMINI_API_KEY not configured"}
+def classify_headlines(news: list[dict], api_key: str | None = None) -> list[dict]:
+    """Classify a list of {headline, source, tags} dicts via Gemini, returning the
+    same dicts enriched with `sentiment` + `confidence`. Raises on API failure.
 
-    news = _relevant_news(db)
-    if not news:
-        return {"available": False, "reason": "No recent coffee news in DB"}
+    Shared by the daily run() and the historical backfill so both use identical
+    prompt, model and parsing.
+    """
+    api_key = api_key or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY not configured")
 
     headlines_block = "\n".join(
         f"{i + 1}. [{item['source']}] {item['headline']}"
         for i, item in enumerate(news)
     )
-
     prompt = (
         "You are a coffee commodity market analyst. Classify each headline as Bullish, "
         "Bearish, or Neutral for coffee futures prices (KC arabica and/or RC robusta).\n\n"
@@ -170,30 +171,26 @@ def run(db) -> dict:
         f"Headlines:\n{headlines_block}"
     )
 
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            "gemini-2.5-flash",
-            generation_config={"response_mime_type": "application/json"},
-        )
-        last_err: Exception | None = None
-        for attempt in range(3):
-            try:
-                response = model.generate_content(prompt)
-                classifications = json.loads(response.text)
-                break
-            except Exception as e:
-                last_err = e
-                if attempt < 2:
-                    time.sleep(2 ** attempt)  # 1s, 2s
-        else:
-            raise last_err if last_err else RuntimeError("Gemini call failed")
-    except Exception as e:
-        return {"available": False, "reason": f"Gemini API error: {e}"}
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel(
+        "gemini-2.5-flash",
+        generation_config={"response_mime_type": "application/json"},
+    )
+    last_err: Exception | None = None
+    for attempt in range(3):
+        try:
+            response = model.generate_content(prompt)
+            classifications = json.loads(response.text)
+            break
+        except Exception as e:
+            last_err = e
+            if attempt < 2:
+                time.sleep(2 ** attempt)  # 1s, 2s
+    else:
+        raise last_err if last_err else RuntimeError("Gemini call failed")
 
     cls_map = {c["n"]: c for c in classifications}
-
     items_out = []
     for i, item in enumerate(news):
         cls = cls_map.get(i + 1, {})
@@ -207,6 +204,21 @@ def run(db) -> dict:
             "confidence": confidence,
             "tags":       item["tags"],
         })
+    return items_out
+
+
+def run(db) -> dict:
+    if not os.getenv("GEMINI_API_KEY"):
+        return {"available": False, "reason": "GEMINI_API_KEY not configured"}
+
+    news = _relevant_news(db)
+    if not news:
+        return {"available": False, "reason": "No recent coffee news in DB"}
+
+    try:
+        items_out = classify_headlines(news)
+    except Exception as e:
+        return {"available": False, "reason": f"Gemini API error: {e}"}
 
     return {
         "available":  True,
