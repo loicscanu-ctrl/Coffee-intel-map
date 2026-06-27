@@ -277,7 +277,7 @@
         ]
       },
       {
-        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
+        "headline": "Body Count’s Now In The Coffee House…",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 98.0,
@@ -331,7 +331,7 @@
         ]
       },
       {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 98.0,
@@ -357,9 +357,77 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
+  },
+  "open_direction": {
+    "available": true,
+    "as_of": "2026-06-25",
+    "scraped_at": "2026-06-27T13:33:34.410704Z",
+    "direction": "Bearish",
+    "base_margin": -0.009094911244875834,
+    "final_margin": -0.18910344040570348,
+    "base_prob": 0.4977262878617245,
+    "final_prob": 0.45286452041872255,
+    "prob_up": 0.45286452041872255,
+    "prob_down": 0.5471354795812775,
+    "features": [
+      {
+        "var_name": "rc_ret_1d",
+        "label": "RC 1-Day Return",
+        "raw_value": 0.013218235770164455,
+        "raw_fmt": "+1.32%",
+        "phi": -0.14659601000679767
+      },
+      {
+        "var_name": "usdbrl_ret_1d",
+        "label": "USD/BRL Daily Return",
+        "raw_value": 0.0016653718477506185,
+        "raw_fmt": "+0.17%",
+        "phi": -0.03236092287873282
+      },
+      {
+        "var_name": "eurusd_ret_1d",
+        "label": "EUR/USD Daily Return",
+        "raw_value": 0.00048572821394565757,
+        "raw_fmt": "+0.05%",
+        "phi": -0.007479180296829903
+      },
+      {
+        "var_name": "kc_rc_gap_z",
+        "label": "New York Price Gap (z)",
+        "raw_value": -1.1201859828328005,
+        "raw_fmt": "-1.12σ",
+        "phi": 0.006427584021532748
+      }
+    ],
+    "barrier": {
+      "horizon_days": 5,
+      "k_sigma": 1.0,
+      "vol_window": 20
+    },
+    "model": {
+      "kind": "logistic_regression_l2",
+      "active_features": [
+        "rc_ret_1d",
+        "eurusd_ret_1d",
+        "kc_rc_gap_z",
+        "usdbrl_ret_1d"
+      ],
+      "n_features": 4,
+      "n_train": 213,
+      "test_accuracy": 0.5625,
+      "n_test": 64,
+      "undefined_ratio": 0.1566265060240964,
+      "n_resolvable": 249,
+      "n_undefined": 39,
+      "fx_source": {
+        "eurusd": "fx_history/none",
+        "usdbrl": "fx_history/none",
+        "dxy": "none"
+      }
+    }
   }
 }
