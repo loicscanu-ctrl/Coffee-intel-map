@@ -16,32 +16,40 @@ export default function SignalsMethodology() {
       </P>
 
       <Highlight>
-        <strong>Live vs. illustrative.</strong> &ldquo;Robusta forecast&rdquo; (§2) and &ldquo;News sentiment&rdquo;
-        (§4) are live. &ldquo;Open price direction&rdquo; (§1) needs an intraday ICE RC feed and &ldquo;Vietnam
-        differential&rdquo; (§3) needs a stocks-to-use pipeline — both currently render <em>example</em> numbers to show
-        the model shape, not a tradeable call.
+        <strong>Live vs. illustrative.</strong> &ldquo;Open price direction&rdquo; (§1), &ldquo;Robusta forecast&rdquo;
+        (§2) and &ldquo;News sentiment&rdquo; (§4) are live. &ldquo;Vietnam differential&rdquo; (§3) still needs a
+        stocks-to-use pipeline and renders <em>example</em> numbers to show the model shape, not a tradeable call.
       </Highlight>
 
-      <H2>1 · Open price direction — triple-barrier classifier + SHAP (illustrative)</H2>
+      <H2>1 · Open price direction — triple-barrier classifier + exact SHAP (live)</H2>
       <P>
-        The goal is a directional call on ICE Robusta in the first 30 minutes after the open. Labels come from a{" "}
-        <strong>triple-barrier</strong> scheme (López de Prado): each observation gets an upper price barrier, a lower
-        price barrier, and a vertical <em>time</em> barrier. The label is whichever barrier is touched first. If the
-        time barrier is hit before either price barrier, the case is <strong>undefined</strong> and the model abstains
-        rather than forcing a guess.
+        A directional call on ICE Robusta&rsquo;s next session. Labels come from a <strong>triple-barrier</strong>{" "}
+        scheme (López de Prado): each day gets an upper price barrier and a lower price barrier (both at{" "}
+        <Code>±K·σ</Code> of the trailing daily volatility) and a vertical <em>time</em> barrier <Code>H</Code> days
+        out. The label is whichever barrier the RC settle path touches first. If the time barrier is reached before
+        either price barrier, the case is <strong>undefined</strong> and the model abstains rather than forcing a
+        guess. Defaults: <Code>H</Code> = 5 trading days, <Code>K</Code> = 1σ.
       </P>
       <P>
-        A gradient-boosted classifier outputs a probability, decomposed with <strong>SHAP</strong>: starting from the
-        base rate <Code>E[f(x)]</Code> (the unconditional probability), each feature&rsquo;s SHAP value{" "}
-        <Code>φ&#7522;</Code> pushes the estimate up or down to the final <Code>f(x)</Code>, drawn as a waterfall.
-        Features are the open&rsquo;s relationship to the prior RC settlement plus overnight FX/DXY moves after the RC
-        close.
+        The original design targeted the first 30 minutes after the open with intraday ticks — a feed we don&rsquo;t
+        ingest. This live version reformulates the same idea on daily bars from the data we already ship: 5y of RC + KC
+        front-month settles (<Code>contract_prices_archive.json</Code>) plus EUR/USD, USD/BRL and the dollar index from
+        Stooq. The feature family is preserved: RC&rsquo;s own daily move, the overnight FX/DXY moves, and the
+        KC&minus;RC New-York arbitrage gap (z-scored).
+      </P>
+      <P>
+        A <strong>logistic regression</strong> outputs the probability, decomposed with <strong>SHAP</strong> drawn as
+        a waterfall from the base rate <Code>E[f(x)]</Code> to the final <Code>f(x)</Code>. For a logistic model the
+        SHAP value is <em>closed-form exact</em> in log-odds space — <Code>φ&#7522; = β&#7522;·z&#7522;</Code> and{" "}
+        <Code>Σφ&#7522; = margin(x) − base_margin</Code> with zero residual — so the chart is mathematically exact, not
+        a sampled approximation, and we carry no <Code>shap</Code> dependency. Bars are in log-odds (where they&rsquo;re
+        additive); endpoints are labelled with the implied probability.
       </P>
       <P className="text-[11px] text-slate-500">
-        On the illustrative sample the model abstains on the majority of cases (the time barrier is hit first ~55% of
-        the time) and scores ~72% on the cases it <em>does</em> call — a reminder that the headline accuracy is
-        conditional on a defined signal. Pending a live intraday feed, treat this section as a worked example of the
-        method, not a forecast.
+        Accuracy is reported on a chronological 30% holdout (no shuffling → no look-ahead), conditional on a{" "}
+        <em>defined</em> outcome; the live coefficients refit on the full history. The undefined ratio — how often the
+        time barrier wins — is shown alongside, because the headline accuracy only describes the cases the model chose
+        to call. Full write-up: <Code>docs/research/open-price-direction-methodology.md</Code>.
       </P>
 
       <H2>2 · Robusta futures forecast — multi-factor OLS (live)</H2>
