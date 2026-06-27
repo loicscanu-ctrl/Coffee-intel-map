@@ -113,6 +113,24 @@ def _fetch_hourly_kc(range_days: int = 730) -> "list[dict] | None":
     return None
 
 
+def _print_bar_alignment_diagnostic(bars: list[dict], n_days: int = 2) -> None:
+    """Dump the last `n_days` trading days' bars in London time so we can SEE
+    the alignment (do KC bars sit at :00 or at :15 past, given arabica opens
+    04:15 ET = 09:15 London?). Printed to stderr; never affects output."""
+    by_day: dict[str, list[dict]] = defaultdict(list)
+    for b in bars:
+        dt = datetime.fromtimestamp(b["ts_utc"], tz=timezone.utc).astimezone(_LONDON)
+        by_day[dt.strftime("%Y-%m-%d")].append((dt, b))  # type: ignore[arg-type]
+    days = sorted(by_day)[-n_days:]
+    print("[backfill][diag] KC=F hourly bars in London time (last "
+          f"{len(days)} trading days):", file=sys.stderr)
+    for day in days:
+        print(f"[backfill][diag]   {day}:", file=sys.stderr)
+        for dt, b in sorted(by_day[day], key=lambda x: x[0]):
+            print(f"[backfill][diag]     {dt.strftime('%H:%M %Z')}  "
+                  f"O={b['open']:.2f} C={b['close']:.2f}", file=sys.stderr)
+
+
 def _diff_by_day(bars: list[dict]) -> dict[str, float]:
     """Map each London trading date → kc_after_rc_diff (KC settle / KC at
     17:30 − 1), computed within the Yahoo series so the contract level cancels.
@@ -177,6 +195,7 @@ def run(dry_run: bool = False) -> dict:
     bars = _fetch_hourly_kc()
     if bars is None:
         return {"ok": False, "reason": "yahoo_unreachable"}
+    _print_bar_alignment_diagnostic(bars)
     backfill = _diff_by_day(bars)
     if not backfill:
         return {"ok": False, "reason": "no_1700_london_bars_parsed"}
