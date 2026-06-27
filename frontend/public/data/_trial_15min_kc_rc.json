@@ -1,0 +1,200 @@
+[
+  {
+    "date": "2026-05-27",
+    "kc_last_1730": 270.1000061035156,
+    "rc_last_1730": null,
+    "kc_last_1830": 263.8999938964844,
+    "rc_open_0915": null,
+    "kc_settle": 269.85,
+    "rc_settle": 3472.0
+  },
+  {
+    "date": "2026-05-28",
+    "kc_last_1730": 274.0,
+    "rc_last_1730": null,
+    "kc_last_1830": 266.3999938964844,
+    "rc_open_0915": null,
+    "kc_settle": 274.25,
+    "rc_settle": 3554.0
+  },
+  {
+    "date": "2026-05-29",
+    "kc_last_1730": 265.75,
+    "rc_last_1730": null,
+    "kc_last_1830": 265.8999938964844,
+    "rc_open_0915": null,
+    "kc_settle": 265.6,
+    "rc_settle": 3476.0
+  },
+  {
+    "date": "2026-06-01",
+    "kc_last_1730": 260.3999938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 260.0,
+    "rc_open_0915": null,
+    "kc_settle": 260.6,
+    "rc_settle": 3438.0
+  },
+  {
+    "date": "2026-06-02",
+    "kc_last_1730": 259.3999938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 259.1499938964844,
+    "rc_open_0915": null,
+    "kc_settle": 259.2,
+    "rc_settle": 3462.0
+  },
+  {
+    "date": "2026-06-03",
+    "kc_last_1730": 253.6999969482422,
+    "rc_last_1730": null,
+    "kc_last_1830": 252.64999389648438,
+    "rc_open_0915": null,
+    "kc_settle": 253.1,
+    "rc_settle": 3371.0
+  },
+  {
+    "date": "2026-06-04",
+    "kc_last_1730": 247.64999389648438,
+    "rc_last_1730": null,
+    "kc_last_1830": 247.35000610351562,
+    "rc_open_0915": null,
+    "kc_settle": 247.15,
+    "rc_settle": 3352.0
+  },
+  {
+    "date": "2026-06-05",
+    "kc_last_1730": 246.39999389648438,
+    "rc_last_1730": null,
+    "kc_last_1830": 246.64999389648438,
+    "rc_open_0915": null,
+    "kc_settle": 246.5,
+    "rc_settle": 3316.0
+  },
+  {
+    "date": "2026-06-08",
+    "kc_last_1730": 246.0500030517578,
+    "rc_last_1730": null,
+    "kc_last_1830": 245.5,
+    "rc_open_0915": null,
+    "kc_settle": 245.9,
+    "rc_settle": 3333.0
+  },
+  {
+    "date": "2026-06-09",
+    "kc_last_1730": 244.3000030517578,
+    "rc_last_1730": null,
+    "kc_last_1830": 245.1999969482422,
+    "rc_open_0915": null,
+    "kc_settle": 244.4,
+    "rc_settle": 3293.0
+  },
+  {
+    "date": "2026-06-10",
+    "kc_last_1730": 244.39999389648438,
+    "rc_last_1730": null,
+    "kc_last_1830": 244.6999969482422,
+    "rc_open_0915": null,
+    "kc_settle": 248.4,
+    "rc_settle": 3354.0
+  },
+  {
+    "date": "2026-06-11",
+    "kc_last_1730": 250.5500030517578,
+    "rc_last_1730": null,
+    "kc_last_1830": 251.25,
+    "rc_open_0915": null,
+    "kc_settle": 253.95,
+    "rc_settle": 3463.0
+  },
+  {
+    "date": "2026-06-12",
+    "kc_last_1730": 253.64999389648438,
+    "rc_last_1730": null,
+    "kc_last_1830": 253.8000030517578,
+    "rc_open_0915": null,
+    "kc_settle": 257.2,
+    "rc_settle": 3594.0
+  },
+  {
+    "date": "2026-06-15",
+    "kc_last_1730": 259.1499938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 259.1000061035156,
+    "rc_open_0915": null,
+    "kc_settle": 262.95,
+    "rc_settle": 3607.0
+  },
+  {
+    "date": "2026-06-16",
+    "kc_last_1730": 273.29998779296875,
+    "rc_last_1730": null,
+    "kc_last_1830": 273.6000061035156,
+    "rc_open_0915": null,
+    "kc_settle": 277.25,
+    "rc_settle": 3669.0
+  },
+  {
+    "date": "2026-06-17",
+    "kc_last_1730": 272.3999938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 263.75,
+    "rc_open_0915": null,
+    "kc_settle": 277.85,
+    "rc_settle": 3680.0
+  },
+  {
+    "date": "2026-06-18",
+    "kc_last_1730": 267.1000061035156,
+    "rc_last_1730": null,
+    "kc_last_1830": 256.1000061035156,
+    "rc_open_0915": null,
+    "kc_settle": 275.1,
+    "rc_settle": 3685.0
+  },
+  {
+    "date": "2026-06-22",
+    "kc_last_1730": 268.1499938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 266.45001220703125,
+    "rc_open_0915": null,
+    "kc_settle": 277.0,
+    "rc_settle": 3589.0
+  },
+  {
+    "date": "2026-06-23",
+    "kc_last_1730": 275.95001220703125,
+    "rc_last_1730": null,
+    "kc_last_1830": 275.75,
+    "rc_open_0915": null,
+    "kc_settle": 287.95,
+    "rc_settle": 3580.0
+  },
+  {
+    "date": "2026-06-24",
+    "kc_last_1730": 277.45001220703125,
+    "rc_last_1730": null,
+    "kc_last_1830": 277.75,
+    "rc_open_0915": null,
+    "kc_settle": 291.55,
+    "rc_settle": 3707.0
+  },
+  {
+    "date": "2026-06-25",
+    "kc_last_1730": 276.75,
+    "rc_last_1730": null,
+    "kc_last_1830": 263.45001220703125,
+    "rc_open_0915": null,
+    "kc_settle": 288.8,
+    "rc_settle": 3756.0
+  },
+  {
+    "date": "2026-06-26",
+    "kc_last_1730": 273.3999938964844,
+    "rc_last_1730": null,
+    "kc_last_1830": 273.95001220703125,
+    "rc_open_0915": null,
+    "kc_settle": null,
+    "rc_settle": null
+  }
+]
