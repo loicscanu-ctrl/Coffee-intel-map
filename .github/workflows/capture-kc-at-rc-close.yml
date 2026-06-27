@@ -1,0 +1,79 @@
+name: "0.2 – Capture KC at RC Close"
+
+# Records the front-month Arabica (KC) price at 17:30 London (ICE Robusta
+# session close), once per trading day, into
+# frontend/public/data/kc_at_rc_close_history.json. Feeds the
+# `kc_after_rc_diff` feature in the open-direction model (the NY-only move in
+# the hour after London robusta closes — a leading indicator for robusta's
+# next open). See backend/scraper/capture_kc_at_rc_close.py for the rationale.
+#
+# Reads the live KC/RC snapshot the acaphe poll (0.1) already pushes to Redis
+# every 15 min — no Playwright, no scraping here. The script's London-time
+# guard records only within ±8 min of 17:30 London, so:
+#   - DST is handled (the 16:30 and 17:30 UTC fires cover 17:30 London in BST
+#     and GMT respectively; the guard lets exactly the right one through);
+#   - a LATE cron fire lands outside the window and skips cleanly rather than
+#     recording a wrong-time price.
+# Extra :00/:15/:45 fires give the on-time tick more chances to land despite
+# GH Actions' known cron lateness; dedup-by-date means only the first valid
+# capture per day commits.
+
+on:
+  schedule:
+    - cron: '0,15,30,45 16,17 * * 1-5'
+  workflow_dispatch:
+
+concurrency:
+  group: data-commit          # serialise with the other repo committers
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 4
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip when Upstash secrets are missing
+        id: gate
+        env:
+          URL:   ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$TOKEN" ]; then
+            echo "::warning::Upstash secrets not configured — KC-at-RC-close capture disabled."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.skip == 'false'
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        if: steps.gate.outputs.skip == 'false'
+        run: pip install --quiet requests
+
+      - name: Capture KC at RC close (skips cleanly outside the window)
+        if: steps.gate.outputs.skip == 'false'
+        working-directory: backend
+        env:
+          UPSTASH_REDIS_REST_URL:   ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: python -m scraper.capture_kc_at_rc_close
+
+      - name: Commit history if it changed
+        if: steps.gate.outputs.skip == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/kc_at_rc_close_history.json
+          git diff --cached --quiet \
+            && echo "No new capture this tick." \
+            || (git commit -m "data: KC at RC close capture [skip ci]" \
+                && git pull --rebase --autostash --strategy-option=theirs origin main \
+                && git push)

@@ -35,9 +35,18 @@ export default function SignalsMethodology() {
         ingest. This live version reformulates the same idea on daily bars from the data we already ship: 5y of RC + KC
         front-month settles (<Code>contract_prices_archive.json</Code>) plus the <strong>Coffee Currency Index</strong>
         {" "}— our own coffee-trade-weighted basket of producer vs consumer currencies, not the generic dollar index.
-        The four features are RC&rsquo;s own daily move, the CCI&rsquo;s daily move, the CCI level (z-scored, i.e. how
+        The features are RC&rsquo;s own daily move, the CCI&rsquo;s daily move, the CCI level (z-scored, i.e. how
         stretched the currency basket is), and the KC&minus;RC New-York arbitrage gap (z-scored). Using the CCI in
         place of EUR/USD + DXY + USD/BRL keeps the currency axis coffee-relevant and drops the DXY dependency.
+      </P>
+      <P>
+        A fifth feature, <Code>kc_after_rc_diff</Code> (&ldquo;NY after RC-close move&rdquo;), is the most
+        economically-motivated: London robusta closes at 17:30 London, but New-York arabica trades ~1 more hour and
+        settles at 13:30&nbsp;ET, so the NY move in that final hour is information robusta hasn&rsquo;t traded on yet —
+        and robusta tends to gap toward it at the next open. We capture KC&rsquo;s price at 17:30 London each day
+        (from the live quote feed) and the model uses <Code>KC_settle ÷ KC_at_RC_close − 1</Code>. Because there&rsquo;s
+        no intraday history to backfill, this one is forward-accumulating: it switches on automatically once ~40
+        captured days build up.
       </P>
       <P>
         A <strong>logistic regression</strong> outputs the probability, decomposed with <strong>SHAP</strong> drawn as
