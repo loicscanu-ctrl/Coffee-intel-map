@@ -15,9 +15,13 @@ This module makes the panel LIVE by reformulating the same idea on the
 data we DO ship daily:
 
   * 5y of RC + KC front-month daily settles (contract_prices_archive.json)
-  * Daily EUR/USD, USD/BRL, and the US Dollar Index (DXY) from Stooq
-    (same free CSV source robusta_factors.py already uses for DXY), with
-    a fallback to the shipped fx_history.json when Stooq is unreachable.
+  * The Coffee Currency Index (CCI) — our own coffee-trade-weighted basket
+    of producer vs consumer currencies — reconstructed from the component
+    FX pairs in fx_history.json with the SAME weights + orientation as the
+    published index (fetch_currency_index.py). This is the currency axis
+    instead of the generic dollar index: the CCI is coffee-relevant
+    (higher = origin currencies strengthening = bullish coffee), needs no
+    extra network call, and works wherever the rest of the quant step does.
 
 The label is still a triple barrier — just applied to the DAILY RC path
 instead of an intraday one: from each day, an upper and lower price
@@ -62,10 +66,19 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+# Coffee Currency Index weights + orientation, reused verbatim from the CCI
+# module so the model's CCI feature stays in lock-step with the published
+# index (no second copy of the weights to drift). Importing these is
+# side-effect-free (the fetch logic is guarded behind __main__).
+from scraper.quant_model.fetch_currency_index import (  # noqa: E402
+    EXPORTERS,
+    IMPORTERS,
+    _strength_sign,
+)
 
 _ROOT       = Path(__file__).resolve().parents[3]
 _ARCHIVE    = _ROOT / "data" / "contract_prices_archive.json"
@@ -80,16 +93,22 @@ _BARRIER_K = 1.0
 _VOL_WINDOW = 20          # trailing window for the per-day σ estimate
 _KC_TO_USD_PER_MT = 22.0462   # KC ¢/lb → USD/MT
 _MIN_DEFINED = 80         # need at least this many labelled (non-abstain) rows
-_STOOQ_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; coffee-intel/1.0)"}
+_CCI_Z_WINDOW = 120       # rolling window for the CCI level z-score
 
 # Display metadata per feature: the order + human label + raw-value formatter.
 # var_name is the stable key surfaced to the frontend / methodology doc.
+#
+# The currency axis is the Coffee Currency Index (CCI) — a coffee-trade-weighted
+# basket of producer (export) vs consumer (import) currencies — NOT the dollar
+# index. Higher CCI = origin currencies strengthening vs USD = origin costs up
+# in USD terms = bullish coffee. This replaces the old EUR/USD + DXY + USD/BRL
+# trio with one coffee-relevant pair of features (the index's daily move and how
+# stretched its level is), removing the DXY dependency entirely.
 _FEATURE_SPECS = [
-    ("rc_ret_1d",     "RC 1-Day Return",        lambda v: f"{v*100:+.2f}%"),
-    ("eurusd_ret_1d", "EUR/USD Daily Return",   lambda v: f"{v*100:+.2f}%"),
-    ("dxy_ret_1d",    "DXY Daily Return",       lambda v: f"{v*100:+.2f}%"),
-    ("kc_rc_gap_z",   "New York Price Gap (z)", lambda v: f"{v:+.2f}σ"),
-    ("usdbrl_ret_1d", "USD/BRL Daily Return",   lambda v: f"{v*100:+.2f}%"),
+    ("rc_ret_1d",   "RC 1-Day Return",        lambda v: f"{v*100:+.2f}%"),
+    ("cci_ret_1d",  "Coffee Currency Index Δ", lambda v: f"{v*100:+.2f}%"),
+    ("cci_z",       "Coffee Currency Index (z)", lambda v: f"{v:+.2f}σ"),
+    ("kc_rc_gap_z", "New York Price Gap (z)", lambda v: f"{v:+.2f}σ"),
 ]
 _FEATURE_KEYS = [k for k, _, _ in _FEATURE_SPECS]
 
@@ -142,73 +161,70 @@ def _load_prices() -> "tuple[pd.Series, pd.Series] | None":
     return rc, kc
 
 
-# ── FX loading: Stooq daily, fallback to shipped fx_history ──────────────────
+# ── Coffee Currency Index (CCI) — coffee-trade-weighted FX basket ────────────
+# Built from the same component pairs in fx_history.json the published CCI uses,
+# with identical weights + strength orientation (imported from the CCI module).
+# Replaces the dollar-centric EUR/USD + DXY + USD/BRL features with one
+# coffee-relevant currency axis. fx_history.json is produced by the CCI
+# workflow via a GitHub-Actions-reachable CDN FX API (jsdelivr), so this needs
+# no extra network call and works wherever the rest of the quant step does.
 
-def _fetch_stooq_daily(symbol: str) -> "pd.Series | None":
-    """Daily close series from Stooq for `symbol` (e.g. 'eurusd', 'usdbrl',
-    'dx.f'). Free CSV, no auth. Returns None on any failure."""
-    url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
-    try:
-        r = requests.get(url, headers=_STOOQ_HEADERS, timeout=20)
-        r.raise_for_status()
-        lines = r.text.strip().splitlines()
-    except Exception:
-        return None
-    if len(lines) < 2:
-        return None
-    dates, closes = [], []
-    for line in lines[1:]:
-        parts = line.split(",")
-        if len(parts) < 5:
-            continue
-        try:
-            dates.append(pd.Timestamp(parts[0]))
-            closes.append(float(parts[4]))
-        except (ValueError, TypeError):
-            continue
-    if not closes:
-        return None
-    return pd.Series(closes, index=pd.DatetimeIndex(dates)).sort_index()
-
-
-def _fx_from_history(pair_key: str) -> "pd.Series | None":
-    """Fallback FX series from the shipped fx_history.json (rolling ~1y).
-    pair_key is the JSON key, e.g. 'EURUSD=X' or 'BRL=X'."""
+def _fx_history_pairs() -> dict:
+    """All per-pair daily close series from fx_history.json, keyed by ticker
+    (e.g. 'BRL=X'). Empty dict on any failure."""
     if not _FX_HISTORY.exists():
-        return None
+        return {}
     try:
         doc = json.loads(_FX_HISTORY.read_text(encoding="utf-8"))
     except Exception:
-        return None
-    p = (doc.get("pairs") or {}).get(pair_key) or {}
-    hist = p.get("history") or []
-    dates, closes = [], []
-    for row in hist:
-        d, c = row.get("date"), row.get("close")
-        if d is None or c is None:
-            continue
-        try:
-            dates.append(pd.Timestamp(d))
-            closes.append(float(c))
-        except (ValueError, TypeError):
-            continue
-    if not closes:
-        return None
-    return pd.Series(closes, index=pd.DatetimeIndex(dates)).sort_index()
+        return {}
+    out: dict[str, pd.Series] = {}
+    for ticker, p in (doc.get("pairs") or {}).items():
+        dates, closes = [], []
+        for row in p.get("history") or []:
+            d, c = row.get("date"), row.get("close")
+            if d is None or c is None:
+                continue
+            try:
+                dates.append(pd.Timestamp(d))
+                closes.append(float(c))
+            except (ValueError, TypeError):
+                continue
+        if closes:
+            out[ticker] = pd.Series(closes, index=pd.DatetimeIndex(dates)).sort_index()
+    return out
 
 
-def _load_fx() -> dict:
-    """Return {'eurusd': Series, 'usdbrl': Series, 'dxy': Series}.
+def _compute_cci_index() -> "pd.Series | None":
+    """Reconstruct the daily Coffee Currency Index level series (base 100) from
+    the fx_history component pairs.
 
-    Each prefers Stooq (multi-year daily) and falls back to fx_history.json.
-    fx_history stores EUR/USD directly (EURUSD=X) and USD/BRL as BRL=X.
-    DXY has no fx_history entry, so it's Stooq-or-nothing (the feature drops
-    out gracefully if both are missing — see _build_frame).
+    Mirrors fetch_currency_index._compute_index_series exactly: each pair's
+    daily return is normalised to a USD-strength return via _strength_sign(),
+    exporters add (+w) and importers subtract (−w), and the weighted ΔI is
+    accumulated from a base of 100. Higher index = producer currencies
+    strengthening vs USD. Returns None if no component pairs are available.
     """
-    eurusd = _fetch_stooq_daily("eurusd") or _fx_from_history("EURUSD=X")
-    usdbrl = _fetch_stooq_daily("usdbrl") or _fx_from_history("BRL=X")
-    dxy    = _fetch_stooq_daily("dx.f")
-    return {"eurusd": eurusd, "usdbrl": usdbrl, "dxy": dxy}
+    pairs = _fx_history_pairs()
+    if not pairs:
+        return None
+    returns = {t: s.pct_change() for t, s in pairs.items()}
+    df = pd.DataFrame(returns).dropna(how="all")
+    if df.empty:
+        return None
+    delta_i = pd.Series(0.0, index=df.index)
+    used = 0
+    for ticker, _name, w in EXPORTERS:
+        if ticker in df.columns:
+            delta_i += df[ticker].fillna(0) * (w * _strength_sign(ticker))
+            used += 1
+    for ticker, _name, w in IMPORTERS:
+        if ticker in df.columns:
+            delta_i += df[ticker].fillna(0) * (-w * _strength_sign(ticker))
+            used += 1
+    if used == 0:
+        return None
+    return (1 + delta_i).cumprod() * 100.0
 
 
 # ── Feature + label construction ─────────────────────────────────────────────
@@ -250,16 +266,13 @@ def _triple_barrier_labels(rc: pd.Series) -> pd.Series:
     return pd.Series(out, index=rc.index)
 
 
-def _build_frame(rc: pd.Series, kc: pd.Series, fx: dict) -> "tuple[pd.DataFrame, list[str]] | None":
+def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None") -> "tuple[pd.DataFrame, list[str]] | None":
     """Assemble the aligned daily feature+label frame.
 
-    Returns (frame, active_feature_keys). Features whose underlying series is
-    entirely missing (e.g. DXY when Stooq is unreachable AND it has no
-    fx_history fallback) are DROPPED rather than failing the whole model — a
-    4-feature decomposition is still useful and honest. Returns None only when
-    so much is missing that nothing can be built (no RC-relative feature at
-    all). The two always-available features are rc_ret_1d and kc_rc_gap_z
-    (both derived purely from the price archive).
+    Returns (frame, active_feature_keys). The CCI features are DROPPED rather
+    than failing the whole model if fx_history is unavailable — the two
+    price-archive-only features (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns
+    None only when even those can't be built.
     """
     cols: dict[str, pd.Series] = {"rc": rc}
     active: list[str] = []
@@ -275,17 +288,16 @@ def _build_frame(rc: pd.Series, kc: pd.Series, fx: dict) -> "tuple[pd.DataFrame,
     cols["kc_rc_gap_z"] = gap_z.reindex(rc.index, method="ffill")
     active.append("kc_rc_gap_z")
 
-    # FX-dependent features: include only when the series exists.
-    fx_feature_map = [
-        ("eurusd_ret_1d", fx.get("eurusd")),
-        ("dxy_ret_1d",    fx.get("dxy")),
-        ("usdbrl_ret_1d", fx.get("usdbrl")),
-    ]
-    for key, series in fx_feature_map:
-        if series is None:
-            continue
-        cols[key] = series.reindex(rc.index, method="ffill").pct_change()
-        active.append(key)
+    # Coffee Currency Index features (when fx_history yields the index):
+    #   cci_ret_1d — the index's daily move (origin-vs-consumer currency shift)
+    #   cci_z      — how stretched the index level is (rolling z-score)
+    if cci is not None and not cci.empty:
+        cci_re = cci.reindex(rc.index, method="ffill")
+        cols["cci_ret_1d"] = cci_re.pct_change()
+        cci_mu = cci_re.rolling(_CCI_Z_WINDOW, min_periods=20).mean()
+        cci_sd = cci_re.rolling(_CCI_Z_WINDOW, min_periods=20).std()
+        cols["cci_z"] = (cci_re - cci_mu) / cci_sd.replace(0, np.nan)
+        active.extend(["cci_ret_1d", "cci_z"])
 
     if len(active) < 2:
         return None
@@ -346,8 +358,8 @@ def run(db=None) -> dict:
         return _unavailable("contract_prices_archive.json missing or unreadable")
     rc, kc = prices
 
-    fx = _load_fx()
-    built = _build_frame(rc, kc, fx)
+    cci = _compute_cci_index()
+    built = _build_frame(rc, kc, cci)
     if built is None:
         return _unavailable("Could not assemble even the price-only features")
     frame, active_keys = built
@@ -455,20 +467,10 @@ def run(db=None) -> dict:
             "undefined_ratio": undefined_ratio,
             "n_resolvable":    int(n_resolvable),
             "n_undefined":     int(n_undef),
-            "fx_source": {
-                "eurusd": "stooq" if _fetch_stooq_marker(fx["eurusd"]) else "fx_history/none",
-                "usdbrl": "stooq" if _fetch_stooq_marker(fx["usdbrl"]) else "fx_history/none",
-                "dxy":    "stooq" if fx["dxy"] is not None else "none",
-            },
+            "currency_axis":   "coffee_currency_index",
+            "cci_available":   cci is not None and not cci.empty,
         },
     }
-
-
-def _fetch_stooq_marker(series) -> bool:
-    """Heuristic provenance marker: a Stooq daily pull yields ≫400 rows; the
-    fx_history fallback yields ≤~365. Used only for the report's debug
-    `fx_source` block, never for logic."""
-    return series is not None and len(series) > 400
 
 
 if __name__ == "__main__":

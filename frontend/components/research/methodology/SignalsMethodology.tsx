@@ -33,9 +33,11 @@ export default function SignalsMethodology() {
       <P>
         The original design targeted the first 30 minutes after the open with intraday ticks — a feed we don&rsquo;t
         ingest. This live version reformulates the same idea on daily bars from the data we already ship: 5y of RC + KC
-        front-month settles (<Code>contract_prices_archive.json</Code>) plus EUR/USD, USD/BRL and the dollar index from
-        Stooq. The feature family is preserved: RC&rsquo;s own daily move, the overnight FX/DXY moves, and the
-        KC&minus;RC New-York arbitrage gap (z-scored).
+        front-month settles (<Code>contract_prices_archive.json</Code>) plus the <strong>Coffee Currency Index</strong>
+        {" "}— our own coffee-trade-weighted basket of producer vs consumer currencies, not the generic dollar index.
+        The four features are RC&rsquo;s own daily move, the CCI&rsquo;s daily move, the CCI level (z-scored, i.e. how
+        stretched the currency basket is), and the KC&minus;RC New-York arbitrage gap (z-scored). Using the CCI in
+        place of EUR/USD + DXY + USD/BRL keeps the currency axis coffee-relevant and drops the DXY dependency.
       </P>
       <P>
         A <strong>logistic regression</strong> outputs the probability, decomposed with <strong>SHAP</strong> drawn as

@@ -286,7 +286,7 @@
         ]
       },
       {
-        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
+        "headline": "Body Count’s Now In The Coffee House…",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -340,7 +340,7 @@
         ]
       },
       {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -357,7 +357,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -365,42 +365,42 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-27T16:18:05.249793Z",
+    "scraped_at": "2026-06-27T17:18:48.026203Z",
     "direction": "Bearish",
-    "base_margin": -0.018876699093022448,
-    "final_margin": -0.20263573427401693,
-    "base_prob": 0.4952809653536225,
-    "final_prob": 0.44951370083038245,
-    "prob_up": 0.44951370083038245,
-    "prob_down": 0.5504862991696176,
+    "base_margin": 0.052779336947060086,
+    "final_margin": -0.22167894123989237,
+    "base_prob": 0.5131917720647002,
+    "final_prob": 0.44480610592430186,
+    "prob_up": 0.44480610592430186,
+    "prob_down": 0.5551938940756982,
     "features": [
+      {
+        "var_name": "cci_z",
+        "label": "Coffee Currency Index (z)",
+        "raw_value": 1.7483376242162851,
+        "raw_fmt": "+1.75σ",
+        "phi": -0.11438320048987424
+      },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.15496069727879466
+        "phi": -0.0954162694679965
       },
       {
-        "var_name": "usdbrl_ret_1d",
-        "label": "USD/BRL Daily Return",
-        "raw_value": 0.0016653718477506185,
-        "raw_fmt": "+0.17%",
-        "phi": -0.033222217416207574
+        "var_name": "cci_ret_1d",
+        "label": "Coffee Currency Index Δ",
+        "raw_value": -0.0008786404698499783,
+        "raw_fmt": "-0.09%",
+        "phi": -0.047774785712485744
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12\u03c3",
-        "phi": 0.012716130550998713
-      },
-      {
-        "var_name": "eurusd_ret_1d",
-        "label": "EUR/USD Daily Return",
-        "raw_value": 0.00048572821394565757,
-        "raw_fmt": "+0.05%",
-        "phi": -0.008292251036990975
+        "raw_fmt": "-1.12σ",
+        "phi": -0.01688402251659596
       }
     ],
     "barrier": {
@@ -412,22 +412,19 @@
       "kind": "logistic_regression_l2",
       "active_features": [
         "rc_ret_1d",
-        "eurusd_ret_1d",
-        "kc_rc_gap_z",
-        "usdbrl_ret_1d"
+        "cci_ret_1d",
+        "cci_z",
+        "kc_rc_gap_z"
       ],
       "n_features": 4,
-      "n_train": 212,
-      "test_accuracy": 0.5625,
-      "n_test": 64,
-      "undefined_ratio": 0.15725806451612903,
-      "n_resolvable": 248,
-      "n_undefined": 39,
-      "fx_source": {
-        "eurusd": "fx_history/none",
-        "usdbrl": "fx_history/none",
-        "dxy": "none"
-      }
+      "n_train": 195,
+      "test_accuracy": 0.5254237288135594,
+      "n_test": 59,
+      "undefined_ratio": 0.16521739130434782,
+      "n_resolvable": 230,
+      "n_undefined": 38,
+      "currency_axis": "coffee_currency_index",
+      "cci_available": true
     }
   }
 }
