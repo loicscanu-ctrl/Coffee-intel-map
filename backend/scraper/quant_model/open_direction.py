@@ -83,6 +83,11 @@ from scraper.quant_model.fetch_currency_index import (  # noqa: E402
 _ROOT       = Path(__file__).resolve().parents[3]
 _ARCHIVE    = _ROOT / "data" / "contract_prices_archive.json"
 _FX_HISTORY = _ROOT / "frontend" / "public" / "data" / "fx_history.json"
+_KC_AT_RC_CLOSE = _ROOT / "frontend" / "public" / "data" / "kc_at_rc_close_history.json"
+
+# The kc_after_rc_diff feature only turns on once enough captured days overlap
+# the training window — see capture_kc_at_rc_close.py (forward-accumulating).
+_MIN_KC_RC_OVERLAP = 40
 
 # ── Triple-barrier hyper-parameters ──────────────────────────────────────────
 # H = horizon in trading days the vertical (time) barrier sits at.
@@ -104,11 +109,18 @@ _CCI_Z_WINDOW = 120       # rolling window for the CCI level z-score
 # in USD terms = bullish coffee. This replaces the old EUR/USD + DXY + USD/BRL
 # trio with one coffee-relevant pair of features (the index's daily move and how
 # stretched its level is), removing the DXY dependency entirely.
+#
+# kc_after_rc_diff is the New-York-only move in the ~1h AFTER London robusta
+# closes (KC settle vs KC at 17:30 London) — a leading indicator for robusta's
+# next open. It's forward-accumulating (captured daily by
+# capture_kc_at_rc_close.py), so it's the last feature and only activates once
+# enough captured days overlap the training window.
 _FEATURE_SPECS = [
-    ("rc_ret_1d",   "RC 1-Day Return",        lambda v: f"{v*100:+.2f}%"),
-    ("cci_ret_1d",  "Coffee Currency Index Δ", lambda v: f"{v*100:+.2f}%"),
-    ("cci_z",       "Coffee Currency Index (z)", lambda v: f"{v:+.2f}σ"),
-    ("kc_rc_gap_z", "New York Price Gap (z)", lambda v: f"{v:+.2f}σ"),
+    ("rc_ret_1d",       "RC 1-Day Return",          lambda v: f"{v*100:+.2f}%"),
+    ("cci_ret_1d",      "Coffee Currency Index Δ",  lambda v: f"{v*100:+.2f}%"),
+    ("cci_z",           "Coffee Currency Index (z)", lambda v: f"{v:+.2f}σ"),
+    ("kc_rc_gap_z",     "New York Price Gap (z)",   lambda v: f"{v:+.2f}σ"),
+    ("kc_after_rc_diff", "NY after RC-Close Move",  lambda v: f"{v*100:+.2f}%"),
 ]
 _FEATURE_KEYS = [k for k, _, _ in _FEATURE_SPECS]
 
@@ -227,6 +239,33 @@ def _compute_cci_index() -> "pd.Series | None":
     return (1 + delta_i).cumprod() * 100.0
 
 
+def _load_kc_at_rc_close() -> "pd.Series | None":
+    """{date → KC front-month price at 17:30 London} from the forward-captured
+    history (capture_kc_at_rc_close.py). None when the file is absent/empty —
+    the feature simply stays off until enough days accumulate."""
+    if not _KC_AT_RC_CLOSE.exists():
+        return None
+    try:
+        rows = json.loads(_KC_AT_RC_CLOSE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(rows, list) or not rows:
+        return None
+    dates, vals = [], []
+    for r in rows:
+        d, v = r.get("date"), r.get("kc_at_rc_close")
+        if d is None or v is None:
+            continue
+        try:
+            dates.append(pd.Timestamp(d))
+            vals.append(float(v))
+        except (ValueError, TypeError):
+            continue
+    if not vals:
+        return None
+    return pd.Series(vals, index=pd.DatetimeIndex(dates)).sort_index()
+
+
 # ── Feature + label construction ─────────────────────────────────────────────
 
 def _zscore_rolling(s: pd.Series, window: int = 52 * 5) -> pd.Series:
@@ -266,13 +305,15 @@ def _triple_barrier_labels(rc: pd.Series) -> pd.Series:
     return pd.Series(out, index=rc.index)
 
 
-def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None") -> "tuple[pd.DataFrame, list[str]] | None":
+def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
+                 kc_at_rc_close: "pd.Series | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
     """Assemble the aligned daily feature+label frame.
 
-    Returns (frame, active_feature_keys). The CCI features are DROPPED rather
-    than failing the whole model if fx_history is unavailable — the two
-    price-archive-only features (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns
-    None only when even those can't be built.
+    Returns (frame, active_feature_keys). Optional features (CCI, the
+    NY-after-RC-close move) are DROPPED rather than failing the whole model
+    when their inputs are unavailable — the two price-archive-only features
+    (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns None only when even those
+    can't be built.
     """
     cols: dict[str, pd.Series] = {"rc": rc}
     active: list[str] = []
@@ -298,6 +339,23 @@ def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None") -> "tupl
         cci_sd = cci_re.rolling(_CCI_Z_WINDOW, min_periods=20).std()
         cols["cci_z"] = (cci_re - cci_mu) / cci_sd.replace(0, np.nan)
         active.extend(["cci_ret_1d", "cci_z"])
+
+    # NY-after-RC-close move: KC's daily settle vs KC at 17:30 London (the
+    # robusta close). Positive = New York rallied in the hour after London
+    # robusta stopped trading → robusta tends to gap up next open. Only
+    # included when enough captured days overlap the price archive, since this
+    # series is forward-accumulating (no historical intraday backfill).
+    if kc_at_rc_close is not None and not kc_at_rc_close.empty:
+        kc_close_aligned = kc.reindex(kc_at_rc_close.index)   # KC settle on the same dates
+        diff = (kc_close_aligned / kc_at_rc_close) - 1.0
+        diff = diff.dropna()
+        if len(diff.index.intersection(rc.index)) >= _MIN_KC_RC_OVERLAP:
+            # No ffill: a same-day diff only makes sense on days we actually
+            # captured. Days without a capture stay NaN and are excluded from
+            # training rows (dropna in run()), so the feature is used only
+            # where it's real.
+            cols["kc_after_rc_diff"] = diff.reindex(rc.index)
+            active.append("kc_after_rc_diff")
 
     if len(active) < 2:
         return None
@@ -359,7 +417,8 @@ def run(db=None) -> dict:
     rc, kc = prices
 
     cci = _compute_cci_index()
-    built = _build_frame(rc, kc, cci)
+    kc_at_rc_close = _load_kc_at_rc_close()
+    built = _build_frame(rc, kc, cci, kc_at_rc_close)
     if built is None:
         return _unavailable("Could not assemble even the price-only features")
     frame, active_keys = built
@@ -469,6 +528,7 @@ def run(db=None) -> dict:
             "n_undefined":     int(n_undef),
             "currency_axis":   "coffee_currency_index",
             "cci_available":   cci is not None and not cci.empty,
+            "kc_after_rc_active": "kc_after_rc_diff" in active_keys,
         },
     }
 

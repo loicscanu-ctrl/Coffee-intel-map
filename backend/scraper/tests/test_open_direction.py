@@ -125,6 +125,46 @@ def test_build_frame_price_only_when_cci_missing():
     assert active == ["rc_ret_1d", "kc_rc_gap_z"]
 
 
+def test_kc_after_rc_off_without_history():
+    """No KC-at-RC-close capture → the feature is absent (forward-accumulating)."""
+    rc = _series(list(np.linspace(3000, 3200, 80)))
+    kc = _series(list(np.linspace(250, 270, 80)))
+    built = od._build_frame(rc, kc, None, kc_at_rc_close=None)
+    _frame, active = built
+    assert "kc_after_rc_diff" not in active
+
+
+def test_kc_after_rc_activates_with_enough_overlap():
+    """Once ≥ _MIN_KC_RC_OVERLAP captured days overlap the archive, the
+    NY-after-RC-close feature joins the set."""
+    n = 120
+    rc = _series(list(np.linspace(3000, 3200, n)))
+    kc = _series(list(np.linspace(250, 270, n)))
+    # Capture covers the last 60 days (> _MIN_KC_RC_OVERLAP=40): KC at RC close
+    # = settle × (1 ∓ small intraday move).
+    cap_dates = kc.index[-60:]
+    import pandas as pd
+    at_close = pd.Series(
+        [float(kc.loc[d]) * 0.998 for d in cap_dates], index=cap_dates
+    )
+    built = od._build_frame(rc, kc, None, kc_at_rc_close=at_close)
+    _frame, active = built
+    assert "kc_after_rc_diff" in active
+
+
+def test_kc_after_rc_stays_off_below_overlap_threshold():
+    n = 120
+    rc = _series(list(np.linspace(3000, 3200, n)))
+    kc = _series(list(np.linspace(250, 270, n)))
+    # Only 10 captured days — below the 40-day activation threshold.
+    cap_dates = kc.index[-10:]
+    import pandas as pd
+    at_close = pd.Series([float(kc.loc[d]) * 0.998 for d in cap_dates], index=cap_dates)
+    built = od._build_frame(rc, kc, None, kc_at_rc_close=at_close)
+    _frame, active = built
+    assert "kc_after_rc_diff" not in active
+
+
 def test_cci_index_orientation_exporter_strength_raises_index():
     """Sanity on the CCI reconstruction: when an exporter currency strengthens
     vs USD (BRL=X falls, i.e. fewer BRL per USD), the index should RISE. Mirrors

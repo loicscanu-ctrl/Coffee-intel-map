@@ -92,12 +92,13 @@ So a "decisive" move is roughly **±1σ over a trading week**.
 All features are computed on the daily bar and standardised (z-scored) on the
 training distribution before fitting. The canonical display order:
 
-| `var_name`     | Label                      | Definition                                                         |
-|----------------|----------------------------|---------------------------------------------------------------------|
-| `rc_ret_1d`    | RC 1-Day Return            | RC front-month daily return                                         |
-| `cci_ret_1d`   | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
-| `cci_z`        | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
-| `kc_rc_gap_z`  | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a long window            |
+| `var_name`         | Label                      | Definition                                                         |
+|--------------------|----------------------------|---------------------------------------------------------------------|
+| `rc_ret_1d`        | RC 1-Day Return            | RC front-month daily return                                         |
+| `cci_ret_1d`       | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
+| `cci_z`            | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
+| `kc_rc_gap_z`      | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a long window            |
+| `kc_after_rc_diff` | NY after RC-Close Move     | KC settle ÷ KC at 17:30 London − 1 — the NY-only move in the hour after London robusta closes |
 
 `22.0462` converts KC (¢/lb) to USD/MT so the KC−RC gap is a like-for-like
 arbitrage spread. The CCI itself is reconstructed exactly as
@@ -105,14 +106,40 @@ arbitrage spread. The CCI itself is reconstructed exactly as
 is normalised to a USD-strength return, exporters add (+w) and importers
 subtract (−w), and the weighted ΔI is accumulated from a base of 100.
 
+### The NY-after-RC-close feature (`kc_after_rc_diff`)
+
+This is the single most economically-motivated feature, and worth its own note.
+ICE Robusta (London) closes its session at **17:30 London**; ICE Arabica /
+Coffee C (New York) keeps trading for ~1 more hour and settles at 13:30 ET.
+During that final hour New York prices in information London robusta has already
+stopped trading on — and robusta tends to **gap toward it at its next open**. So
+
+    kc_after_rc_diff = KC_settle / KC_at_17:30_London − 1
+
+(positive = NY rallied after London closed → bullish for robusta's next open)
+is a genuine leading indicator for the very thing this model predicts.
+
+The catch is data: `KC_at_17:30_London` is an *intraday* snapshot, and there is
+no free deep intraday arabica history to backfill it. So it is captured **going
+forward** — `capture_kc_at_rc_close.py` reads the front-month KC price from the
+live acaphe snapshot (which workflow 0.1 pushes to Redis every 15 min) at 17:30
+London each trading day and appends it to
+`frontend/public/data/kc_at_rc_close_history.json`. A London-time guard (handling
+DST and late cron fires) records only within ±8 min of 17:30 London, so the
+series is clean even if a capture tick is missed. The feature **activates
+automatically** in the model once at least `_MIN_KC_RC_OVERLAP` (40) captured
+days overlap the training window — until then the model simply runs without it.
+
 ### Graceful feature degradation
 
 `rc_ret_1d` and `kc_rc_gap_z` are derived purely from the price archive and are
 **always present**. The two CCI features are included only when `fx_history.json`
-yields the component pairs. If it doesn't, the model proceeds on the two
-price-only features rather than failing entirely. The active feature set is
-reported in `open_direction.model.active_features`, and the SHAP decomposition
-adapts to whatever set was used.
+yields the component pairs; `kc_after_rc_diff` only once enough captured days
+exist. If an input is missing, the model proceeds on the remaining features
+rather than failing entirely. The active feature set is reported in
+`open_direction.model.active_features` (with `cci_available` and
+`kc_after_rc_active` flags), and the SHAP decomposition adapts to whatever set
+was used.
 
 ---
 
