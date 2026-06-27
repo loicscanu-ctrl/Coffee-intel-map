@@ -10,6 +10,7 @@ const TABS = [
   { href: "/supply",  label: "Supply" },
   { href: "/demand",  label: "Demand" },
   { href: "/macro",   label: "Macro" },
+  { href: "/signals", label: "Signals" },
   { href: "/map",     label: "Map" },
   { href: "/data-map",label: "Data Map" },
   { href: "/research",label: "Research" },
