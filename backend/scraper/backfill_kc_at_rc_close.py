@@ -7,16 +7,24 @@ go live immediately instead of waiting weeks for the forward capture
 
 What it produces
 ================
-For each trading day in the last ~2 years it records the front-month Arabica
-(KC) price at ~17:30 London — the ICE Robusta session close — approximated as
-the MIDPOINT of the hourly bar covering 17:00–18:00 London. (KC settles at
-18:30 London, RC closes 17:30 London, so the bar's midpoint is the closest
-single hourly mark to 17:30; forward live captures from the 15-min poll are
-more precise, and take precedence on any overlapping date.)
+For each trading day in the last ~2 years it records `kc_after_rc_diff` — the
+NY-only return from RC close (17:30 London) to KC settle (18:30 London),
+computed ENTIRELY WITHIN the Yahoo KC=F series:
 
-The output schema matches the forward capture exactly, with a `source`
-provenance flag:
-    {"date": "2026-06-25", "kc_at_rc_close": 311.2, "source": "yahoo_hourly_backfill"}
+    a = midpoint of the 17:00–18:00 London bar     ≈ KC at 17:30 (RC close)
+    b = close of the last KC bar of the London day ≈ KC settle (18:30)
+    kc_after_rc_diff = b / a − 1
+
+Computing the ratio within one series is essential: dividing an archive
+front-contract settle by Yahoo's *continuous* front (which can track a
+different delivery month) would inject the calendar spread (several %) instead
+of the genuine intraday move. Within Yahoo's own series the contract LEVEL
+cancels and only the ~1h price action remains.
+
+    {"date": "2026-06-25", "kc_after_rc_diff": 0.004, "source": "yahoo_hourly_backfill"}
+
+Forward live captures (capture_kc_at_rc_close.py) record the 17:30 price and
+the model derives the same diff; the backfill rows carry the diff directly.
 
 Source + where to run
 =====================
@@ -105,18 +113,37 @@ def _fetch_hourly_kc(range_days: int = 730) -> "list[dict] | None":
     return None
 
 
-def _kc_at_rc_close_by_day(bars: list[dict]) -> dict[str, float]:
-    """Map each London trading date → KC at ~17:30 London, the midpoint of the
-    17:00–18:00 London bar."""
-    by_day: dict[str, float] = {}
+def _diff_by_day(bars: list[dict]) -> dict[str, float]:
+    """Map each London trading date → kc_after_rc_diff (KC settle / KC at
+    17:30 − 1), computed within the Yahoo series so the contract level cancels.
+
+    a = midpoint of the 17:00 London bar (≈ 17:30, RC close)
+    b = close of the last KC bar of that London day (≈ 18:30 settle)
+    """
+    # Bucket bars by London date, keyed by London hour.
+    by_day_hours: dict[str, dict[int, dict]] = defaultdict(dict)
     for b in bars:
-        dt_london = datetime.fromtimestamp(b["ts_utc"], tz=timezone.utc).astimezone(_LONDON)
-        if dt_london.hour != _RC_CLOSE_HR:
+        dt = datetime.fromtimestamp(b["ts_utc"], tz=timezone.utc).astimezone(_LONDON)
+        date_str = dt.strftime("%Y-%m-%d")
+        # Keep the bar per (date, hour); KC session runs ~09:15–18:30 London.
+        by_day_hours[date_str][dt.hour] = b
+
+    out: dict[str, float] = {}
+    for date_str, hours in by_day_hours.items():
+        a_bar = hours.get(_RC_CLOSE_HR)            # 17:00 London bar → 17:30 est
+        if a_bar is None:
             continue
-        date_str = dt_london.strftime("%Y-%m-%d")
-        # Midpoint of the 17:00–18:00 bar ≈ price at 17:30.
-        by_day[date_str] = round((b["open"] + b["close"]) / 2.0, 2)
-    return by_day
+        a = (a_bar["open"] + a_bar["close"]) / 2.0
+        # Settle proxy: close of the last bar at hour ≤ 18 (KC closes 18:30 L).
+        settle_hours = [h for h in hours if h <= 18 and h >= _RC_CLOSE_HR]
+        if not settle_hours:
+            continue
+        b_bar = hours[max(settle_hours)]
+        b = b_bar["close"]
+        if a <= 0:
+            continue
+        out[date_str] = round(b / a - 1.0, 6)
+    return out
 
 
 def _load_history() -> list[dict]:
@@ -134,13 +161,13 @@ def _merge(existing: list[dict], backfill: dict[str, float]) -> tuple[list[dict]
     capture. Returns (merged_rows, n_added)."""
     by_date = {r.get("date"): r for r in existing if r.get("date")}
     added = 0
-    for date_str, price in sorted(backfill.items()):
+    for date_str, diff in sorted(backfill.items()):
         cur = by_date.get(date_str)
         if cur is not None and cur.get("source") in _PRECISE_SOURCES:
             continue   # never clobber a 15-min-precise forward capture
         if cur is not None and cur.get("source") == _SOURCE:
             continue   # already backfilled
-        by_date[date_str] = {"date": date_str, "kc_at_rc_close": price, "source": _SOURCE}
+        by_date[date_str] = {"date": date_str, "kc_after_rc_diff": diff, "source": _SOURCE}
         added += 1
     merged = sorted(by_date.values(), key=lambda r: r.get("date", ""))[-_KEEP_DAYS:]
     return merged, added
@@ -150,7 +177,7 @@ def run(dry_run: bool = False) -> dict:
     bars = _fetch_hourly_kc()
     if bars is None:
         return {"ok": False, "reason": "yahoo_unreachable"}
-    backfill = _kc_at_rc_close_by_day(bars)
+    backfill = _diff_by_day(bars)
     if not backfill:
         return {"ok": False, "reason": "no_1700_london_bars_parsed"}
 

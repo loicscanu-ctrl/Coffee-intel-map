@@ -126,41 +126,36 @@ def test_build_frame_price_only_when_cci_missing():
 
 
 def test_kc_after_rc_off_without_history():
-    """No KC-at-RC-close capture → the feature is absent (forward-accumulating)."""
+    """No capture history → the feature is absent (forward-accumulating)."""
     rc = _series(list(np.linspace(3000, 3200, 80)))
     kc = _series(list(np.linspace(250, 270, 80)))
-    built = od._build_frame(rc, kc, None, kc_at_rc_close=None)
+    built = od._build_frame(rc, kc, None, kc_after_rc=None)
     _frame, active = built
     assert "kc_after_rc_diff" not in active
 
 
 def test_kc_after_rc_activates_with_enough_overlap():
-    """Once ≥ _MIN_KC_RC_OVERLAP captured days overlap the archive, the
-    NY-after-RC-close feature joins the set."""
+    """Once ≥ _MIN_KC_RC_OVERLAP diff days overlap the archive, the
+    NY-after-RC-close feature joins the set. The series is the diff directly."""
+    import pandas as pd
     n = 120
     rc = _series(list(np.linspace(3000, 3200, n)))
     kc = _series(list(np.linspace(250, 270, n)))
-    # Capture covers the last 60 days (> _MIN_KC_RC_OVERLAP=40): KC at RC close
-    # = settle × (1 ∓ small intraday move).
-    cap_dates = kc.index[-60:]
-    import pandas as pd
-    at_close = pd.Series(
-        [float(kc.loc[d]) * 0.998 for d in cap_dates], index=cap_dates
-    )
-    built = od._build_frame(rc, kc, None, kc_at_rc_close=at_close)
+    diff_dates = kc.index[-60:]   # > _MIN_KC_RC_OVERLAP=40
+    diff = pd.Series([0.002] * len(diff_dates), index=diff_dates)
+    built = od._build_frame(rc, kc, None, kc_after_rc=diff)
     _frame, active = built
     assert "kc_after_rc_diff" in active
 
 
 def test_kc_after_rc_stays_off_below_overlap_threshold():
+    import pandas as pd
     n = 120
     rc = _series(list(np.linspace(3000, 3200, n)))
     kc = _series(list(np.linspace(250, 270, n)))
-    # Only 10 captured days — below the 40-day activation threshold.
-    cap_dates = kc.index[-10:]
-    import pandas as pd
-    at_close = pd.Series([float(kc.loc[d]) * 0.998 for d in cap_dates], index=cap_dates)
-    built = od._build_frame(rc, kc, None, kc_at_rc_close=at_close)
+    diff_dates = kc.index[-10:]   # below the 40-day threshold
+    diff = pd.Series([0.002] * len(diff_dates), index=diff_dates)
+    built = od._build_frame(rc, kc, None, kc_after_rc=diff)
     _frame, active = built
     assert "kc_after_rc_diff" not in active
 

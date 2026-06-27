@@ -239,10 +239,21 @@ def _compute_cci_index() -> "pd.Series | None":
     return (1 + delta_i).cumprod() * 100.0
 
 
-def _load_kc_at_rc_close() -> "pd.Series | None":
-    """{date → KC front-month price at 17:30 London} from the forward-captured
-    history (capture_kc_at_rc_close.py). None when the file is absent/empty —
-    the feature simply stays off until enough days accumulate."""
+def _load_kc_after_rc(kc: "pd.Series") -> "pd.Series | None":
+    """{date → kc_after_rc_diff} = the NY-only return from RC close (17:30
+    London) to KC settle. Two row shapes are supported in the history file:
+
+      * backfill rows carry the diff directly (`kc_after_rc_diff`) — computed
+        within a single intraday series so the contract level cancels;
+      * forward-capture rows carry the 17:30 price (`kc_at_rc_close`), and we
+        derive the diff as KC_settle / price − 1 using the same-day archive
+        settle. (acaphe's front ≈ the archive front, so this stays single-
+        contract in practice — unlike Yahoo's continuous series, which is why
+        the backfill stores the diff pre-computed.)
+
+    Returns None when the file is absent/empty — the feature stays off until
+    enough days accumulate.
+    """
     if not _KC_AT_RC_CLOSE.exists():
         return None
     try:
@@ -253,12 +264,25 @@ def _load_kc_at_rc_close() -> "pd.Series | None":
         return None
     dates, vals = [], []
     for r in rows:
-        d, v = r.get("date"), r.get("kc_at_rc_close")
-        if d is None or v is None:
+        d = r.get("date")
+        if d is None:
             continue
         try:
-            dates.append(pd.Timestamp(d))
-            vals.append(float(v))
+            ts = pd.Timestamp(d)
+        except (ValueError, TypeError):
+            continue
+        diff = r.get("kc_after_rc_diff")
+        if diff is None:
+            price = r.get("kc_at_rc_close")
+            if price is None or ts not in kc.index:
+                continue
+            try:
+                diff = float(kc.loc[ts]) / float(price) - 1.0
+            except (ValueError, TypeError, ZeroDivisionError):
+                continue
+        try:
+            vals.append(float(diff))
+            dates.append(ts)
         except (ValueError, TypeError):
             continue
     if not vals:
@@ -306,7 +330,7 @@ def _triple_barrier_labels(rc: pd.Series) -> pd.Series:
 
 
 def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
-                 kc_at_rc_close: "pd.Series | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
+                 kc_after_rc: "pd.Series | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
     """Assemble the aligned daily feature+label frame.
 
     Returns (frame, active_feature_keys). Optional features (CCI, the
@@ -340,20 +364,17 @@ def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
         cols["cci_z"] = (cci_re - cci_mu) / cci_sd.replace(0, np.nan)
         active.extend(["cci_ret_1d", "cci_z"])
 
-    # NY-after-RC-close move: KC's daily settle vs KC at 17:30 London (the
-    # robusta close). Positive = New York rallied in the hour after London
-    # robusta stopped trading → robusta tends to gap up next open. Only
-    # included when enough captured days overlap the price archive, since this
-    # series is forward-accumulating (no historical intraday backfill).
-    if kc_at_rc_close is not None and not kc_at_rc_close.empty:
-        kc_close_aligned = kc.reindex(kc_at_rc_close.index)   # KC settle on the same dates
-        diff = (kc_close_aligned / kc_at_rc_close) - 1.0
-        diff = diff.dropna()
+    # NY-after-RC-close move: the NY-only return from RC close (17:30 London)
+    # to KC settle. Positive = New York rallied in the hour after London
+    # robusta stopped trading → robusta tends to gap up next open. The series
+    # is pre-computed within a single intraday source (see _load_kc_after_rc),
+    # so no contract-spread contamination. Only included when enough days
+    # overlap the archive.
+    if kc_after_rc is not None and not kc_after_rc.empty:
+        diff = kc_after_rc.dropna()
         if len(diff.index.intersection(rc.index)) >= _MIN_KC_RC_OVERLAP:
-            # No ffill: a same-day diff only makes sense on days we actually
-            # captured. Days without a capture stay NaN and are excluded from
-            # training rows (dropna in run()), so the feature is used only
-            # where it's real.
+            # No ffill: only real captured/backfilled days contribute; missing
+            # days stay NaN and drop out of training rows (dropna in run()).
             cols["kc_after_rc_diff"] = diff.reindex(rc.index)
             active.append("kc_after_rc_diff")
 
@@ -417,8 +438,8 @@ def run(db=None) -> dict:
     rc, kc = prices
 
     cci = _compute_cci_index()
-    kc_at_rc_close = _load_kc_at_rc_close()
-    built = _build_frame(rc, kc, cci, kc_at_rc_close)
+    kc_after_rc = _load_kc_after_rc(kc)
+    built = _build_frame(rc, kc, cci, kc_after_rc)
     if built is None:
         return _unavailable("Could not assemble even the price-only features")
     frame, active_keys = built
