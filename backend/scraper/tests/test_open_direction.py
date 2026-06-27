@@ -101,33 +101,48 @@ def test_triple_barrier_flat_is_undefined():
 
 # ── Graceful degradation ─────────────────────────────────────────────────────
 
-def test_build_frame_drops_missing_fx_feature():
-    """With DXY missing, the frame should still build on the remaining
-    features and report DXY absent from the active set."""
+def test_build_frame_includes_cci_features():
+    """With a CCI series present, the two CCI features join the two
+    price-only features (no DXY anywhere)."""
     rc = _series(list(np.linspace(3000, 3200, 60)))
     kc = _series(list(np.linspace(250, 270, 60)))
-    fx = {
-        "eurusd": _series(list(np.linspace(1.08, 1.10, 60))),
-        "usdbrl": _series(list(np.linspace(5.0, 5.2, 60))),
-        "dxy":    None,   # missing
-    }
-    built = od._build_frame(rc, kc, fx)
+    cci = _series(list(100 + np.cumsum(np.full(60, 0.05))))
+    built = od._build_frame(rc, kc, cci)
     assert built is not None
     _frame, active = built
-    assert "dxy_ret_1d" not in active
-    assert "rc_ret_1d" in active and "kc_rc_gap_z" in active
-    assert "eurusd_ret_1d" in active and "usdbrl_ret_1d" in active
+    assert set(active) == {"rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z"}
+    # DXY must not appear anywhere in the feature set.
+    assert not any("dxy" in k for k in active)
 
 
-def test_build_frame_price_only_still_works():
-    """Even with ALL fx missing, the two price-only features keep it alive."""
+def test_build_frame_price_only_when_cci_missing():
+    """With no CCI series, the two price-only features keep it alive."""
     rc = _series(list(np.linspace(3000, 3200, 60)))
     kc = _series(list(np.linspace(250, 270, 60)))
-    fx = {"eurusd": None, "usdbrl": None, "dxy": None}
-    built = od._build_frame(rc, kc, fx)
+    built = od._build_frame(rc, kc, None)
     assert built is not None
     _frame, active = built
     assert active == ["rc_ret_1d", "kc_rc_gap_z"]
+
+
+def test_cci_index_orientation_exporter_strength_raises_index():
+    """Sanity on the CCI reconstruction: when an exporter currency strengthens
+    vs USD (BRL=X falls, i.e. fewer BRL per USD), the index should RISE. Mirrors
+    fetch_currency_index._compute_index_series sign convention."""
+    import pandas as pd
+    idx = pd.date_range("2026-01-01", periods=5, freq="D")
+    # BRL=X is local-per-USD: a DECREASE = stronger real = index up.
+    brl = pd.Series([5.0, 4.9, 4.8, 4.7, 4.6], index=idx)
+    monkey_pairs = {"BRL=X": brl}
+    # Build ΔI the same way _compute_cci_index does, restricted to BRL.
+    from scraper.quant_model.fetch_currency_index import _strength_sign
+    rets = brl.pct_change()
+    # exporter weight applied with +w * strength_sign; BRL strengthening
+    # (negative raw return × -1 sign) → positive contribution → index up.
+    contrib = rets.fillna(0) * (0.513 * _strength_sign("BRL=X"))
+    index = (1 + contrib).cumprod() * 100
+    assert index.iloc[-1] > index.iloc[0]
+    assert monkey_pairs  # keep ref for readability
 
 
 def test_unavailable_when_archive_missing(monkeypatch, tmp_path):

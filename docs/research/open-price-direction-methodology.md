@@ -25,15 +25,30 @@ self-updating:
 
 - **RC and KC front-month daily settles** — `data/contract_prices_archive.json`
   (~5 years, 2021-06 → present).
-- **EUR/USD, USD/BRL, and the US Dollar Index (DXY)** — Stooq free daily CSV
-  (the same source `robusta_factors.py` already uses for DXY), with a fallback
-  to the shipped `fx_history.json` for EUR/USD and USD/BRL when Stooq is
-  unreachable.
+- **The Coffee Currency Index (CCI)** — reconstructed from the component FX
+  pairs in `fx_history.json` (the platform's own coffee-trade-weighted basket
+  of producer vs consumer currencies), using the *identical* weights and
+  strength orientation as the published index in `fetch_currency_index.py`.
+  `fx_history.json` is produced daily by the CCI workflow from a
+  GitHub-Actions-reachable CDN FX API, so the model needs no extra network call.
 
 The reformulation changes the prediction horizon from "first 30 minutes" to
-"next session(s)" but preserves the feature family (the contract's own move,
-overnight FX/DXY moves, and the NY arbitrage gap) and the barrier-based
-labelling philosophy.
+"next session(s)" but preserves the spirit of the feature family (the
+contract's own move, the FX backdrop, and the NY arbitrage gap) and the
+barrier-based labelling philosophy.
+
+**On the currency axis — why the CCI, not the dollar index.** The original mock
+used EUR/USD, USD/BRL and the US Dollar Index (DXY). DXY is a generic
+trade-weighted dollar basket dominated by the euro and yen — only loosely
+related to coffee. The platform already publishes the **Coffee Currency Index**,
+a basket weighted by actual coffee trade: producer (export) currencies — BRL
+0.513, VND 0.262, COP 0.128, IDR 0.051, PEN 0.047 — net of consumer (import)
+currencies — EUR 0.673, JPY, CHF, CNY, CAD, KRW, GBP. The index *rises* when
+producer currencies strengthen against the dollar (origin costs rise in USD →
+bullish coffee) and *falls* when consumer currencies strengthen. Using the CCI
+in place of EUR/USD + DXY + USD/BRL collapses three overlapping dollar features
+into one coffee-relevant axis, removes the DXY dependency entirely, and avoids
+the multicollinearity of carrying EUR and BRL both standalone and inside DXY.
 
 ---
 
@@ -77,26 +92,27 @@ So a "decisive" move is roughly **±1σ over a trading week**.
 All features are computed on the daily bar and standardised (z-scored) on the
 training distribution before fitting. The canonical display order:
 
-| `var_name`       | Label                  | Definition                                                    |
-|------------------|------------------------|---------------------------------------------------------------|
-| `rc_ret_1d`      | RC 1-Day Return        | RC front-month daily return                                   |
-| `eurusd_ret_1d`  | EUR/USD Daily Return   | EUR/USD daily return (RC is EUR-quoted-adjacent demand proxy) |
-| `dxy_ret_1d`     | DXY Daily Return       | US Dollar Index daily return                                  |
-| `kc_rc_gap_z`    | New York Price Gap (z) | (KC·22.0462 − RC) in USD/MT, z-scored over a long window      |
-| `usdbrl_ret_1d`  | USD/BRL Daily Return   | USD/BRL daily return (Brazil is the marginal arabica/conilon supplier) |
+| `var_name`     | Label                      | Definition                                                         |
+|----------------|----------------------------|---------------------------------------------------------------------|
+| `rc_ret_1d`    | RC 1-Day Return            | RC front-month daily return                                         |
+| `cci_ret_1d`   | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
+| `cci_z`        | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
+| `kc_rc_gap_z`  | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a long window            |
 
 `22.0462` converts KC (¢/lb) to USD/MT so the KC−RC gap is a like-for-like
-arbitrage spread.
+arbitrage spread. The CCI itself is reconstructed exactly as
+`fetch_currency_index._compute_index_series`: each component pair's daily return
+is normalised to a USD-strength return, exporters add (+w) and importers
+subtract (−w), and the weighted ΔI is accumulated from a base of 100.
 
 ### Graceful feature degradation
 
 `rc_ret_1d` and `kc_rc_gap_z` are derived purely from the price archive and are
-**always present**. The three FX-dependent features are included only when their
-underlying series loads. If, for example, the DXY pull fails and has no
-fallback, the model proceeds on the remaining four features rather than failing
-entirely. The active feature set is reported in
-`open_direction.model.active_features`, and the SHAP decomposition adapts to
-whatever set was used. In production (Stooq reachable) all five are active.
+**always present**. The two CCI features are included only when `fx_history.json`
+yields the component pairs. If it doesn't, the model proceeds on the two
+price-only features rather than failing entirely. The active feature set is
+reported in `open_direction.model.active_features`, and the SHAP decomposition
+adapts to whatever set was used.
 
 ---
 
@@ -158,10 +174,12 @@ Two honest caveats are surfaced in the output and the UI:
 - **Undefined ratio** — fraction of resolvable days where the time barrier was
   hit first. A high ratio means the method abstains often; the accuracy is
   conditional on the rest.
-- **Training-window size** — `n_train`. When Stooq is unreachable and the model
-  falls back to the rolling ~1-year `fx_history.json`, the FX-dependent features
-  (and hence the joined training window) shrink, which both reduces `n_train`
-  and can drop DXY. The output's `fx_source` block records which path was taken.
+- **Training-window size** — `n_train`. The CCI features come from
+  `fx_history.json`, a rolling ~1-year window, so the joined training set is
+  currently ~190–210 defined rows even though the RC price archive spans 5
+  years. Extending the FX history would lengthen the window; the model refits
+  every day as it grows. `model.cci_available` records whether the CCI axis was
+  present on a given run.
 
 A model that cannot assemble at least `_MIN_DEFINED` (80) defined training rows
 reports `available: false` rather than publishing a thin fit.
@@ -190,15 +208,16 @@ reports `available: false` rather than publishing a thin fit.
   "barrier": { "horizon_days": 5, "k_sigma": 1.0, "vol_window": 20 },
   "model": {
     "kind": "logistic_regression_l2",
-    "active_features": ["rc_ret_1d", "eurusd_ret_1d", "kc_rc_gap_z", "usdbrl_ret_1d"],
+    "active_features": ["rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z"],
     "n_features": 4,
-    "n_train": 213,
-    "test_accuracy": 0.5625,        // on defined cases, time-holdout
-    "n_test": 64,
-    "undefined_ratio": 0.157,
-    "n_resolvable": 249,
-    "n_undefined": 39,
-    "fx_source": { "eurusd": "stooq", "usdbrl": "stooq", "dxy": "stooq" }
+    "n_train": 195,
+    "test_accuracy": 0.525,         // on defined cases, time-holdout
+    "n_test": 59,
+    "undefined_ratio": 0.165,
+    "n_resolvable": 230,
+    "n_undefined": 38,
+    "currency_axis": "coffee_currency_index",
+    "cci_available": true
   }
 }
 ```
@@ -216,9 +235,10 @@ reports `available: false` rather than publishing a thin fit.
   probability itself.
 - Respect the **undefined ratio**. On a sample where the method abstains ~50% of
   the time, the accuracy figure only describes the half it chose to call.
-- The current sandbox/limited-FX fit trains on a thin window; the production fit
-  (multi-year Stooq FX + DXY active) is materially larger. Treat early live
-  numbers as the method coming online, not a seasoned track record.
+- The current fit trains on a ~1-year window (the CCI history length), so it is
+  thin relative to the 5-year price archive. Treat early live numbers as the
+  method coming online, not a seasoned track record; the model refits daily and
+  the window lengthens as FX history accumulates.
 
 ---
 
