@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T23:58:32+00:00",
+  "generated_at": "2026-06-27T23:53:11+00:00",
   "country_iso3": "COL",
   "year_window": [
     2023,
@@ -9,19 +9,15 @@
     "Huila": {
       "province_id": 17,
       "noaa_name": "Huila",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 52.86,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 50.12,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 50.18
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 49.93
@@ -44,46 +40,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 48.67
+          "vhi": 47.86
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 49.62
+          "vhi": 48.44
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 51.18
+          "vhi": 49.65
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 52.72
+          "vhi": 50.43
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 53.63
+          "vhi": 49.68
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 52.86
+          "vhi": 49.12
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 50.12
         }
       ]
     },
     "Antioquia": {
       "province_id": 2,
       "noaa_name": "Antioquia",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 47.23,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 45.31,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 50.64
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 49.79
@@ -106,46 +102,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 47.61
+          "vhi": 47.07
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 47.35
+          "vhi": 46.51
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 47.86
+          "vhi": 46.57
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 48.34
+          "vhi": 46.23
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 48.67
+          "vhi": 45.76
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 47.23
+          "vhi": 45.0
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 45.31
         }
       ]
     },
     "Cauca": {
       "province_id": 10,
       "noaa_name": "Cauca",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 47.73,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 44.87,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 45.47
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 45.28
@@ -168,46 +164,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 42.47
+          "vhi": 41.56
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 43.0
+          "vhi": 41.46
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 44.45
+          "vhi": 42.0
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 46.23
+          "vhi": 42.47
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 48.54
+          "vhi": 42.81
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 47.73
+          "vhi": 43.48
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 44.87
         }
       ]
     },
     "Caldas": {
       "province_id": 7,
       "noaa_name": "Caldas",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 53.13,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 54.98,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 49.59
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 49.53
@@ -230,46 +226,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 50.12
+          "vhi": 49.82
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 50.36
+          "vhi": 49.92
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 52.11
+          "vhi": 51.49
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 53.13
+          "vhi": 52.3
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 53.58
+          "vhi": 52.65
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 53.13
+          "vhi": 52.84
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 54.98
         }
       ]
     },
     "Nariño": {
       "province_id": 21,
       "noaa_name": "Narino",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 48.65,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 44.26,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 44.82
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 43.98
@@ -292,27 +288,31 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 42.61
+          "vhi": 41.65
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 42.95
+          "vhi": 41.46
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 44.12
+          "vhi": 41.59
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 46.31
+          "vhi": 42.28
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 49.38
+          "vhi": 43.13
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 48.65
+          "vhi": 43.59
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 44.26
         }
       ]
     }

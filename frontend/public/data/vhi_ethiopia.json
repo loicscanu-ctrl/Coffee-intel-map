@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T23:58:43+00:00",
+  "generated_at": "2026-06-27T23:53:27+00:00",
   "country_iso3": "ETH",
   "year_window": [
     2023,
@@ -9,19 +9,15 @@
     "Sidama/Yirgacheffe": {
       "province_id": 11,
       "noaa_name": "SNNPR",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 24.49,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 21.74,
         "severity": "stress"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 66.92
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 68.27
@@ -44,46 +40,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 53.33
+          "vhi": 54.04
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 46.03
+          "vhi": 46.91
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 39.3
+          "vhi": 40.38
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 33.9
+          "vhi": 35.25
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 28.94
+          "vhi": 30.53
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 24.49
+          "vhi": 25.64
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 21.74
         }
       ]
     },
     "Jimma": {
       "province_id": 9,
       "noaa_name": "Oromia",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 34.29,
-        "severity": "stress"
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 40.81,
+        "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 52.23
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 53.57
@@ -106,46 +102,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 41.78
+          "vhi": 43.01
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 39.18
+          "vhi": 40.7
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 36.32
+          "vhi": 38.32
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 34.46
+          "vhi": 37.23
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 33.59
+          "vhi": 37.6
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 34.29
+          "vhi": 38.12
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 40.81
         }
       ]
     },
     "Limu": {
       "province_id": 9,
       "noaa_name": "Oromia",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 34.29,
-        "severity": "stress"
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 40.81,
+        "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 52.23
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 53.57
@@ -168,46 +164,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 41.78
+          "vhi": 43.01
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 39.18
+          "vhi": 40.7
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 36.32
+          "vhi": 38.32
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 34.46
+          "vhi": 37.23
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 33.59
+          "vhi": 37.6
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 34.29
+          "vhi": 38.12
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 40.81
         }
       ]
     },
     "Kaffa": {
       "province_id": 11,
       "noaa_name": "SNNPR",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 24.49,
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 21.74,
         "severity": "stress"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 66.92
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 68.27
@@ -230,46 +226,46 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 53.33
+          "vhi": 54.04
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 46.03
+          "vhi": 46.91
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 39.3
+          "vhi": 40.38
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 33.9
+          "vhi": 35.25
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 28.94
+          "vhi": 30.53
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 24.49
+          "vhi": 25.64
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 21.74
         }
       ]
     },
     "Harrar": {
       "province_id": 9,
       "noaa_name": "Oromia",
-      "weeks_in_window": 179,
+      "weeks_in_window": 180,
       "vhi_latest": {
         "year": 2026,
-        "week": 24,
-        "iso_week": "2026-W24",
-        "vhi": 34.29,
-        "severity": "stress"
+        "week": 25,
+        "iso_week": "2026-W25",
+        "vhi": 40.81,
+        "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W13",
-          "vhi": 52.23
-        },
         {
           "iso_week": "2026-W14",
           "vhi": 53.57
@@ -292,27 +288,31 @@
         },
         {
           "iso_week": "2026-W19",
-          "vhi": 41.78
+          "vhi": 43.01
         },
         {
           "iso_week": "2026-W20",
-          "vhi": 39.18
+          "vhi": 40.7
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 36.32
+          "vhi": 38.32
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 34.46
+          "vhi": 37.23
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 33.59
+          "vhi": 37.6
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 34.29
+          "vhi": 38.12
+        },
+        {
+          "iso_week": "2026-W25",
+          "vhi": 40.81
         }
       ]
     }
