@@ -1,6 +1,6 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-27T16:17:38.022677+00:00",
+    "scraped_at": "2026-06-27T17:23:27.969558+00:00",
     "index_value": 107.560651,
     "daily_delta_i": 0.000451,
     "daily_delta_pct": 0.045113,
@@ -228,7 +228,7 @@
       }
     ]
   },
-  "scraped_at": "2026-06-27T16:18:05.756536Z",
+  "scraped_at": "2026-06-27T17:23:27.969558+00:00",
   "sentiment": {
     "available": true,
     "scraped_at": "2026-06-27T16:18:02.827221Z",
@@ -286,7 +286,7 @@
         ]
       },
       {
-        "headline": "Body Count’s Now In The Coffee House…",
+        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -340,7 +340,7 @@
         ]
       },
       {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -357,7 +357,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating — 1/8 paired days",
+    "reason": "accumulating \u2014 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -378,7 +378,7 @@
         "var_name": "cci_z",
         "label": "Coffee Currency Index (z)",
         "raw_value": 1.7483376242162851,
-        "raw_fmt": "+1.75σ",
+        "raw_fmt": "+1.75\u03c3",
         "phi": -0.11438320048987424
       },
       {
@@ -390,7 +390,7 @@
       },
       {
         "var_name": "cci_ret_1d",
-        "label": "Coffee Currency Index Δ",
+        "label": "Coffee Currency Index \u0394",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
         "phi": -0.047774785712485744
@@ -399,7 +399,7 @@
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12σ",
+        "raw_fmt": "-1.12\u03c3",
         "phi": -0.01688402251659596
       }
     ],
