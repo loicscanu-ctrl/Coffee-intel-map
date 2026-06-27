@@ -141,7 +141,19 @@ def _archive_settles() -> dict[str, dict[str, float]]:
 
 def run() -> dict:
     kc_bars = _fetch_15m("KC=F")
-    rc_bars = _fetch_15m("RM=F")    # robusta — the open question
+    # Robusta is the open question — probe several candidate Yahoo symbols and
+    # use the first that returns intraday bars.
+    rc_bars = None
+    rc_symbol = None
+    for cand in ["RM=F", "RC=F", "LRC=F", "RMF.NYM", "LCF=F", "D=F"]:
+        b = _fetch_15m(cand)
+        if b:
+            rc_bars, rc_symbol = b, cand
+            print(f"[trial] robusta intraday FOUND via {cand}")
+            break
+    if rc_bars is None:
+        print("[trial] robusta intraday: NONE of the candidate symbols returned data",
+              file=sys.stderr)
     if kc_bars is None and rc_bars is None:
         return {"ok": False, "reason": "no intraday data for either symbol"}
 
@@ -174,7 +186,8 @@ def run() -> dict:
     # ── Inspection table ──────────────────────────────────────────────────────
     rc_intraday_days = sum(1 for r in rows if r["rc_last_1730"] is not None or r["rc_open_0915"] is not None)
     print(f"[trial] {len(rows)} days; robusta-intraday present on {rc_intraday_days}; "
-          f"RM=F intraday {'WORKS' if rc_intraday_days else 'EMPTY (Yahoo robusta dead)'}")
+          f"robusta symbol={rc_symbol or 'NONE'} → "
+          f"{'WORKS' if rc_intraday_days else 'EMPTY (no Yahoo robusta intraday)'}")
     print("\n date        kc@1730  rc@1730  kc@1830  rc_open0915  kc_settle  rc_settle")
     for r in rows[-22:]:   # last ~month of trading days
         def f(x): return f"{x:8.2f}" if isinstance(x, (int, float)) else "    —   "
