@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-26T08:00:14.765946Z",
-  "count": 59,
+  "generated_at": "2026-06-27T18:25:46.177226Z",
+  "count": 60,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -143,6 +143,20 @@
       "workflow_run_deps": [],
       "concurrency_group": "build-workflow-inventory",
       "timeout_minutes": 5
+    },
+    {
+      "file": "capture-kc-at-rc-close.yml",
+      "name": "0.2 \u2013 Capture KC at RC Close",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "0,15,30,45 16,17 * * 1-5"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 4
     },
     {
       "file": "check-live-quotes.yml",
