@@ -256,6 +256,66 @@
       "score": 0,
       "magnitude": "large",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "AGRO_colombia_Caldas_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=149.2]"
+    },
+    {
+      "id": "AGRO_vn_Lam_Dong_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.17, forecast_7d_rain=67.2]"
+    },
+    {
+      "id": "AGRO_vn_Dak_Nong_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=119.7]"
+    },
+    {
+      "id": "AGRO_vn_Gia_Lai_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=68.2]"
+    },
+    {
+      "id": "AGRO_vn_Kon_Tum_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=101.2]"
     }
   ],
   "history": [
@@ -2794,5 +2854,5 @@
       "priceLDN": 3556
     }
   ],
-  "generatedAt": "2026-06-26T22:16:58.515Z"
+  "generatedAt": "2026-06-27T05:47:36.514Z"
 }
