@@ -228,12 +228,12 @@
       }
     ]
   },
-  "scraped_at": "2026-06-27T17:23:27.969558+00:00",
+  "scraped_at": "2026-06-27T17:23:55.345390Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-27T16:18:02.827221Z",
+    "scraped_at": "2026-06-27T17:23:53.726156Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 92.9,
+    "overall_confidence": 91.1,
     "net_index": 0.0,
     "bull_count": 0,
     "bear_count": 0,
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -289,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +298,7 @@
         "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 88.0,
         "tags": [
           "sprudge"
         ]
@@ -343,7 +343,7 @@
         "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -365,10 +365,10 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-27T17:18:48.026203Z",
+    "scraped_at": "2026-06-27T17:23:54.836495Z",
     "direction": "Bearish",
-    "base_margin": 0.052779336947060086,
-    "final_margin": -0.22167894123989237,
+    "base_margin": 0.05277933694706005,
+    "final_margin": -0.22167894123989235,
     "base_prob": 0.5131917720647002,
     "final_prob": 0.44480610592430186,
     "prob_up": 0.44480610592430186,
@@ -386,21 +386,21 @@
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.0954162694679965
+        "phi": -0.09541626946799649
       },
       {
         "var_name": "cci_ret_1d",
         "label": "Coffee Currency Index \u0394",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
-        "phi": -0.047774785712485744
+        "phi": -0.04777478571248574
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
-        "phi": -0.01688402251659596
+        "phi": -0.01688402251659595
       }
     ],
     "barrier": {
