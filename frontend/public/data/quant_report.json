@@ -228,16 +228,16 @@
       }
     ]
   },
-  "scraped_at": "2026-06-27T18:43:16.210005+00:00",
+  "scraped_at": "2026-06-27T18:43:43.207059Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-27T17:23:53.726156Z",
+    "scraped_at": "2026-06-27T18:43:41.716415Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 91.1,
-    "net_index": 0.0,
-    "bull_count": 0,
+    "overall_confidence": 92.8,
+    "net_index": 20.0,
+    "bull_count": 3,
     "bear_count": 0,
-    "neutral_count": 12,
+    "neutral_count": 9,
     "total": 12,
     "items": [
       {
@@ -252,8 +252,8 @@
       {
         "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -270,8 +270,8 @@
       {
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -289,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +298,7 @@
         "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 88.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -315,8 +315,8 @@
       {
         "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -343,7 +343,7 @@
         "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -365,42 +365,49 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-27T17:23:54.836495Z",
+    "scraped_at": "2026-06-27T18:43:42.749408Z",
     "direction": "Bearish",
-    "base_margin": 0.05277933694706005,
-    "final_margin": -0.22167894123989235,
-    "base_prob": 0.5131917720647002,
-    "final_prob": 0.44480610592430186,
-    "prob_up": 0.44480610592430186,
-    "prob_down": 0.5551938940756982,
+    "base_margin": 0.07739445622305924,
+    "final_margin": -0.7853446333142031,
+    "base_prob": 0.5193389618123888,
+    "final_prob": 0.31316913994626133,
+    "prob_up": 0.31316913994626133,
+    "prob_down": 0.6868308600537387,
     "features": [
+      {
+        "var_name": "kc_after_rc_diff",
+        "label": "NY after RC-Close Move",
+        "raw_value": -0.043131,
+        "raw_fmt": "-4.31%",
+        "phi": -0.5704002314587092
+      },
       {
         "var_name": "cci_z",
         "label": "Coffee Currency Index (z)",
         "raw_value": 1.7483376242162851,
         "raw_fmt": "+1.75\u03c3",
-        "phi": -0.11438320048987424
+        "phi": -0.13299357996811365
       },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.09541626946799649
+        "phi": -0.11792298997674244
       },
       {
         "var_name": "cci_ret_1d",
         "label": "Coffee Currency Index \u0394",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
-        "phi": -0.04777478571248574
+        "phi": -0.05736892404199613
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
-        "phi": -0.01688402251659595
+        "phi": 0.015946635908299128
       }
     ],
     "barrier": {
@@ -414,17 +421,19 @@
         "rc_ret_1d",
         "cci_ret_1d",
         "cci_z",
-        "kc_rc_gap_z"
+        "kc_rc_gap_z",
+        "kc_after_rc_diff"
       ],
-      "n_features": 4,
-      "n_train": 195,
-      "test_accuracy": 0.5254237288135594,
-      "n_test": 59,
-      "undefined_ratio": 0.16521739130434782,
-      "n_resolvable": 230,
+      "n_features": 5,
+      "n_train": 187,
+      "test_accuracy": 0.543859649122807,
+      "n_test": 57,
+      "undefined_ratio": 0.17117117117117117,
+      "n_resolvable": 222,
       "n_undefined": 38,
       "currency_axis": "coffee_currency_index",
-      "cci_available": true
+      "cci_available": true,
+      "kc_after_rc_active": true
     }
   }
 }
