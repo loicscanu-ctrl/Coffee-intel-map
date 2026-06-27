@@ -228,29 +228,29 @@
       }
     ]
   },
-  "scraped_at": "2026-06-27T16:17:38.022677+00:00",
+  "scraped_at": "2026-06-27T16:18:05.756536Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-26T22:46:19.701720Z",
+    "scraped_at": "2026-06-27T16:18:02.827221Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 96.2,
-    "net_index": 20.0,
-    "bull_count": 3,
+    "overall_confidence": 92.9,
+    "net_index": 0.0,
+    "bull_count": 0,
     "bear_count": 0,
-    "neutral_count": 9,
+    "neutral_count": 12,
     "total": 12,
     "items": [
       {
-        "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
+        "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
+        "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
@@ -259,10 +259,19 @@
         ]
       },
       {
+        "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -271,7 +280,7 @@
         "headline": "Jill Hoff Of Monogram Coffee Is The 2026 Canada Barista Champion",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +307,7 @@
         "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -306,8 +315,8 @@
       {
         "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -316,7 +325,7 @@
         "headline": "Here Are The Winners Of The 2026 US Barista Championship",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -325,7 +334,7 @@
         "headline": "The 2026 US Barista Championship: Finals",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -334,16 +343,7 @@
         "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 98.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Here Are The Semi-Finalists For The 2026 US Barista Championship",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 98.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -365,42 +365,42 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-27T13:33:34.410704Z",
+    "scraped_at": "2026-06-27T16:18:05.249793Z",
     "direction": "Bearish",
-    "base_margin": -0.009094911244875834,
-    "final_margin": -0.18910344040570348,
-    "base_prob": 0.4977262878617245,
-    "final_prob": 0.45286452041872255,
-    "prob_up": 0.45286452041872255,
-    "prob_down": 0.5471354795812775,
+    "base_margin": -0.018876699093022448,
+    "final_margin": -0.20263573427401693,
+    "base_prob": 0.4952809653536225,
+    "final_prob": 0.44951370083038245,
+    "prob_up": 0.44951370083038245,
+    "prob_down": 0.5504862991696176,
     "features": [
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.14659601000679767
+        "phi": -0.15496069727879466
       },
       {
         "var_name": "usdbrl_ret_1d",
         "label": "USD/BRL Daily Return",
         "raw_value": 0.0016653718477506185,
         "raw_fmt": "+0.17%",
-        "phi": -0.03236092287873282
-      },
-      {
-        "var_name": "eurusd_ret_1d",
-        "label": "EUR/USD Daily Return",
-        "raw_value": 0.00048572821394565757,
-        "raw_fmt": "+0.05%",
-        "phi": -0.007479180296829903
+        "phi": -0.033222217416207574
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
-        "phi": 0.006427584021532748
+        "phi": 0.012716130550998713
+      },
+      {
+        "var_name": "eurusd_ret_1d",
+        "label": "EUR/USD Daily Return",
+        "raw_value": 0.00048572821394565757,
+        "raw_fmt": "+0.05%",
+        "phi": -0.008292251036990975
       }
     ],
     "barrier": {
@@ -417,11 +417,11 @@
         "usdbrl_ret_1d"
       ],
       "n_features": 4,
-      "n_train": 213,
+      "n_train": 212,
       "test_accuracy": 0.5625,
       "n_test": 64,
-      "undefined_ratio": 0.1566265060240964,
-      "n_resolvable": 249,
+      "undefined_ratio": 0.15725806451612903,
+      "n_resolvable": 248,
       "n_undefined": 39,
       "fx_source": {
         "eurusd": "fx_history/none",
