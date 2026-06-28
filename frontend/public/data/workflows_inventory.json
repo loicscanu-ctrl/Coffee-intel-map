@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-28T11:21:49.665440Z",
-  "count": 63,
+  "generated_at": "2026-06-28T13:27:24.459661Z",
+  "count": 64,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -12,6 +12,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 60
+    },
+    {
+      "file": "backfill-enso-thermocline.yml",
+      "name": "0.9 \u2013 Backfill \u2014 ENSO thermocline archive (TAO/TRITON 150m, multi-year)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 30
     },
     {
       "file": "backfill-essm-history.yml",
