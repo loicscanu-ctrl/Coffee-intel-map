@@ -289,6 +289,78 @@
       "score": 0,
       "magnitude": "large",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "AGRO_colombia_Caldas_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.17, forecast_7d_rain=119.6]"
+    },
+    {
+      "id": "AGRO_uganda_Mbale_severe_defoliation",
+      "name": "Severe Defoliation / Bean Shrinkage",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "critical",
+      "timeframe": "current",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "uganda/Mbale: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=30.5, spei_3=-1.62]"
+    },
+    {
+      "id": "AGRO_uganda_Mt_Elgon_severe_defoliation",
+      "name": "Severe Defoliation / Bean Shrinkage",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "critical",
+      "timeframe": "current",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "uganda/Mt Elgon: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=30.5, spei_3=-1.7]"
+    },
+    {
+      "id": "AGRO_vn_Dak_Nong_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.26, forecast_7d_rain=122.6]"
+    },
+    {
+      "id": "AGRO_vn_Gia_Lai_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=97.6]"
+    },
+    {
+      "id": "AGRO_vn_Kon_Tum_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.45, forecast_7d_rain=107.9]"
     }
   ],
   "history": [
@@ -2860,5 +2932,5 @@
       "priceLDN": 3556
     }
   ],
-  "generatedAt": "2026-06-27T06:22:29.127Z"
+  "generatedAt": "2026-06-28T06:10:33.992Z"
 }
