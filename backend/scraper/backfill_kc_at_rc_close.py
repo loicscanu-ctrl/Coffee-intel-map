@@ -49,7 +49,7 @@ import json
 import sys
 import time
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -71,7 +71,7 @@ _YAHOO_HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"]
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; coffee-intel/1.0)"}
 
 
-def _fetch_hourly_kc(range_days: int = 730) -> "list[dict] | None":
+def _fetch_hourly_kc(range_days: int = 730) -> list[dict] | None:
     """Hourly KC=F bars as [{ts_utc, open, close}], or None if unreachable.
 
     Tries both Yahoo hosts. The chart API caps 1h history near 730d.
@@ -123,7 +123,7 @@ def _diff_by_day(bars: list[dict]) -> dict[str, float]:
     # Bucket bars by London date, keyed by London hour.
     by_day_hours: dict[str, dict[int, dict]] = defaultdict(dict)
     for b in bars:
-        dt = datetime.fromtimestamp(b["ts_utc"], tz=timezone.utc).astimezone(_LONDON)
+        dt = datetime.fromtimestamp(b["ts_utc"], tz=UTC).astimezone(_LONDON)
         date_str = dt.strftime("%Y-%m-%d")
         # Keep the bar per (date, hour); KC session runs ~09:15–18:30 London.
         by_day_hours[date_str][dt.hour] = b

@@ -64,7 +64,7 @@ _T_1830 = "18:15"   # bar 18:15→18:30  → close = price at 18:30
 _T_OPEN = "09:00"   # robusta first bar 09:00→09:15 → open=first trade, close=+15min
 
 
-def _front_symbol(market: str) -> "str | None":
+def _front_symbol(market: str) -> str | None:
     """Most-liquid (max-OI) front contract symbol for 'arabica'/'robusta' from
     futures_chain.json, e.g. 'RMU26'. None if unavailable."""
     try:

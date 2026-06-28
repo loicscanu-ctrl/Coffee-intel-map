@@ -173,6 +173,19 @@ LON_UPPER_E = 270.0     # buffer above 95°W (=265°E)
 # → Δ30d=None across the board.
 HISTORY_DAYS = 75
 
+# Staleness tolerance for fetch failures. PFEG (the upstream ERDDAP)
+# is intermittently down for hours at a time — 522 (CF↔origin timeout)
+# or 525 (origin SSL handshake failed). Because TAO daily data already
+# lags ~3 weeks, a single missed daily fetch loses NOTHING: the
+# committed JSON is still just as current as it would be on a good day.
+# So when a fetch fails but the on-disk JSON is younger than this, we
+# treat it as an acceptable no-op (exit 3 → workflow stays green, no
+# Telegram). Only when we've gone this many days WITHOUT a successful
+# refresh does it escalate to a real failure (exit 1 → Telegram),
+# which signals the pipeline is genuinely broken, not just having a
+# bad morning.
+STALE_AFTER_DAYS = 7
+
 # Kelvin-wave thresholds, °C — unchanged from v3/v4. Δ-30d = mean of
 # last 7 days minus mean of 30-37 days ago at the same site/depth band.
 KELVIN_WARM_THRESHOLD = 1.0
@@ -574,13 +587,59 @@ def _persist(doc: dict) -> None:
     OUT_PATH.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
 
 
+def _existing_data_age_days() -> float | None:
+    """Age in days of the committed enso_thermocline.json, derived from
+    its `scraped_at` field. None if the file is missing or unreadable
+    (treat that as 'infinitely stale' — a missing file IS a real
+    failure worth alerting on). Used to decide whether a fetch failure
+    is a tolerable no-op (data still fresh) or a genuine outage."""
+    if not OUT_PATH.exists():
+        return None
+    try:
+        doc = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+        scraped_at = doc["scraped_at"]
+        ts = datetime.fromisoformat(scraped_at)
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=UTC)
+    except (json.JSONDecodeError, KeyError, ValueError, OSError) as e:
+        logger.warning(f"[therm] couldn't read existing JSON age: {e}")
+        return None
+    return (datetime.now(UTC) - ts).total_seconds() / 86400.0
+
+
+def _fetch_failure_exit_code(reason: str) -> int:
+    """Map a fetch/parse failure to an exit code, softening it to a
+    no-op (3) when the committed JSON is still fresh enough that we've
+    lost nothing. Escalates to a real failure (1) only when the data
+    on disk is missing or older than STALE_AFTER_DAYS."""
+    age = _existing_data_age_days()
+    if age is not None and age <= STALE_AFTER_DAYS:
+        logger.warning(
+            f"[therm] {reason} — but committed JSON is only {age:.1f}d old "
+            f"(≤ {STALE_AFTER_DAYS}d tolerance). Treating as a no-op: TAO "
+            f"daily data lags ~3 weeks, so nothing is lost. Exit 3 (no alert)."
+        )
+        return 3
+    age_str = f"{age:.1f}d" if age is not None else "missing"
+    logger.error(
+        f"[therm] {reason} — and committed JSON is {age_str} "
+        f"(> {STALE_AFTER_DAYS}d tolerance). Escalating to real failure. Exit 1."
+    )
+    return 1
+
+
 def run(*, write: bool, diag: bool = False) -> int:
     """Fetch via the proxy, parse, persist. Exit codes:
         0 — success (data written or previewed cleanly)
-        1 — fetch/parse failure across all dataset candidates
+        1 — fetch/parse failure AND committed JSON is stale/missing
+            (genuine outage — workflow should alert)
         2 — proxy not configured (ERDDAP_PROXY_BASE / ERDDAP_PROXY_SECRET
             env vars missing). Distinct exit code so the workflow can
             treat this as a configuration error vs a real fetch issue.
+        3 — fetch/parse failure BUT committed JSON is still fresh
+            (≤ STALE_AFTER_DAYS). Tolerable no-op — PFEG had a bad
+            moment but we've lost no actionable data. Workflow should
+            treat this as success (no alert).
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logger.info("[therm] mode=fetch via Cloudflare Worker proxy → ERDDAP")
@@ -621,20 +680,18 @@ def run(*, write: bool, diag: bool = False) -> int:
         logger.info(f"[therm] --diag winning response head:\n{head}")
 
     if not text:
-        logger.error(
-            f"[therm] FATAL: no dataset in {DATASET_CANDIDATES} returned data. "
-            f"Verify upstream + dataset IDs — try `<proxy>/info/index.csv?searchFor=tao` "
-            f"manually to find the upstream's TAO catalog."
+        return _fetch_failure_exit_code(
+            f"no dataset in {DATASET_CANDIDATES} returned data "
+            "(upstream likely down — 522/525 — or dataset IDs changed; "
+            "try `<proxy>/info/index.csv?searchFor=tao` to inspect)"
         )
-        return 1
 
     raw_obs = parse_erddap_json(text)
     if not raw_obs:
-        logger.error(
-            "[therm] FATAL: 0 observations parsed from the ERDDAP response. "
-            "Re-run with --diag to see the response head."
+        return _fetch_failure_exit_code(
+            "0 observations parsed from the ERDDAP response "
+            "(re-run with --diag to see the response head)"
         )
-        return 1
 
     # Snap each raw observation to one of our 7 anchor sites.
     by_site: dict[str, list[OceanObs]] = defaultdict(list)

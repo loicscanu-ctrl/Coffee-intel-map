@@ -374,3 +374,47 @@ def test_build_payload_carries_lat_lon_for_map_pins():
         # Spans 156°E (positive) through 95°W (negative) — the full
         # operational TAO/TRITON array.
         assert -180 <= b["lon"] <= 180
+
+
+# ── staleness-tolerant fetch-failure exit code ───────────────────────────
+
+
+def _write_json_with_age(tmp_path, monkeypatch, *, days_old: float | None):
+    """Point therm.OUT_PATH at a temp file. days_old=None → no file
+    on disk (simulates a never-yet-populated pipeline)."""
+    out = tmp_path / "enso_thermocline.json"
+    monkeypatch.setattr(therm, "OUT_PATH", out)
+    if days_old is not None:
+        ts = datetime.now(UTC) - timedelta(days=days_old)
+        out.write_text(json.dumps({"scraped_at": ts.isoformat()}))
+    return out
+
+
+def test_fetch_failure_soft_skips_when_data_fresh(tmp_path, monkeypatch):
+    """A transient PFEG outage with a still-fresh committed JSON is a
+    no-op (exit 3) — TAO daily data lags ~3 weeks so nothing is lost,
+    and we don't want a Telegram alert for every upstream hiccup."""
+    _write_json_with_age(tmp_path, monkeypatch, days_old=2.0)
+    assert therm._fetch_failure_exit_code("upstream 522") == 3
+
+
+def test_fetch_failure_escalates_when_data_stale(tmp_path, monkeypatch):
+    """If we haven't refreshed in > STALE_AFTER_DAYS, the pipeline is
+    genuinely broken (not just a bad morning) — escalate to exit 1 so
+    the workflow alerts."""
+    _write_json_with_age(tmp_path, monkeypatch, days_old=therm.STALE_AFTER_DAYS + 1)
+    assert therm._fetch_failure_exit_code("upstream 522") == 1
+
+
+def test_fetch_failure_escalates_when_data_missing(tmp_path, monkeypatch):
+    """No committed JSON at all = the pipeline never succeeded; a fetch
+    failure here is a real failure worth alerting on (exit 1)."""
+    _write_json_with_age(tmp_path, monkeypatch, days_old=None)
+    assert therm._fetch_failure_exit_code("upstream 522") == 1
+
+
+def test_fetch_failure_boundary_is_inclusive(tmp_path, monkeypatch):
+    """Exactly at the threshold counts as still-fresh (≤, not <) so the
+    boundary day doesn't flip to an alert."""
+    _write_json_with_age(tmp_path, monkeypatch, days_old=therm.STALE_AFTER_DAYS - 0.01)
+    assert therm._fetch_failure_exit_code("upstream 522") == 3

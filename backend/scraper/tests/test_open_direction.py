@@ -18,7 +18,6 @@ import pandas as pd  # noqa: E402
 
 from scraper.quant_model import open_direction as od  # noqa: E402
 
-
 # ── Logistic fit + exact SHAP ────────────────────────────────────────────────
 
 def test_logistic_fit_separates_clean_data():

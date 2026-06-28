@@ -19,7 +19,6 @@ import pytest
 
 from telegram.handlers.brief import _staleness_tag
 
-
 TODAY = date(2026, 6, 26)
 
 

@@ -53,7 +53,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -74,7 +74,7 @@ _MAX_AGE_MIN  = 20         # snapshot must be at most this old (poll is every 15
 _KEEP_DAYS    = 730        # ~2y of history retained
 
 
-def _redis_get(key: str) -> "dict | list | None":
+def _redis_get(key: str) -> dict | list | None:
     """GET a key from Upstash Redis via REST. Returns the parsed JSON value
     (the poll stores the snapshot as a JSON string) or None on any failure."""
     if not UPSTASH_URL or not UPSTASH_TOKEN:
@@ -104,7 +104,7 @@ def _minutes_from_rc_close(now_london: datetime) -> float:
     return (now_london - close).total_seconds() / 60.0
 
 
-def _front_kc_last(snapshot: dict) -> "tuple[float, str] | None":
+def _front_kc_last(snapshot: dict) -> tuple[float, str] | None:
     """Front-month KC last price + month label from the live snapshot.
 
     acaphe stores arabica contracts front-first (nearest expiry at index 0),
@@ -122,7 +122,7 @@ def _front_kc_last(snapshot: dict) -> "tuple[float, str] | None":
     return None
 
 
-def _snapshot_age_min(snapshot: dict, now_utc: datetime) -> "float | None":
+def _snapshot_age_min(snapshot: dict, now_utc: datetime) -> float | None:
     """Minutes since the snapshot's fetched_at. None if unparseable."""
     fa = snapshot.get("fetched_at")
     if not fa:
@@ -130,7 +130,7 @@ def _snapshot_age_min(snapshot: dict, now_utc: datetime) -> "float | None":
     try:
         ts = datetime.fromisoformat(str(fa).replace("Z", "+00:00"))
         if ts.tzinfo is None:
-            ts = ts.replace(tzinfo=timezone.utc)
+            ts = ts.replace(tzinfo=UTC)
         return (now_utc - ts).total_seconds() / 60.0
     except Exception:
         return None
@@ -153,10 +153,10 @@ def _write_history(rows: list[dict]) -> None:
                         encoding="utf-8")
 
 
-def run(now_utc: "datetime | None" = None) -> dict:
+def run(now_utc: datetime | None = None) -> dict:
     """Returns a small status dict (recorded / skipped + reason). `now_utc`
     is injectable for tests; defaults to the real clock."""
-    now_utc = now_utc or datetime.now(timezone.utc)
+    now_utc = now_utc or datetime.now(UTC)
     now_london = now_utc.astimezone(_LONDON)
     date_str = now_london.strftime("%Y-%m-%d")
 
