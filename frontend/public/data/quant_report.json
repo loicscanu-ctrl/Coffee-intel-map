@@ -1,99 +1,99 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-28T14:38:14.203024+00:00",
-    "index_value": 107.947005,
-    "daily_delta_i": 0.000463,
-    "daily_delta_pct": 0.046271,
-    "zscore": 1.834791,
-    "zscore_mean": 104.654118,
-    "zscore_std": 1.794693,
+    "scraped_at": "2026-06-28T20:20:35.404103+00:00",
+    "index_value": 107.89708,
+    "daily_delta_i": 0.0,
+    "daily_delta_pct": 0.0,
+    "zscore": 1.807448,
+    "zscore_mean": 104.65392,
+    "zscore_std": 1.794331,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.03422,
-        "contribution": -0.000176
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": 0.180391,
-        "contribution": 0.000473
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": 0.366985,
-        "contribution": 0.00047
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": -0.327132,
-        "contribution": -0.000167
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": 0.087135,
-        "contribution": 4.1e-05
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.0236,
-        "contribution": -0.000159
+        "daily_chg": 0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": 0.000382,
-        "contribution": -0.0
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.023421,
-        "contribution": 1.2e-05
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.027056,
-        "contribution": -1.4e-05
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": 0.0206,
-        "contribution": -9e-06
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": -0.000299,
+        "daily_chg": -0.0,
         "contribution": 0.0
       },
       {
@@ -101,8 +101,8 @@
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": 0.020533,
-        "contribution": -8e-06
+        "daily_chg": -0.0,
+        "contribution": 0.0
       }
     ],
     "history": [
@@ -224,11 +224,11 @@
       },
       {
         "date": "2026-06-28",
-        "value": 107.947005
+        "value": 107.89708
       }
     ]
   },
-  "scraped_at": "2026-06-28T14:38:43.843251Z",
+  "scraped_at": "2026-06-28T20:20:35.404103+00:00",
   "sentiment": {
     "available": true,
     "scraped_at": "2026-06-28T14:38:42.712775Z",
