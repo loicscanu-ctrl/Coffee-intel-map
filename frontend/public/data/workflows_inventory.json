@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-28T05:45:27.401807Z",
-  "count": 62,
+  "generated_at": "2026-06-28T11:09:03.899928Z",
+  "count": 63,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -34,6 +34,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 30
+    },
+    {
+      "file": "backfill-intraday-5y.yml",
+      "name": "1.97 \u2013 Backfill Intraday KC/RC 5y (Barchart continuous)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 20
     },
     {
       "file": "backfill-kc-at-rc-close.yml",
@@ -860,6 +871,11 @@
         "file": "fetch-intraday-kc-rc.yml",
         "name": "1.96 \u2013 Fetch Intraday KC/RC 15min (Barchart)",
         "version": "1.96"
+      },
+      {
+        "file": "backfill-intraday-5y.yml",
+        "name": "1.97 \u2013 Backfill Intraday KC/RC 5y (Barchart continuous)",
+        "version": "1.97"
       }
     ],
     "stale_curation": [],
@@ -873,7 +889,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 2,
+    "uncovered_workflows_count": 3,
     "stale_curation_count": 0
   }
 }
