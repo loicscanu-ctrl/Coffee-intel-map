@@ -392,70 +392,67 @@ def main():
 
     # ── fx_history.json: per-pair daily closes for the FX time-series widget ──
     # The Macro tab's CurrencyIndexSection shows the aggregate index. This file
-    # backs the FX time-series widget that drills into the individual pairs.
-    # We already downloaded 2y of closes above so this is essentially free.
+    # backs the FX time-series widget AND the open-direction model's CCI features.
+    #
+    # We MERGE into the existing file rather than overwriting: the deep history
+    # (built once by backfill_fx_history.py back to 2020) must persist so the
+    # model's CCI features keep multi-year depth. jsDelivr only serves ~1y per
+    # run, so truncating to tail(365) here would silently amputate the backfill
+    # on every daily run. Merge keeps every older date and refreshes recent ones.
+    existing_pairs: dict[str, dict] = {}
+    if FX_OUT.exists():
+        try:
+            existing_pairs = (json.loads(FX_OUT.read_text(encoding="utf-8"))
+                              .get("pairs") or {})
+        except Exception:
+            existing_pairs = {}
+
+    def _merge_pair(ticker, name, typ, w, closes):
+        by_date: dict[str, float] = {}
+        for row in (existing_pairs.get(ticker) or {}).get("history", []) or []:
+            d, c = row.get("date"), _safe_float(row.get("close"))
+            if d and c is not None:
+                by_date[d] = c
+        if closes is not None and not closes.empty:
+            for dt_, val in closes.items():
+                c = _safe_float(val)
+                if c is not None:
+                    by_date[dt_.date().isoformat()] = c
+        hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
+        return {"name": name, "type": typ, "weight": w, "history": hist} if hist else None
+
     fx_pairs: dict[str, dict] = {}
     for ticker, name, w in EXPORTERS:
-        closes = exporter_closes.get(ticker)
-        if closes is None or closes.empty:
-            continue
-        tail = closes.tail(FX_HISTORY_DAYS)
-        fx_pairs[ticker] = {
-            "name":    name,
-            "type":    "export",
-            "weight":  w,
-            "history": [
-                {"date": dt.date().isoformat(), "close": _safe_float(val)}
-                for dt, val in tail.items()
-                if _safe_float(val) is not None
-            ],
-        }
+        merged = _merge_pair(ticker, name, "export", w, exporter_closes.get(ticker))
+        if merged:
+            fx_pairs[ticker] = merged
     for ticker, name, w in IMPORTERS:
-        closes = importer_closes.get(ticker)
-        if closes is None or closes.empty:
-            continue
-        tail = closes.tail(FX_HISTORY_DAYS)
-        fx_pairs[ticker] = {
-            "name":    name,
-            "type":    "import",
-            "weight":  w,
-            "history": [
-                {"date": dt.date().isoformat(), "close": _safe_float(val)}
-                for dt, val in tail.items()
-                if _safe_float(val) is not None
-            ],
-        }
+        merged = _merge_pair(ticker, name, "import", w, importer_closes.get(ticker))
+        if merged:
+            fx_pairs[ticker] = merged
 
     # GTQ (Guatemala) — fetched standalone, NOT part of the CCI exporter/importer
     # weights, so the Origin Farmgate panel can convert ANACAFE's quetzal café-oro
     # prices to USD/MT per day.
     try:
         gtq_closes = _fetch_all_closes(["GTQ=X"]).get("GTQ=X")
-        if gtq_closes is not None and not gtq_closes.empty:
-            tail = gtq_closes.tail(FX_HISTORY_DAYS)
-            fx_pairs["GTQ=X"] = {
-                "name":    "USD/GTQ",
-                "type":    "reference",
-                "weight":  0.0,
-                "history": [
-                    {"date": dt.date().isoformat(), "close": _safe_float(val)}
-                    for dt, val in tail.items()
-                    if _safe_float(val) is not None
-                ],
-            }
+        merged = _merge_pair("GTQ=X", "USD/GTQ", "reference", 0.0, gtq_closes)
+        if merged:
+            fx_pairs["GTQ=X"] = merged
     except Exception as e:  # noqa: BLE001
         print(f"  GTQ=X (reference) fetch failed: {e}")
 
     fx_output = {
         "scraped_at":   scraped_at,
-        "history_days": FX_HISTORY_DAYS,
+        "history_days": max((len(p["history"]) for p in fx_pairs.values()), default=0),
         "pairs":        fx_pairs,
     }
     safe_write_json(
         FX_OUT, fx_output,
         lambda d: (bool(d.get("pairs")), "no fx pairs"),
     )
-    print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs)")
+    print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs, "
+          f"{fx_output['history_days']} max history days)")
 
 
 if __name__ == "__main__":
