@@ -44,6 +44,12 @@ interface BuoySlot {
   // this field was added.
   window_min_c?:     number | null;
   window_max_c?:     number | null;
+  // Trajectory anchors for the range bar's velocity ticks: where the
+  // 150 m temperature sat ~1 month and ~3 months before the latest
+  // reading. Rendered as amber marks so the gap to the white "now"
+  // tick shows how fast (and which way) it's moving.
+  temp_30d_ago_c?:   number | null;
+  temp_90d_ago_c?:   number | null;
 }
 
 interface ColumnAvg { mean_temp_c: number | null; n_buoys: number; }
@@ -113,23 +119,49 @@ function latKeyOf(lat: number): "2N" | "0N" | "2S" | null {
 
 // Thin horizontal "where in its historical range does today's reading
 // sit" bar. Blue→red gradient = cold edge → warm edge of the buoy's
-// full archived envelope, white tick = current latest. Renders null
-// if we don't have a meaningful range (no data / flat history so
-// min == max).
+// full archived envelope. White tick = now; amber ticks = where it sat
+// ~1 month (brighter) and ~3 months (fainter) ago, so the gap between
+// them shows velocity + direction at a glance. Renders null if we don't
+// have a meaningful range (no data / flat history so min == max).
 function RangeBar({
-  current, min, max,
-}: { current: number | null; min: number | null; max: number | null }) {
+  current, min, max, ago30, ago90,
+}: {
+  current: number | null; min: number | null; max: number | null;
+  ago30?: number | null; ago90?: number | null;
+}) {
   if (current == null || min == null || max == null || max <= min) return null;
-  const pct = Math.max(0, Math.min(1, (current - min) / (max - min))) * 100;
+  const posOf = (v: number) => Math.max(0, Math.min(1, (v - min) / (max - min))) * 100;
+  const pct = posOf(current);
+
+  // A past-position tick. Amber; older = fainter. Skipped if absent.
+  const ghost = (v: number | null | undefined, opacity: number, label: string) =>
+    v == null ? null : (
+      <div
+        className="absolute top-0 bottom-0"
+        style={{
+          left: `calc(${posOf(v)}% - 0.5px)`, width: 1,
+          background: "#fbbf24", opacity,
+        }}
+        title={`${label}: ${v.toFixed(2)}°C`}
+      />
+    );
+
+  const tip =
+    `Historical range ${min.toFixed(1)}–${max.toFixed(1)}°C · now ${current.toFixed(2)}°C` +
+    (ago30 != null ? ` · 1mo ago ${ago30.toFixed(2)}°C` : "") +
+    (ago90 != null ? ` · 3mo ago ${ago90.toFixed(2)}°C` : "");
+
   return (
     <div className="mt-0.5">
       <div
-        className="relative h-1 rounded-sm overflow-hidden"
-        title={`Historical range ${min.toFixed(1)}–${max.toFixed(1)}°C · now ${current.toFixed(2)}°C`}
+        className="relative h-2 rounded-sm overflow-hidden"
+        title={tip}
         style={{
           background: "linear-gradient(to right, #3b82f6 0%, #1e293b 50%, #ef4444 100%)",
         }}
       >
+        {ghost(ago90, 0.5, "3 months ago")}
+        {ghost(ago30, 0.85, "1 month ago")}
         <div
           className="absolute top-0 bottom-0 bg-white"
           style={{ left: `calc(${pct}% - 1px)`, width: 2 }}
@@ -327,6 +359,8 @@ export default function EnsoThermoclineCard() {
                     current={b.latest_temp_c}
                     min={b.window_min_c ?? null}
                     max={b.window_max_c ?? null}
+                    ago30={b.temp_30d_ago_c ?? null}
+                    ago90={b.temp_90d_ago_c ?? null}
                   />
                   <div className="text-slate-600 text-[8px] mt-0.5">
                     Δ30d {b.delta_30d_c != null
@@ -340,14 +374,31 @@ export default function EnsoThermoclineCard() {
         ))}
       </div>
 
+      {/* Range-bar legend */}
+      <div className="flex items-center gap-3 text-[8px] text-slate-500 font-mono">
+        <span>Range bar:</span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-0.5 h-2.5 bg-white" /> now
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24" }} /> 1mo ago
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24", opacity: 0.5 }} /> 3mo ago
+        </span>
+        <span className="text-slate-600">— gap = how fast it&apos;s moving</span>
+      </div>
+
       <div className="text-[9px] text-slate-600 leading-snug">
-        Subsurface T at ~{t.depth_m} m at 7 TAO/TRITON buoys anchored inside the Niño 3.4 box
-        (5°N-5°S, 170°W-120°W). Kelvin signal = mean of last 7 days minus mean of 30-37 days ago at the
-        same station and depth — |Δ| ≥ {t.thresholds.warm_kelvin} °C qualifies as a downwelling
-        (warm) or upwelling (cold) Kelvin wave. Surface SST response expected ~{t.lead_weeks} weeks
-        later. The Phase 2 WWV card above shows the depth-integrated reservoir (4–6 month lead);
-        this card shows the specific slugs of heat breaching the thermocline now. Source: NOAA NDBC
-        realtime2 .ocean feeds — each buoy&apos;s lat/lon also pinned on the ENSO risk map below.
+        Subsurface T at ~{t.depth_m} m at {t.buoys.length} TAO/TRITON buoys across the equatorial
+        Pacific (165°E–95°W, 2°N–2°S). Kelvin signal = mean of last 7 days minus mean of 30-37 days
+        ago at the same station and depth — |Δ| ≥ {t.thresholds.warm_kelvin} °C qualifies as a
+        downwelling (warm) or upwelling (cold) Kelvin wave. Surface SST response expected
+        ~{t.lead_weeks} weeks later. The range bar spans each buoy&apos;s full archived history; the
+        white tick is now and the amber ticks are where it sat 1 and 3 months ago. The Phase 2 WWV
+        card above shows the depth-integrated reservoir (4–6 month lead); this card shows the
+        specific slugs of heat breaching the thermocline now. Source: NOAA ERDDAP TAO/TRITON — each
+        buoy&apos;s lat/lon also pinned on the ENSO risk map below.
       </div>
     </div>
   );
