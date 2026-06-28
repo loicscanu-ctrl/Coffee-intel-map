@@ -212,6 +212,7 @@ def test_load_intraday_excludes_roll_days(tmp_path, monkeypatch):
     so the calendar spread never shows up as a spurious gap. The within-day
     kc_after_rc_diff is unaffected."""
     import json
+
     import pandas as pd
     rows = [
         # day 1: contract A
