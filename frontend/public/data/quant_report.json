@@ -286,7 +286,7 @@
         ]
       },
       {
-        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
+        "headline": "Body Count’s Now In The Coffee House…",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -340,7 +340,7 @@
         ]
       },
       {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -357,7 +357,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -365,49 +365,56 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-27T18:43:42.749408Z",
+    "scraped_at": "2026-06-28T13:04:14.064009Z",
     "direction": "Bearish",
-    "base_margin": 0.07739445622305924,
-    "final_margin": -0.7853446333142031,
-    "base_prob": 0.5193389618123888,
-    "final_prob": 0.31316913994626133,
-    "prob_up": 0.31316913994626133,
-    "prob_down": 0.6868308600537387,
+    "base_margin": 0.08992008716383666,
+    "final_margin": -0.11846424496761081,
+    "base_prob": 0.5224648869482655,
+    "final_prob": 0.47041852565451375,
+    "prob_up": 0.47041852565451375,
+    "prob_down": 0.5295814743454863,
     "features": [
-      {
-        "var_name": "kc_after_rc_diff",
-        "label": "NY after RC-Close Move",
-        "raw_value": -0.043131,
-        "raw_fmt": "-4.31%",
-        "phi": -0.5704002314587092
-      },
-      {
-        "var_name": "cci_z",
-        "label": "Coffee Currency Index (z)",
-        "raw_value": 1.7483376242162851,
-        "raw_fmt": "+1.75\u03c3",
-        "phi": -0.13299357996811365
-      },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.11792298997674244
+        "phi": -0.10164764588319179
       },
       {
-        "var_name": "cci_ret_1d",
-        "label": "Coffee Currency Index \u0394",
-        "raw_value": -0.0008786404698499783,
-        "raw_fmt": "-0.09%",
-        "phi": -0.05736892404199613
+        "var_name": "cci_z",
+        "label": "Coffee Currency Index (z)",
+        "raw_value": 1.7483376242162851,
+        "raw_fmt": "+1.75σ",
+        "phi": -0.06780356192000851
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12\u03c3",
-        "phi": 0.015946635908299128
+        "raw_fmt": "-1.12σ",
+        "phi": 0.06414381984480746
+      },
+      {
+        "var_name": "cci_ret_1d",
+        "label": "Coffee Currency Index Δ",
+        "raw_value": -0.0008786404698499783,
+        "raw_fmt": "-0.09%",
+        "phi": -0.05744979895033085
+      },
+      {
+        "var_name": "rc_overnight_gap",
+        "label": "RC Overnight Gap",
+        "raw_value": -0.0024958402662229595,
+        "raw_fmt": "-0.25%",
+        "phi": -0.05615842869348148
+      },
+      {
+        "var_name": "kc_after_rc_diff",
+        "label": "NY after RC-Close Move",
+        "raw_value": 0.0,
+        "raw_fmt": "+0.00%",
+        "phi": 0.010531283470757699
       }
     ],
     "barrier": {
@@ -422,18 +429,22 @@
         "cci_ret_1d",
         "cci_z",
         "kc_rc_gap_z",
-        "kc_after_rc_diff"
+        "kc_after_rc_diff",
+        "rc_overnight_gap"
       ],
-      "n_features": 5,
-      "n_train": 187,
-      "test_accuracy": 0.543859649122807,
-      "n_test": 57,
-      "undefined_ratio": 0.17117117117117117,
-      "n_resolvable": 222,
-      "n_undefined": 38,
+      "n_features": 6,
+      "n_train": 163,
+      "test_accuracy": 0.46938775510204084,
+      "n_test": 49,
+      "undefined_ratio": 0.15789473684210525,
+      "n_resolvable": 190,
+      "n_undefined": 30,
       "currency_axis": "coffee_currency_index",
       "cci_available": true,
-      "kc_after_rc_active": true
+      "kc_after_rc_active": true,
+      "rc_overnight_active": true,
+      "intraday_source": "barchart_15min",
+      "roll_days_excluded": 65
     }
   }
 }

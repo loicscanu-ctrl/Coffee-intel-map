@@ -84,9 +84,13 @@ _ROOT       = Path(__file__).resolve().parents[3]
 _ARCHIVE    = _ROOT / "data" / "contract_prices_archive.json"
 _FX_HISTORY = _ROOT / "frontend" / "public" / "data" / "fx_history.json"
 _KC_AT_RC_CLOSE = _ROOT / "frontend" / "public" / "data" / "kc_at_rc_close_history.json"
+# Precise 15-min intraday points (RM + KC) — Barchart-backfilled ~5.7y, plus
+# forward-captured going forward. Supersedes the coarse hourly kc_at_rc_close
+# for kc_after_rc_diff and adds the robusta overnight-gap feature.
+_INTRADAY = _ROOT / "frontend" / "public" / "data" / "intraday_kc_rc_15min.json"
 
-# The kc_after_rc_diff feature only turns on once enough captured days overlap
-# the training window — see capture_kc_at_rc_close.py (forward-accumulating).
+# An intraday-derived feature turns on once enough days overlap the training
+# window (both the 15-min source and the legacy hourly fallback).
 _MIN_KC_RC_OVERLAP = 40
 
 # ── Triple-barrier hyper-parameters ──────────────────────────────────────────
@@ -110,17 +114,23 @@ _CCI_Z_WINDOW = 120       # rolling window for the CCI level z-score
 # trio with one coffee-relevant pair of features (the index's daily move and how
 # stretched its level is), removing the DXY dependency entirely.
 #
-# kc_after_rc_diff is the New-York-only move in the ~1h AFTER London robusta
-# closes (KC settle vs KC at 17:30 London) — a leading indicator for robusta's
-# next open. It's forward-accumulating (captured daily by
-# capture_kc_at_rc_close.py), so it's the last feature and only activates once
-# enough captured days overlap the training window.
+# Two intraday-derived features from the 15-min RM+KC history:
+#   kc_after_rc_diff — the New-York-only move in the hour AFTER London robusta
+#     closes (KC 18:30 ÷ KC 17:30 − 1). WITHIN-DAY, WITHIN-CONTRACT, so it is
+#     immune to contract rolls.
+#   rc_overnight_gap — robusta's own overnight gap (RC open ÷ prior RC 17:30
+#     close − 1). This is CROSS-DAY, so on a roll day (today's front contract ≠
+#     yesterday's) the two prices are different delivery months and the calendar
+#     spread would masquerade as a huge gap — those days are EXCLUDED (set NaN)
+#     so they never pollute the statistics.
+# Both only activate once enough days overlap the training window.
 _FEATURE_SPECS = [
-    ("rc_ret_1d",       "RC 1-Day Return",          lambda v: f"{v*100:+.2f}%"),
-    ("cci_ret_1d",      "Coffee Currency Index Δ",  lambda v: f"{v*100:+.2f}%"),
-    ("cci_z",           "Coffee Currency Index (z)", lambda v: f"{v:+.2f}σ"),
-    ("kc_rc_gap_z",     "New York Price Gap (z)",   lambda v: f"{v:+.2f}σ"),
-    ("kc_after_rc_diff", "NY after RC-Close Move",  lambda v: f"{v*100:+.2f}%"),
+    ("rc_ret_1d",        "RC 1-Day Return",          lambda v: f"{v*100:+.2f}%"),
+    ("cci_ret_1d",       "Coffee Currency Index Δ",  lambda v: f"{v*100:+.2f}%"),
+    ("cci_z",            "Coffee Currency Index (z)", lambda v: f"{v:+.2f}σ"),
+    ("kc_rc_gap_z",      "New York Price Gap (z)",   lambda v: f"{v:+.2f}σ"),
+    ("kc_after_rc_diff", "NY after RC-Close Move",   lambda v: f"{v*100:+.2f}%"),
+    ("rc_overnight_gap", "RC Overnight Gap",         lambda v: f"{v*100:+.2f}%"),
 ]
 _FEATURE_KEYS = [k for k, _, _ in _FEATURE_SPECS]
 
@@ -290,6 +300,82 @@ def _load_kc_after_rc(kc: "pd.Series") -> "pd.Series | None":
     return pd.Series(vals, index=pd.DatetimeIndex(dates)).sort_index()
 
 
+def _load_intraday() -> "pd.DataFrame | None":
+    """Two roll-aware features from intraday_kc_rc_15min.json (15-min RM+KC):
+
+      kc_after_rc_diff = kc_last_1830 / kc_last_1730 − 1
+        The NY-only move in the hour after London robusta closes. Within-day,
+        within the same KC contract → immune to rolls.
+
+      rc_overnight_gap = rc_open_first / rc_last_1730.shift(1) − 1
+        Robusta's overnight gap from yesterday's 17:30 close to today's open.
+        CROSS-DAY → on a roll day (rc_symbol today ≠ yesterday) the two prices
+        are different delivery months; that calendar spread would show up as a
+        spurious gap, so those days are EXCLUDED (NaN) — never polluting the
+        stats. (Reported via `roll_days_excluded` in the model block.)
+
+    Returns a DataFrame indexed by date with both columns (+ `_rc_roll`), or
+    None if the file is absent/empty. Days missing the needed prices are NaN.
+    """
+    if not _INTRADAY.exists():
+        return None
+    try:
+        rows = json.loads(_INTRADAY.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(rows, list) or not rows:
+        return None
+
+    recs = []
+    for r in rows:
+        d = r.get("date")
+        if not d:
+            continue
+        try:
+            ts = pd.Timestamp(d)
+        except (ValueError, TypeError):
+            continue
+        recs.append((ts, r))
+    if not recs:
+        return None
+    recs.sort(key=lambda x: x[0])
+    idx = pd.DatetimeIndex([t for t, _ in recs])
+
+    def col(key):
+        out = []
+        for _, r in recs:
+            v = r.get(key)
+            try:
+                out.append(float(v) if v is not None else np.nan)
+            except (ValueError, TypeError):
+                out.append(np.nan)
+        return pd.Series(out, index=idx)
+
+    kc_1730 = col("kc_last_1730")
+    kc_1830 = col("kc_last_1830")
+    rc_1730 = col("rc_last_1730")
+    rc_open = col("rc_open_first")
+    rc_sym  = pd.Series([r.get("rc_symbol") for _, r in recs], index=idx)
+
+    # Within-day NY move (roll-immune).
+    kc_after = (kc_1830 / kc_1730 - 1.0).where((kc_1730 > 0) & kc_1830.notna())
+
+    # Cross-day RC overnight gap; exclude roll days (contract changed vs prior).
+    prev_rc_1730 = rc_1730.shift(1)
+    prev_sym     = rc_sym.shift(1)
+    is_roll      = rc_sym.ne(prev_sym) & prev_sym.notna()
+    rc_gap = (rc_open / prev_rc_1730 - 1.0).where(
+        (prev_rc_1730 > 0) & rc_open.notna() & (~is_roll)
+    )
+
+    df = pd.DataFrame({
+        "kc_after_rc_diff": kc_after,
+        "rc_overnight_gap": rc_gap,
+        "_rc_roll":         is_roll.fillna(False),
+    }, index=idx)
+    return df
+
+
 # ── Feature + label construction ─────────────────────────────────────────────
 
 def _zscore_rolling(s: pd.Series, window: int = 52 * 5) -> pd.Series:
@@ -330,14 +416,14 @@ def _triple_barrier_labels(rc: pd.Series) -> pd.Series:
 
 
 def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
-                 kc_after_rc: "pd.Series | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
+                 intraday: "pd.DataFrame | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
     """Assemble the aligned daily feature+label frame.
 
-    Returns (frame, active_feature_keys). Optional features (CCI, the
-    NY-after-RC-close move) are DROPPED rather than failing the whole model
-    when their inputs are unavailable — the two price-archive-only features
-    (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns None only when even those
-    can't be built.
+    Returns (frame, active_feature_keys). Optional features (CCI, the intraday
+    NY-after-RC-close move + RC overnight gap) are DROPPED rather than failing
+    the whole model when their inputs are unavailable — the two price-archive-
+    only features (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns None only when
+    even those can't be built.
     """
     cols: dict[str, pd.Series] = {"rc": rc}
     active: list[str] = []
@@ -364,19 +450,18 @@ def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
         cols["cci_z"] = (cci_re - cci_mu) / cci_sd.replace(0, np.nan)
         active.extend(["cci_ret_1d", "cci_z"])
 
-    # NY-after-RC-close move: the NY-only return from RC close (17:30 London)
-    # to KC settle. Positive = New York rallied in the hour after London
-    # robusta stopped trading → robusta tends to gap up next open. The series
-    # is pre-computed within a single intraday source (see _load_kc_after_rc),
-    # so no contract-spread contamination. Only included when enough days
-    # overlap the archive.
-    if kc_after_rc is not None and not kc_after_rc.empty:
-        diff = kc_after_rc.dropna()
-        if len(diff.index.intersection(rc.index)) >= _MIN_KC_RC_OVERLAP:
-            # No ffill: only real captured/backfilled days contribute; missing
-            # days stay NaN and drop out of training rows (dropna in run()).
-            cols["kc_after_rc_diff"] = diff.reindex(rc.index)
-            active.append("kc_after_rc_diff")
+    # Intraday features (15-min RM+KC): the NY-after-RC-close move and robusta's
+    # overnight gap. Each is added independently when it has enough overlap with
+    # the price-archive index. No ffill — only real days contribute; missing /
+    # roll-excluded days stay NaN and drop out of training (dropna in run()).
+    if intraday is not None and not intraday.empty:
+        for key in ("kc_after_rc_diff", "rc_overnight_gap"):
+            if key not in intraday.columns:
+                continue
+            s = intraday[key].dropna()
+            if len(s.index.intersection(rc.index)) >= _MIN_KC_RC_OVERLAP:
+                cols[key] = s.reindex(rc.index)
+                active.append(key)
 
     if len(active) < 2:
         return None
@@ -438,8 +523,16 @@ def run(db=None) -> dict:
     rc, kc = prices
 
     cci = _compute_cci_index()
-    kc_after_rc = _load_kc_after_rc(kc)
-    built = _build_frame(rc, kc, cci, kc_after_rc)
+    # Prefer the precise 15-min intraday source; fall back to the coarse hourly
+    # kc_at_rc_close history (kc_after_rc_diff only) when intraday isn't present.
+    intraday = _load_intraday()
+    if intraday is None:
+        legacy = _load_kc_after_rc(kc)
+        intraday = (legacy.to_frame("kc_after_rc_diff")
+                    if legacy is not None and not legacy.empty else None)
+    n_roll_excluded = int(intraday["_rc_roll"].sum()) if (
+        intraday is not None and "_rc_roll" in intraday.columns) else 0
+    built = _build_frame(rc, kc, cci, intraday)
     if built is None:
         return _unavailable("Could not assemble even the price-only features")
     frame, active_keys = built
@@ -549,7 +642,10 @@ def run(db=None) -> dict:
             "n_undefined":     int(n_undef),
             "currency_axis":   "coffee_currency_index",
             "cci_available":   cci is not None and not cci.empty,
-            "kc_after_rc_active": "kc_after_rc_diff" in active_keys,
+            "kc_after_rc_active":   "kc_after_rc_diff" in active_keys,
+            "rc_overnight_active":  "rc_overnight_gap" in active_keys,
+            "intraday_source":      "barchart_15min" if _INTRADAY.exists() else "hourly_fallback",
+            "roll_days_excluded":   n_roll_excluded,
         },
     }
 

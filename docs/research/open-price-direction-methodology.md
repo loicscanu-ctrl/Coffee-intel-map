@@ -98,7 +98,8 @@ training distribution before fitting. The canonical display order:
 | `cci_ret_1d`       | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
 | `cci_z`            | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
 | `kc_rc_gap_z`      | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a long window            |
-| `kc_after_rc_diff` | NY after RC-Close Move     | KC settle ÷ KC at 17:30 London − 1 — the NY-only move in the hour after London robusta closes |
+| `kc_after_rc_diff` | NY after RC-Close Move     | KC 18:30 ÷ KC 17:30 London − 1 — the NY-only move in the hour after London robusta closes (within-day, roll-immune) |
+| `rc_overnight_gap` | RC Overnight Gap           | RC open ÷ prior-day RC 17:30 close − 1 — robusta's overnight gap; **roll days excluded** (see below) |
 
 `22.0462` converts KC (¢/lb) to USD/MT so the KC−RC gap is a like-for-like
 arbitrage spread. The CCI itself is reconstructed exactly as
@@ -119,16 +120,35 @@ stopped trading on — and robusta tends to **gap toward it at its next open**. 
 (positive = NY rallied after London closed → bullish for robusta's next open)
 is a genuine leading indicator for the very thing this model predicts.
 
-The catch is data: `KC_at_17:30_London` is an *intraday* snapshot, and there is
-no free deep intraday arabica history to backfill it. So it is captured **going
-forward** — `capture_kc_at_rc_close.py` reads the front-month KC price from the
-live acaphe snapshot (which workflow 0.1 pushes to Redis every 15 min) at 17:30
-London each trading day and appends it to
-`frontend/public/data/kc_at_rc_close_history.json`. A London-time guard (handling
-DST and late cron fires) records only within ±8 min of 17:30 London, so the
-series is clean even if a capture tick is missed. The feature **activates
-automatically** in the model once at least `_MIN_KC_RC_OVERLAP` (40) captured
-days overlap the training window — until then the model simply runs without it.
+**Data source (precise 15-min, ~5.7 years).** Both this feature and
+`rc_overnight_gap` come from `intraday_kc_rc_15min.json` — 15-minute RM + KC
+bars from **Barchart** (`queryminutes.ashx`, reached via the same Playwright +
+XSRF session the OI scraper uses). Barchart is the only intraday source that
+carries robusta; Yahoo has none. The backfill
+(`backfill_intraday_kc_rc.py`, workflow 1.97) fetches each delivery contract
+(32 RM + 27 KC back to 2020-10) and stitches them into a front-month series by
+**daily volume** — the genuinely liquid contract each day, which avoids the
+stale near-expiry prints an FND-based roll would capture. Barchart timestamps
+are US Central; localised to America/Chicago → Europe/London, where 15-min bars
+land exactly on the 17:30 / 18:30 / 09:00 boundaries. Validation: RC
+last-traded @ 17:30 vs the official settle agrees to a **0.14% median** over
+1,272 days, with zero >2% days — confirming both the timezone mapping and the
+contract consistency.
+
+**Roll-day exclusion (important for the stats).** `rc_overnight_gap` is a
+*cross-day* ratio (today's open vs yesterday's close). On a roll day — when the
+liquid front contract changes — those two prices are different delivery months,
+so the **calendar spread** (often several %) would masquerade as a giant
+overnight gap and pollute the distribution. The loader therefore sets
+`rc_overnight_gap` to NaN on every roll day (`rc_symbol` ≠ prior day's), and the
+count is reported as `model.roll_days_excluded`. `kc_after_rc_diff` is
+*within-day* (KC 17:30 → 18:30, same KC contract) and so is immune to rolls — it
+is not excluded.
+
+A forward capture (`capture_kc_at_rc_close.py`, workflow 0.2) reads the live
+acaphe snapshot at 17:30 London each day to keep the series current; both
+intraday features **activate automatically** once at least `_MIN_KC_RC_OVERLAP`
+(40) days overlap the training window.
 
 ### Graceful feature degradation
 
