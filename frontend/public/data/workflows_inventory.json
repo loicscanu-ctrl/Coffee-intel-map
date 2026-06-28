@@ -1,7 +1,18 @@
 {
-  "generated_at": "2026-06-28T14:53:28.743516Z",
-  "count": 65,
+  "generated_at": "2026-06-28T20:01:58.197095Z",
+  "count": 66,
   "workflows": [
+    {
+      "file": "_probe-fx-history.yml",
+      "name": "_probe \u2013 FX history date range (throwaway)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 5
+    },
     {
       "file": "backfill-30yr-history.yml",
       "name": "0.9 \u2013 One-shot \u2014 Backfill 30Y daily weather history (1995-2024)",
