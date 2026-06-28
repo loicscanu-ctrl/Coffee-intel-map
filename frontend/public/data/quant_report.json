@@ -1,99 +1,99 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-27T18:43:16.210005+00:00",
-    "index_value": 107.512149,
-    "daily_delta_i": 0.0,
-    "daily_delta_pct": 0.0,
-    "zscore": 1.799118,
-    "zscore_mean": 104.305622,
-    "zscore_std": 1.782277,
+    "scraped_at": "2026-06-28T13:06:10.371298+00:00",
+    "index_value": 107.947005,
+    "daily_delta_i": 0.000463,
+    "daily_delta_pct": 0.046271,
+    "zscore": 1.834791,
+    "zscore_mean": 104.654118,
+    "zscore_std": 1.794693,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.0,
-        "contribution": -0.0
+        "daily_chg": -0.03422,
+        "contribution": -0.000176
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": -0.0,
-        "contribution": -0.0
+        "daily_chg": 0.180391,
+        "contribution": 0.000473
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": -0.0,
-        "contribution": -0.0
+        "daily_chg": 0.366985,
+        "contribution": 0.00047
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": -0.0,
-        "contribution": -0.0
+        "daily_chg": -0.327132,
+        "contribution": -0.000167
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": -0.0,
-        "contribution": -0.0
+        "daily_chg": 0.087135,
+        "contribution": 4.1e-05
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.0,
-        "contribution": -0.0
+        "daily_chg": 0.0236,
+        "contribution": -0.000159
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": -0.0,
-        "contribution": 0.0
+        "daily_chg": 0.000382,
+        "contribution": -0.0
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.0,
-        "contribution": 0.0
+        "daily_chg": -0.023421,
+        "contribution": 1.2e-05
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.0,
-        "contribution": 0.0
+        "daily_chg": 0.027056,
+        "contribution": -1.4e-05
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": -0.0,
-        "contribution": 0.0
+        "daily_chg": 0.0206,
+        "contribution": -9e-06
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": -0.0,
+        "daily_chg": -0.000299,
         "contribution": 0.0
       },
       {
@@ -101,134 +101,134 @@
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": -0.0,
-        "contribution": 0.0
+        "daily_chg": 0.020533,
+        "contribution": -8e-06
       }
     ],
     "history": [
       {
-        "date": "2026-05-29",
-        "value": 106.006618
-      },
-      {
         "date": "2026-05-30",
-        "value": 105.943373
+        "value": 106.274744
       },
       {
         "date": "2026-05-31",
-        "value": 105.888942
+        "value": 106.220142
       },
       {
         "date": "2026-06-01",
-        "value": 105.986266
+        "value": 106.317771
       },
       {
         "date": "2026-06-02",
-        "value": 106.539197
+        "value": 106.872432
       },
       {
         "date": "2026-06-03",
-        "value": 106.757433
+        "value": 107.09135
       },
       {
         "date": "2026-06-04",
-        "value": 106.284576
+        "value": 106.617015
       },
       {
         "date": "2026-06-05",
-        "value": 106.439207
+        "value": 106.772129
       },
       {
         "date": "2026-06-06",
-        "value": 105.757514
+        "value": 106.088304
       },
       {
         "date": "2026-06-07",
-        "value": 105.775315
+        "value": 106.106161
       },
       {
         "date": "2026-06-08",
-        "value": 105.657076
+        "value": 105.987551
       },
       {
         "date": "2026-06-09",
-        "value": 105.248295
+        "value": 105.577492
       },
       {
         "date": "2026-06-10",
-        "value": 105.564353
+        "value": 105.894538
       },
       {
         "date": "2026-06-11",
-        "value": 105.652729
+        "value": 105.983191
       },
       {
         "date": "2026-06-12",
-        "value": 106.498281
+        "value": 106.831387
       },
       {
         "date": "2026-06-13",
-        "value": 107.076095
+        "value": 107.411009
       },
       {
         "date": "2026-06-14",
-        "value": 106.938049
+        "value": 107.272531
       },
       {
         "date": "2026-06-15",
-        "value": 106.835108
+        "value": 107.169268
       },
       {
         "date": "2026-06-16",
-        "value": 107.042704
+        "value": 107.377513
       },
       {
         "date": "2026-06-17",
-        "value": 106.641716
+        "value": 106.975271
       },
       {
         "date": "2026-06-18",
-        "value": 106.995282
+        "value": 107.329943
       },
       {
         "date": "2026-06-19",
-        "value": 107.263823
+        "value": 107.599324
       },
       {
         "date": "2026-06-20",
-        "value": 107.22758
+        "value": 107.562968
       },
       {
         "date": "2026-06-21",
-        "value": 107.14621
+        "value": 107.481343
       },
       {
         "date": "2026-06-22",
-        "value": 107.428668
+        "value": 107.764685
       },
       {
         "date": "2026-06-23",
-        "value": 107.547232
+        "value": 107.883619
       },
       {
         "date": "2026-06-24",
-        "value": 107.571602
+        "value": 107.908066
       },
       {
         "date": "2026-06-25",
-        "value": 107.477084
+        "value": 107.813252
       },
       {
         "date": "2026-06-26",
-        "value": 107.512149
+        "value": 107.848426
       },
       {
         "date": "2026-06-27",
-        "value": 107.512149
+        "value": 107.89708
+      },
+      {
+        "date": "2026-06-28",
+        "value": 107.947005
       }
     ]
   },
-  "scraped_at": "2026-06-27T18:43:43.207059Z",
+  "scraped_at": "2026-06-28T13:06:10.371298+00:00",
   "sentiment": {
     "available": true,
     "scraped_at": "2026-06-27T18:43:41.716415Z",
@@ -286,7 +286,7 @@
         ]
       },
       {
-        "headline": "Body Count’s Now In The Coffee House…",
+        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -340,7 +340,7 @@
         ]
       },
       {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -357,7 +357,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating — 1/8 paired days",
+    "reason": "accumulating \u2014 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -385,19 +385,19 @@
         "var_name": "cci_z",
         "label": "Coffee Currency Index (z)",
         "raw_value": 1.7483376242162851,
-        "raw_fmt": "+1.75σ",
+        "raw_fmt": "+1.75\u03c3",
         "phi": -0.06780356192000851
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12σ",
+        "raw_fmt": "-1.12\u03c3",
         "phi": 0.06414381984480746
       },
       {
         "var_name": "cci_ret_1d",
-        "label": "Coffee Currency Index Δ",
+        "label": "Coffee Currency Index \u0394",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
         "phi": -0.05744979895033085
