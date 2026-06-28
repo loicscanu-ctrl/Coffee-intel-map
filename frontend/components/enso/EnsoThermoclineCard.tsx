@@ -36,11 +36,12 @@ interface BuoySlot {
   baseline_30d_mean_c: number | null;
   delta_30d_c:       number | null;
   kelvin_signal:     "warm-kelvin-wave" | "cold-kelvin-wave" | "neutral" | "no-data";
-  // Min/max temperature across the fetched window (~75 days). Lets
-  // the cell render a thin range bar with a marker at latest_temp_c
-  // so the eye picks up "near top / near bottom of recent range"
-  // without having to read numbers. Optional for backwards-compat
-  // with JSON written before this field was added.
+  // Min/max temperature across the buoy's FULL archived history
+  // (climatology envelope, derived from the date-keyed archive). Lets
+  // the cell render a thin range bar with a marker at latest_temp_c so
+  // the eye picks up "near the historical high / low" without reading
+  // numbers. Optional for backwards-compat with JSON written before
+  // this field was added.
   window_min_c?:     number | null;
   window_max_c?:     number | null;
 }
@@ -110,11 +111,11 @@ function latKeyOf(lat: number): "2N" | "0N" | "2S" | null {
   return null;
 }
 
-// Thin horizontal "where in the recent window does today's reading
-// sit" bar. Slate background = full window range, blue→red gradient
-// = cold edge → warm edge, white tick = current latest. Renders null
-// if we don't have a meaningful range (no data / single observation
-// so min == max).
+// Thin horizontal "where in its historical range does today's reading
+// sit" bar. Blue→red gradient = cold edge → warm edge of the buoy's
+// full archived envelope, white tick = current latest. Renders null
+// if we don't have a meaningful range (no data / flat history so
+// min == max).
 function RangeBar({
   current, min, max,
 }: { current: number | null; min: number | null; max: number | null }) {
@@ -124,7 +125,7 @@ function RangeBar({
     <div className="mt-0.5">
       <div
         className="relative h-1 rounded-sm overflow-hidden"
-        title={`Recent range ${min.toFixed(1)}–${max.toFixed(1)}°C · now ${current.toFixed(2)}°C`}
+        title={`Historical range ${min.toFixed(1)}–${max.toFixed(1)}°C · now ${current.toFixed(2)}°C`}
         style={{
           background: "linear-gradient(to right, #3b82f6 0%, #1e293b 50%, #ef4444 100%)",
         }}

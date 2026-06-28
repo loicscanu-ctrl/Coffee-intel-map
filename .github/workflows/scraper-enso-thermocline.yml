@@ -99,7 +99,7 @@ jobs:
           fi
           exit "$rc"
 
-      - name: Commit updated enso_thermocline.json if changed
+      - name: Commit updated thermocline snapshot + archive if changed
         if: ${{ inputs.dry_run != true && steps.fetch.outputs.stale_tolerant_skip != 'true' }}
         run: |
           set -e
@@ -109,12 +109,15 @@ jobs:
             echo "No enso_thermocline.json produced — nothing to commit."
             exit 0
           fi
-          git add frontend/public/data/enso_thermocline.json
+          # Snapshot (frontend reads this) + archive (source of truth the
+          # daily run appends to). The archive lives in data/ and is not
+          # shipped to the frontend bundle.
+          git add frontend/public/data/enso_thermocline.json data/enso_thermocline_archive.json
           if git diff --cached --quiet; then
             echo "No thermocline change."
             exit 0
           fi
-          git commit -m "data: ENSO thermocline (TAO/TRITON 150m via NDBC) refresh $(date -u +%Y-%m-%d) [skip ci]"
+          git commit -m "data: ENSO thermocline (TAO/TRITON 150m) refresh $(date -u +%Y-%m-%d) [skip ci]"
           git pull --rebase --autostash --strategy-option=theirs origin main
           git push origin main
 
