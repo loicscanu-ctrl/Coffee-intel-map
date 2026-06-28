@@ -75,7 +75,6 @@ jobs:
           BPS_WORKER_URL:    ${{ secrets.BPS_WORKER_URL }}
           BPS_WORKER_SECRET: ${{ secrets.BPS_WORKER_SECRET }}
         run: |
-          set -e
           ARGS=""
           if [ "$DRY_RUN" != "true" ]; then
             ARGS="$ARGS --write"
@@ -84,10 +83,24 @@ jobs:
             ARGS="$ARGS --diag"
           fi
           cd backend
+          set +e
           PYTHONPATH=. python -m scraper.sources.enso_thermocline $ARGS
+          rc=$?
+          set -e
+          # Exit 3 = upstream (PFEG) had a transient outage but the
+          # committed JSON is still fresh (TAO daily data lags ~3 weeks,
+          # so a single missed fetch loses nothing). Treat as a no-op:
+          # job stays green, commit step finds no diff, no Telegram.
+          # Exit 1/2 are real failures and propagate to `failure()`.
+          if [ "$rc" = "3" ]; then
+            echo "stale_tolerant_skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::PFEG transient outage; committed JSON still fresh — skipping without alert."
+            exit 0
+          fi
+          exit "$rc"
 
       - name: Commit updated enso_thermocline.json if changed
-        if: ${{ inputs.dry_run != true }}
+        if: ${{ inputs.dry_run != true && steps.fetch.outputs.stale_tolerant_skip != 'true' }}
         run: |
           set -e
           git config user.name  "github-actions[bot]"
