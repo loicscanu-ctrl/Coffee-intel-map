@@ -128,21 +128,24 @@ async def _fetch_contracts(symbols: list[str]) -> dict[str, str]:
     return out
 
 
-def _parse_day_index(csv_text: str) -> dict[str, dict[str, dict]]:
-    """{london_date: {london_HH:MM: {open, close}}} from a specific-contract CSV
-    ('<CT datetime>,<day>,O,H,L,C,V'). Last five fields are O,H,L,C,V."""
-    out: dict[str, dict[str, dict]] = defaultdict(dict)
+def _parse_day_index(csv_text: str) -> dict[str, dict]:
+    """{london_date: {"bars": {HH:MM: {open, close}}, "vol": total_day_volume}}
+    from a specific-contract CSV ('<CT datetime>,<day>,O,H,L,C,V'). The daily
+    volume lets the stitcher pick the genuinely liquid front contract."""
+    out: dict[str, dict] = defaultdict(lambda: {"bars": {}, "vol": 0.0})
     for line in (csv_text or "").strip().splitlines():
         parts = line.split(",")
         if len(parts) < 6:
             continue
         try:
             ct = datetime.strptime(parts[0].strip(), "%Y-%m-%d %H:%M").replace(tzinfo=_CHICAGO)
-            o, _h, _l, c, _v = (float(x) for x in parts[-5:])
+            o, _h, _l, c, v = (float(x) for x in parts[-5:])
         except (ValueError, TypeError):
             continue
         ldn = ct.astimezone(_LONDON)
-        out[ldn.strftime("%Y-%m-%d")][ldn.strftime("%H:%M")] = {"open": o, "close": c}
+        day = out[ldn.strftime("%Y-%m-%d")]
+        day["bars"][ldn.strftime("%H:%M")] = {"open": o, "close": c}
+        day["vol"] += v
     return out
 
 
@@ -161,22 +164,20 @@ def _archive_settles() -> dict:
 
 
 def _stitch(market: str, contracts: list[tuple[str, date]],
-            parsed: dict[str, dict[str, dict]]) -> dict[str, tuple[str, dict]]:
-    """{date: (front_symbol, day_bars)}. For each date, the front contract =
-    the one with data that day whose fnd is the nearest >= date (else the
-    latest available)."""
-    # date -> list of (fnd, symbol, day_bars) for contracts that have that day.
+            parsed: dict[str, dict]) -> dict[str, tuple[str, dict]]:
+    """{date: (front_symbol, day_bars)}. The front contract each day is the
+    most-TRADED one (max daily volume) — the genuine liquid front. This is
+    roll-correct without modelling FND: near a roll, liquidity has already
+    moved to the next contract, so the dying illiquid contract is never picked
+    even though it's still nominally nearer expiry."""
     by_date: dict[str, list] = defaultdict(list)
-    fnd_of = dict(contracts)
     for sym, _f in contracts:
-        for day, bars in parsed.get(sym, {}).items():
-            by_date[day].append((fnd_of[sym], sym, bars))
+        for day, rec in parsed.get(sym, {}).items():
+            by_date[day].append((rec["vol"], sym, rec["bars"]))
     out: dict[str, tuple[str, dict]] = {}
     for day, cands in by_date.items():
-        d = date.fromisoformat(day)
-        future = [c for c in cands if c[0] >= d]
-        pick = min(future, key=lambda c: c[0]) if future else max(cands, key=lambda c: c[0])
-        out[day] = (pick[1], pick[2])
+        vol, sym, bars = max(cands, key=lambda c: c[0])
+        out[day] = (sym, bars)
     return out
 
 
