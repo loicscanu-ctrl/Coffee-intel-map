@@ -15,27 +15,36 @@ futures, with an exact additive (SHAP-style) attribution of each prediction.
 The Signals tab previously carried a hand-coded mock of this panel: a SHAP
 waterfall with frozen numbers and a "MOCK DATA" banner. The original concept
 targeted the **first 30 minutes after the ICE Robusta open** and used a
-López-de-Prado triple-barrier labelling scheme on intraday ticks. That design
-requires an intraday RC price feed the platform does not ingest.
+López-de-Prado triple-barrier labelling scheme on intraday ticks.
 
 This methodology keeps the *idea* — a triple-barrier-labelled directional
-classifier with an exact attribution of the latest call — but reformulates it
-on the data the platform already ships **daily**, so the panel can be live and
-self-updating:
+classifier with an exact attribution of the latest call — but predicts the
+**next daily session** rather than the first 30 minutes. The label is built on
+daily RC settles; intraday data (added later — see below) feeds two of the
+features but not the label.
+
+Data sources:
 
 - **RC and KC front-month daily settles** — `data/contract_prices_archive.json`
-  (~5 years, 2021-06 → present).
+  (~5 years, 2021-06 → present). Drives the label and the two always-on
+  features.
 - **The Coffee Currency Index (CCI)** — reconstructed from the component FX
   pairs in `fx_history.json` (the platform's own coffee-trade-weighted basket
   of producer vs consumer currencies), using the *identical* weights and
   strength orientation as the published index in `fetch_currency_index.py`.
   `fx_history.json` is produced daily by the CCI workflow from a
   GitHub-Actions-reachable CDN FX API, so the model needs no extra network call.
+- **15-minute RM + KC intraday** — `intraday_kc_rc_15min.json` (~5.7 years from
+  Barchart; see §3). At the original design time no intraday RC feed was
+  ingested; Barchart's `queryminutes.ashx` later turned out to carry robusta
+  intraday (Yahoo does not), so the two New-York-window features now use real
+  15-min data. The label remains daily.
 
 The reformulation changes the prediction horizon from "first 30 minutes" to
 "next session(s)" but preserves the spirit of the feature family (the
-contract's own move, the FX backdrop, and the NY arbitrage gap) and the
-barrier-based labelling philosophy.
+contract's own move, the FX backdrop, the NY arbitrage gap, and the
+after-close / overnight intraday moves) and the barrier-based labelling
+philosophy.
 
 **On the currency axis — why the CCI, not the dollar index.** The original mock
 used EUR/USD, USD/BRL and the US Dollar Index (DXY). DXY is a generic
@@ -97,7 +106,7 @@ training distribution before fitting. The canonical display order:
 | `rc_ret_1d`        | RC 1-Day Return            | RC front-month daily return                                         |
 | `cci_ret_1d`       | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
 | `cci_z`            | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
-| `kc_rc_gap_z`      | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a long window            |
+| `kc_rc_gap_z`      | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a 260-day rolling window  |
 | `kc_after_rc_diff` | NY after RC-Close Move     | KC 18:30 ÷ KC 17:30 London − 1 — the NY-only move in the hour after London robusta closes (within-day, roll-immune) |
 | `rc_overnight_gap` | RC Overnight Gap           | RC open ÷ prior-day RC 17:30 close − 1 — robusta's overnight gap; **roll days excluded** (see below) |
 
@@ -148,10 +157,12 @@ Coffee C (New York) keeps trading for ~1 more hour and settles at 13:30 ET.
 During that final hour New York prices in information London robusta has already
 stopped trading on — and robusta tends to **gap toward it at its next open**. So
 
-    kc_after_rc_diff = KC_settle / KC_at_17:30_London − 1
+    kc_after_rc_diff = KC_at_18:30_London / KC_at_17:30_London − 1
 
-(positive = NY rallied after London closed → bullish for robusta's next open)
-is a genuine leading indicator for the very thing this model predicts.
+(both the close of the 15-min bar at the respective London time, same KC
+contract; positive = NY rallied after London closed → bullish for robusta's
+next open) is a genuine leading indicator for the very thing this model
+predicts. Being within-day and within one KC contract, it is roll-immune.
 
 **Data source (precise 15-min, ~5.7 years).** Both this feature and
 `rc_overnight_gap` come from `intraday_kc_rc_15min.json` — 15-minute RM + KC
@@ -178,21 +189,34 @@ count is reported as `model.roll_days_excluded`. `kc_after_rc_diff` is
 *within-day* (KC 17:30 → 18:30, same KC contract) and so is immune to rolls — it
 is not excluded.
 
-A forward capture (`capture_kc_at_rc_close.py`, workflow 0.2) reads the live
-acaphe snapshot at 17:30 London each day to keep the series current; both
-intraday features **activate automatically** once at least `_MIN_KC_RC_OVERLAP`
-(40) days overlap the training window.
+Both intraday features **activate automatically** once at least
+`_MIN_KC_RC_OVERLAP` (40) days overlap the training window
+(`model.kc_after_rc_active`, `model.rc_overnight_active`), and the active source
+is reported as `model.intraday_source` (`barchart_15min`, or `hourly_fallback`
+when the 15-min file is absent and the legacy `kc_at_rc_close_history.json`
+hourly history is used for `kc_after_rc_diff` only).
+
+**Refresh cadence (current limitation).** `intraday_kc_rc_15min.json` is
+produced by the Barchart backfill (`backfill_intraday_kc_rc.py`, workflow 1.97)
+and the 1-month fetcher (1.96) — both **`workflow_dispatch` only**, i.e. not yet
+scheduled. The separate acaphe forward capture (`capture_kc_at_rc_close.py`,
+workflow 0.2) writes to the *legacy* `kc_at_rc_close_history.json` fallback, not
+the 15-min file. Consequently the 15-min file does not self-update: until a
+daily incremental refresh is wired, the two intraday features go NaN on dates
+past the last backfill, which freezes the model's scored `as_of` at that date.
+Re-running 1.97 advances it. (Tracked as future work in §8.)
 
 ### Graceful feature degradation
 
 `rc_ret_1d` and `kc_rc_gap_z` are derived purely from the price archive and are
 **always present**. The two CCI features are included only when `fx_history.json`
-yields the component pairs; `kc_after_rc_diff` only once enough captured days
-exist. If an input is missing, the model proceeds on the remaining features
-rather than failing entirely. The active feature set is reported in
-`open_direction.model.active_features` (with `cci_available` and
-`kc_after_rc_active` flags), and the SHAP decomposition adapts to whatever set
-was used.
+yields the component pairs; `kc_after_rc_diff` and `rc_overnight_gap` only once
+enough intraday days overlap. Each optional feature is added **independently**,
+so a missing input drops only its own feature(s) — the model proceeds on the
+rest rather than failing. The active set is reported in
+`model.active_features`, with the flags `cci_available`, `kc_after_rc_active`,
+`rc_overnight_active`, `intraday_source`, and `roll_days_excluded`; the SHAP
+decomposition adapts to whatever set was used and stays exactly additive.
 
 ---
 
@@ -254,12 +278,13 @@ Two honest caveats are surfaced in the output and the UI:
 - **Undefined ratio** — fraction of resolvable days where the time barrier was
   hit first. A high ratio means the method abstains often; the accuracy is
   conditional on the rest.
-- **Training-window size** — `n_train`. The CCI features come from
-  `fx_history.json`, a rolling ~1-year window, so the joined training set is
-  currently ~190–210 defined rows even though the RC price archive spans 5
-  years. Extending the FX history would lengthen the window; the model refits
-  every day as it grows. `model.cci_available` records whether the CCI axis was
-  present on a given run.
+- **Training-window size** — `n_train`. The joined training set is the
+  intersection of *all active features'* coverage. The binding constraint is
+  `fx_history.json` (a rolling ~1-year CCI window); the two intraday features
+  tighten it slightly further. So with all six features active, `n_train` is
+  currently ~160 defined rows even though the RC price archive spans 5 years and
+  the intraday history ~5.7. Lengthening the FX history is the main lever; the
+  model refits every day as coverage grows.
 
 A model that cannot assemble at least `_MIN_DEFINED` (80) defined training rows
 reports `available: false` rather than publishing a thin fit.
@@ -272,36 +297,54 @@ reports `available: false` rather than publishing a thin fit.
 {
   "available": true,
   "as_of": "2026-06-25",            // date of the scored observation
-  "scraped_at": "2026-06-27T13:32:25Z",
+  "scraped_at": "2026-06-28T14:38:43Z",
   "direction": "Bearish",
-  "base_margin": -0.0091,           // E[f(x)] in log-odds
-  "final_margin": -0.1891,          // f(x) in log-odds
-  "base_prob": 0.4977,              // σ(base_margin)
-  "final_prob": 0.4529,             // σ(final_margin)
-  "prob_up": 0.4529,
-  "prob_down": 0.5471,
+  "base_margin": ...,               // E[f(x)] in log-odds
+  "final_margin": ...,              // f(x) in log-odds
+  "base_prob": ...,                 // σ(base_margin)
+  "final_prob": ...,                // σ(final_margin)
+  "prob_up": ...,
+  "prob_down": ...,
   "features": [                     // sorted by |φ| descending
-    { "var_name": "rc_ret_1d", "label": "RC 1-Day Return",
-      "raw_value": 0.0132, "raw_fmt": "+1.32%", "phi": -0.1466 }
-    // …
+    {
+      "var_name": "kc_rc_gap_z",
+      "label": "New York Price Gap (z)",
+      "raw_value": -1.12,           // the z-score (this feature IS a z)
+      "raw_fmt": "-1.12σ",
+      "usd_per_ton": -781.0,        // robusta USD/MT ruler (see §3)
+      "phi": 0.0641,                // log-odds SHAP contribution
+      "detail": {                   // only on the price-gap factor
+        "kc_usd_per_mt": 6366.9, "rc_usd_per_mt": 3756.0,
+        "gap_usd_per_mt": 2610.9, "gap_mean_usd_per_mt": 3391.9,
+        "gap_std_usd_per_mt": 697.2,
+        "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z over a 260-day window"
+      }
+    }
+    // … the other five factors (no `detail`)
   ],
   "barrier": { "horizon_days": 5, "k_sigma": 1.0, "vol_window": 20 },
   "model": {
     "kind": "logistic_regression_l2",
-    "active_features": ["rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z"],
-    "n_features": 4,
-    "n_train": 195,
-    "test_accuracy": 0.525,         // on defined cases, time-holdout
-    "n_test": 59,
-    "undefined_ratio": 0.165,
-    "n_resolvable": 230,
-    "n_undefined": 38,
+    "active_features": ["rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z",
+                        "kc_after_rc_diff", "rc_overnight_gap"],
+    "n_features": 6,
+    "n_train": 163,
+    "test_accuracy": 0.469,         // on defined cases, time-holdout
+    "n_test": 49,
+    "undefined_ratio": 0.158,
+    "n_resolvable": 190,
+    "n_undefined": 30,
     "currency_axis": "coffee_currency_index",
-    "cci_available": true
+    "cci_available": true,
+    "kc_after_rc_active": true,
+    "rc_overnight_active": true,
+    "intraday_source": "barchart_15min",   // or "hourly_fallback"
+    "roll_days_excluded": 65               // RC roll days NaN'd in rc_overnight_gap
   }
 }
 ```
 
+Every factor carries `usd_per_ton`; only `kc_rc_gap_z` carries `detail`.
 `Σ features[].phi == final_margin − base_margin` holds exactly.
 
 ---
@@ -315,18 +358,27 @@ reports `available: false` rather than publishing a thin fit.
   probability itself.
 - Respect the **undefined ratio**. On a sample where the method abstains ~50% of
   the time, the accuracy figure only describes the half it chose to call.
-- The current fit trains on a ~1-year window (the CCI history length), so it is
-  thin relative to the 5-year price archive. Treat early live numbers as the
-  method coming online, not a seasoned track record; the model refits daily and
-  the window lengthens as FX history accumulates.
+- The current fit trains on a ~1-year window (the binding FX-history length),
+  so it is thin relative to the multi-year price + intraday archives. Treat
+  early live numbers as the method coming online, not a seasoned track record;
+  the model refits daily and the window lengthens as FX history accumulates.
 
 ---
 
 ## 8. Limitations and future work
 
-- **Daily, not intraday.** The original 30-minutes-after-open framing is not
-  recoverable without an intraday RC feed. If one is added, the same labelling +
-  attribution code applies to a finer bar with only the barrier units changing.
+- **Daily label, intraday features.** The *label* is still the daily triple
+  barrier; the original 30-minutes-after-open framing isn't used. Now that a
+  15-min RM feed exists (Barchart, §3), the same labelling + attribution code
+  could be applied to an intraday bar — only the barrier units would change.
+  Today intraday data feeds two features but not the label.
+- **Intraday refresh not scheduled (operational).** `intraday_kc_rc_15min.json`
+  is refreshed only by manual `workflow_dispatch` (1.96 / 1.97); the acaphe
+  forward capture feeds the legacy hourly fallback, not the 15-min file. Until a
+  daily incremental refresh is wired, the two intraday features go NaN past the
+  last backfill and the scored `as_of` freezes there. The fix is a small daily
+  job that fetches the current front contracts and merges recent days into the
+  file.
 - **Linear classifier.** Logistic regression buys exact attribution and a tiny
   dependency footprint at the cost of not modelling feature interactions. A
   gradient-boosted tree with tree-SHAP would capture interactions but needs the
