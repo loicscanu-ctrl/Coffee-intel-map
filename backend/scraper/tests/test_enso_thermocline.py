@@ -543,6 +543,33 @@ def test_incremental_start_caps_a_huge_gap():
     assert start == (now - timedelta(days=therm.MAX_INCREMENTAL_DAYS)).strftime("%Y-%m-%d")
 
 
+def test_analyse_from_archive_sets_trajectory_anchors():
+    """The range bar's velocity ticks need where the buoy sat ~1 and
+    ~3 months before its latest reading — looked up from the FULL
+    archive (90d is outside the 75-day snapshot window)."""
+    archive = therm._empty_archive()
+    series = {}
+    for d in range(0, 7):     # recent week ~20
+        series[_day(d)] = 20.0
+    series[_day(30)] = 22.0   # ~1 month ago, warmer
+    series[_day(90)] = 25.0   # ~3 months ago, warmer still → cooling trajectory
+    archive["buoys"]["0n155w"] = series
+
+    a = {x.site.station_id: x for x in therm._analyse_from_archive(archive)}["0n155w"]
+    assert a.temp_30d_ago_c == 22.0
+    assert a.temp_90d_ago_c == 25.0
+    # 90d anchor must survive even though it's outside the snapshot window.
+    assert a.window_min_c == 20.0   # climatology floor still from full history
+
+
+def test_lookback_temp_averages_window_and_returns_none_when_absent():
+    series = {"2026-01-01": 18.0, "2026-01-03": 20.0, "2026-03-01": 25.0}
+    # ~60 days back from 2026-03-01 lands near Jan 1-3 → mean(18, 20).
+    assert therm._lookback_temp(series, "2026-03-01", 59, tol_days=4) == 19.0
+    # Nothing near 1 year back → None.
+    assert therm._lookback_temp(series, "2026-03-01", 365) is None
+
+
 def test_run_writes_snapshot_and_archive_end_to_end(tmp_path, monkeypatch):
     """Full daily-run path with the network stubbed: a fetched window is
     merged into the archive, then BOTH the public snapshot and the

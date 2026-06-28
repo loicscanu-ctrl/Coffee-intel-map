@@ -33,8 +33,10 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 # Reuse the backfill's contract enumeration, fetch, parse, volume-stitch and
 # settle logic so the refresh and the deep backfill agree bar-for-bar.
 from scraper.backfill_intraday_kc_rc import (  # noqa: E402
+    _T_1730,
+    _T_1830,
+    _T_OPEN,
     OUT_PATH,
-    _T_1730, _T_1830, _T_OPEN,
     _archive_settles,
     _contracts,
     _fetch_contracts,

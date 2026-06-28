@@ -451,6 +451,14 @@ class BuoyAnalysis:
     # coldest we've seen since the lookback started".
     window_min_c:         float | None
     window_max_c:         float | None
+    # Trajectory anchors for the velocity ticks on the card's range bar:
+    # the buoy's temperature ~1 month and ~3 months before its latest
+    # reading. The spacing between these and `latest` shows how fast (and
+    # which way) the 150 m temperature is moving. None when the archive
+    # doesn't reach back that far. Only populated on the archive-derived
+    # path (the deep history is required to look back 90 days).
+    temp_30d_ago_c:       float | None = None
+    temp_90d_ago_c:       float | None = None
 
 
 def _classify_kelvin(delta_c: float | None) -> str:
@@ -627,6 +635,8 @@ def build_payload(
                     "kelvin_signal": a.kelvin_signal,
                     "window_min_c":  a.window_min_c,
                     "window_max_c":  a.window_max_c,
+                    "temp_30d_ago_c": a.temp_30d_ago_c,
+                    "temp_90d_ago_c": a.temp_90d_ago_c,
                 }
                 for a in analyses
             ],
@@ -757,10 +767,26 @@ def _series_to_obs(site: BuoySite, series: dict[str, float]) -> list[OceanObs]:
     return out
 
 
+def _lookback_temp(
+    series: dict[str, float], anchor_date: str, days_back: int, tol_days: int = 4,
+) -> float | None:
+    """Mean temperature ~days_back before anchor_date, averaged over a
+    ±tol_days window so a single missing day doesn't blank it. None if
+    the archive carries nothing near that point. Used for the range
+    bar's "where was it 1 / 3 months ago" velocity ticks."""
+    anchor = datetime.fromisoformat(f"{anchor_date}T00:00:00+00:00")
+    target = anchor - timedelta(days=days_back)
+    lo = (target - timedelta(days=tol_days)).strftime("%Y-%m-%d")
+    hi = (target + timedelta(days=tol_days)).strftime("%Y-%m-%d")
+    vals = [t for d, t in series.items() if lo <= d <= hi]
+    return round(sum(vals) / len(vals), 2) if vals else None
+
+
 def _analyse_from_archive(archive: dict) -> list[BuoyAnalysis]:
     """Derive each buoy's analysis from the archive: Δ-30d / 7-day means
     from the most recent SNAPSHOT_WINDOW_DAYS of data, range bar from the
-    buoy's FULL historical envelope (climatology min/max)."""
+    buoy's FULL historical envelope (climatology min/max), and the
+    1-/3-month-ago trajectory anchors for the velocity ticks."""
     buoys = archive.get("buoys", {})
     analyses: list[BuoyAnalysis] = []
     for site in NDBC_BUOYS:
@@ -778,10 +804,16 @@ def _analyse_from_archive(archive: dict) -> list[BuoyAnalysis]:
             - timedelta(days=SNAPSHOT_WINDOW_DAYS)
         ).strftime("%Y-%m-%d")
         recent = {d: t for d, t in series.items() if d >= cutoff}
-        analyses.append(analyse_buoy(
+        an = analyse_buoy(
             site, _series_to_obs(site, recent),
             climo_min_c=climo_min, climo_max_c=climo_max,
-        ))
+        )
+        # Trajectory anchors look 30 / 90 days back from the latest
+        # reading across the FULL series (90d is outside the snapshot
+        # window, so it must come from the archive, not `recent`).
+        an.temp_30d_ago_c = _lookback_temp(series, newest, 30)
+        an.temp_90d_ago_c = _lookback_temp(series, newest, 90)
+        analyses.append(an)
     return analyses
 
 
