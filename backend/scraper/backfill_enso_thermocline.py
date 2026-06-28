@@ -6,8 +6,8 @@ up incrementally.
 
 Why a separate backfill
 =======================
-The daily run pulls only a small recent window (RECENT_FETCH_DAYS) and merges
-it into data/enso_thermocline_archive.json — it never re-pulls deep history.
+The daily run pulls only a small frontier-anchored window and merges it into
+data/enso_thermocline_archive.json — it never re-pulls deep history.
 This script establishes that history: it walks ERDDAP YEAR BY YEAR (each chunk
 small enough to clear the Cloudflare Worker's 30 s wall), merges every chunk
 into the same archive, then derives the public snapshot from the result.
