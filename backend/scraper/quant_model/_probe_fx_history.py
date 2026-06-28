@@ -1,45 +1,66 @@
 """
-_probe_fx_history.py  (throwaway diagnostic)
-Determines how far back the fawazahmed0 currency-api serves data, and via which
-URL form, so the multi-year CCI backfill can target the right endpoint. Runs on
-a GitHub Actions runner (jsDelivr is reachable there; it's policy-blocked from
-the dev sandbox). Prints a coverage table to stdout — nothing is written.
+_probe_fx_history.py  (throwaway diagnostic, round 2)
+fawazahmed0 only serves >=2024-03-02, so we need a deep-history source that also
+carries the exotic exporter pairs (VND, COP, PEN — ECB/Frankfurter lacks them).
+Tests Yahoo chart v8 and Stooq CSV for the hardest pairs back to 2020. Runs on a
+GH runner (these hosts are policy-blocked from the dev sandbox). Prints coverage.
 """
 import sys
 import requests
 
-CUR = "brl"  # any tracked currency; we only care about HTTP 200 + a usd map
-
-FORMS = [
-    ("npm v1 min", "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{d}/v1/currencies/usd.min.json"),
-    ("npm v1",     "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{d}/v1/currencies/usd.json"),
-    ("gh v1 min",  "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@{d}/v1/currencies/usd.min.json"),
-    ("gh latest",  "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@{d}/latest/currencies/usd.json"),
-    ("pages.dev",  "https://{d}.currency-api.pages.dev/v1/currencies/usd.json"),
-]
-
-DATES = ["2019-06-03", "2020-01-02", "2020-06-01", "2020-11-23",
-         "2021-06-01", "2022-06-01", "2023-06-01", "2024-03-02", "latest"]
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+P1, P2 = 1577836800, 1893456000  # 2020-01-01 .. 2030-01-01
 
 
-def probe(form_url, d):
-    url = form_url.format(d=d)
+def yahoo(tkr):
+    for host in ("query1.finance.yahoo.com", "query2.finance.yahoo.com"):
+        url = f"https://{host}/v8/finance/chart/{tkr}?period1={P1}&period2={P2}&interval=1d"
+        try:
+            r = requests.get(url, headers=UA, timeout=25)
+            if r.status_code != 200:
+                last = f"{r.status_code}"; continue
+            res = r.json()["chart"]["result"][0]
+            ts = res["timestamp"]
+            cl = res["indicators"]["quote"][0]["close"]
+            import datetime as dt
+            d0 = dt.datetime.utcfromtimestamp(ts[0]).date()
+            d1 = dt.datetime.utcfromtimestamp(ts[-1]).date()
+            nz = sum(1 for c in cl if c is not None)
+            return f"OK {nz}pts {d0}..{d1}"
+        except Exception as e:  # noqa: BLE001
+            last = f"ERR {type(e).__name__}"
+    return last
+
+
+def stooq(sym):
+    url = f"https://stooq.com/q/d/l/?s={sym}&d1=20200101&d2=20260628&i=d"
     try:
-        r = requests.get(url, timeout=20)
+        r = requests.get(url, headers=UA, timeout=25)
         if r.status_code != 200:
             return f"{r.status_code}"
-        usd = r.json().get("usd", {})
-        return f"200 ({len(usd)} cur, brl={usd.get('brl')})" if usd else "200 empty"
+        lines = r.text.strip().splitlines()
+        if len(lines) < 3 or not lines[0].lower().startswith("date"):
+            return f"no-data ({r.text[:30]!r})"
+        first = lines[1].split(",")[0]; last = lines[-1].split(",")[0]
+        return f"OK {len(lines)-1}pts {first}..{last}"
     except Exception as e:  # noqa: BLE001
         return f"ERR {type(e).__name__}"
 
 
+YH = ["BRL=X", "VND=X", "COP=X", "IDR=X", "PEN=X", "EURUSD=X", "JPY=X",
+      "CHF=X", "CNY=X", "CAD=X", "KRW=X", "GBP=X", "GTQ=X"]
+ST = ["usdbrl", "usdvnd", "usdcop", "usdidr", "usdpen", "eurusd", "usdjpy",
+      "usdchf", "usdcny", "usdcad", "usdkrw", "usdgbp", "usdgtq"]
+
+
 def main():
-    print(f"{'date':12s} | " + " | ".join(f"{n:22s}" for n, _ in FORMS))
-    print("-" * 130)
-    for d in DATES:
-        cells = [probe(u, d) for _, u in FORMS]
-        print(f"{d:12s} | " + " | ".join(f"{c:22s}" for c in cells))
+    print("== Yahoo chart v8 (period1=2020-01-01) ==")
+    for t in YH:
+        print(f"  {t:10s} {yahoo(t)}")
+    print("== Stooq CSV (2020-01-01..2026-06-28) ==")
+    for s in ST:
+        print(f"  {s:10s} {stooq(s)}")
 
 
 if __name__ == "__main__":
