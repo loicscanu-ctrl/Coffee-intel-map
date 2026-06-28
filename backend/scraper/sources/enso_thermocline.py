@@ -192,13 +192,22 @@ LON_UPPER_E = 270.0     # buffer above 95°W (=265°E)
 HISTORY_DAYS = 75
 SNAPSHOT_WINDOW_DAYS = 75
 
-# Daily incremental fetch window. Must comfortably span the ~3-week TAO
-# publication lag plus a few weeks of overlap so consecutive (or
-# briefly-interrupted) daily runs never leave a gap in the archive.
-# 45 ≈ 60% of the old 75-day pull — smaller ERDDAP responses, less load
-# on the CF Worker's 30s wall — while the deep archive (seeded by the
-# backfill) supplies everything the snapshot's Δ-30d / climatology need.
-RECENT_FETCH_DAYS = 45
+# Daily incremental fetch — FRONTIER-ANCHORED, not a fixed lookback.
+# The start date is set just behind the archive's newest date, so a
+# steady-state run transfers only the small revision-overlap window
+# instead of a flat block every day.
+#
+# Why we can't just "fetch yesterday": TAO daily data is published
+# ~3 weeks late (so the newest available reading is already ~21 days
+# old), AND PMEL revises provisional values for a couple weeks after
+# first publishing them. So each run re-pulls a short overlap of the
+# frontier to catch those corrections, plus whatever genuinely-new day
+# has appeared. After a run of missed crons the window auto-extends to
+# cover the gap (frontier is older → start reaches further back).
+REVISION_OVERLAP_DAYS = 10    # re-pull the last N archived days for PMEL corrections
+LAG_FLOOR_DAYS        = 30    # always reach back past the ~21-day publish lag
+MAX_INCREMENTAL_DAYS  = 120   # cap; a gap this large → re-run the backfill instead
+SEED_DAYS             = 75    # empty archive (no backfill yet) → seed a full snapshot window
 
 # Archive retention — 15 years of daily values per buoy. Enough for a
 # real multi-decadal climatology range and a long thermocline-over-time
@@ -817,6 +826,36 @@ def _fetch_failure_exit_code(reason: str) -> int:
     return 1
 
 
+def _archive_frontier(archive: dict) -> str | None:
+    """Newest YYYY-MM-DD present across all buoys, or None if empty."""
+    days = [d for series in archive.get("buoys", {}).values() for d in series]
+    return max(days) if days else None
+
+
+def _incremental_start_date(archive: dict, *, today: datetime | None = None) -> str:
+    """Frontier-anchored start date for the daily incremental fetch.
+
+    Steady state: start = frontier − REVISION_OVERLAP_DAYS, so we only
+    re-pull the short overlap PMEL might still be revising plus whatever
+    new day appeared — not a fixed block. We also never look back less
+    than LAG_FLOOR_DAYS (so we reliably clear the ~21-day publish lag and
+    actually reach upstream's newest data), and never more than
+    MAX_INCREMENTAL_DAYS (a gap that large means the archive is far
+    behind — re-run the backfill rather than hammer the proxy). An empty
+    archive (no backfill yet) seeds a full snapshot window.
+    """
+    now = today or datetime.now(UTC)
+    frontier = _archive_frontier(archive)
+    if frontier is None:
+        return (now - timedelta(days=SEED_DAYS)).strftime("%Y-%m-%d")
+    frontier_dt = datetime.fromisoformat(f"{frontier}T00:00:00+00:00")
+    # How far back must the start reach to sit REVISION_OVERLAP_DAYS
+    # behind the frontier? Floor at LAG_FLOOR, cap at MAX_INCREMENTAL.
+    days_behind = (now - frontier_dt).days + REVISION_OVERLAP_DAYS
+    lookback = max(LAG_FLOOR_DAYS, min(days_behind, MAX_INCREMENTAL_DAYS))
+    return (now - timedelta(days=lookback)).strftime("%Y-%m-%d")
+
+
 def run(*, write: bool, diag: bool = False) -> int:
     """Fetch via the proxy, parse, persist. Exit codes:
         0 — success (data written or previewed cleanly)
@@ -844,9 +883,9 @@ def run(*, write: bool, diag: bool = False) -> int:
 
     archive = _load_archive()
 
-    # Pull a SMALL recent window and merge it into the deep archive,
-    # rather than re-pulling the whole snapshot window every run.
-    start_date = (datetime.now(UTC) - timedelta(days=RECENT_FETCH_DAYS)).strftime("%Y-%m-%d")
+    # Pull only what's needed to extend the archive frontier (+ a short
+    # revision overlap), not a fixed block, and merge it in.
+    start_date = _incremental_start_date(archive)
     raw_obs, winning_dataset, rc = _fetch_window(proxy_base, secret, start_date, diag=diag)
     if rc is not None:
         # Fetch failed. The archive + last committed snapshot are still

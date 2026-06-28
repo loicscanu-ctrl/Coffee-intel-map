@@ -499,6 +499,50 @@ def test_analyse_from_archive_climatology_spans_full_history():
     assert analyses["2n95w"].kelvin_signal == "no-data"
 
 
+def test_incremental_start_seeds_full_window_when_archive_empty():
+    """No backfill yet → seed a full snapshot window so the first run is
+    self-sufficient."""
+    now = datetime(2026, 6, 28, tzinfo=UTC)
+    start = therm._incremental_start_date(therm._empty_archive(), today=now)
+    assert start == (now - timedelta(days=therm.SEED_DAYS)).strftime("%Y-%m-%d")
+
+
+def test_incremental_start_anchors_just_behind_frontier_in_steady_state():
+    """Steady state: frontier sits ~21d back (publish lag); the start
+    reaches only REVISION_OVERLAP past it (clamped up to LAG_FLOOR), NOT
+    a fixed 45-day block — so we re-pull just the revision overlap."""
+    now = datetime(2026, 6, 28, tzinfo=UTC)
+    archive = therm._empty_archive()
+    frontier = (now - timedelta(days=21)).strftime("%Y-%m-%d")
+    archive["buoys"]["0n155w"] = {frontier: 19.0}
+    start = therm._incremental_start_date(archive, today=now)
+    # 21 days behind + 10 overlap = 31, floored at LAG_FLOOR(30) → 31.
+    assert start == (now - timedelta(days=31)).strftime("%Y-%m-%d")
+    # And that's far less than the old fixed 45-day block.
+    assert (now - datetime.fromisoformat(f"{start}T00:00:00+00:00")).days < 45
+
+
+def test_incremental_start_auto_extends_after_outage():
+    """If the cron has been down and the frontier is old, the window
+    auto-extends to cover the gap (so no permanent hole forms)."""
+    now = datetime(2026, 6, 28, tzinfo=UTC)
+    archive = therm._empty_archive()
+    frontier = (now - timedelta(days=60)).strftime("%Y-%m-%d")   # ~5wk stale frontier
+    archive["buoys"]["0n155w"] = {frontier: 19.0}
+    start = therm._incremental_start_date(archive, today=now)
+    assert start == (now - timedelta(days=70)).strftime("%Y-%m-%d")   # 60 + 10 overlap
+
+
+def test_incremental_start_caps_a_huge_gap():
+    """A frontier years stale shouldn't trigger a giant proxy pull — cap
+    the lookback (operator should re-run the backfill instead)."""
+    now = datetime(2026, 6, 28, tzinfo=UTC)
+    archive = therm._empty_archive()
+    archive["buoys"]["0n155w"] = {"2020-01-01": 19.0}
+    start = therm._incremental_start_date(archive, today=now)
+    assert start == (now - timedelta(days=therm.MAX_INCREMENTAL_DAYS)).strftime("%Y-%m-%d")
+
+
 def test_run_writes_snapshot_and_archive_end_to_end(tmp_path, monkeypatch):
     """Full daily-run path with the network stubbed: a fetched window is
     merged into the archive, then BOTH the public snapshot and the
