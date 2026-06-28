@@ -107,6 +107,39 @@ arbitrage spread. The CCI itself is reconstructed exactly as
 is normalised to a USD-strength return, exporters add (+w) and importers
 subtract (−w), and the weighted ΔI is accumulated from a base of 100.
 
+### USD/ton quantification per factor
+
+Each factor is also reported in **robusta USD/MT** (`usd_per_ton`), so the
+magnitudes are comparable on one dollar ruler regardless of whether the raw
+value is a % return or a z-score:
+
+- **Return factors** (`rc_ret_1d`, `rc_overnight_gap`, `cci_ret_1d`,
+  `kc_after_rc_diff`): the % move applied to the latest robusta price —
+  `raw × RC_price`.
+- **Level (z-score) factors** (`kc_rc_gap_z`, `cci_z`): the **deviation from the
+  rolling mean** in USD/MT, so a stretched level reads as a dollar anomaly
+  rather than an absolute level. For the gap that's `gap − gap_mean`; for the
+  CCI it's the index's %-deviation from its 120-day mean × `RC_price`.
+
+### Price-gap detail (written down)
+
+The New York Price Gap factor additionally carries a `detail` block spelling out
+the components used for its z-score, so nothing is hidden behind the σ:
+
+```jsonc
+"detail": {
+  "kc_usd_per_mt":       6366.9,   // KC ¢/lb × 22.0462
+  "rc_usd_per_mt":       3756.0,   // RC front settle
+  "gap_usd_per_mt":      2610.9,   // KC$/MT − RC$/MT (the arbitrage gap)
+  "gap_mean_usd_per_mt": 3391.9,   // 260-day rolling mean of the gap
+  "gap_std_usd_per_mt":  697.2,    // 260-day rolling std (the z denominator)
+  "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z-scored over a 260-day rolling window"
+}
+```
+
+So `kc_rc_gap_z = (gap − gap_mean) / gap_std`, and the factor's `usd_per_ton`
+= `gap − gap_mean` (here −781 USD/MT: the gap is $781/t below its year-average).
+
 ### The NY-after-RC-close feature (`kc_after_rc_diff`)
 
 This is the single most economically-motivated feature, and worth its own note.

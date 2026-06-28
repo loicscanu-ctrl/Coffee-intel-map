@@ -1,99 +1,99 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-28T13:06:10.371298+00:00",
-    "index_value": 107.947005,
-    "daily_delta_i": 0.000463,
-    "daily_delta_pct": 0.046271,
-    "zscore": 1.834791,
-    "zscore_mean": 104.654118,
-    "zscore_std": 1.794693,
+    "scraped_at": "2026-06-27T18:43:16.210005+00:00",
+    "index_value": 107.512149,
+    "daily_delta_i": 0.0,
+    "daily_delta_pct": 0.0,
+    "zscore": 1.799118,
+    "zscore_mean": 104.305622,
+    "zscore_std": 1.782277,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": -0.03422,
-        "contribution": -0.000176
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": 0.180391,
-        "contribution": 0.000473
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": 0.366985,
-        "contribution": 0.00047
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": -0.327132,
-        "contribution": -0.000167
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": 0.087135,
-        "contribution": 4.1e-05
+        "daily_chg": -0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.0236,
-        "contribution": -0.000159
+        "daily_chg": 0.0,
+        "contribution": -0.0
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": 0.000382,
-        "contribution": -0.0
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.023421,
-        "contribution": 1.2e-05
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.027056,
-        "contribution": -1.4e-05
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": 0.0206,
-        "contribution": -9e-06
+        "daily_chg": -0.0,
+        "contribution": 0.0
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": -0.000299,
+        "daily_chg": -0.0,
         "contribution": 0.0
       },
       {
@@ -101,144 +101,144 @@
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": 0.020533,
-        "contribution": -8e-06
+        "daily_chg": -0.0,
+        "contribution": 0.0
       }
     ],
     "history": [
       {
+        "date": "2026-05-29",
+        "value": 106.006618
+      },
+      {
         "date": "2026-05-30",
-        "value": 106.274744
+        "value": 105.943373
       },
       {
         "date": "2026-05-31",
-        "value": 106.220142
+        "value": 105.888942
       },
       {
         "date": "2026-06-01",
-        "value": 106.317771
+        "value": 105.986266
       },
       {
         "date": "2026-06-02",
-        "value": 106.872432
+        "value": 106.539197
       },
       {
         "date": "2026-06-03",
-        "value": 107.09135
+        "value": 106.757433
       },
       {
         "date": "2026-06-04",
-        "value": 106.617015
+        "value": 106.284576
       },
       {
         "date": "2026-06-05",
-        "value": 106.772129
+        "value": 106.439207
       },
       {
         "date": "2026-06-06",
-        "value": 106.088304
+        "value": 105.757514
       },
       {
         "date": "2026-06-07",
-        "value": 106.106161
+        "value": 105.775315
       },
       {
         "date": "2026-06-08",
-        "value": 105.987551
+        "value": 105.657076
       },
       {
         "date": "2026-06-09",
-        "value": 105.577492
+        "value": 105.248295
       },
       {
         "date": "2026-06-10",
-        "value": 105.894538
+        "value": 105.564353
       },
       {
         "date": "2026-06-11",
-        "value": 105.983191
+        "value": 105.652729
       },
       {
         "date": "2026-06-12",
-        "value": 106.831387
+        "value": 106.498281
       },
       {
         "date": "2026-06-13",
-        "value": 107.411009
+        "value": 107.076095
       },
       {
         "date": "2026-06-14",
-        "value": 107.272531
+        "value": 106.938049
       },
       {
         "date": "2026-06-15",
-        "value": 107.169268
+        "value": 106.835108
       },
       {
         "date": "2026-06-16",
-        "value": 107.377513
+        "value": 107.042704
       },
       {
         "date": "2026-06-17",
-        "value": 106.975271
+        "value": 106.641716
       },
       {
         "date": "2026-06-18",
-        "value": 107.329943
+        "value": 106.995282
       },
       {
         "date": "2026-06-19",
-        "value": 107.599324
+        "value": 107.263823
       },
       {
         "date": "2026-06-20",
-        "value": 107.562968
+        "value": 107.22758
       },
       {
         "date": "2026-06-21",
-        "value": 107.481343
+        "value": 107.14621
       },
       {
         "date": "2026-06-22",
-        "value": 107.764685
+        "value": 107.428668
       },
       {
         "date": "2026-06-23",
-        "value": 107.883619
+        "value": 107.547232
       },
       {
         "date": "2026-06-24",
-        "value": 107.908066
+        "value": 107.571602
       },
       {
         "date": "2026-06-25",
-        "value": 107.813252
+        "value": 107.477084
       },
       {
         "date": "2026-06-26",
-        "value": 107.848426
+        "value": 107.512149
       },
       {
         "date": "2026-06-27",
-        "value": 107.89708
-      },
-      {
-        "date": "2026-06-28",
-        "value": 107.947005
+        "value": 107.512149
       }
     ]
   },
-  "scraped_at": "2026-06-28T13:06:38.271208Z",
+  "scraped_at": "2026-06-27T18:43:43.207059Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-28T13:06:36.798725Z",
+    "scraped_at": "2026-06-27T18:43:41.716415Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 93.6,
-    "net_index": 0.0,
-    "bull_count": 0,
+    "overall_confidence": 92.8,
+    "net_index": 20.0,
+    "bull_count": 3,
     "bear_count": 0,
-    "neutral_count": 11,
-    "total": 11,
+    "neutral_count": 9,
+    "total": 12,
     "items": [
       {
         "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
@@ -252,8 +252,8 @@
       {
         "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -270,8 +270,8 @@
       {
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -286,10 +286,10 @@
         ]
       },
       {
-        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
+        "headline": "Body Count’s Now In The Coffee House…",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +298,7 @@
         "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -315,8 +315,8 @@
       {
         "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -338,6 +338,15 @@
         "tags": [
           "sprudge"
         ]
+      },
+      {
+        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I’d Be Delicious",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
       }
     ]
   },
@@ -348,7 +357,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -356,56 +365,70 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-28T13:06:37.811940Z",
+    "scraped_at": "2026-06-28T14:35:59.146624Z",
     "direction": "Bearish",
-    "base_margin": 0.0899200871638366,
-    "final_margin": -0.11846424496761364,
+    "base_margin": 0.08992008716383666,
+    "final_margin": -0.11846424496761081,
     "base_prob": 0.5224648869482655,
-    "final_prob": 0.470418525654513,
-    "prob_up": 0.470418525654513,
-    "prob_down": 0.529581474345487,
+    "final_prob": 0.47041852565451375,
+    "prob_up": 0.47041852565451375,
+    "prob_down": 0.5295814743454863,
     "features": [
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.10164764588319242
+        "usd_per_ton": 49.6,
+        "phi": -0.10164764588319179
       },
       {
         "var_name": "cci_z",
         "label": "Coffee Currency Index (z)",
-        "raw_value": 1.7483376242165887,
-        "raw_fmt": "+1.75\u03c3",
-        "phi": -0.06780356192001868
+        "raw_value": 1.7483376242162851,
+        "raw_fmt": "+1.75σ",
+        "usd_per_ton": 88.6,
+        "phi": -0.06780356192000851
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12\u03c3",
-        "phi": 0.06414381984481145
+        "raw_fmt": "-1.12σ",
+        "usd_per_ton": -781.0,
+        "phi": 0.06414381984480746,
+        "detail": {
+          "kc_usd_per_mt": 6366.9,
+          "rc_usd_per_mt": 3756.0,
+          "gap_usd_per_mt": 2610.9,
+          "gap_mean_usd_per_mt": 3391.9,
+          "gap_std_usd_per_mt": 697.2,
+          "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z-scored over a 260-day rolling window"
+        }
       },
       {
         "var_name": "cci_ret_1d",
-        "label": "Coffee Currency Index \u0394",
+        "label": "Coffee Currency Index Δ",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
-        "phi": -0.057449798950327306
+        "usd_per_ton": -3.3,
+        "phi": -0.05744979895033085
       },
       {
         "var_name": "rc_overnight_gap",
         "label": "RC Overnight Gap",
         "raw_value": -0.0024958402662229595,
         "raw_fmt": "-0.25%",
-        "phi": -0.056158428693481144
+        "usd_per_ton": -9.4,
+        "phi": -0.05615842869348148
       },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
         "raw_value": 0.0,
         "raw_fmt": "+0.00%",
-        "phi": 0.010531283470757892
+        "usd_per_ton": 0.0,
+        "phi": 0.010531283470757699
       }
     ],
     "barrier": {

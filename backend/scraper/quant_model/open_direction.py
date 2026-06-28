@@ -598,17 +598,81 @@ def run(db=None) -> dict:
     n_undef = int(resolvable["label"].isna().sum())
     undefined_ratio = (n_undef / n_resolvable) if n_resolvable else None
 
+    # ── USD/ton ruler + price-gap detail ─────────────────────────────────────
+    # Each factor is also quantified in robusta USD/MT so the magnitudes are
+    # comparable on one dollar ruler. For the four return/level features the
+    # USD/MT is the move expressed on the latest robusta price (the common
+    # ruler); for the New-York Price Gap it's the LITERAL gap (KC$/MT − RC$/MT).
+    def _at(series, dt):
+        try:
+            v = series.reindex([dt], method="ffill").iloc[0]
+            return float(v) if pd.notna(v) else None
+        except Exception:
+            return None
+
+    rc_px  = _at(rc, latest_date)                                   # robusta USD/MT
+    kc_px  = _at(kc, latest_date)                                   # arabica ¢/lb
+    kc_usd = kc_px * _KC_TO_USD_PER_MT if kc_px is not None else None
+
+    # Price-gap components, written down: KC$/MT, RC$/MT, the gap, and the
+    # rolling mean/std the z-score is built from (260-day window, see _build_frame).
+    gap_series = (kc * _KC_TO_USD_PER_MT - rc).dropna()
+    g_mu = gap_series.rolling(52 * 5, min_periods=20).mean()
+    g_sd = gap_series.rolling(52 * 5, min_periods=20).std()
+    gap_raw  = _at(gap_series, latest_date)
+    gap_mean = _at(g_mu, latest_date)
+    gap_std  = _at(g_sd, latest_date)
+    gap_detail = None
+    if None not in (kc_usd, rc_px, gap_raw):
+        gap_detail = {
+            "kc_usd_per_mt":       round(kc_usd, 1),
+            "rc_usd_per_mt":       round(rc_px, 1),
+            "gap_usd_per_mt":      round(gap_raw, 1),
+            "gap_mean_usd_per_mt": round(gap_mean, 1) if gap_mean is not None else None,
+            "gap_std_usd_per_mt":  round(gap_std, 1) if gap_std is not None else None,
+            "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z-scored over a 260-day rolling window",
+        }
+
+    # CCI level %-deviation from its rolling mean (for the cci_z USD/MT ruler).
+    cci_pct_dev = None
+    if cci is not None and not cci.empty:
+        cci_re = cci.reindex(rc.index, method="ffill")
+        cci_lvl = _at(cci_re, latest_date)
+        cci_m   = _at(cci_re.rolling(_CCI_Z_WINDOW, min_periods=20).mean(), latest_date)
+        if cci_lvl is not None and cci_m:
+            cci_pct_dev = (cci_lvl - cci_m) / cci_m
+
+    def _usd_per_ton(key: str, raw: float) -> "float | None":
+        if rc_px is None:
+            return None
+        if key == "kc_rc_gap_z":
+            # The two z-score (level) features report their DEVIATION from the
+            # rolling mean in USD/MT — comparable to the daily-move factors and
+            # to each other. The literal gap level lives in `detail`.
+            if gap_raw is None or gap_mean is None:
+                return None
+            return round(gap_raw - gap_mean, 1)
+        if key == "cci_z":
+            return round(cci_pct_dev * rc_px, 1) if cci_pct_dev is not None else None
+        # Return-type features (rc_ret_1d, rc_overnight_gap, cci_ret_1d,
+        # kc_after_rc_diff): the % move on the robusta price = USD/MT magnitude.
+        return round(raw * rc_px, 1)
+
     spec_by_key = {k: (label, fmt) for k, label, fmt in _FEATURE_SPECS}
     features_out = []
     for key, raw, phi in zip(active_keys, x_raw.values, phis):
         label, fmt = spec_by_key[key]
-        features_out.append({
-            "var_name":  key,
-            "label":     label,
-            "raw_value": float(raw),
-            "raw_fmt":   fmt(float(raw)),
-            "phi":       float(phi),   # margin (log-odds) units; Σ = gap exactly
-        })
+        item = {
+            "var_name":    key,
+            "label":       label,
+            "raw_value":   float(raw),
+            "raw_fmt":     fmt(float(raw)),
+            "usd_per_ton": _usd_per_ton(key, float(raw)),
+            "phi":         float(phi),   # margin (log-odds) units; Σ = gap exactly
+        }
+        if key == "kc_rc_gap_z" and gap_detail is not None:
+            item["detail"] = gap_detail
+        features_out.append(item)
     # Show the steepest contributors first (largest |φ|) — matches how a SHAP
     # waterfall is conventionally ordered.
     features_out.sort(key=lambda f: abs(f["phi"]), reverse=True)
