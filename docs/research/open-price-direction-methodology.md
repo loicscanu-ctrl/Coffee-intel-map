@@ -196,15 +196,22 @@ is reported as `model.intraday_source` (`barchart_15min`, or `hourly_fallback`
 when the 15-min file is absent and the legacy `kc_at_rc_close_history.json`
 hourly history is used for `kc_after_rc_diff` only).
 
-**Refresh cadence (current limitation).** `intraday_kc_rc_15min.json` is
-produced by the Barchart backfill (`backfill_intraday_kc_rc.py`, workflow 1.97)
-and the 1-month fetcher (1.96) — both **`workflow_dispatch` only**, i.e. not yet
-scheduled. The separate acaphe forward capture (`capture_kc_at_rc_close.py`,
-workflow 0.2) writes to the *legacy* `kc_at_rc_close_history.json` fallback, not
-the 15-min file. Consequently the 15-min file does not self-update: until a
-daily incremental refresh is wired, the two intraday features go NaN on dates
-past the last backfill, which freezes the model's scored `as_of` at that date.
-Re-running 1.97 advances it. (Tracked as future work in §8.)
+**Refresh cadence.** The full history in `intraday_kc_rc_15min.json` is built by
+the Barchart deep backfill (`backfill_intraday_kc_rc.py`, workflow 1.97,
+~5.7y from 59 contracts) — heavy, run manually when the history needs rebuilding.
+Day-to-day currency is kept by a **scheduled daily incremental refresh**
+(`refresh_intraday_kc_rc.py`, workflow 1.98) that runs **20:13 UTC Mon-Fri**,
+after both markets close (KC 18:30 London) and before the 21:30 UTC quant run
+(1.9). It fetches only the few nearest contracts, volume-stitches them with the
+*same* logic as the backfill (so contract selection is identical), and **merges**
+the recent days into the file — recent dates overwrite, all older history is
+preserved. The model therefore picks up the fresh intraday the same day and the
+scored `as_of` advances automatically. Same-day official settles aren't in the
+archive yet at 20:13 UTC; the model doesn't use the settle, and the next day's
+refresh backfills it. The separate acaphe forward capture
+(`capture_kc_at_rc_close.py`, workflow 0.2) still writes the *legacy*
+`kc_at_rc_close_history.json` hourly fallback used only when the 15-min file is
+absent.
 
 ### Graceful feature degradation
 
@@ -372,13 +379,13 @@ Every factor carries `usd_per_ton`; only `kc_rc_gap_z` carries `detail`.
   15-min RM feed exists (Barchart, §3), the same labelling + attribution code
   could be applied to an intraday bar — only the barrier units would change.
   Today intraday data feeds two features but not the label.
-- **Intraday refresh not scheduled (operational).** `intraday_kc_rc_15min.json`
-  is refreshed only by manual `workflow_dispatch` (1.96 / 1.97); the acaphe
-  forward capture feeds the legacy hourly fallback, not the 15-min file. Until a
-  daily incremental refresh is wired, the two intraday features go NaN past the
-  last backfill and the scored `as_of` freezes there. The fix is a small daily
-  job that fetches the current front contracts and merges recent days into the
-  file.
+- **Intraday refresh (resolved).** `intraday_kc_rc_15min.json` is now kept
+  current by a scheduled daily incremental job (`refresh_intraday_kc_rc.py`,
+  workflow 1.98, 20:13 UTC Mon-Fri) that fetches the nearest front contracts and
+  merges the recent days into the file ahead of the 21:30 UTC quant run (§3), so
+  the two intraday features stay live and the scored `as_of` no longer freezes.
+  The deep backfill (1.97) remains the manual tool for rebuilding the full
+  ~5.7y history.
 - **Linear classifier.** Logistic regression buys exact attribution and a tiny
   dependency footprint at the cost of not modelling feature interactions. A
   gradient-boosted tree with tree-SHAP would capture interactions but needs the
