@@ -100,37 +100,41 @@ def test_triple_barrier_flat_is_undefined():
 
 # ── Graceful degradation ─────────────────────────────────────────────────────
 
-def test_build_frame_includes_cci_features():
-    """With a CCI series present, the two CCI features join the two
-    price-only features (no DXY anywhere)."""
+def test_build_frame_includes_cci_feature():
+    """With a CCI series present, the 5-day CCI momentum joins the price-only
+    features (no DXY, no cci_z/cci_ret_1d which the back-test dropped)."""
     rc = _series(list(np.linspace(3000, 3200, 60)))
     kc = _series(list(np.linspace(250, 270, 60)))
     cci = _series(list(100 + np.cumsum(np.full(60, 0.05))))
     built = od._build_frame(rc, kc, cci)
     assert built is not None
     _frame, active = built
-    assert set(active) == {"rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z"}
-    # DXY must not appear anywhere in the feature set.
+    assert set(active) == {"rc_ret_1d", "kc_rc_gap_z", "kc_rc_gap_ret", "cci_ret_5d"}
+    # Neither DXY nor the dropped CCI features may appear.
     assert not any("dxy" in k for k in active)
+    assert "cci_z" not in active and "cci_ret_1d" not in active
 
 
 def test_build_frame_price_only_when_cci_missing():
-    """With no CCI series, the two price-only features keep it alive."""
+    """With no CCI series, the three price-only features keep it alive."""
     rc = _series(list(np.linspace(3000, 3200, 60)))
     kc = _series(list(np.linspace(250, 270, 60)))
     built = od._build_frame(rc, kc, None)
     assert built is not None
     _frame, active = built
-    assert active == ["rc_ret_1d", "kc_rc_gap_z"]
+    assert active == ["rc_ret_1d", "kc_rc_gap_z", "kc_rc_gap_ret"]
 
 
-def _intraday_df(dates, kc_after=None, rc_gap=None):
+def _intraday_df(dates, kc_after=None, rc_gap=None, rc_open15=None):
     """Build an intraday-feature DataFrame for _build_frame (cols:
-    kc_after_rc_diff, rc_overnight_gap)."""
+    kc_after_rc_diff, rc_open15_ret, rc_overnight_gap)."""
     import pandas as pd
+    def _col(v):
+        return pd.Series(v if v is not None else [np.nan]*len(dates), index=dates)
     return pd.DataFrame({
-        "kc_after_rc_diff": pd.Series(kc_after if kc_after is not None else [np.nan]*len(dates), index=dates),
-        "rc_overnight_gap": pd.Series(rc_gap if rc_gap is not None else [np.nan]*len(dates), index=dates),
+        "kc_after_rc_diff": _col(kc_after),
+        "rc_open15_ret":    _col(rc_open15),
+        "rc_overnight_gap": _col(rc_gap),
     }, index=dates)
 
 

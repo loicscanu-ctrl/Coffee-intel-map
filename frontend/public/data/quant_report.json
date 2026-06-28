@@ -356,30 +356,30 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-28T14:38:43.501281Z",
-    "direction": "Bearish",
-    "base_margin": 0.08992008716383662,
-    "final_margin": -0.11846424496761357,
-    "base_prob": 0.5224648869482655,
-    "final_prob": 0.470418525654513,
-    "prob_up": 0.470418525654513,
-    "prob_down": 0.529581474345487,
+    "scraped_at": "2026-06-28T20:16:17.727905Z",
+    "direction": "Bullish",
+    "base_margin": 0.20406599866199748,
+    "final_margin": 0.3923029471973721,
+    "base_prob": 0.5508401940991241,
+    "final_prob": 0.5968369638064962,
+    "prob_up": 0.5968369638064962,
+    "prob_down": 0.4031630361935038,
     "features": [
+      {
+        "var_name": "rc_open15_ret",
+        "label": "RC Opening 15-min Move",
+        "raw_value": 0.011398387545176636,
+        "raw_fmt": "+1.14%",
+        "usd_per_ton": 42.8,
+        "phi": 0.378880884286106
+      },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
         "usd_per_ton": 49.6,
-        "phi": -0.1016476458831924
-      },
-      {
-        "var_name": "cci_z",
-        "label": "Coffee Currency Index (z)",
-        "raw_value": 1.7483376242165887,
-        "raw_fmt": "+1.75\u03c3",
-        "usd_per_ton": 88.6,
-        "phi": -0.06780356192001868
+        "phi": -0.12821550136035034
       },
       {
         "var_name": "kc_rc_gap_z",
@@ -387,7 +387,7 @@
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
         "usd_per_ton": -781.0,
-        "phi": 0.06414381984481146,
+        "phi": 0.08475821628894455,
         "detail": {
           "kc_usd_per_mt": 6366.9,
           "rc_usd_per_mt": 3756.0,
@@ -398,12 +398,12 @@
         }
       },
       {
-        "var_name": "cci_ret_1d",
-        "label": "Coffee Currency Index \u0394",
-        "raw_value": -0.0008786404698499783,
-        "raw_fmt": "-0.09%",
-        "usd_per_ton": -3.3,
-        "phi": -0.057449798950327306
+        "var_name": "kc_rc_gap_ret",
+        "label": "NY Price Gap \u0394",
+        "raw_value": -0.040295623974128,
+        "raw_fmt": "-4.03%",
+        "usd_per_ton": -151.4,
+        "phi": -0.08441520258803077
       },
       {
         "var_name": "rc_overnight_gap",
@@ -411,7 +411,15 @@
         "raw_value": -0.0024958402662229595,
         "raw_fmt": "-0.25%",
         "usd_per_ton": -9.4,
-        "phi": -0.05615842869348115
+        "phi": -0.04795669722452738
+      },
+      {
+        "var_name": "cci_ret_5d",
+        "label": "Coffee Currency Index 5-Day \u0394",
+        "raw_value": 0.004102773511416524,
+        "raw_fmt": "+0.41%",
+        "usd_per_ton": 15.4,
+        "phi": -0.018659494744505175
       },
       {
         "var_name": "kc_after_rc_diff",
@@ -419,7 +427,7 @@
         "raw_value": 0.0,
         "raw_fmt": "+0.00%",
         "usd_per_ton": 0.0,
-        "phi": 0.010531283470757892
+        "phi": 0.00384474387773772
       }
     ],
     "barrier": {
@@ -431,25 +439,30 @@
       "kind": "logistic_regression_l2",
       "active_features": [
         "rc_ret_1d",
-        "cci_ret_1d",
-        "cci_z",
         "kc_rc_gap_z",
+        "kc_rc_gap_ret",
         "kc_after_rc_diff",
-        "rc_overnight_gap"
+        "rc_open15_ret",
+        "rc_overnight_gap",
+        "cci_ret_5d"
       ],
-      "n_features": 6,
-      "n_train": 163,
-      "test_accuracy": 0.46938775510204084,
-      "n_test": 49,
-      "undefined_ratio": 0.15789473684210525,
-      "n_resolvable": 190,
-      "n_undefined": 30,
+      "n_features": 7,
+      "n_train": 887,
+      "test_accuracy": 0.5822416302765647,
+      "baseline_accuracy": 0.5254730713245997,
+      "edge": 0.056768558951964976,
+      "eval_method": "walk_forward",
+      "n_test": 687,
+      "undefined_ratio": 0.16682375117813383,
+      "n_resolvable": 1061,
+      "n_undefined": 177,
       "currency_axis": "coffee_currency_index",
       "cci_available": true,
       "kc_after_rc_active": true,
+      "rc_open15_active": true,
       "rc_overnight_active": true,
       "intraday_source": "barchart_15min",
-      "roll_days_excluded": 65
+      "roll_days_excluded": 63
     }
   }
 }

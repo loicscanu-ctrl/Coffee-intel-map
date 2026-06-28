@@ -47,6 +47,9 @@ interface OpenDirection {
     n_features:      number;
     n_train:         number;
     test_accuracy:   number | null;
+    baseline_accuracy?: number | null;
+    edge?:           number | null;
+    eval_method?:    string;
     n_test:          number;
     undefined_ratio: number | null;
     n_resolvable:    number;
@@ -301,7 +304,17 @@ export default function PriceDirectionSection() {
                 <span className="text-[11px] font-mono text-emerald-400">
                   {data.model?.test_accuracy != null ? fmtPct(data.model.test_accuracy, 1) : "—"}
                 </span>
-                <span className="text-[11px] text-slate-500"> (n={data.model?.n_test ?? 0}, time-holdout)</span>
+                {data.model?.baseline_accuracy != null && (
+                  <span className="text-[11px] text-slate-500">
+                    {" "}vs {fmtPct(data.model.baseline_accuracy, 1)} baseline
+                    {data.model?.edge != null && (
+                      <span className={data.model.edge >= 0 ? "text-emerald-500" : "text-rose-500"}>
+                        {" "}({data.model.edge >= 0 ? "+" : ""}{(data.model.edge * 100).toFixed(1)}pp)
+                      </span>
+                    )}
+                  </span>
+                )}
+                <span className="text-[11px] text-slate-500"> · n={data.model?.n_test ?? 0}, {data.model?.eval_method === "walk_forward" ? "walk-forward" : "holdout"}</span>
               </div>
               <div>
                 <span className="text-[11px] text-slate-400">Undefined ratio: </span>

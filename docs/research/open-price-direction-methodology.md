@@ -104,17 +104,28 @@ training distribution before fitting. The canonical display order:
 | `var_name`         | Label                      | Definition                                                         |
 |--------------------|----------------------------|---------------------------------------------------------------------|
 | `rc_ret_1d`        | RC 1-Day Return            | RC front-month daily return                                         |
-| `cci_ret_1d`       | Coffee Currency Index Δ    | CCI daily return — the producer-vs-consumer currency move of the day |
-| `cci_z`            | Coffee Currency Index (z)  | CCI level z-scored over a 120-day rolling window — how stretched the basket is |
 | `kc_rc_gap_z`      | New York Price Gap (z)     | (KC·22.0462 − RC) in USD/MT, z-scored over a 260-day rolling window  |
+| `kc_rc_gap_ret`    | NY Price Gap Δ             | daily change of the KC−RC arbitrage gap (distinct from its level)   |
 | `kc_after_rc_diff` | NY after RC-Close Move     | KC 18:30 ÷ KC 17:30 London − 1 — the NY-only move in the hour after London robusta closes (within-day, roll-immune) |
+| `rc_open15_ret`    | RC Opening 15-min Move     | RC 09:15 ÷ RC open − 1 — robusta's opening 15-minute move (within-day, roll-immune) |
 | `rc_overnight_gap` | RC Overnight Gap           | RC open ÷ prior-day RC 17:30 close − 1 — robusta's overnight gap; **roll days excluded** (see below) |
+| `cci_ret_5d`       | Coffee Currency Index 5-Day Δ | CCI 5-day momentum — the producer-vs-consumer currency shift over a trading week |
+
+This 7-feature set was **selected by the back-test in §5** (walk-forward, refit
+monthly, vs a majority-class baseline). It supersedes the earlier 6-feature set:
+the two weak CCI features (`cci_ret_1d`, `cci_z`) were dropped — `cci_z` was net
+negative out-of-sample, `cci_ret_1d` neutral — and three features added
+(`kc_rc_gap_ret`, `rc_open15_ret`, and `cci_ret_5d`, the CCI horizon that
+actually carries signal). The change lifts the out-of-sample edge from ~+3.3pp to
+~+5.7pp over baseline.
 
 `22.0462` converts KC (¢/lb) to USD/MT so the KC−RC gap is a like-for-like
 arbitrage spread. The CCI itself is reconstructed exactly as
 `fetch_currency_index._compute_index_series`: each component pair's daily return
 is normalised to a USD-strength return, exporters add (+w) and importers
-subtract (−w), and the weighted ΔI is accumulated from a base of 100.
+subtract (−w), and the weighted ΔI is accumulated from a base of 100. Its
+per-pair FX closes are backfilled to 2020 (Yahoo, workflow 1.99) so the CCI has
+multi-year depth instead of starving the model to ~1 year.
 
 ### USD/ton quantification per factor
 
@@ -122,13 +133,12 @@ Each factor is also reported in **robusta USD/MT** (`usd_per_ton`), so the
 magnitudes are comparable on one dollar ruler regardless of whether the raw
 value is a % return or a z-score:
 
-- **Return factors** (`rc_ret_1d`, `rc_overnight_gap`, `cci_ret_1d`,
-  `kc_after_rc_diff`): the % move applied to the latest robusta price —
-  `raw × RC_price`.
-- **Level (z-score) factors** (`kc_rc_gap_z`, `cci_z`): the **deviation from the
-  rolling mean** in USD/MT, so a stretched level reads as a dollar anomaly
-  rather than an absolute level. For the gap that's `gap − gap_mean`; for the
-  CCI it's the index's %-deviation from its 120-day mean × `RC_price`.
+- **Return factors** (`rc_ret_1d`, `kc_rc_gap_ret`, `kc_after_rc_diff`,
+  `rc_open15_ret`, `rc_overnight_gap`, `cci_ret_5d`): the % move applied to the
+  latest robusta price — `raw × RC_price`.
+- **Level (z-score) factor** (`kc_rc_gap_z`): the **deviation from the rolling
+  mean** in USD/MT, so a stretched level reads as a dollar anomaly rather than an
+  absolute level — `gap − gap_mean`.
 
 ### Price-gap detail (written down)
 
@@ -215,13 +225,14 @@ absent.
 
 ### Graceful feature degradation
 
-`rc_ret_1d` and `kc_rc_gap_z` are derived purely from the price archive and are
-**always present**. The two CCI features are included only when `fx_history.json`
-yields the component pairs; `kc_after_rc_diff` and `rc_overnight_gap` only once
-enough intraday days overlap. Each optional feature is added **independently**,
-so a missing input drops only its own feature(s) — the model proceeds on the
-rest rather than failing. The active set is reported in
-`model.active_features`, with the flags `cci_available`, `kc_after_rc_active`,
+`rc_ret_1d`, `kc_rc_gap_z` and `kc_rc_gap_ret` are derived purely from the price
+archive and are **always present**. `cci_ret_5d` is included only when
+`fx_history.json` yields the component pairs; the three intraday features
+(`kc_after_rc_diff`, `rc_open15_ret`, `rc_overnight_gap`) only once enough
+intraday days overlap. Each optional feature is added **independently**, so a
+missing input drops only its own feature(s) — the model proceeds on the rest
+rather than failing. The active set is reported in `model.active_features`, with
+the flags `cci_available`, `kc_after_rc_active`, `rc_open15_active`,
 `rc_overnight_active`, `intraday_source`, and `roll_days_excluded`; the SHAP
 decomposition adapts to whatever set was used and stays exactly additive.
 
@@ -266,32 +277,60 @@ plots use for classifiers (`link="logit"`).
 
 ---
 
-## 5. Validation
+## 5. Validation and feature selection (back-test)
 
-Accuracy is reported on a **chronological holdout**, never in-sample:
+Accuracy is reported via a **walk-forward**, never in-sample or a single split
+(`_walk_forward_eval`):
 
-1. The defined-label rows are split 70/30 by time (first 70% train, last 30%
-   test) — no shuffling, so there is no look-ahead leakage across the split.
-2. The model is fit on the training portion and scored on the held-out tail.
-3. `test_accuracy` is the fraction of correctly-classified **defined** test
-   cases; `n_test` is the test size.
+1. Expanding window over the defined-label rows: refit every 21 trading days on
+   all rows up to `cut − embargo`, predict the next block.
+2. Features are standardised on the **training rows only** each fold (no
+   standardisation leakage across the split).
+3. An **H-day embargo** drops the rows straddling each split, because the
+   triple-barrier labels overlap H days — a naive split would leak the label.
+4. `test_accuracy` is the fraction of correctly-classified **defined** OOS cases;
+   it is always reported next to `baseline_accuracy` (the majority class on the
+   *same* OOS rows) and `edge = test_accuracy − baseline` — the only number worth
+   beating. `eval_method` records `walk_forward` (or `holdout_70_30` for samples
+   too small to walk-forward). The **live** coefficients are then refit on the
+   full history so today's prediction uses every observation.
 
-The **live** coefficients are then refit on the *full* history (so today's
-prediction uses every available observation), but the reported accuracy always
-reflects the out-of-sample holdout.
+**Current read (as of this writing):** ~887 defined training rows, walk-forward
+**test_accuracy ≈ 0.58 vs ~0.53 baseline → edge ≈ +5.7pp** on ~690 OOS days.
 
-Two honest caveats are surfaced in the output and the UI:
+### How the 7 features were chosen
+
+The same walk-forward harness drove feature selection over a 15-candidate
+library (momentum at several horizons, a volatility regime, level
+mean-reversion, the KC−RC gap level and change, three intraday microstructure
+moves, and three CCI horizons). Findings:
+
+- **The old 6-feature set was data-starved and below baseline.** With the CCI
+  series only ~1 year deep, requiring its columns amputated ~4 years of training
+  rows, leaving ~160 rows and a sub-baseline single-split accuracy. Backfilling
+  `fx_history` to 2020 (§3, workflow 1.99) removed the starvation.
+- **CCI: only 5-day momentum helps.** On the deep CCI window, `cci_ret_5d` lifted
+  edge by ~+1.7pp over the price-only core, whereas `cci_ret_1d` was neutral and
+  `cci_z` net negative — so only `cci_ret_5d` is kept. The coffee index stays the
+  currency axis (no DXY), just via the horizon that carries signal.
+- **Two new features earn their place:** `kc_rc_gap_ret` (the gap's daily change,
+  additive to its level) and `rc_open15_ret` (robusta's opening 15-min move).
+- **Robustness:** the edge is stable across L2 (0.25–4.0), refit cadence
+  (weekly→quarterly), and barrier settings (H=5 best; see §2). Ablation:
+  dropping `kc_after_rc_diff` or `rc_ret_1d` hurts most.
+- **Honest caveat:** greedy selection peeks at the same OOS rows, so the true
+  forward edge is likely a touch under the +5.7pp headline (~+3–4pp). The
+  *qualitative* result — drop the weak CCI features, add the gap-change and
+  opening-momentum — holds across the whole sensitivity grid.
+
+Two further caveats are surfaced in the output and the UI:
 
 - **Undefined ratio** — fraction of resolvable days where the time barrier was
   hit first. A high ratio means the method abstains often; the accuracy is
   conditional on the rest.
 - **Training-window size** — `n_train`. The joined training set is the
-  intersection of *all active features'* coverage. The binding constraint is
-  `fx_history.json` (a rolling ~1-year CCI window); the two intraday features
-  tighten it slightly further. So with all six features active, `n_train` is
-  currently ~160 defined rows even though the RC price archive spans 5 years and
-  the intraday history ~5.7. Lengthening the FX history is the main lever; the
-  model refits every day as coverage grows.
+  intersection of all active features' coverage; with the deep FX backfill the
+  binding constraint is now the intraday history (~5.7y) rather than the CCI.
 
 A model that cannot assemble at least `_MIN_DEFINED` (80) defined training rows
 reports `available: false` rather than publishing a thin fit.
@@ -327,23 +366,28 @@ reports `available: false` rather than publishing a thin fit.
         "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z over a 260-day window"
       }
     }
-    // … the other five factors (no `detail`)
+    // … the other six factors (no `detail`)
   ],
   "barrier": { "horizon_days": 5, "k_sigma": 1.0, "vol_window": 20 },
   "model": {
     "kind": "logistic_regression_l2",
-    "active_features": ["rc_ret_1d", "cci_ret_1d", "cci_z", "kc_rc_gap_z",
-                        "kc_after_rc_diff", "rc_overnight_gap"],
-    "n_features": 6,
-    "n_train": 163,
-    "test_accuracy": 0.469,         // on defined cases, time-holdout
-    "n_test": 49,
+    "active_features": ["rc_ret_1d", "kc_rc_gap_z", "kc_rc_gap_ret",
+                        "kc_after_rc_diff", "rc_open15_ret", "rc_overnight_gap",
+                        "cci_ret_5d"],
+    "n_features": 7,
+    "n_train": 887,
+    "test_accuracy": 0.582,           // walk-forward OOS, defined cases
+    "baseline_accuracy": 0.525,       // majority class on the same OOS rows
+    "edge": 0.057,                    // test_accuracy − baseline
+    "eval_method": "walk_forward",    // or "holdout_70_30" for small samples
+    "n_test": 687,
     "undefined_ratio": 0.158,
     "n_resolvable": 190,
     "n_undefined": 30,
     "currency_axis": "coffee_currency_index",
-    "cci_available": true,
+    "cci_available": true,            // cci_ret_5d active
     "kc_after_rc_active": true,
+    "rc_open15_active": true,
     "rc_overnight_active": true,
     "intraday_source": "barchart_15min",   // or "hourly_fallback"
     "roll_days_excluded": 65               // RC roll days NaN'd in rc_overnight_gap
@@ -365,10 +409,11 @@ Every factor carries `usd_per_ton`; only `kc_rc_gap_z` carries `detail`.
   probability itself.
 - Respect the **undefined ratio**. On a sample where the method abstains ~50% of
   the time, the accuracy figure only describes the half it chose to call.
-- The current fit trains on a ~1-year window (the binding FX-history length),
-  so it is thin relative to the multi-year price + intraday archives. Treat
-  early live numbers as the method coming online, not a seasoned track record;
-  the model refits daily and the window lengthens as FX history accumulates.
+- The fit now trains on ~890 defined rows (the FX history was backfilled to
+  2020, removing the old ~1-year bottleneck). The walk-forward edge is **modest
+  by design** (~+5.7pp headline, likely ~+3–4pp truly forward): daily commodity
+  direction is hard, and a small consistent edge over the majority baseline is
+  the realistic target — not a high hit-rate. The model refits daily.
 
 ---
 
