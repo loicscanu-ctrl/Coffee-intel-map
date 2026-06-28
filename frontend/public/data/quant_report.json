@@ -1,6 +1,6 @@
 {
   "currency_index": {
-    "scraped_at": "2026-06-28T13:06:10.371298+00:00",
+    "scraped_at": "2026-06-28T14:38:14.203024+00:00",
     "index_value": 107.947005,
     "daily_delta_i": 0.000463,
     "daily_delta_pct": 0.046271,
@@ -228,12 +228,12 @@
       }
     ]
   },
-  "scraped_at": "2026-06-28T13:06:38.271208Z",
+  "scraped_at": "2026-06-28T14:38:43.843251Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-28T13:06:36.798725Z",
+    "scraped_at": "2026-06-28T14:38:42.712775Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 93.6,
+    "overall_confidence": 96.9,
     "net_index": 0.0,
     "bull_count": 0,
     "bear_count": 0,
@@ -244,7 +244,7 @@
         "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +280,7 @@
         "headline": "Jill Hoff Of Monogram Coffee Is The 2026 Canada Barista Champion",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -289,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +298,7 @@
         "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -307,7 +307,7 @@
         "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -325,7 +325,7 @@
         "headline": "Here Are The Winners Of The 2026 US Barista Championship",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -334,7 +334,7 @@
         "headline": "The 2026 US Barista Championship: Finals",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -356,10 +356,10 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-28T13:06:37.811940Z",
+    "scraped_at": "2026-06-28T14:38:43.501281Z",
     "direction": "Bearish",
-    "base_margin": 0.0899200871638366,
-    "final_margin": -0.11846424496761364,
+    "base_margin": 0.08992008716383662,
+    "final_margin": -0.11846424496761357,
     "base_prob": 0.5224648869482655,
     "final_prob": 0.470418525654513,
     "prob_up": 0.470418525654513,
@@ -370,13 +370,15 @@
         "label": "RC 1-Day Return",
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
-        "phi": -0.10164764588319242
+        "usd_per_ton": 49.6,
+        "phi": -0.1016476458831924
       },
       {
         "var_name": "cci_z",
         "label": "Coffee Currency Index (z)",
         "raw_value": 1.7483376242165887,
         "raw_fmt": "+1.75\u03c3",
+        "usd_per_ton": 88.6,
         "phi": -0.06780356192001868
       },
       {
@@ -384,13 +386,23 @@
         "label": "New York Price Gap (z)",
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
-        "phi": 0.06414381984481145
+        "usd_per_ton": -781.0,
+        "phi": 0.06414381984481146,
+        "detail": {
+          "kc_usd_per_mt": 6366.9,
+          "rc_usd_per_mt": 3756.0,
+          "gap_usd_per_mt": 2610.9,
+          "gap_mean_usd_per_mt": 3391.9,
+          "gap_std_usd_per_mt": 697.2,
+          "formula": "gap = KC(\u00a2/lb \u00d7 22.0462) \u2212 RC, in USD/MT; z-scored over a 260-day rolling window"
+        }
       },
       {
         "var_name": "cci_ret_1d",
         "label": "Coffee Currency Index \u0394",
         "raw_value": -0.0008786404698499783,
         "raw_fmt": "-0.09%",
+        "usd_per_ton": -3.3,
         "phi": -0.057449798950327306
       },
       {
@@ -398,13 +410,15 @@
         "label": "RC Overnight Gap",
         "raw_value": -0.0024958402662229595,
         "raw_fmt": "-0.25%",
-        "phi": -0.056158428693481144
+        "usd_per_ton": -9.4,
+        "phi": -0.05615842869348115
       },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
         "raw_value": 0.0,
         "raw_fmt": "+0.00%",
+        "usd_per_ton": 0.0,
         "phi": 0.010531283470757892
       }
     ],

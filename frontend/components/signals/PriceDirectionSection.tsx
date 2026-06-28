@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 // ── Live open-direction model output (quant_report.json["open_direction"]) ──
 // Produced daily by backend/scraper/quant_model/open_direction.py — a
@@ -9,12 +9,23 @@ import { useEffect, useState } from "react";
 // with zero residual, so the waterfall below is mathematically exact, not a
 // sampled approximation. Methodology: docs/research/open-price-direction-methodology.md
 
+interface GapDetail {
+  kc_usd_per_mt:       number;
+  rc_usd_per_mt:       number;
+  gap_usd_per_mt:      number;
+  gap_mean_usd_per_mt: number | null;
+  gap_std_usd_per_mt:  number | null;
+  formula:             string;
+}
+
 interface Feature {
-  var_name:  string;
-  label:     string;
-  raw_value: number;
-  raw_fmt:   string;
-  phi:       number;   // margin (log-odds) units
+  var_name:    string;
+  label:       string;
+  raw_value:   number;
+  raw_fmt:     string;
+  usd_per_ton: number | null;   // factor magnitude on the robusta USD/MT ruler
+  phi:         number;          // margin (log-odds) units
+  detail?:     GapDetail;       // only on the New York Price Gap factor
 }
 
 interface OpenDirection {
@@ -46,6 +57,12 @@ interface OpenDirection {
 function fmtPct(v: number | null | undefined, digits = 2): string {
   if (v == null) return "—";
   return `${(v * 100).toFixed(digits)}%`;
+}
+
+function fmtUsdTon(v: number | null | undefined): string {
+  if (v == null) return "—";
+  const sign = v > 0 ? "+" : v < 0 ? "−" : "";
+  return `${sign}$${Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: 0 })}/t`;
 }
 
 export default function PriceDirectionSection() {
@@ -130,17 +147,22 @@ export default function PriceDirectionSection() {
               <thead>
                 <tr className="text-[10px] text-slate-400 uppercase tracking-wider border-b border-slate-700 bg-slate-800/60">
                   <th className="text-left px-4 py-2 w-56">Factor</th>
-                  <th className="text-right px-4 py-2 w-28">Value</th>
-                  <th className="text-center px-4 py-2 w-28">Direction</th>
+                  <th className="text-right px-4 py-2 w-24">Value</th>
+                  <th className="text-right px-4 py-2 w-28">USD/ton</th>
+                  <th className="text-center px-4 py-2 w-24">Direction</th>
                   <th className="text-center px-4 py-2">Confidence</th>
                 </tr>
               </thead>
               <tbody>
                 {features.map((f, i) => (
-                  <tr key={f.var_name} className={`border-b border-slate-800 ${i % 2 ? "bg-slate-900/60" : ""}`}>
+                  <Fragment key={f.var_name}>
+                  <tr className={`border-b border-slate-800 ${i % 2 ? "bg-slate-900/60" : ""}`}>
                     <td className="px-4 py-2 text-slate-300">{f.label}</td>
                     <td className={`px-4 py-2 text-right font-mono font-semibold ${f.raw_value < 0 ? "text-red-400" : "text-slate-200"}`}>
                       {f.raw_fmt}
+                    </td>
+                    <td className={`px-4 py-2 text-right font-mono ${(f.usd_per_ton ?? 0) < 0 ? "text-red-400" : "text-slate-300"}`}>
+                      {fmtUsdTon(f.usd_per_ton)}
                     </td>
                     {i === 0 && (
                       <td className={`px-4 py-2 text-center font-bold text-sm ${isBull ? "text-emerald-400" : "text-red-400"}`} rowSpan={features.length}>
@@ -166,6 +188,30 @@ export default function PriceDirectionSection() {
                       </td>
                     )}
                   </tr>
+                  {/* Price-gap detail: components written down beneath the row. */}
+                  {f.detail && (
+                    <tr className={i % 2 ? "bg-slate-900/60" : ""}>
+                      <td colSpan={3} className="px-4 pb-2 pt-0">
+                        <div className="text-[10px] text-slate-500 font-mono leading-relaxed border-l-2 border-slate-700 pl-3">
+                          <span className="text-slate-400">Arabica</span> {f.detail.kc_usd_per_mt.toLocaleString()} $/t (KC ¢/lb × 22.0462)
+                          {"  −  "}
+                          <span className="text-slate-400">Robusta</span> {f.detail.rc_usd_per_mt.toLocaleString()} $/t
+                          {"  =  gap "}
+                          <span className="text-slate-200">{f.detail.gap_usd_per_mt.toLocaleString()} $/t</span>
+                          {f.detail.gap_mean_usd_per_mt != null && (
+                            <>
+                              {"  vs 260-day mean "}
+                              {f.detail.gap_mean_usd_per_mt.toLocaleString()} $/t
+                              {f.detail.gap_std_usd_per_mt != null && <> (σ {f.detail.gap_std_usd_per_mt.toLocaleString()} $/t)</>}
+                              {" → "}
+                              <span className={f.raw_value < 0 ? "text-red-400" : "text-emerald-400"}>{f.raw_fmt}</span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -188,7 +234,10 @@ export default function PriceDirectionSection() {
                     <span className={`font-mono text-[11px] font-semibold ${f.raw_value < 0 ? "text-red-300" : "text-slate-300"}`}>
                       {f.raw_fmt}
                     </span>
-                    <span className="text-[10px] text-slate-500 ml-1">= {f.var_name}</span>
+                    {f.usd_per_ton != null && (
+                      <span className="text-[10px] text-slate-500 ml-1">({fmtUsdTon(f.usd_per_ton)})</span>
+                    )}
+                    <span className="text-[10px] text-slate-500 ml-1">{f.var_name}</span>
                   </div>
 
                   <div className="flex-1 relative h-6 bg-slate-800 rounded">

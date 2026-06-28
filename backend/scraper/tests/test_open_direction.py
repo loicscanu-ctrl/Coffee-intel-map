@@ -236,3 +236,23 @@ def test_load_intraday_excludes_roll_days(tmp_path, monkeypatch):
     assert bool(df.loc[pd.Timestamp("2026-03-04"), "_rc_roll"]) is True
     # kc_after_rc_diff (within-day) present on the roll day regardless.
     assert not pd.isna(df.loc[pd.Timestamp("2026-03-04"), "kc_after_rc_diff"])
+
+
+def test_run_emits_usd_per_ton_and_gap_detail():
+    """Every factor carries a usd_per_ton (robusta $/MT ruler), and the New
+    York Price Gap factor carries the written-down component detail."""
+    out = od.run()
+    if not out.get("available"):
+        import pytest
+        pytest.skip(f"model unavailable: {out.get('reason')}")
+    feats = out["features"]
+    assert all("usd_per_ton" in f for f in feats), "every factor needs usd_per_ton"
+    gap = next((f for f in feats if f["var_name"] == "kc_rc_gap_z"), None)
+    if gap is not None:
+        d = gap.get("detail")
+        assert d is not None, "gap factor must carry detail"
+        # gap = KC$/MT − RC$/MT (components written down)
+        assert abs(d["gap_usd_per_mt"] - (d["kc_usd_per_mt"] - d["rc_usd_per_mt"])) < 1.0
+        # the gap's usd_per_ton is the deviation from the rolling mean
+        if d["gap_mean_usd_per_mt"] is not None and gap["usd_per_ton"] is not None:
+            assert abs(gap["usd_per_ton"] - (d["gap_usd_per_mt"] - d["gap_mean_usd_per_mt"])) < 1.0
