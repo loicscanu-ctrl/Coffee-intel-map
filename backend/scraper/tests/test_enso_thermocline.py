@@ -418,3 +418,114 @@ def test_fetch_failure_boundary_is_inclusive(tmp_path, monkeypatch):
     boundary day doesn't flip to an alert."""
     _write_json_with_age(tmp_path, monkeypatch, days_old=therm.STALE_AFTER_DAYS - 0.01)
     assert therm._fetch_failure_exit_code("upstream 522") == 3
+
+
+# ── archive (date-keyed per-buoy temperature history) ─────────────────────
+
+
+def _day(days_ago: int) -> str:
+    return (datetime.now(UTC) - timedelta(days=days_ago)).strftime("%Y-%m-%d")
+
+
+def test_build_tabledap_query_adds_upper_bound_when_end_date_given():
+    """The backfill fetches bounded year-chunks; end_date adds the upper
+    time constraint so each chunk is small. Daily run omits it."""
+    q = therm._build_tabledap_query("pmelTaoDyT", "2010-01-01", "2010-12-31")
+    assert "time>=2010-01-01" in q and "time<=2010-12-31" in q
+    q2 = therm._build_tabledap_query("pmelTaoDyT", "2010-01-01")
+    assert "time<=" not in q2
+
+
+def test_obs_to_daily_means_collapses_depths_and_drops_unmapped():
+    """Multiple in-window depths on one (buoy, day) average to a single
+    150 m-band value; obs that don't snap to an anchor site are dropped."""
+    obs = [
+        _obs(0, 18.0, lon_e=205.0, depth_m=140.0),   # 0n155w, today
+        _obs(0, 20.0, lon_e=205.0, depth_m=160.0),   # 0n155w, today (other depth)
+        _obs(1, 19.0, lon_e=205.0, depth_m=150.0),   # 0n155w, yesterday
+        _obs(0, 25.0, lon_e=320.0, depth_m=150.0),   # Atlantic — unmapped, dropped
+    ]
+    daily = therm._obs_to_daily_means(obs)
+    assert set(daily.keys()) == {"0n155w"}
+    assert daily["0n155w"][_day(0)] == 19.0   # mean(18, 20)
+    assert daily["0n155w"][_day(1)] == 19.0
+
+
+def test_merge_into_archive_latest_fetch_wins():
+    """PMEL revises values over time; a re-fetch of the same (buoy, day)
+    overwrites. Returns the count of cells written."""
+    archive = therm._empty_archive()
+    n1 = therm._merge_into_archive(archive, {"0n155w": {"2026-01-01": 18.0}})
+    n2 = therm._merge_into_archive(archive, {"0n155w": {"2026-01-01": 18.5,
+                                                        "2026-01-02": 19.0}})
+    assert n1 == 1 and n2 == 2
+    assert archive["buoys"]["0n155w"]["2026-01-01"] == 18.5   # corrected
+    assert archive["buoys"]["0n155w"]["2026-01-02"] == 19.0
+
+
+def test_trim_archive_drops_dates_past_retention():
+    archive = therm._empty_archive()
+    old = (datetime.now(UTC) - timedelta(days=therm.ARCHIVE_RETENTION_DAYS + 30)).strftime("%Y-%m-%d")
+    archive["buoys"]["0n155w"] = {old: 18.0, _day(1): 19.0}
+    dropped = therm._trim_archive(archive)
+    assert dropped == 1
+    assert old not in archive["buoys"]["0n155w"]
+    assert _day(1) in archive["buoys"]["0n155w"]
+
+
+def test_analyse_from_archive_climatology_spans_full_history():
+    """Range bar (window_min/max) must reflect the buoy's WHOLE archived
+    history, while Δ-30d is computed only from the recent snapshot window.
+    A years-old extreme should set the climatology floor even though it's
+    far outside the Δ-30d window."""
+    archive = therm._empty_archive()
+    series = {}
+    # Recent: last 7 days warm (~20), 30-37 days ago cooler (~17) → +Δ30d.
+    for d in range(0, 7):
+        series[_day(d)] = 20.0
+    for d in range(30, 37):
+        series[_day(d)] = 17.0
+    # A years-old cold extreme — outside the 75-day window, inside history.
+    series[_day(900)] = 9.5
+    archive["buoys"]["0n155w"] = series
+
+    analyses = {a.site.station_id: a for a in therm._analyse_from_archive(archive)}
+    a = analyses["0n155w"]
+    assert a.delta_30d_c == 3.0                # 20 − 17, from recent window only
+    assert a.kelvin_signal == "warm-kelvin-wave"
+    assert a.window_min_c == 9.5               # climatology floor from full history
+    assert a.window_max_c == 20.0
+    # A buoy with no archive series degrades to no-data, not a crash.
+    assert analyses["2n95w"].kelvin_signal == "no-data"
+
+
+def test_run_writes_snapshot_and_archive_end_to_end(tmp_path, monkeypatch):
+    """Full daily-run path with the network stubbed: a fetched window is
+    merged into the archive, then BOTH the public snapshot and the
+    archive file are written. Re-running merges (doesn't clobber)."""
+    monkeypatch.setattr(therm, "OUT_PATH", tmp_path / "snap.json")
+    monkeypatch.setattr(therm, "ARCHIVE_PATH", tmp_path / "archive.json")
+    monkeypatch.setattr(therm, "_proxy_env", lambda: ("https://x.workers.dev", "s"))
+
+    # Stub the network: return a span of synthetic obs for the headline
+    # buoy (0n155w → lon_e 205) covering both Δ-30d windows.
+    obs = [_obs(d, 20.0) for d in range(0, 7)] + [_obs(d, 17.0) for d in range(30, 37)]
+    monkeypatch.setattr(
+        therm, "_fetch_window",
+        lambda *a, **k: (obs, "pmelTaoDyT", None),
+    )
+
+    rc = therm.run(write=True)
+    assert rc == 0
+    assert (tmp_path / "snap.json").exists()
+    assert (tmp_path / "archive.json").exists()
+
+    snap = json.loads((tmp_path / "snap.json").read_text())
+    assert len(snap["thermocline"]["buoys"]) == len(therm.NDBC_BUOYS)
+    head = snap["thermocline"]["headline"]
+    assert head["station_id"] == "0n155w"
+    assert head["kelvin_signal"] == "warm-kelvin-wave"
+
+    archive = json.loads((tmp_path / "archive.json").read_text())
+    assert "0n155w" in archive["buoys"]
+    assert len(archive["buoys"]["0n155w"]) == 14   # 7 recent + 7 baseline days

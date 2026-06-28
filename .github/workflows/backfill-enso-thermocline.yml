@@ -1,0 +1,100 @@
+name: "0.9 – Backfill — ENSO thermocline archive (TAO/TRITON 150m, multi-year)"
+
+# One-time / occasional deep seed of data/enso_thermocline_archive.json —
+# the date-keyed per-buoy 150 m temperature history that the DAILY workflow
+# (scraper-enso-thermocline.yml) then tops up incrementally.
+#
+# Walks ERDDAP year-by-year via the same CF Worker proxy as the daily run
+# (each chunk small enough to clear the Worker's 30 s wall), merges every
+# chunk into the archive, then derives the public snapshot from it.
+#
+# Run this once after deploying the archive model, then again only if you
+# want to extend/repair the history. The daily cron handles steady state.
+#
+# Manual-dispatch only — never scheduled (deep pulls are heavy and rarely
+# needed). See cf-worker/README.md for the proxy setup.
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Years of history to seed (chunked one year per request)."
+        required: false
+        default: "15"
+        type: string
+      dry_run:
+        description: "Preview only (no commit). Default true = preview."
+        required: false
+        default: true
+        type: boolean
+      diag:
+        description: "Log the head of each year-chunk response (debug schema drift)."
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  backfill-enso-thermocline:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30        # year-by-year chunking over a slow upstream
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Backfill TAO/TRITON archive via Cloudflare Worker proxy
+        id: backfill
+        env:
+          YEARS:   ${{ inputs.years }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          DIAG:    ${{ inputs.diag }}
+          ERDDAP_PROXY_BASE:   ${{ vars.ERDDAP_PROXY_BASE }}
+          ERDDAP_PROXY_SECRET: ${{ secrets.ERDDAP_PROXY_SECRET }}
+        run: |
+          set -e
+          ARGS="--years ${YEARS:-15}"
+          if [ "$DRY_RUN" != "true" ]; then
+            ARGS="$ARGS --write"
+          fi
+          if [ "$DIAG" = "true" ]; then
+            ARGS="$ARGS --diag"
+          fi
+          cd backend
+          PYTHONPATH=. python -m scraper.backfill_enso_thermocline $ARGS
+
+      - name: Commit seeded archive + snapshot if changed
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ ! -f data/enso_thermocline_archive.json ]; then
+            echo "No archive produced — nothing to commit."
+            exit 0
+          fi
+          git add data/enso_thermocline_archive.json frontend/public/data/enso_thermocline.json
+          if git diff --cached --quiet; then
+            echo "No archive change."
+            exit 0
+          fi
+          git commit -m "data: ENSO thermocline archive backfill ($(date -u +%Y-%m-%d)) [skip ci]"
+          git pull --rebase --autostash --strategy-option=theirs origin main
+          git push origin main
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

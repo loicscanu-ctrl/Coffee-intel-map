@@ -58,6 +58,15 @@ ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 OUT_PATH = DATA_DIR / "enso_thermocline.json"
 
+# Date-keyed per-buoy temperature archive — the source of truth, same
+# pattern as data/contract_prices_archive.json for OI. Lives in data/
+# (NOT shipped to the frontend); the public snapshot above is DERIVED
+# from it each run. Daily runs append a small recent window into this
+# file instead of re-pulling deep history every time; the one-time
+# backfill_enso_thermocline.py seeds the deep record.
+#   shape: {"_meta": {...}, "buoys": {station_id: {"YYYY-MM-DD": temp_c}}}
+ARCHIVE_PATH = ROOT / "data" / "enso_thermocline_archive.json"
+
 
 # ── target buoy catalog (Niño 3.4 anchor sites) ─────────────────────────────
 
@@ -171,7 +180,30 @@ LON_UPPER_E = 270.0     # buffer above 95°W (=265°E)
 # hit CF Worker's 30s wall under slow PFEG load. Was tried at 50
 # but that put the baseline window before the fetch start_date
 # → Δ30d=None across the board.
+#
+# ARCHIVE MODEL (current): we no longer re-pull this whole window for
+# its own sake each run. RECENT_FETCH_DAYS is the small incremental
+# window the daily run pulls and merges into the archive;
+# SNAPSHOT_WINDOW_DAYS is the slice of the (deep) archive we read back
+# to derive the card snapshot. The Δ-30d math needs ~37 days spanning
+# back from the latest obs, and TAO daily data lags ~3 weeks, so the
+# snapshot window stays at 75; the daily fetch only has to overlap the
+# archive frontier and catch new arrivals, so it can be much smaller.
 HISTORY_DAYS = 75
+SNAPSHOT_WINDOW_DAYS = 75
+
+# Daily incremental fetch window. Must comfortably span the ~3-week TAO
+# publication lag plus a few weeks of overlap so consecutive (or
+# briefly-interrupted) daily runs never leave a gap in the archive.
+# 45 ≈ 60% of the old 75-day pull — smaller ERDDAP responses, less load
+# on the CF Worker's 30s wall — while the deep archive (seeded by the
+# backfill) supplies everything the snapshot's Δ-30d / climatology need.
+RECENT_FETCH_DAYS = 45
+
+# Archive retention — 15 years of daily values per buoy. Enough for a
+# real multi-decadal climatology range and a long thermocline-over-time
+# chart, bounded so the committed file can't grow without limit.
+ARCHIVE_RETENTION_DAYS = 15 * 366
 
 # Staleness tolerance for fetch failures. PFEG (the upstream ERDDAP)
 # is intermittently down for hours at a time — 522 (CF↔origin timeout)
@@ -273,7 +305,9 @@ def _fetch_via_proxy(
     return resp.text, resp.status_code
 
 
-def _build_tabledap_query(dataset_id: str, start_date: str) -> str:
+def _build_tabledap_query(
+    dataset_id: str, start_date: str, end_date: str | None = None,
+) -> str:
     """ERDDAP tabledap query as a path+query string, ready to drop
     onto the proxy base. We don't pin the temperature column in the
     SELECT — let ERDDAP return its full schema so the parser can
@@ -284,6 +318,11 @@ def _build_tabledap_query(dataset_id: str, start_date: str) -> str:
     there's no SELECT clause: it tells the parser "constraints start
     here, the column-list was empty (i.e. return all)." Without it
     ERDDAP returns HTTP 400 'All constraints must be preceded by &'.
+
+    end_date (optional) adds an upper time bound so the deep backfill
+    can fetch one bounded year-chunk at a time instead of "everything
+    since start" — keeping each response small enough for the CF
+    Worker's 30 s wall.
     """
     constraints = (
         f"&latitude>={LAT_LOWER}&latitude<={LAT_UPPER}"
@@ -291,6 +330,8 @@ def _build_tabledap_query(dataset_id: str, start_date: str) -> str:
         f"&depth>={DEPTH_LOWER_M}&depth<={DEPTH_UPPER_M}"
         f"&time>={start_date}"
     )
+    if end_date:
+        constraints += f"&time<={end_date}"
     return f"{dataset_id}.json?{constraints}"
 
 
@@ -413,7 +454,13 @@ def _classify_kelvin(delta_c: float | None) -> str:
     return "neutral"
 
 
-def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
+def analyse_buoy(
+    site: BuoySite,
+    obs: list[OceanObs],
+    *,
+    climo_min_c: float | None = None,
+    climo_max_c: float | None = None,
+) -> BuoyAnalysis:
     """Δ-30d signal = mean(last 7 days of available data at this
     site/depth band) − mean(30-37 days before that). |Δ| ≥ 1.0 °C
     qualifies as a downwelling (warm) or upwelling (cold) Kelvin
@@ -424,9 +471,17 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
     TAO daily data routinely lags 2-3 weeks; anchoring to wall-clock
     'now' would leave the recent-7d window empty and force every
     site to no-data even when there's plenty of usable data.
+
+    window_min_c / window_max_c default to the min/max of the obs
+    passed in. When climo_min_c / climo_max_c are supplied (the
+    archive-derived path passes the buoy's FULL-history extremes),
+    those win — so the card's range bar reads as "where today sits in
+    the buoy's whole historical envelope", not just the recent slice.
     """
     if not obs:
-        return BuoyAnalysis(site, 0, None, None, None, None, "no-data", None, None)
+        return BuoyAnalysis(
+            site, 0, None, None, None, None, "no-data", climo_min_c, climo_max_c,
+        )
     obs_sorted = sorted(obs, key=lambda o: o.timestamp, reverse=True)
     latest = obs_sorted[0]
     anchor = latest.timestamp
@@ -444,6 +499,8 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
         delta = round(recent_mean - baseline_mean, 2)
 
     temps = [o.temp_c for o in obs]
+    win_min = climo_min_c if climo_min_c is not None else round(min(temps), 2)
+    win_max = climo_max_c if climo_max_c is not None else round(max(temps), 2)
 
     return BuoyAnalysis(
         site=                site,
@@ -453,8 +510,8 @@ def analyse_buoy(site: BuoySite, obs: list[OceanObs]) -> BuoyAnalysis:
         baseline_30d_mean_c= round(baseline_mean, 2) if baseline_mean is not None else None,
         delta_30d_c=         delta,
         kelvin_signal=       _classify_kelvin(delta),
-        window_min_c=        round(min(temps), 2),
-        window_max_c=        round(max(temps), 2),
+        window_min_c=        win_min,
+        window_max_c=        win_max,
     )
 
 
@@ -587,6 +644,138 @@ def _persist(doc: dict) -> None:
     OUT_PATH.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
 
 
+# ── archive (date-keyed per-buoy temperature history) ───────────────────────
+
+
+def _empty_archive() -> dict:
+    return {
+        "_meta": {
+            "description": (
+                "Authoritative date-keyed per-buoy 150 m-band temperature "
+                "history for the TAO/TRITON Niño-3.4 array. Each buoy → "
+                "{YYYY-MM-DD: temp_c}. Daily runs append a recent window; "
+                "the public enso_thermocline.json snapshot is derived from "
+                "this. Seeded by backfill_enso_thermocline.py."
+            ),
+            "started": datetime.now(UTC).strftime("%Y-%m-%d"),
+            "target_depth_m": TARGET_DEPTH_M,
+            "depth_band_m": [DEPTH_LOWER_M, DEPTH_UPPER_M],
+        },
+        "buoys": {},
+    }
+
+
+def _load_archive() -> dict:
+    """Load the per-buoy temperature archive, or an empty skeleton if it
+    doesn't exist yet (first run before any backfill)."""
+    if ARCHIVE_PATH.exists():
+        try:
+            doc = json.loads(ARCHIVE_PATH.read_text(encoding="utf-8"))
+            doc.setdefault("buoys", {})
+            return doc
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(f"[therm] archive unreadable ({e}); starting fresh")
+    return _empty_archive()
+
+
+def _save_archive(archive: dict) -> None:
+    ARCHIVE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Compact — this file grows to a few MB over 15y; no need for indent.
+    ARCHIVE_PATH.write_text(
+        json.dumps(archive, separators=(",", ":")), encoding="utf-8",
+    )
+
+
+def _obs_to_daily_means(raw_obs: list[OceanObs]) -> dict[str, dict[str, float]]:
+    """Collapse raw per-depth observations into one 150 m-band value per
+    (buoy, calendar-day): {station_id: {YYYY-MM-DD: mean_temp_c}}. Obs
+    that don't snap to an anchor site are dropped."""
+    buckets: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+    for o in raw_obs:
+        site = _nearest_site(o.lat, o.lon_e)
+        if site is None:
+            continue
+        day = o.timestamp.strftime("%Y-%m-%d")
+        buckets[site.station_id][day].append(o.temp_c)
+    return {
+        sid: {day: round(sum(v) / len(v), 2) for day, v in days.items()}
+        for sid, days in buckets.items()
+    }
+
+
+def _merge_into_archive(archive: dict, daily: dict[str, dict[str, float]]) -> int:
+    """Merge freshly-fetched daily means into the archive (latest fetch
+    wins on overlap — values are corrected/finalised over time by PMEL).
+    Returns the count of (buoy, day) cells written."""
+    buoys = archive.setdefault("buoys", {})
+    n = 0
+    for sid, days in daily.items():
+        target = buoys.setdefault(sid, {})
+        for day, temp in days.items():
+            target[day] = temp
+            n += 1
+    return n
+
+
+def _trim_archive(archive: dict) -> int:
+    """Drop per-buoy dates older than the retention window. Returns the
+    number of cells dropped."""
+    cutoff = (datetime.now(UTC) - timedelta(days=ARCHIVE_RETENTION_DAYS)).strftime("%Y-%m-%d")
+    dropped = 0
+    for days in archive.get("buoys", {}).values():
+        stale = [d for d in days if d < cutoff]
+        for d in stale:
+            del days[d]
+            dropped += 1
+    return dropped
+
+
+def _series_to_obs(site: BuoySite, series: dict[str, float]) -> list[OceanObs]:
+    """Reconstruct synthetic daily OceanObs from an archive series so the
+    existing analyse_buoy() (which works on OceanObs) can derive the
+    snapshot unchanged. Each archived day → one obs stamped at noon UTC
+    and the nominal target depth."""
+    out: list[OceanObs] = []
+    for day, temp in series.items():
+        try:
+            ts = datetime.fromisoformat(f"{day}T12:00:00+00:00")
+        except ValueError:
+            continue
+        out.append(OceanObs(
+            timestamp=ts, lat=site.lat, lon_e=site.longitude_e,
+            depth_m=float(TARGET_DEPTH_M), temp_c=temp,
+        ))
+    return out
+
+
+def _analyse_from_archive(archive: dict) -> list[BuoyAnalysis]:
+    """Derive each buoy's analysis from the archive: Δ-30d / 7-day means
+    from the most recent SNAPSHOT_WINDOW_DAYS of data, range bar from the
+    buoy's FULL historical envelope (climatology min/max)."""
+    buoys = archive.get("buoys", {})
+    analyses: list[BuoyAnalysis] = []
+    for site in NDBC_BUOYS:
+        series = buoys.get(site.station_id, {})
+        if not series:
+            analyses.append(analyse_buoy(site, []))
+            continue
+        all_temps = list(series.values())
+        climo_min = round(min(all_temps), 2)
+        climo_max = round(max(all_temps), 2)
+        # Snapshot window: the last N days up to the buoy's newest date.
+        newest = max(series)
+        cutoff = (
+            datetime.fromisoformat(f"{newest}T00:00:00+00:00")
+            - timedelta(days=SNAPSHOT_WINDOW_DAYS)
+        ).strftime("%Y-%m-%d")
+        recent = {d: t for d, t in series.items() if d >= cutoff}
+        analyses.append(analyse_buoy(
+            site, _series_to_obs(site, recent),
+            climo_min_c=climo_min, climo_max_c=climo_max,
+        ))
+    return analyses
+
+
 def _existing_data_age_days() -> float | None:
     """Age in days of the committed enso_thermocline.json, derived from
     its `scraped_at` field. None if the file is missing or unreadable
@@ -653,66 +842,34 @@ def run(*, write: bool, diag: bool = False) -> int:
         )
         return 2
 
-    start_date = (datetime.now(UTC) - timedelta(days=HISTORY_DAYS)).strftime("%Y-%m-%d")
+    archive = _load_archive()
 
-    # Walk dataset candidates until one returns a usable response.
-    text: str | None = None
-    winning_dataset: str | None = None
-    for ds in DATASET_CANDIDATES:
-        path_query = _build_tabledap_query(ds, start_date)
-        body, status = _fetch_via_proxy(proxy_base, secret, path_query)
-        if status == 200 and body:
-            logger.info(f"[therm] fetched OK: dataset={ds} ({len(body):,} bytes)")
-            text = body
-            winning_dataset = ds
-            break
-        if status == 401:
-            logger.error(
-                f"[therm] FATAL: proxy returned 401 for {ds} — "
-                f"ERDDAP_PROXY_SECRET mismatch with the Worker's PROXY_SECRET."
-            )
-            return 2
-        snippet = (body or "")[:160].replace("\n", " ")
-        logger.info(f"[therm] dataset={ds} → HTTP {status} :: {snippet}")
+    # Pull a SMALL recent window and merge it into the deep archive,
+    # rather than re-pulling the whole snapshot window every run.
+    start_date = (datetime.now(UTC) - timedelta(days=RECENT_FETCH_DAYS)).strftime("%Y-%m-%d")
+    raw_obs, winning_dataset, rc = _fetch_window(proxy_base, secret, start_date, diag=diag)
+    if rc is not None:
+        # Fetch failed. The archive + last committed snapshot are still
+        # valid (TAO lag means a missed day loses nothing), so route
+        # through the stale-tolerant exit-code logic.
+        return rc
 
-    if diag and text:
-        head = "\n".join(text.splitlines()[:15])
-        logger.info(f"[therm] --diag winning response head:\n{head}")
-
-    if not text:
-        return _fetch_failure_exit_code(
-            f"no dataset in {DATASET_CANDIDATES} returned data "
-            "(upstream likely down — 522/525 — or dataset IDs changed; "
-            "try `<proxy>/info/index.csv?searchFor=tao` to inspect)"
-        )
-
-    raw_obs = parse_erddap_json(text)
-    if not raw_obs:
-        return _fetch_failure_exit_code(
-            "0 observations parsed from the ERDDAP response "
-            "(re-run with --diag to see the response head)"
-        )
-
-    # Snap each raw observation to one of our 7 anchor sites.
-    by_site: dict[str, list[OceanObs]] = defaultdict(list)
-    skipped = 0
-    for o in raw_obs:
-        site = _nearest_site(o.lat, o.lon_e)
-        if site is None:
-            skipped += 1
-            continue
-        by_site[site.station_id].append(o)
+    daily = _obs_to_daily_means(raw_obs)
+    n_cells = _merge_into_archive(archive, daily)
+    n_dropped = _trim_archive(archive)
+    fresh_days = sum(len(v) for v in daily.values())
     logger.info(
-        f"[therm] parsed {len(raw_obs)} obs ({skipped} unmapped); "
-        f"distributed across {len(by_site)}/{len(NDBC_BUOYS)} anchor sites"
+        f"[therm] parsed {len(raw_obs)} obs → {fresh_days} buoy-days merged "
+        f"({n_cells} cells written, {n_dropped} trimmed); "
+        f"archive now spans {_archive_span(archive)}"
     )
 
-    analyses = [analyse_buoy(s, by_site.get(s.station_id, [])) for s in NDBC_BUOYS]
+    analyses = _analyse_from_archive(archive)
     for a in analyses:
         if a.latest:
             logger.info(
                 f"[therm]   {a.site.station_id:>7} {a.site.label}: "
-                f"{a.obs_count} obs, latest {a.latest.temp_c:.2f}°C @ {a.latest.depth_m:.0f}m, "
+                f"latest {a.latest.temp_c:.2f}°C, range {a.window_min_c}–{a.window_max_c}, "
                 f"Δ30d={_fmt_signed(a.delta_30d_c)} → {a.kelvin_signal}"
             )
         else:
@@ -729,12 +886,85 @@ def run(*, write: bool, diag: bool = False) -> int:
         )
 
     if write:
+        _save_archive(archive)
         _persist(doc)
         n_with_data = sum(1 for a in analyses if a.latest is not None)
-        logger.info(f"[therm] wrote {OUT_PATH} ({n_with_data}/{len(NDBC_BUOYS)} buoys reporting)")
+        logger.info(
+            f"[therm] wrote {OUT_PATH} ({n_with_data}/{len(NDBC_BUOYS)} buoys reporting) "
+            f"+ archive {ARCHIVE_PATH.name}"
+        )
     else:
         logger.info("[therm] preview only — pass --write to persist")
     return 0
+
+
+def _archive_span(archive: dict) -> str:
+    """Human one-liner of the archive's date coverage, for the log."""
+    all_days = [d for days in archive.get("buoys", {}).values() for d in days]
+    if not all_days:
+        return "empty"
+    return f"{min(all_days)} → {max(all_days)} ({len(set(all_days))} distinct days)"
+
+
+def _fetch_raw_obs(
+    proxy_base: str, secret: str, start_date: str,
+    end_date: str | None = None, *, diag: bool = False,
+) -> tuple[list[OceanObs], str | None, int]:
+    """Low-level: walk the dataset candidates for ONE time window and
+    return (obs, winning_dataset, status). status is an HTTP-ish code:
+        200 — got parseable observations
+        401 — shared-secret mismatch (operator must fix)
+        0   — upstream down / no candidate served / parsed empty
+    No staleness logic here — callers decide what a failure means.
+    Shared by the daily run and the year-by-year backfill."""
+    text: str | None = None
+    winning_dataset: str | None = None
+    for ds in DATASET_CANDIDATES:
+        path_query = _build_tabledap_query(ds, start_date, end_date)
+        body, status = _fetch_via_proxy(proxy_base, secret, path_query)
+        if status == 200 and body:
+            span = f"{start_date}→{end_date or 'now'}"
+            logger.info(f"[therm] fetched OK: dataset={ds} {span} ({len(body):,} bytes)")
+            text = body
+            winning_dataset = ds
+            break
+        if status == 401:
+            logger.error(
+                f"[therm] FATAL: proxy returned 401 for {ds} — "
+                f"ERDDAP_PROXY_SECRET mismatch with the Worker's PROXY_SECRET."
+            )
+            return [], None, 401
+        snippet = (body or "")[:160].replace("\n", " ")
+        logger.info(f"[therm] dataset={ds} → HTTP {status} :: {snippet}")
+
+    if diag and text:
+        head = "\n".join(text.splitlines()[:15])
+        logger.info(f"[therm] --diag winning response head:\n{head}")
+
+    if not text:
+        return [], None, 0
+    raw_obs = parse_erddap_json(text)
+    return (raw_obs, winning_dataset, 200) if raw_obs else ([], None, 0)
+
+
+def _fetch_window(
+    proxy_base: str, secret: str, start_date: str, *, diag: bool = False,
+) -> tuple[list[OceanObs], str | None, int | None]:
+    """Daily-run wrapper around _fetch_raw_obs that maps a fetch failure
+    to a stale-tolerant exit code: returns (obs, dataset, None) on
+    success, or ([], None, exit_code) where exit_code is 2 (secret
+    mismatch), or 3/1 from the staleness helper."""
+    obs, winning_dataset, status = _fetch_raw_obs(
+        proxy_base, secret, start_date, diag=diag,
+    )
+    if status == 401:
+        return [], None, 2
+    if status != 200 or not obs:
+        return [], None, _fetch_failure_exit_code(
+            "no dataset returned data (upstream likely down — 522/525 — "
+            "or dataset IDs changed; try `<proxy>/info/index.csv?searchFor=tao`)"
+        )
+    return obs, winning_dataset, None
 
 
 def main() -> int:
