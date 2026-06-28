@@ -148,14 +148,21 @@ def _parse_csv_to_london(csv_text: str) -> dict[str, dict[str, dict]]:
 
 
 def _archive_settle(market: str, symbol: str) -> dict[str, float]:
-    """{date: settle} for one contract symbol from the daily archive."""
+    """{date: settle} for one contract symbol from the daily archive.
+
+    The archive keys robusta in CANONICAL form (RC…, e.g. RCU26) while
+    futures_chain gives the DISPLAY form (RM…, e.g. RMU26), so we convert
+    via symbols.to_canonical (RM→RC; KC unchanged) before the lookup.
+    """
+    from scraper.symbols import to_canonical
+    key = to_canonical(symbol)
     try:
         arch = json.loads(_ARCHIVE.read_text(encoding="utf-8"))
     except Exception:
         return {}
     out: dict[str, float] = {}
     for day, contracts in (arch.get(market) or {}).items():
-        rec = (contracts or {}).get(symbol)
+        rec = (contracts or {}).get(key)
         if rec and rec.get("price") is not None:
             out[day] = float(rec["price"])
     return out
