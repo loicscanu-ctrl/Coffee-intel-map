@@ -103,7 +103,7 @@ async def _fetch_contracts(symbols: list[str]) -> dict[str, str]:
         try:
             await pg.goto(init, wait_until="domcontentloaded", timeout=30000)
             await pg.wait_for_timeout(3500)
-            for i, sym in enumerate(symbols):
+            for sym in symbols:
                 csv = await pg.evaluate(
                     """async ({sym, maxrec}) => {
                         function getCookie(n){const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)');return v?decodeURIComponent(v[2]):null;}
