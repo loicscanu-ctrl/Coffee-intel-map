@@ -124,39 +124,59 @@ def test_build_frame_price_only_when_cci_missing():
     assert active == ["rc_ret_1d", "kc_rc_gap_z"]
 
 
-def test_kc_after_rc_off_without_history():
-    """No capture history → the feature is absent (forward-accumulating)."""
+def _intraday_df(dates, kc_after=None, rc_gap=None):
+    """Build an intraday-feature DataFrame for _build_frame (cols:
+    kc_after_rc_diff, rc_overnight_gap)."""
+    import pandas as pd
+    return pd.DataFrame({
+        "kc_after_rc_diff": pd.Series(kc_after if kc_after is not None else [np.nan]*len(dates), index=dates),
+        "rc_overnight_gap": pd.Series(rc_gap if rc_gap is not None else [np.nan]*len(dates), index=dates),
+    }, index=dates)
+
+
+def test_intraday_off_without_history():
+    """No intraday → both intraday features absent (degrade gracefully)."""
     rc = _series(list(np.linspace(3000, 3200, 80)))
     kc = _series(list(np.linspace(250, 270, 80)))
-    built = od._build_frame(rc, kc, None, kc_after_rc=None)
+    built = od._build_frame(rc, kc, None, intraday=None)
     _frame, active = built
-    assert "kc_after_rc_diff" not in active
+    assert "kc_after_rc_diff" not in active and "rc_overnight_gap" not in active
 
 
-def test_kc_after_rc_activates_with_enough_overlap():
-    """Once ≥ _MIN_KC_RC_OVERLAP diff days overlap the archive, the
-    NY-after-RC-close feature joins the set. The series is the diff directly."""
-    import pandas as pd
+def test_intraday_activates_with_enough_overlap():
+    """Once ≥ _MIN_KC_RC_OVERLAP days overlap, both intraday features join."""
     n = 120
     rc = _series(list(np.linspace(3000, 3200, n)))
     kc = _series(list(np.linspace(250, 270, n)))
-    diff_dates = kc.index[-60:]   # > _MIN_KC_RC_OVERLAP=40
-    diff = pd.Series([0.002] * len(diff_dates), index=diff_dates)
-    built = od._build_frame(rc, kc, None, kc_after_rc=diff)
+    d = kc.index[-60:]   # > _MIN_KC_RC_OVERLAP=40
+    intr = _intraday_df(d, kc_after=[0.002]*60, rc_gap=[0.001]*60)
+    built = od._build_frame(rc, kc, None, intraday=intr)
     _frame, active = built
+    assert "kc_after_rc_diff" in active and "rc_overnight_gap" in active
+
+
+def test_intraday_stays_off_below_overlap_threshold():
+    n = 120
+    rc = _series(list(np.linspace(3000, 3200, n)))
+    kc = _series(list(np.linspace(250, 270, n)))
+    d = kc.index[-10:]   # below the 40-day threshold
+    intr = _intraday_df(d, kc_after=[0.002]*10, rc_gap=[0.001]*10)
+    built = od._build_frame(rc, kc, None, intraday=intr)
+    _frame, active = built
+    assert "kc_after_rc_diff" not in active and "rc_overnight_gap" not in active
+
+
+def test_intraday_features_added_independently():
+    """If only one intraday column has enough overlap, only it activates."""
+    n = 120
+    rc = _series(list(np.linspace(3000, 3200, n)))
+    kc = _series(list(np.linspace(250, 270, n)))
+    d = kc.index[-60:]
+    # kc_after has 60 days; rc_gap all-NaN → only kc_after activates.
+    intr = _intraday_df(d, kc_after=[0.002]*60, rc_gap=None)
+    _frame, active = od._build_frame(rc, kc, None, intraday=intr)
     assert "kc_after_rc_diff" in active
-
-
-def test_kc_after_rc_stays_off_below_overlap_threshold():
-    import pandas as pd
-    n = 120
-    rc = _series(list(np.linspace(3000, 3200, n)))
-    kc = _series(list(np.linspace(250, 270, n)))
-    diff_dates = kc.index[-10:]   # below the 40-day threshold
-    diff = pd.Series([0.002] * len(diff_dates), index=diff_dates)
-    built = od._build_frame(rc, kc, None, kc_after_rc=diff)
-    _frame, active = built
-    assert "kc_after_rc_diff" not in active
+    assert "rc_overnight_gap" not in active
 
 
 def test_cci_index_orientation_exporter_strength_raises_index():
@@ -185,3 +205,33 @@ def test_unavailable_when_archive_missing(monkeypatch, tmp_path):
     out = od.run()
     assert out["available"] is False
     assert "archive" in out["reason"].lower()
+
+
+def test_load_intraday_excludes_roll_days(tmp_path, monkeypatch):
+    """rc_overnight_gap must be NaN on roll days (rc_symbol changed vs prior),
+    so the calendar spread never shows up as a spurious gap. The within-day
+    kc_after_rc_diff is unaffected."""
+    import json
+    import pandas as pd
+    rows = [
+        # day 1: contract A
+        {"date": "2026-03-02", "rc_symbol": "RMK26", "rc_last_1730": 3000, "rc_open_first": 2990,
+         "kc_last_1730": 250, "kc_last_1830": 251},
+        # day 2: same contract A → gap is real (open vs prior close)
+        {"date": "2026-03-03", "rc_symbol": "RMK26", "rc_last_1730": 3010, "rc_open_first": 3005,
+         "kc_last_1730": 252, "kc_last_1830": 253},
+        # day 3: ROLL to contract B → cross-contract gap must be excluded
+        {"date": "2026-03-04", "rc_symbol": "RMN26", "rc_last_1730": 3120, "rc_open_first": 3115,
+         "kc_last_1730": 254, "kc_last_1830": 255},
+    ]
+    p = tmp_path / "intraday.json"
+    p.write_text(json.dumps(rows))
+    monkeypatch.setattr(od, "_INTRADAY", p)
+    df = od._load_intraday()
+    # Day 2: same contract → gap present (3005/3000 - 1).
+    assert not pd.isna(df.loc[pd.Timestamp("2026-03-03"), "rc_overnight_gap"])
+    # Day 3: roll → gap must be NaN (would otherwise be 3115/3010-1 ≈ +3.5% spurious).
+    assert pd.isna(df.loc[pd.Timestamp("2026-03-04"), "rc_overnight_gap"])
+    assert bool(df.loc[pd.Timestamp("2026-03-04"), "_rc_roll"]) is True
+    # kc_after_rc_diff (within-day) present on the roll day regardless.
+    assert not pd.isna(df.loc[pd.Timestamp("2026-03-04"), "kc_after_rc_diff"])
