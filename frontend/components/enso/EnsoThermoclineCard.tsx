@@ -133,14 +133,16 @@ function RangeBar({
   const posOf = (v: number) => Math.max(0, Math.min(1, (v - min) / (max - min))) * 100;
   const pct = posOf(current);
 
-  // A past-position tick. Amber; older = fainter. Skipped if absent.
+  // A past-position tick. Amber; older = fainter. A dark halo keeps it
+  // legible wherever it lands on the gradient. Skipped if absent.
   const ghost = (v: number | null | undefined, opacity: number, label: string) =>
     v == null ? null : (
       <div
         className="absolute top-0 bottom-0"
         style={{
-          left: `calc(${posOf(v)}% - 0.5px)`, width: 1,
+          left: `calc(${posOf(v)}% - 0.5px)`, width: 1.5,
           background: "#fbbf24", opacity,
+          boxShadow: "0 0 0 0.5px rgba(15,23,42,0.7)",
         }}
         title={`${label}: ${v.toFixed(2)}°C`}
       />
@@ -154,17 +156,24 @@ function RangeBar({
   return (
     <div className="mt-0.5">
       <div
-        className="relative h-2 rounded-sm overflow-hidden"
+        className="relative h-2 rounded-sm overflow-hidden border border-slate-700"
         title={tip}
         style={{
-          background: "linear-gradient(to right, #3b82f6 0%, #1e293b 50%, #ef4444 100%)",
+          // Cold (blue) → neutral (slate-400) → warm (red). The middle
+          // is a LIGHT neutral, not dark slate, so the bar reads as one
+          // continuous track instead of looking gapped against the tile.
+          background: "linear-gradient(to right, #3b82f6 0%, #94a3b8 50%, #ef4444 100%)",
         }}
       >
-        {ghost(ago90, 0.5, "3 months ago")}
-        {ghost(ago30, 0.85, "1 month ago")}
+        {ghost(ago90, 0.55, "3 months ago")}
+        {ghost(ago30, 0.9, "1 month ago")}
+        {/* "now" — white with a dark halo so it pops on blue, grey or red. */}
         <div
           className="absolute top-0 bottom-0 bg-white"
-          style={{ left: `calc(${pct}% - 1px)`, width: 2 }}
+          style={{
+            left: `calc(${pct}% - 1px)`, width: 2,
+            boxShadow: "0 0 0 0.5px rgba(15,23,42,0.9)",
+          }}
         />
       </div>
       <div className="flex justify-between text-[7px] text-slate-600 leading-none mt-0.5 font-mono">
@@ -225,6 +234,13 @@ export default function EnsoThermoclineCard() {
     (c) => Object.values(buoysByCell).some((b) => b?.column === c),
   );
   const rowOrder = t.latitude_order ?? DEFAULT_LAT_ORDER;
+
+  // Trajectory ticks only exist once a snapshot carries the 1-/3-month
+  // anchors; until then the legend shouldn't promise marks that aren't
+  // drawn (e.g. right after the field was added, before the next fetch).
+  const hasTrajectory = t.buoys.some(
+    (b) => b.temp_30d_ago_c != null || b.temp_90d_ago_c != null,
+  );
 
   return (
     <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 space-y-3">
@@ -374,19 +390,26 @@ export default function EnsoThermoclineCard() {
         ))}
       </div>
 
-      {/* Range-bar legend */}
+      {/* Range-bar legend. The 1mo/3mo ticks only appear once the
+          snapshot carries the trajectory anchors, so don't advertise
+          them before then. */}
       <div className="flex items-center gap-3 text-[8px] text-slate-500 font-mono">
         <span>Range bar:</span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-0.5 h-2.5 bg-white" /> now
         </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24" }} /> 1mo ago
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24", opacity: 0.5 }} /> 3mo ago
-        </span>
-        <span className="text-slate-600">— gap = how fast it&apos;s moving</span>
+        <span className="text-slate-600">within each buoy&apos;s 15-yr min–max</span>
+        {hasTrajectory && (
+          <>
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24" }} /> 1mo ago
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-0.5 h-2.5" style={{ background: "#fbbf24", opacity: 0.55 }} /> 3mo ago
+            </span>
+            <span className="text-slate-600">— gap = how fast it&apos;s moving</span>
+          </>
+        )}
       </div>
 
       <div className="text-[9px] text-slate-600 leading-snug">
