@@ -228,23 +228,23 @@
       }
     ]
   },
-  "scraped_at": "2026-06-28T14:38:14.203024+00:00",
+  "scraped_at": "2026-06-28T14:38:43.843251Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-27T18:43:41.716415Z",
+    "scraped_at": "2026-06-28T14:38:42.712775Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 92.8,
-    "net_index": 20.0,
-    "bull_count": 3,
+    "overall_confidence": 96.9,
+    "net_index": 0.0,
+    "bull_count": 0,
     "bear_count": 0,
-    "neutral_count": 9,
-    "total": 12,
+    "neutral_count": 11,
+    "total": 11,
     "items": [
       {
         "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -252,8 +252,8 @@
       {
         "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -270,8 +270,8 @@
       {
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +280,7 @@
         "headline": "Jill Hoff Of Monogram Coffee Is The 2026 Canada Barista Champion",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -289,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -298,7 +298,7 @@
         "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -307,7 +307,7 @@
         "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -315,8 +315,8 @@
       {
         "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -325,7 +325,7 @@
         "headline": "Here Are The Winners Of The 2026 US Barista Championship",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -334,16 +334,7 @@
         "headline": "The 2026 US Barista Championship: Finals",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
@@ -365,10 +356,10 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-06-25",
-    "scraped_at": "2026-06-28T14:37:30.783257Z",
+    "scraped_at": "2026-06-28T14:38:43.501281Z",
     "direction": "Bearish",
-    "base_margin": 0.0899200871638366,
-    "final_margin": -0.11846424496761364,
+    "base_margin": 0.08992008716383662,
+    "final_margin": -0.11846424496761357,
     "base_prob": 0.5224648869482655,
     "final_prob": 0.470418525654513,
     "prob_up": 0.470418525654513,
@@ -380,7 +371,7 @@
         "raw_value": 0.013218235770164455,
         "raw_fmt": "+1.32%",
         "usd_per_ton": 49.6,
-        "phi": -0.10164764588319242
+        "phi": -0.1016476458831924
       },
       {
         "var_name": "cci_z",
@@ -396,7 +387,7 @@
         "raw_value": -1.1201859828328005,
         "raw_fmt": "-1.12\u03c3",
         "usd_per_ton": -781.0,
-        "phi": 0.06414381984481145,
+        "phi": 0.06414381984481146,
         "detail": {
           "kc_usd_per_mt": 6366.9,
           "rc_usd_per_mt": 3756.0,
@@ -420,7 +411,7 @@
         "raw_value": -0.0024958402662229595,
         "raw_fmt": "-0.25%",
         "usd_per_ton": -9.4,
-        "phi": -0.056158428693481144
+        "phi": -0.05615842869348115
       },
       {
         "var_name": "kc_after_rc_diff",
