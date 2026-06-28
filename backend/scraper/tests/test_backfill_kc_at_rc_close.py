@@ -5,7 +5,7 @@ things that must be right: the 17:00–18:00-London bar midpoint becomes the
 17:30 estimate (DST-aware), and the merge never clobbers a precise forward
 capture or duplicates a prior backfill.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 from scraper import backfill_kc_at_rc_close as bf
@@ -15,7 +15,7 @@ _LONDON = ZoneInfo("Europe/London")
 
 def _bar(day: str, hour_london: int, o: float, c: float) -> dict:
     dt = datetime.fromisoformat(f"{day}T{hour_london:02d}:00:00").replace(tzinfo=_LONDON)
-    return {"ts_utc": int(dt.astimezone(timezone.utc).timestamp()), "open": o, "close": c}
+    return {"ts_utc": int(dt.astimezone(UTC).timestamp()), "open": o, "close": c}
 
 
 def test_diff_within_series_cancels_contract_level():
