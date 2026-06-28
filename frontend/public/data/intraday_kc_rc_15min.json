@@ -7,7 +7,7 @@
     "rc_open_first": null,
     "rc_open_0915": null,
     "kc_settle": 278.1,
-    "rc_settle": null,
+    "rc_settle": 3358.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -19,7 +19,7 @@
     "rc_open_first": 3369.0,
     "rc_open_0915": 3365.0,
     "kc_settle": 276.65,
-    "rc_settle": null,
+    "rc_settle": 3285.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -31,7 +31,7 @@
     "rc_open_first": 3290.0,
     "rc_open_0915": 3266.0,
     "kc_settle": 269.2,
-    "rc_settle": null,
+    "rc_settle": 3161.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -43,7 +43,7 @@
     "rc_open_first": 3181.0,
     "rc_open_0915": 3119.0,
     "kc_settle": 275.95,
-    "rc_settle": null,
+    "rc_settle": 3188.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -55,7 +55,7 @@
     "rc_open_first": 3199.0,
     "rc_open_0915": 3151.0,
     "kc_settle": 275.8,
-    "rc_settle": null,
+    "rc_settle": 3177.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -67,7 +67,7 @@
     "rc_open_first": 3173.0,
     "rc_open_0915": 3155.0,
     "kc_settle": 281.1,
-    "rc_settle": null,
+    "rc_settle": 3179.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -79,7 +79,7 @@
     "rc_open_first": 3167.0,
     "rc_open_0915": 3184.0,
     "kc_settle": 281.8,
-    "rc_settle": null,
+    "rc_settle": 3193.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -91,7 +91,7 @@
     "rc_open_first": 3184.0,
     "rc_open_0915": 3181.0,
     "kc_settle": 283.25,
-    "rc_settle": null,
+    "rc_settle": 3279.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -103,7 +103,7 @@
     "rc_open_first": 3280.0,
     "rc_open_0915": 3294.0,
     "kc_settle": 284.1,
-    "rc_settle": null,
+    "rc_settle": 3322.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -115,7 +115,7 @@
     "rc_open_first": 3313.0,
     "rc_open_0915": 3310.0,
     "kc_settle": 277.35,
-    "rc_settle": null,
+    "rc_settle": 3278.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -127,7 +127,7 @@
     "rc_open_first": 3257.0,
     "rc_open_0915": 3244.0,
     "kc_settle": 272.95,
-    "rc_settle": null,
+    "rc_settle": 3194.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -139,7 +139,7 @@
     "rc_open_first": 3189.0,
     "rc_open_0915": 3198.0,
     "kc_settle": 277.1,
-    "rc_settle": null,
+    "rc_settle": 3301.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -151,7 +151,7 @@
     "rc_open_first": 3292.0,
     "rc_open_0915": 3285.0,
     "kc_settle": 272.05,
-    "rc_settle": null,
+    "rc_settle": 3263.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -163,7 +163,7 @@
     "rc_open_first": 3283.0,
     "rc_open_0915": 3323.0,
     "kc_settle": 278.4,
-    "rc_settle": null,
+    "rc_settle": 3328.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -175,7 +175,7 @@
     "rc_open_first": 3315.0,
     "rc_open_0915": 3336.0,
     "kc_settle": 288.35,
-    "rc_settle": null,
+    "rc_settle": 3421.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -187,7 +187,7 @@
     "rc_open_first": 3410.0,
     "rc_open_0915": 3414.0,
     "kc_settle": 285.1,
-    "rc_settle": null,
+    "rc_settle": 3403.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -199,7 +199,7 @@
     "rc_open_first": 3366.0,
     "rc_open_0915": 3372.0,
     "kc_settle": 278.8,
-    "rc_settle": null,
+    "rc_settle": 3344.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -211,7 +211,7 @@
     "rc_open_first": 3349.0,
     "rc_open_0915": 3380.0,
     "kc_settle": 280.6,
-    "rc_settle": null,
+    "rc_settle": 3392.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -223,7 +223,7 @@
     "rc_open_first": 3410.0,
     "rc_open_0915": 3406.0,
     "kc_settle": 280.25,
-    "rc_settle": null,
+    "rc_settle": 3357.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -235,7 +235,7 @@
     "rc_open_first": 3353.0,
     "rc_open_0915": 3349.0,
     "kc_settle": 275.35,
-    "rc_settle": null,
+    "rc_settle": 3285.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -247,7 +247,7 @@
     "rc_open_first": 3295.0,
     "rc_open_0915": 3290.0,
     "kc_settle": 275.9,
-    "rc_settle": null,
+    "rc_settle": 3275.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -259,7 +259,7 @@
     "rc_open_first": null,
     "rc_open_0915": null,
     "kc_settle": 276.2,
-    "rc_settle": null,
+    "rc_settle": 3275.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -271,7 +271,7 @@
     "rc_open_first": 3279.0,
     "rc_open_0915": 3294.0,
     "kc_settle": 280.4,
-    "rc_settle": null,
+    "rc_settle": 3297.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -283,7 +283,7 @@
     "rc_open_first": 3311.0,
     "rc_open_0915": 3328.0,
     "kc_settle": 276.1,
-    "rc_settle": null,
+    "rc_settle": 3316.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -295,7 +295,7 @@
     "rc_open_first": 3293.0,
     "rc_open_0915": 3295.0,
     "kc_settle": 265.15,
-    "rc_settle": null,
+    "rc_settle": 3321.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -307,7 +307,7 @@
     "rc_open_first": 3262.0,
     "rc_open_0915": 3304.0,
     "kc_settle": 267.15,
-    "rc_settle": null,
+    "rc_settle": 3302.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -319,7 +319,7 @@
     "rc_open_first": 3311.0,
     "rc_open_0915": 3336.0,
     "kc_settle": 274.85,
-    "rc_settle": null,
+    "rc_settle": 3382.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -331,7 +331,7 @@
     "rc_open_first": 3366.0,
     "rc_open_0915": 3367.0,
     "kc_settle": 272.8,
-    "rc_settle": null,
+    "rc_settle": 3363.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -343,7 +343,7 @@
     "rc_open_first": 3358.0,
     "rc_open_0915": 3394.0,
     "kc_settle": 273.4,
-    "rc_settle": null,
+    "rc_settle": 3440.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -355,7 +355,7 @@
     "rc_open_first": 3429.0,
     "rc_open_0915": 3440.0,
     "kc_settle": 268.35,
-    "rc_settle": null,
+    "rc_settle": 3372.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -367,7 +367,7 @@
     "rc_open_first": 3367.0,
     "rc_open_0915": 3346.0,
     "kc_settle": 260.1,
-    "rc_settle": null,
+    "rc_settle": 3245.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -379,7 +379,7 @@
     "rc_open_first": 3258.0,
     "rc_open_0915": 3242.0,
     "kc_settle": 256.75,
-    "rc_settle": null,
+    "rc_settle": 3175.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -391,7 +391,7 @@
     "rc_open_first": 3200.0,
     "rc_open_0915": 3183.0,
     "kc_settle": 262.15,
-    "rc_settle": null,
+    "rc_settle": 3208.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -403,7 +403,7 @@
     "rc_open_first": 3200.0,
     "rc_open_0915": 3196.0,
     "kc_settle": 260.5,
-    "rc_settle": null,
+    "rc_settle": 3214.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -415,7 +415,7 @@
     "rc_open_first": 3209.0,
     "rc_open_0915": 3200.0,
     "kc_settle": 265.5,
-    "rc_settle": null,
+    "rc_settle": 3265.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -439,7 +439,7 @@
     "rc_open_first": 3305.0,
     "rc_open_0915": 3322.0,
     "kc_settle": 266.35,
-    "rc_settle": null,
+    "rc_settle": 3377.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -451,7 +451,7 @@
     "rc_open_first": 3367.0,
     "rc_open_0915": 3391.0,
     "kc_settle": 262.1,
-    "rc_settle": null,
+    "rc_settle": 3339.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -463,7 +463,7 @@
     "rc_open_first": 3333.0,
     "rc_open_0915": 3361.0,
     "kc_settle": 266.7,
-    "rc_settle": null,
+    "rc_settle": 3415.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -475,7 +475,7 @@
     "rc_open_first": 3411.0,
     "rc_open_0915": 3413.0,
     "kc_settle": 258.7,
-    "rc_settle": null,
+    "rc_settle": 3347.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -487,7 +487,7 @@
     "rc_open_first": 3347.0,
     "rc_open_0915": 3366.0,
     "kc_settle": 254.2,
-    "rc_settle": null,
+    "rc_settle": 3315.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -499,7 +499,7 @@
     "rc_open_first": 3316.0,
     "rc_open_0915": 3338.0,
     "kc_settle": 252.85,
-    "rc_settle": null,
+    "rc_settle": 3335.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -511,7 +511,7 @@
     "rc_open_first": 3340.0,
     "rc_open_0915": 3352.0,
     "kc_settle": 247.6,
-    "rc_settle": null,
+    "rc_settle": 3278.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -523,7 +523,7 @@
     "rc_open_first": 3280.0,
     "rc_open_0915": 3270.0,
     "kc_settle": 242.4,
-    "rc_settle": null,
+    "rc_settle": 3270.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -535,7 +535,7 @@
     "rc_open_first": 3271.0,
     "rc_open_0915": 3272.0,
     "kc_settle": 242.1,
-    "rc_settle": null,
+    "rc_settle": 3233.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -547,7 +547,7 @@
     "rc_open_first": 3234.0,
     "rc_open_0915": 3230.0,
     "kc_settle": 241.65,
-    "rc_settle": null,
+    "rc_settle": 3260.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -559,7 +559,7 @@
     "rc_open_first": 3258.0,
     "rc_open_0915": 3248.0,
     "kc_settle": 240.9,
-    "rc_settle": null,
+    "rc_settle": 3230.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -571,7 +571,7 @@
     "rc_open_first": 3220.0,
     "rc_open_0915": 3239.0,
     "kc_settle": 244.6,
-    "rc_settle": null,
+    "rc_settle": 3297.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -583,7 +583,7 @@
     "rc_open_first": 3297.0,
     "rc_open_0915": 3303.0,
     "kc_settle": 250.25,
-    "rc_settle": null,
+    "rc_settle": 3395.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -595,7 +595,7 @@
     "rc_open_first": 3375.0,
     "rc_open_0915": 3398.0,
     "kc_settle": 253.4,
-    "rc_settle": null,
+    "rc_settle": 3525.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -607,7 +607,7 @@
     "rc_open_first": 3510.0,
     "rc_open_0915": 3499.0,
     "kc_settle": 259.2,
-    "rc_settle": null,
+    "rc_settle": 3529.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -619,7 +619,7 @@
     "rc_open_first": 3539.0,
     "rc_open_0915": 3565.0,
     "kc_settle": 272.8,
-    "rc_settle": null,
+    "rc_settle": 3598.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -631,7 +631,7 @@
     "rc_open_first": 3598.0,
     "rc_open_0915": 3578.0,
     "kc_settle": 271.9,
-    "rc_settle": null,
+    "rc_settle": 3622.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -643,7 +643,7 @@
     "rc_open_first": 3617.0,
     "rc_open_0915": 3660.0,
     "kc_settle": 267.8,
-    "rc_settle": null,
+    "rc_settle": 3629.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -655,7 +655,7 @@
     "rc_open_first": 3609.0,
     "rc_open_0915": 3612.0,
     "kc_settle": 267.8,
-    "rc_settle": null,
+    "rc_settle": 3592.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -667,7 +667,7 @@
     "rc_open_first": 3579.0,
     "rc_open_0915": 3582.0,
     "kc_settle": 267.0,
-    "rc_settle": null,
+    "rc_settle": 3542.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -679,7 +679,7 @@
     "rc_open_first": 3532.0,
     "rc_open_0915": 3501.0,
     "kc_settle": 275.95,
-    "rc_settle": null,
+    "rc_settle": 3556.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -691,7 +691,7 @@
     "rc_open_first": 3547.0,
     "rc_open_0915": 3557.0,
     "kc_settle": 277.2,
-    "rc_settle": null,
+    "rc_settle": 3605.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
@@ -703,7 +703,7 @@
     "rc_open_first": 3597.0,
     "rc_open_0915": 3638.0,
     "kc_settle": 276.4,
-    "rc_settle": null,
+    "rc_settle": 3662.0,
     "kc_symbol": "KCU26",
     "rc_symbol": "RMU26"
   },
