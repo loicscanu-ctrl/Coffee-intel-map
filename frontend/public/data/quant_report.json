@@ -228,17 +228,17 @@
       }
     ]
   },
-  "scraped_at": "2026-06-29T22:37:08.533944+00:00",
+  "scraped_at": "2026-06-29T22:37:37.490437Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-28T20:20:56.316242Z",
+    "scraped_at": "2026-06-29T22:37:36.290942Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 93.5,
+    "overall_confidence": 92.8,
     "net_index": 0.0,
     "bull_count": 0,
     "bear_count": 0,
-    "neutral_count": 10,
-    "total": 10,
+    "neutral_count": 8,
+    "total": 8,
     "items": [
       {
         "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
@@ -253,7 +253,7 @@
         "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +262,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 92.0,
         "tags": [
           "sprudge"
         ]
@@ -271,7 +271,7 @@
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -289,7 +289,7 @@
         "headline": "Body Count\u2019s Now In The Coffee House\u2026",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -305,24 +305,6 @@
       },
       {
         "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Sabbath Coffee Roasters In Royal Oak, MI",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Here Are The Winners Of The 2026 US Barista Championship",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -346,79 +328,79 @@
   },
   "open_direction": {
     "available": true,
-    "as_of": "2026-06-25",
-    "scraped_at": "2026-06-28T20:20:57.144873Z",
+    "as_of": "2026-06-26",
+    "scraped_at": "2026-06-29T22:37:37.142476Z",
     "direction": "Bullish",
-    "base_margin": 0.20442524500408915,
-    "final_margin": 0.3827671660054799,
-    "base_prob": 0.5509290755072251,
-    "final_prob": 0.5945403359795768,
-    "prob_up": 0.5945403359795768,
-    "prob_down": 0.4054596640204232,
+    "base_margin": 0.20789535036039342,
+    "final_margin": 0.1896303844300145,
+    "base_prob": 0.5517874486275958,
+    "final_prob": 0.5472660416017698,
+    "prob_up": 0.5472660416017698,
+    "prob_down": 0.45273395839823016,
     "features": [
       {
         "var_name": "rc_open15_ret",
         "label": "RC Opening 15-min Move",
-        "raw_value": 0.011398387545176636,
-        "raw_fmt": "+1.14%",
-        "usd_per_ton": 42.8,
-        "phi": 0.3807770929558466
+        "raw_value": 0.007960472138347496,
+        "raw_fmt": "+0.80%",
+        "usd_per_ton": 30.4,
+        "phi": 0.2062594675480037
       },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
-        "raw_value": 0.013218235770164455,
-        "raw_fmt": "+1.32%",
-        "usd_per_ton": 49.6,
-        "phi": -0.12761673086588005
-      },
-      {
-        "var_name": "kc_rc_gap_ret",
-        "label": "NY Price Gap \u0394",
-        "raw_value": -0.040295623974128,
-        "raw_fmt": "-4.03%",
-        "usd_per_ton": -151.4,
-        "phi": -0.08506628614017712
-      },
-      {
-        "var_name": "kc_rc_gap_z",
-        "label": "New York Price Gap (z)",
-        "raw_value": -1.1201859828328005,
-        "raw_fmt": "-1.12\u03c3",
-        "usd_per_ton": -781.0,
-        "phi": 0.0829707527895665,
-        "detail": {
-          "kc_usd_per_mt": 6366.9,
-          "rc_usd_per_mt": 3756.0,
-          "gap_usd_per_mt": 2610.9,
-          "gap_mean_usd_per_mt": 3391.9,
-          "gap_std_usd_per_mt": 697.2,
-          "formula": "gap = KC(\u00a2/lb \u00d7 22.0462) \u2212 RC, in USD/MT; z-scored over a 260-day rolling window"
-        }
+        "raw_value": 0.01624068157614489,
+        "raw_fmt": "+1.62%",
+        "usd_per_ton": 62.0,
+        "phi": -0.158204451062504
       },
       {
         "var_name": "rc_overnight_gap",
         "label": "RC Overnight Gap",
-        "raw_value": -0.0024958402662229595,
-        "raw_fmt": "-0.25%",
-        "usd_per_ton": -9.4,
-        "phi": -0.047470177185171096
+        "raw_value": -0.006273867975995606,
+        "raw_fmt": "-0.63%",
+        "usd_per_ton": -23.9,
+        "phi": -0.1424251428150078
       },
       {
-        "var_name": "cci_ret_5d",
-        "label": "Coffee Currency Index 5-Day \u0394",
-        "raw_value": 0.004502929966870184,
-        "raw_fmt": "+0.45%",
-        "usd_per_ton": 16.9,
-        "phi": -0.02910349520451059
+        "var_name": "kc_rc_gap_z",
+        "label": "New York Price Gap (z)",
+        "raw_value": -1.264422016115068,
+        "raw_fmt": "-1.26\u03c3",
+        "usd_per_ton": -884.2,
+        "phi": 0.0913303139824434,
+        "detail": {
+          "kc_usd_per_mt": 6321.7,
+          "rc_usd_per_mt": 3817.0,
+          "gap_usd_per_mt": 2504.7,
+          "gap_mean_usd_per_mt": 3389.0,
+          "gap_std_usd_per_mt": 699.3,
+          "formula": "gap = KC(\u00a2/lb \u00d7 22.0462) \u2212 RC, in USD/MT; z-scored over a 260-day rolling window"
+        }
+      },
+      {
+        "var_name": "kc_rc_gap_ret",
+        "label": "NY Price Gap \u0394",
+        "raw_value": -0.04067293996693666,
+        "raw_fmt": "-4.07%",
+        "usd_per_ton": -155.2,
+        "phi": -0.08365190782899903
       },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
-        "raw_value": 0.0,
-        "raw_fmt": "+0.00%",
-        "usd_per_ton": 0.0,
-        "phi": 0.003850764651716492
+        "raw_value": 0.002011704462326236,
+        "raw_fmt": "+0.20%",
+        "usd_per_ton": 7.7,
+        "phi": 0.08311333770022061
+      },
+      {
+        "var_name": "cci_ret_5d",
+        "label": "Coffee Currency Index 5-Day \u0394",
+        "raw_value": 0.00231515563683371,
+        "raw_fmt": "+0.23%",
+        "usd_per_ton": 8.8,
+        "phi": -0.014686583454535813
       }
     ],
     "barrier": {
@@ -438,22 +420,22 @@
         "cci_ret_5d"
       ],
       "n_features": 7,
-      "n_train": 887,
-      "test_accuracy": 0.5822416302765647,
-      "baseline_accuracy": 0.5254730713245997,
-      "edge": 0.056768558951964976,
+      "n_train": 843,
+      "test_accuracy": 0.5707620528771384,
+      "baseline_accuracy": 0.5256609642301711,
+      "edge": 0.04510108864696738,
       "eval_method": "walk_forward",
-      "n_test": 687,
-      "undefined_ratio": 0.16682375117813383,
-      "n_resolvable": 1061,
-      "n_undefined": 177,
+      "n_test": 643,
+      "undefined_ratio": 0.17159763313609466,
+      "n_resolvable": 1014,
+      "n_undefined": 174,
       "currency_axis": "coffee_currency_index",
       "cci_available": true,
       "kc_after_rc_active": true,
       "rc_open15_active": true,
       "rc_overnight_active": true,
       "intraday_source": "barchart_15min",
-      "roll_days_excluded": 63
+      "roll_days_excluded": 88
     }
   }
 }
