@@ -1,5 +1,101 @@
 [
   {
+    "id": 7513,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-26",
+    "body": "RC Robusta certified stocks shifted by +46 lots today, bringing global visible exchange inventory to 4,012 lots. 43 lots graded.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260626_103437.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by +46 lots today, bringing global visible exchange inventory to 4,012 lots. 43 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-29T03:48:48.802664",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by +46 lots today, bringing global visible exchange inventory to 4,012 lots. 43 lots graded.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7512,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-26",
+    "body": "KC Arabica certified stocks shifted by -3,107 bags today, bringing global visible exchange inventory to 382,084 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260626.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -3,107 bags today, bringing global visible exchange inventory to 382,084 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-29T03:48:45.457230",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -3,107 bags today, bringing global visible exchange inventory to 382,084 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 7511,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-25",
+    "body": "ICE-EU RC Open Interest changed by +1,542 over the last session, with +1,700 on nearby two contracts and -158 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-25\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +1,542 over the last session, with +1,700 on nearby two contracts and -158 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-29T03:17:47.867549",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +1,542 over the last session, with +1,700 on nearby two contracts and -158 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 7510,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-25",
+    "body": "IFUS KC Open Interest changed by -2,273 over the last session, with -2,233 on nearby two contracts and -40 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-25\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -2,273 over the last session, with -2,233 on nearby two contracts and -40 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-29T03:17:44.918060",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -2,273 over the last session, with -2,233 on nearby two contracts and -40 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
+  },
+  {
     "id": 7509,
     "title": "World Bank Population \u2013 2026-06-29",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3946,101 +4042,5 @@
     "sentiment_confidence": 75.0,
     "sentiment_method": "deterministic",
     "sentiment_reason": "Colombia: no regions flagged at risk"
-  },
-  {
-    "id": 7199,
-    "title": "Brazil Agronomic Status \u2013 2026-06-19",
-    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": -15.78,
-    "lng": -47.93,
-    "tags": [
-      "weather",
-      "brazil",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-19T06:58:40.470139",
-    "commentary": {
-      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Brazil: no regions flagged at risk"
-  },
-  {
-    "id": 7198,
-    "title": "ICE RC Robusta Certified Stocks \u2013 2026-06-18",
-    "body": "RC Robusta certified stocks shifted by +4,032 lots today, bringing global visible exchange inventory to 4,032 lots. 57 lots graded.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "rc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260618_103043.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by +4,032 lots today, bringing global visible exchange inventory to 4,032 lots. 57 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-19T03:27:25.565104",
-    "commentary": {
-      "text": "RC Robusta certified stocks shifted by +4,032 lots today, bringing global visible exchange inventory to 4,032 lots. 57 lots graded.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 7197,
-    "title": "ICE KC Arabica Certified Stocks \u2013 2026-06-18",
-    "body": "KC Arabica certified stocks shifted by -1,904 bags today, bringing global visible exchange inventory to 394,267 bags.",
-    "source": "ICE",
-    "category": "supply",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "ice",
-      "certified-stocks",
-      "kc",
-      "auto-commentary"
-    ],
-    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260618.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -1,904 bags today, bringing global visible exchange inventory to 394,267 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-19T03:27:23.260035",
-    "commentary": {
-      "text": "KC Arabica certified stocks shifted by -1,904 bags today, bringing global visible exchange inventory to 394,267 bags.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    }
-  },
-  {
-    "id": 7196,
-    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-17",
-    "body": "ICE-EU RC Open Interest changed by -7,328 over the last session, with -7,752 on nearby two contracts and +424 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
-    "source": "ICE",
-    "category": "futures",
-    "lat": 51.51,
-    "lng": -0.09,
-    "tags": [
-      "daily-oi",
-      "robusta",
-      "futures",
-      "auto-commentary"
-    ],
-    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-17\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by -7,328 over the last session, with -7,752 on nearby two contracts and +424 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-19T03:16:24.511849",
-    "commentary": {
-      "text": "ICE-EU RC Open Interest changed by -7,328 over the last session, with -7,752 on nearby two contracts and +424 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 62.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "OI snapshot: no decisive technical view"
   }
 ]
