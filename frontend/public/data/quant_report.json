@@ -228,18 +228,45 @@
       }
     ]
   },
-  "scraped_at": "2026-06-30T22:50:16.494715+00:00",
+  "scraped_at": "2026-06-30T22:50:43.106251Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-06-29T22:37:36.290942Z",
+    "scraped_at": "2026-06-30T22:50:41.904906Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 92.8,
-    "net_index": 0.0,
-    "bull_count": 0,
+    "overall_confidence": 92.5,
+    "net_index": 45.0,
+    "bull_count": 4,
     "bear_count": 0,
-    "neutral_count": 8,
+    "neutral_count": 4,
     "total": 8,
     "items": [
+      {
+        "headline": "Sprouts Farmers Market Expands Partnership With Klatch Coffee, Bringing In-Store Cafes To San Diego",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: Filigree Coffee In Orlando, FL",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Three New World Coffee Champions Were Just Crowned",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
         "source": "Sprudge",
@@ -252,7 +279,7 @@
       {
         "headline": "Build-Outs Of Coffee: Others Coffee In Washington, DC",
         "source": "Sprudge",
-        "sentiment": "Neutral",
+        "sentiment": "Bullish",
         "confidence": 90.0,
         "tags": [
           "sprudge"
@@ -262,7 +289,7 @@
         "headline": "Exactly How Much Coffee Do You Need To Boost Athletic Performance?",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 92.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -270,7 +297,7 @@
       {
         "headline": "Build-Outs Of Coffee: Bird Dog Coffee In Laguna Hills, CA",
         "source": "Sprudge",
-        "sentiment": "Neutral",
+        "sentiment": "Bullish",
         "confidence": 90.0,
         "tags": [
           "sprudge"
@@ -278,33 +305,6 @@
       },
       {
         "headline": "Jill Hoff Of Monogram Coffee Is The 2026 Canada Barista Champion",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Body Count\u2019s Now In The Coffee House\u2026",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Mr. Espresso Debuts Limited-Edition Sumatra Jasmine Co-Ferment",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Coffee Talk Tokyo Is The Coffee Video Game Of The Year",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -328,79 +328,79 @@
   },
   "open_direction": {
     "available": true,
-    "as_of": "2026-06-26",
-    "scraped_at": "2026-06-29T22:37:37.142476Z",
+    "as_of": "2026-06-29",
+    "scraped_at": "2026-06-30T22:50:42.748161Z",
     "direction": "Bullish",
-    "base_margin": 0.20789535036039342,
-    "final_margin": 0.1896303844300145,
-    "base_prob": 0.5517874486275958,
-    "final_prob": 0.5472660416017698,
-    "prob_up": 0.5472660416017698,
-    "prob_down": 0.45273395839823016,
+    "base_margin": 0.2078764085017678,
+    "final_margin": 0.3612349773513418,
+    "base_prob": 0.5517827639592693,
+    "final_prob": 0.5893393543422862,
+    "prob_up": 0.5893393543422862,
+    "prob_down": 0.41066064565771376,
     "features": [
-      {
-        "var_name": "rc_open15_ret",
-        "label": "RC Opening 15-min Move",
-        "raw_value": 0.007960472138347496,
-        "raw_fmt": "+0.80%",
-        "usd_per_ton": 30.4,
-        "phi": 0.2062594675480037
-      },
       {
         "var_name": "rc_ret_1d",
         "label": "RC 1-Day Return",
-        "raw_value": 0.01624068157614489,
-        "raw_fmt": "+1.62%",
-        "usd_per_ton": 62.0,
-        "phi": -0.158204451062504
+        "raw_value": -0.014671207754781257,
+        "raw_fmt": "-1.47%",
+        "usd_per_ton": -55.2,
+        "phi": 0.16218669540592157
       },
       {
-        "var_name": "rc_overnight_gap",
-        "label": "RC Overnight Gap",
-        "raw_value": -0.006273867975995606,
-        "raw_fmt": "-0.63%",
-        "usd_per_ton": -23.9,
-        "phi": -0.1424251428150078
+        "var_name": "rc_open15_ret",
+        "label": "RC Opening 15-min Move",
+        "raw_value": -0.002488938053097356,
+        "raw_fmt": "-0.25%",
+        "usd_per_ton": -9.4,
+        "phi": -0.07714157338941818
       },
       {
         "var_name": "kc_rc_gap_z",
         "label": "New York Price Gap (z)",
-        "raw_value": -1.264422016115068,
-        "raw_fmt": "-1.26\u03c3",
-        "usd_per_ton": -884.2,
-        "phi": 0.0913303139824434,
+        "raw_value": -1.0416799840175999,
+        "raw_fmt": "-1.04\u03c3",
+        "usd_per_ton": -729.9,
+        "phi": 0.074126873543515,
         "detail": {
-          "kc_usd_per_mt": 6321.7,
-          "rc_usd_per_mt": 3817.0,
-          "gap_usd_per_mt": 2504.7,
-          "gap_mean_usd_per_mt": 3389.0,
-          "gap_std_usd_per_mt": 699.3,
+          "kc_usd_per_mt": 6417.6,
+          "rc_usd_per_mt": 3761.0,
+          "gap_usd_per_mt": 2656.6,
+          "gap_mean_usd_per_mt": 3386.6,
+          "gap_std_usd_per_mt": 700.7,
           "formula": "gap = KC(\u00a2/lb \u00d7 22.0462) \u2212 RC, in USD/MT; z-scored over a 260-day rolling window"
         }
       },
       {
         "var_name": "kc_rc_gap_ret",
         "label": "NY Price Gap \u0394",
-        "raw_value": -0.04067293996693666,
-        "raw_fmt": "-4.07%",
-        "usd_per_ton": -155.2,
-        "phi": -0.08365190782899903
+        "raw_value": 0.06064521424781355,
+        "raw_fmt": "+6.06%",
+        "usd_per_ton": 228.1,
+        "phi": 0.060973888905770234
       },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
-        "raw_value": 0.002011704462326236,
-        "raw_fmt": "+0.20%",
-        "usd_per_ton": 7.7,
-        "phi": 0.08311333770022061
+        "raw_value": -0.0007190364911018321,
+        "raw_fmt": "-0.07%",
+        "usd_per_ton": -2.7,
+        "phi": -0.028400628949260202
+      },
+      {
+        "var_name": "rc_overnight_gap",
+        "label": "RC Overnight Gap",
+        "raw_value": -0.0011049723756906271,
+        "raw_fmt": "-0.11%",
+        "usd_per_ton": -4.2,
+        "phi": -0.02320476147117574
       },
       {
         "var_name": "cci_ret_5d",
         "label": "Coffee Currency Index 5-Day \u0394",
-        "raw_value": 0.00231515563683371,
-        "raw_fmt": "+0.23%",
-        "usd_per_ton": 8.8,
-        "phi": -0.014686583454535813
+        "raw_value": 0.002396342143227592,
+        "raw_fmt": "+0.24%",
+        "usd_per_ton": 9.0,
+        "phi": -0.015181925195778672
       }
     ],
     "barrier": {
@@ -421,14 +421,14 @@
       ],
       "n_features": 7,
       "n_train": 843,
-      "test_accuracy": 0.5707620528771384,
+      "test_accuracy": 0.5723172628304821,
       "baseline_accuracy": 0.5256609642301711,
-      "edge": 0.04510108864696738,
+      "edge": 0.046656298600311064,
       "eval_method": "walk_forward",
       "n_test": 643,
-      "undefined_ratio": 0.17159763313609466,
+      "undefined_ratio": 0.17061143984220908,
       "n_resolvable": 1014,
-      "n_undefined": 174,
+      "n_undefined": 173,
       "currency_axis": "coffee_currency_index",
       "cci_available": true,
       "kc_after_rc_active": true,
