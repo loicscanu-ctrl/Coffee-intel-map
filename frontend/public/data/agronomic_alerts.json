@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T06:32:12+00:00",
+  "generated_at": "2026-06-30T06:04:59+00:00",
   "ruleset_version": "iphm-v1",
   "origins": {
     "colombia": {
@@ -12,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.17,
-            "forecast_7d_rain": 128.6
+            "forecast_7d_rain": 120.2
           }
         }
       ]
@@ -55,7 +55,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.17,
-            "forecast_7d_rain": 60.2
+            "forecast_7d_rain": 75.0
           }
         }
       ],
@@ -68,7 +68,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.26,
-            "forecast_7d_rain": 122.6
+            "forecast_7d_rain": 121.5
           }
         }
       ],
@@ -81,7 +81,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.55,
-            "forecast_7d_rain": 139.8
+            "forecast_7d_rain": 135.4
           }
         }
       ],
