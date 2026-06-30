@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { ProcessedCotRow } from "@/lib/cot/types";
 import { HM_CAT_COLORS, SectionHeader, MarketToggle } from "./cotShared";
+import { fmtLotK as fmtLot } from "@/lib/formatters";
 
 export function CotGauges({ data }: { data: ProcessedCotRow[] }) {
   const [market, setMarket] = useState<"ny" | "ldn">("ny");
@@ -49,8 +50,6 @@ export function CotGauges({ data }: { data: ProcessedCotRow[] }) {
     if (pct <= 40) return "#84cc16";
     return "#94a3b8";
   };
-
-  const fmtLot = (v: number) => Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + "k" : String(Math.round(v));
 
   const renderGauge = (r: GRData) => {
     const pct = Math.max(0, Math.min(100, r.pct));

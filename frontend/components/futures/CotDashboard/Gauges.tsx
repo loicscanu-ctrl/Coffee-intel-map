@@ -2,6 +2,7 @@
 import type { CotMarketPositions, ProcessedCotRow } from "@/lib/cot/types";
 import { HM_CAT_COLORS } from "./constants";
 import SectionHeader from "./SectionHeader";
+import { fmtLotK as fmtLot } from "@/lib/formatters";
 
 type PositionField = keyof CotMarketPositions;
 type Mkt = "ny" | "ldn";
@@ -59,8 +60,6 @@ export default function CotGauges({ data }: { data: ProcessedCotRow[] }) {
     ...[...ny.longRows, ...ny.shortRows].map(r => ({ ...r, mkt: "NY" })),
     ...[...ldn.longRows, ...ldn.shortRows].map(r => ({ ...r, mkt: "LDN" })),
   ].filter(r => r.pct >= 80 || r.pct <= 20);
-
-  const fmtLot = (v: number) => Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + "k" : String(Math.round(v));
 
   const renderGauge = (r: GRData) => {
     const pct = Math.max(0, Math.min(100, r.pct));

@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFetchJson } from "@/lib/useFetchJson";
 import {
   Bar, BarChart, CartesianGrid, ComposedChart, Legend, Line, LineChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -54,15 +55,8 @@ function uniq(xs: string[]): string[] {
 type Row = Record<string, number | string | null>;
 
 export default function AjcaPanel() {
-  const [d, setD] = useState<AjcaData | null>(null);
-  const [err, setErr] = useState(false);
+  const { data: d, error: err } = useFetchJson<AjcaData>("/data/ajca.json");
   const [dim, setDim] = useState<"origin" | "region">("origin");
-
-  useEffect(() => {
-    fetch("/data/ajca.json")
-      .then(r => (r.ok ? r.json() : Promise.reject(new Error())))
-      .then(setD).catch(() => setErr(true));
-  }, []);
 
   if (err) return <div className="p-4 text-xs text-red-400">Failed to load AJCA data.</div>;
   if (!d) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading AJCA data…</div>;

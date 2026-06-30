@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import { useState, useMemo, useEffect } from "react";
 import PinToReport from "@/components/report/PinToReport";
+import { useFetchJson } from "@/lib/useFetchJson";
 
 const YEAR_COLORS: Record<number, string> = {
   2016: "#64748b", 2017: "#6366f1", 2018: "#8b5cf6",
@@ -75,15 +76,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
 };
 
 export default function KaffeesteuerChart({ isReportMode = false }: { isReportMode?: boolean }) {
-  const [raw, setRaw] = useState<Record<string, number> | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    fetch("/data/kaffeesteuer.json")
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(setRaw)
-      .catch(() => setError(true));
-  }, []);
+  const { data: raw, error } = useFetchJson<Record<string, number>>("/data/kaffeesteuer.json");
 
   const allSeries = useMemo(() => raw ? buildSeries(raw) : [], [raw]);
   const allYears  = useMemo(() => Array.from(new Set(allSeries.map(d => d.year))).sort(), [allSeries]);

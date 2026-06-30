@@ -35,6 +35,12 @@ export function fmtAttr(n: number | null | undefined): string {
   return (n >= 0 ? "+" : "") + n.toFixed(2) + "B";
 }
 
+// Lot count with a k-suffix above 1000: 1500 → "2k", 850 → "850". Used by the
+// COT gauge readouts (CotGauges / Gauges) which had identical local copies.
+export function fmtLotK(v: number): string {
+  return Math.abs(v) >= 1000 ? (v / 1000).toFixed(0) + "k" : String(Math.round(v));
+}
+
 // ISO timestamp → "Xm ago" / "Xh ago" / "Xd ago".
 export function fmtAgo(iso: string): string {
   const h = (Date.now() - Date.parse(iso)) / 3_600_000;
