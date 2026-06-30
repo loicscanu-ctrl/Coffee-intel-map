@@ -212,8 +212,9 @@ def main():
                 "error":      str(e),
             })
 
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump({"scraped_at": scraped_at, "companies": results}, f, indent=2)
+    from scraper.validate_export import safe_write_json
+    safe_write_json(OUT_PATH, {"scraped_at": scraped_at, "companies": results},
+                    lambda d: (isinstance(d.get("companies"), list), "companies missing"))
     print(f"\nSaved {len(results)} companies → {OUT_PATH}")
 
 

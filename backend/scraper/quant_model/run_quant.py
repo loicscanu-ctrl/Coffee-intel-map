@@ -58,8 +58,9 @@ def _append_sentiment_history(sent: dict) -> None:
     history.append(record)
     history.sort(key=lambda h: h.get("date", ""))
     history = history[-365:]
-    with open(HIST_PATH, "w", encoding="utf-8") as f:
-        json.dump(history, f, ensure_ascii=False, separators=(",", ":"))
+    safe_write_json(HIST_PATH, history,
+                    lambda d: (isinstance(d, list), "sentiment history not a list"),
+                    indent=None, ensure_ascii=False, separators=(",", ":"))
     print(f"  Sentiment history → {len(history)} days ({HIST_PATH.name})")
 
 

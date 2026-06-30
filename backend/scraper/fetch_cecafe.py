@@ -355,10 +355,12 @@ def main():
         "by_country_history":      history,
     }
 
+    from scraper.validate_export import safe_write_json
     path = OUT_DIR / "cecafe.json"
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2, ensure_ascii=False)
-    print(f"\nWritten: {path}  ({path.stat().st_size:,} bytes)")
+    safe_write_json(path, out,
+                    lambda d: (isinstance(d, dict) and len(d) > 0, "empty cecafe payload"),
+                    ensure_ascii=False)
+    print(f"\nWritten: {path}")
 
     try:
         _emit_news(series)

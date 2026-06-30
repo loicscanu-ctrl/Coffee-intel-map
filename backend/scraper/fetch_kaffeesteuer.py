@@ -314,9 +314,10 @@ def main():
         print("\nNo new values fetched — leaving JSON unchanged.")
         return
 
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, sort_keys=True)
-        f.write("\n")
+    from scraper.validate_export import safe_write_json
+    safe_write_json(OUT_PATH, results,
+                    lambda d: (bool(d), "empty kaffeesteuer payload"),
+                    sort_keys=True)
     print(f"\nSaved {len(results)} total records (+{added}) → {OUT_PATH}")
 
     # News-feed badge for the latest month — additive, never fails the scraper.
