@@ -1,5 +1,57 @@
 [
   {
+    "id": 7545,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-26",
+    "body": "ICE-EU RC Open Interest changed by +576 over the last session, with +63 on nearby two contracts and +513 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-26\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +576 over the last session, with +63 on nearby two contracts and +513 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T05:18:45.259299",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +576 over the last session, with +63 on nearby two contracts and +513 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 7544,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-26",
+    "body": "IFUS KC Open Interest changed by -9 over the last session, with -689 on nearby two contracts and +680 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-26\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -9 over the last session, with -689 on nearby two contracts and +680 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T05:18:42.524765",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -9 over the last session, with -689 on nearby two contracts and +680 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
+  },
+  {
     "id": 7543,
     "title": "World Bank Population \u2013 2026-06-30",
     "body": "Tracked 14 countries for demand-tab per-capita normalization.",
@@ -3983,57 +4035,5 @@
     "sentiment_confidence": 75.0,
     "sentiment_method": "deterministic",
     "sentiment_reason": "Uganda: no regions flagged at risk"
-  },
-  {
-    "id": 7232,
-    "title": "Indonesia Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": -2.55,
-    "lng": 118.01,
-    "tags": [
-      "weather",
-      "indonesia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-20T06:12:38.090333",
-    "commentary": {
-      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Indonesia: no regions flagged at risk"
-  },
-  {
-    "id": 7231,
-    "title": "Honduras Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 14.07,
-    "lng": -87.2,
-    "tags": [
-      "weather",
-      "honduras",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-20T06:12:37.427346",
-    "commentary": {
-      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Honduras: no regions flagged at risk"
   }
 ]
