@@ -353,9 +353,11 @@ function PortSquareMap({ rows, unit }: { rows: SpotRow[]; unit: Unit }) {
             </div>
             <div className="flex flex-wrap gap-[2px] content-start">
               {prs.flatMap((r, ri) => {
+                // No cap — every 20 t parcel is drawn so the volume is shown
+                // honestly, however large the offer.
                 const n = Math.max(1, Math.round(offerVol(r, unit) / sqSize));
                 const border = cropTier(r.Crop).color;
-                return Array.from({ length: Math.min(n, 60) }).map((_, k) => (
+                return Array.from({ length: n }).map((_, k) => (
                   <span key={`${ri}-${k}`}
                     onMouseEnter={() => setHover(r)}
                     style={{ background: fillOf(r), borderColor: border }}
