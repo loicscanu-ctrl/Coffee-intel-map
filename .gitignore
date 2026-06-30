@@ -1,5 +1,11 @@
 .worktrees/
 .superpowers/
+
+# Proprietary / research-only raw data (e.g. Nielsen retail scan) — never commit
+# to this PUBLIC repo. Only derived, aggregated, non-proprietary outputs may be
+# committed, and only with explicit confirmation.
+research_data/
+
 __pycache__/
 *.pyc
 *.pyo
