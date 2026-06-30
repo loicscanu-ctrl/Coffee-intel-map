@@ -145,6 +145,27 @@ def _filter_fx_outliers(history: list[dict], ticker: str = "") -> tuple[list[dic
     return clean, dropped
 
 
+def _merge_close_series(existing_history: "list[dict] | None", closes,
+                        ticker: str = "") -> tuple[list[dict], int]:
+    """Merge an existing [{date, close}] history with a fresh closes Series —
+    new values win on overlapping dates, older non-overlapping dates preserved —
+    then drop outlier prints. Returns (sorted_clean_history, n_dropped). Shared
+    by the daily merge (fetch_currency_index) and the deep backfill so both apply
+    the same merge + outlier-guard contract."""
+    by_date: dict[str, float] = {}
+    for row in existing_history or []:
+        d, c = row.get("date"), _safe_float(row.get("close"))
+        if d and c is not None:
+            by_date[d] = c
+    if closes is not None and not getattr(closes, "empty", True):
+        for ts, val in closes.items():
+            c = _safe_float(val)
+            if c is not None:
+                by_date[ts.date().isoformat()] = c
+    hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
+    return _filter_fx_outliers(hist, ticker)
+
+
 def _safe_float(val) -> float | None:
     try:
         v = float(val)
@@ -443,18 +464,8 @@ def main():
             existing_pairs = {}
 
     def _merge_pair(ticker, name, typ, w, closes):
-        by_date: dict[str, float] = {}
-        for row in (existing_pairs.get(ticker) or {}).get("history", []) or []:
-            d, c = row.get("date"), _safe_float(row.get("close"))
-            if d and c is not None:
-                by_date[d] = c
-        if closes is not None and not closes.empty:
-            for dt_, val in closes.items():
-                c = _safe_float(val)
-                if c is not None:
-                    by_date[dt_.date().isoformat()] = c
-        hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
-        hist, n_drop = _filter_fx_outliers(hist, ticker)
+        hist, n_drop = _merge_close_series(
+            (existing_pairs.get(ticker) or {}).get("history"), closes, ticker)
         if n_drop:
             print(f"  {ticker}: dropped {n_drop} FX outlier print(s) "
                   f"(> ±{int(_MAX_FX_DAILY_MOVE*100)}%/day)")

@@ -5,7 +5,12 @@ FX print injecting a fake spike-and-recover. It rejects closes implying a > ±30
 one-day move (or a non-positive value), judging each vs the PRIOR RAW close so it
 self-heals on glitches yet lets a real permanent step-devaluation re-level.
 """
-from scraper.quant_model.fetch_currency_index import _filter_fx_outliers
+import pandas as pd
+
+from scraper.quant_model.fetch_currency_index import (
+    _filter_fx_outliers,
+    _merge_close_series,
+)
 
 
 def _h(*closes):
@@ -50,3 +55,23 @@ def test_within_threshold_kept():
     clean, n = _filter_fx_outliers(_h(5.00, 6.45))   # +29%
     assert n == 0
     assert [r["close"] for r in clean] == [5.00, 6.45]
+
+
+# ── shared merge helper (used by both the daily merge and the deep backfill) ──
+
+def test_merge_close_series_new_wins_and_preserves_and_guards():
+    existing = [{"date": "2026-01-01", "close": 5.00},
+                {"date": "2026-01-02", "close": 5.05}]
+    closes = pd.Series({pd.Timestamp("2026-01-02"): 5.06,   # overlap → new wins
+                        pd.Timestamp("2026-01-03"): 9.90})   # +96% → outlier
+    hist, n = _merge_close_series(existing, closes, "BRL=X")
+    by_date = {r["date"]: r["close"] for r in hist}
+    assert by_date["2026-01-01"] == 5.00      # old preserved
+    assert by_date["2026-01-02"] == 5.06      # fresh value wins on overlap
+    assert "2026-01-03" not in by_date        # outlier dropped
+    assert n == 1
+
+
+def test_merge_close_series_handles_empty_inputs():
+    hist, n = _merge_close_series(None, None)
+    assert hist == [] and n == 0

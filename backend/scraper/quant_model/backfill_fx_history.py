@@ -25,7 +25,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -35,7 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from scraper.quant_model.fetch_currency_index import (  # noqa: E402
-    EXPORTERS, IMPORTERS, FX_OUT, _filter_fx_outliers, _safe_float,
+    EXPORTERS, IMPORTERS, FX_OUT, _merge_close_series,
 )
 from scraper.validate_export import safe_write_json  # noqa: E402
 
@@ -75,22 +75,14 @@ def _yahoo_closes(ticker: str, p1: int, p2: int) -> "pd.Series":
     return pd.Series(dtype=float)
 
 
-def _merge_history(existing_pair: dict | None, closes: "pd.Series") -> list[dict]:
+def _merge_history(existing_pair: dict | None, closes: "pd.Series",
+                   ticker: str = "") -> list[dict]:
     """Merge a deep close series with any existing pair history (Yahoo wins on
-    overlapping dates; older non-overlapping dates preserved)."""
-    by_date: dict[str, float] = {}
-    for row in (existing_pair or {}).get("history", []) or []:
-        d, c = row.get("date"), _safe_float(row.get("close"))
-        if d and c is not None:
-            by_date[d] = c
-    for ts, v in closes.items():
-        c = _safe_float(v)
-        if c is not None:
-            by_date[ts.date().isoformat()] = c
-    hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
-    hist, n_drop = _filter_fx_outliers(hist)
+    overlapping dates; older preserved), then outlier-guard. Thin wrapper over
+    the shared _merge_close_series so the backfill and daily merge agree."""
+    hist, n_drop = _merge_close_series((existing_pair or {}).get("history"), closes, ticker)
     if n_drop:
-        print(f"    dropped {n_drop} FX outlier print(s) (> ±30%/day)", file=sys.stderr)
+        print(f"    {ticker}: dropped {n_drop} FX outlier print(s) (> ±30%/day)", file=sys.stderr)
     return hist
 
 
@@ -117,7 +109,7 @@ def run(since: str = "2020-01-01") -> dict:
             if ticker in existing:
                 pairs[ticker] = existing[ticker]
             continue
-        hist = _merge_history(existing.get(ticker), closes)
+        hist = _merge_history(existing.get(ticker), closes, ticker)
         pairs[ticker] = {"name": name, "type": typ, "weight": w, "history": hist}
         span = f"{hist[0]['date']}..{hist[-1]['date']}" if hist else "—"
         print(f"  {ticker:9s} {name:18s} {len(hist):5d} closes  {span}")
