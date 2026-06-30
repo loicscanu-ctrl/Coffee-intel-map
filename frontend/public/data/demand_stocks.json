@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T07:16:46.923134Z",
+  "generated_at": "2026-06-30T06:41:55.551444Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -9837,8 +9837,8 @@
       "name": "Russia",
       "latest_year": "2025",
       "consumption_mt": 274500,
-      "population": 143533851,
-      "per_capita_kg": 1.91,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-06-29",
+    "last_updated": "2026-06-30",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12600,12 +12600,6 @@
         "iso3": "VNM",
         "latest_year": "2024",
         "latest_population": 100987686
-      },
-      "russia": {
-        "name": "Russia",
-        "iso3": "RUS",
-        "latest_year": "2024",
-        "latest_population": 143533851
       },
       "mexico": {
         "name": "Mexico",

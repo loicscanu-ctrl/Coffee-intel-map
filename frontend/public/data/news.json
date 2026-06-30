@@ -1,5 +1,161 @@
 [
   {
+    "id": 7551,
+    "title": "Ethiopia Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 9.15,
+    "lng": 40.49,
+    "tags": [
+      "weather",
+      "ethiopia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:59.180191",
+    "commentary": {
+      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Ethiopia: no regions flagged at risk"
+  },
+  {
+    "id": 7550,
+    "title": "Uganda Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Uganda (Masaka, Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 104mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.3.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 1.37,
+    "lng": 32.29,
+    "tags": [
+      "weather",
+      "uganda",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 3, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Masaka, Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 104mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.3.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:58.730543",
+    "commentary": {
+      "text": "Agronomic Status Update: Uganda (Masaka, Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 104mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.3.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Bullish",
+    "sentiment_confidence": 88.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Uganda: 3 growing regions flagged at agronomic risk"
+  },
+  {
+    "id": 7549,
+    "title": "Indonesia Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -2.55,
+    "lng": 118.01,
+    "tags": [
+      "weather",
+      "indonesia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:58.289196",
+    "commentary": {
+      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Indonesia: no regions flagged at risk"
+  },
+  {
+    "id": 7548,
+    "title": "Honduras Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 14.07,
+    "lng": -87.2,
+    "tags": [
+      "weather",
+      "honduras",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"honduras\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:57.848297",
+    "commentary": {
+      "text": "Agronomic Status Update: Honduras (El Para\u00edso, Cop\u00e1n, Santa B\u00e1rbara, Montecillos, Agalta) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Honduras: no regions flagged at risk"
+  },
+  {
+    "id": 7547,
+    "title": "Colombia Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": 4.71,
+    "lng": -74.07,
+    "tags": [
+      "weather",
+      "colombia",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"colombia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:57.407634",
+    "commentary": {
+      "text": "Agronomic Status Update: Colombia (Huila, Antioquia, Cauca, Caldas, Nari\u00f1o) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Colombia: no regions flagged at risk"
+  },
+  {
+    "id": 7546,
+    "title": "Brazil Agronomic Status \u2013 2026-06-30",
+    "body": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+    "source": "Open-Meteo + NOAA STAR",
+    "category": "supply",
+    "lat": -15.78,
+    "lng": -47.93,
+    "tags": [
+      "weather",
+      "brazil",
+      "agronomic",
+      "auto-commentary"
+    ],
+    "meta": "{\"origin\": \"brazil\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 4, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-06-30T06:04:55.167049",
+    "commentary": {
+      "text": "Agronomic Status Update: Brazil (Sul de Minas, Cerrado, Esp\u00edrito Santo, Paran\u00e1) is currently flagged as normal.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "Brazil: no regions flagged at risk"
+  },
+  {
     "id": 7545,
     "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-26",
     "body": "ICE-EU RC Open Interest changed by +576 over the last session, with +63 on nearby two contracts and +513 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
@@ -3923,117 +4079,5 @@
     ],
     "meta": null,
     "pub_date": "2026-06-21T03:02:39.590057"
-  },
-  {
-    "id": 7239,
-    "title": "USD/HNL FX Rate \u2013 2026-06-21",
-    "body": "USD/HNL FX Rate price: 27.0544",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-21T03:02:38.554611"
-  },
-  {
-    "id": 7238,
-    "title": "USD/IDR FX Rate \u2013 2026-06-21",
-    "body": "USD/IDR FX Rate price: 17789",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -0.789,
-    "lng": 113.921,
-    "tags": [
-      "fx",
-      "indonesia"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-21T03:02:37.516045"
-  },
-  {
-    "id": 7237,
-    "title": "USD/VND FX Rate \u2013 2026-06-21",
-    "body": "USD/VND FX Rate price: 26421",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 14.058,
-    "lng": 108.277,
-    "tags": [
-      "fx",
-      "vietnam"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-21T03:02:36.474742"
-  },
-  {
-    "id": 7236,
-    "title": "USD/BRL FX Rate \u2013 2026-06-21",
-    "body": "USD/BRL FX Rate price: 5.1559",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": -14.235,
-    "lng": -51.925,
-    "tags": [
-      "fx",
-      "brazil"
-    ],
-    "meta": null,
-    "pub_date": "2026-06-21T03:02:35.426402"
-  },
-  {
-    "id": 7234,
-    "title": "Ethiopia Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 9.15,
-    "lng": 40.49,
-    "tags": [
-      "weather",
-      "ethiopia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-20T06:12:39.419015",
-    "commentary": {
-      "text": "Agronomic Status Update: Ethiopia (Sidama/Yirgacheffe, Jimma, Limu, Kaffa, Harrar) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Ethiopia: no regions flagged at risk"
-  },
-  {
-    "id": 7233,
-    "title": "Uganda Agronomic Status \u2013 2026-06-20",
-    "body": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 1.37,
-    "lng": 32.29,
-    "tags": [
-      "weather",
-      "uganda",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-06-20T06:12:38.753901",
-    "commentary": {
-      "text": "Agronomic Status Update: Uganda (Masaka, Kasese, Rwenzori, Mbale, Mt Elgon) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Uganda: no regions flagged at risk"
   }
 ]
