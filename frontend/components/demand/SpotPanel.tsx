@@ -94,7 +94,7 @@ export default function SpotPanel(
         <VolumeOverTime snaps={hist?.snapshots ?? []} unit={unit} totalsNow={totals} asOf={d.as_of} />
       </Section>
 
-      <Section title="Port square-map" hint="Each square ≈ a fixed lot. Fill = origin, border = crop-year freshness. Hover a square for the offer; sort by price.">
+      <Section title="Port square-map" hint="Each square ≈ 20 t (a 60 t offer = 3 squares). Fill = origin, border = crop-year freshness. Hover a square for the offer; sort by price.">
         <PortSquareMap rows={rows} unit={unit} />
       </Section>
 
@@ -291,7 +291,11 @@ function PortSquareMap({ rows, unit }: { rows: SpotRow[]; unit: Unit }) {
   const [typeF, setTypeF] = useState<"All" | "Arabica" | "Robusta">("All");
   const [hover, setHover] = useState<SpotRow | null>(null);
 
-  const sqSize = unit === "mt" ? 25 : 400; // ~one lot per square
+  // One square = a fixed 20 t parcel: an offer of N t draws round(N / 20)
+  // squares (a 60 t offer → 3 squares; rounded when not an exact multiple).
+  // In bags-mode the same 20 t is shown as its bag-equivalent (≈333 bags).
+  const MT_PER_SQUARE = 20;
+  const sqSize = unit === "mt" ? MT_PER_SQUARE : Math.round((MT_PER_SQUARE * 1000) / 60);
 
   const ports = useMemo(() => {
     const filt = rows.filter((r) => typeF === "All" || r.Type === typeF);
