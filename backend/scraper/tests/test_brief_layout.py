@@ -193,3 +193,28 @@ def test_brief_spread_line_has_change_in_parens(fixture_data_dir):
     out = build_brief_message()
     # Today RC N-U = 3438 - 3315 = 123; yesterday 3476 - 3347 = 129; delta = -6.
     assert "N-U spread at 123 (-6)" in out
+
+
+def test_front_two_picks_liquid_front_during_roll():
+    """Near a roll the nearest contract is illiquid (thin, stale-looking last)
+    while OI has moved to the next delivery. _front_two must quote the liquid
+    contract (max OI), not contracts[0], and pair it with the next by expiry."""
+    from telegram.handlers.brief import _front_two
+    # Mirror the 2026-06-29 robusta state: RMN26 dying (2 lots), RMU26 liquid.
+    contracts = [
+        {"symbol": "RMN26", "last": 3761, "oi": 160,   "volume": 2},
+        {"symbol": "RMU26", "last": 3564, "oi": 62072, "volume": 8955},
+        {"symbol": "RMX26", "last": 3510, "oi": 17291, "volume": 4346},
+    ]
+    front, second = _front_two(contracts)
+    assert front["symbol"] == "RMU26"     # liquid front, not the dying RMN26
+    assert second["symbol"] == "RMX26"    # next delivery after the front
+
+
+def test_front_two_falls_back_to_first_without_oi():
+    """With no OI data (older fixtures / sparse feed) behaviour is unchanged:
+    the first contract is the front."""
+    from telegram.handlers.brief import _front_two
+    contracts = [{"symbol": "RMN26", "last": 3438}, {"symbol": "RMU26", "last": 3315}]
+    front, second = _front_two(contracts)
+    assert front["symbol"] == "RMN26" and second["symbol"] == "RMU26"

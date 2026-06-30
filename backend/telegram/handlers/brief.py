@@ -92,13 +92,29 @@ def _staleness_tag(data_date: str | date | datetime | None, today: date | None =
 # ── Futures (RC + KC) — price + spread ────────────────────────────────────────
 
 def _front_two(market_contracts: list[dict]) -> tuple[dict | None, dict | None]:
-    """The two front contracts in display order. The futures_chain ships them
-    sorted by expiration so [0] = front, [1] = second month."""
-    if not market_contracts:
+    """The liquid front contract + the next delivery (for the price line and the
+    front-next calendar spread).
+
+    The futures_chain ships contracts sorted by expiration, but the nearest one
+    is NOT always the traded one: in the weeks before First Notice the market
+    rolls forward, so the front month goes illiquid — a thin, stale-LOOKING last
+    print on a handful of lots — while open interest has already moved to the next
+    delivery. Taking contracts[0] then quotes the dying contract (e.g. RMN26 at
+    3761 on 2 lots when the liquid RMU26 trades 3564), which reads as "stale" /
+    "past" data even though the file is current.
+
+    So the front is the genuinely liquid contract (max open interest, tie-broken
+    by volume), and the second is the next contract after it by expiry."""
+    cs = [c for c in (market_contracts or []) if c.get("last") is not None]
+    if not cs:
         return None, None
-    if len(market_contracts) == 1:
-        return market_contracts[0], None
-    return market_contracts[0], market_contracts[1]
+    front = max(cs, key=lambda c: (c.get("oi") or 0, c.get("volume") or 0))
+    try:
+        idx = market_contracts.index(front)
+    except ValueError:
+        idx = 0
+    second = next((c for c in market_contracts[idx + 1:] if c.get("last") is not None), None)
+    return front, second
 
 
 def _archive_two_recent_dates(archive: dict | None, market: str) -> tuple[str | None, str | None]:
