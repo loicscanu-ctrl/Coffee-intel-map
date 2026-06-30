@@ -109,6 +109,41 @@ IMPORTERS = [
 # Z-score lookback window (trading days)
 Z_WINDOW = 252
 
+# FX outlier guard: a single corrupt FX print (glitch, decimal slip, stale dup,
+# a 0) would otherwise inject a fake spike-and-recover into the returns-based
+# CCI. Reject any close implying a > ±30% one-day move. The check is vs the
+# PRIOR RAW close (not the prior accepted one), so the filter self-heals: a
+# one-off glitch is dropped and the next genuine print kept, while a real
+# permanent step-devaluation (rare, but VND/IDR/COP can do it) re-levels on the
+# next day rather than blanking the rest of the series.
+_MAX_FX_DAILY_MOVE = 0.30
+
+
+def _filter_fx_outliers(history: list[dict], ticker: str = "") -> tuple[list[dict], int]:
+    """Drop close prints implying an absurd (> _MAX_FX_DAILY_MOVE) 1-day move or
+    a non-positive value. `history` is date-sorted [{date, close}]. Returns
+    (clean_history, n_dropped)."""
+    clean: list[dict] = []
+    prev_raw: float | None = None
+    dropped = 0
+    for row in history:
+        try:
+            c = float(row.get("close"))
+        except (TypeError, ValueError):
+            prev_raw = None
+            continue
+        if not (c > 0):
+            dropped += 1
+            prev_raw = None          # garbage: don't use it as a baseline
+            continue
+        if prev_raw is not None and abs(c / prev_raw - 1.0) > _MAX_FX_DAILY_MOVE:
+            dropped += 1
+            prev_raw = c             # let the next day judge against this level
+            continue
+        clean.append({"date": row["date"], "close": c})
+        prev_raw = c
+    return clean, dropped
+
 
 def _safe_float(val) -> float | None:
     try:
@@ -419,6 +454,10 @@ def main():
                 if c is not None:
                     by_date[dt_.date().isoformat()] = c
         hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
+        hist, n_drop = _filter_fx_outliers(hist, ticker)
+        if n_drop:
+            print(f"  {ticker}: dropped {n_drop} FX outlier print(s) "
+                  f"(> ±{int(_MAX_FX_DAILY_MOVE*100)}%/day)")
         return {"name": name, "type": typ, "weight": w, "history": hist} if hist else None
 
     fx_pairs: dict[str, dict] = {}

@@ -35,7 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from scraper.quant_model.fetch_currency_index import (  # noqa: E402
-    EXPORTERS, IMPORTERS, FX_OUT, _safe_float,
+    EXPORTERS, IMPORTERS, FX_OUT, _filter_fx_outliers, _safe_float,
 )
 from scraper.validate_export import safe_write_json  # noqa: E402
 
@@ -87,7 +87,11 @@ def _merge_history(existing_pair: dict | None, closes: "pd.Series") -> list[dict
         c = _safe_float(v)
         if c is not None:
             by_date[ts.date().isoformat()] = c
-    return [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
+    hist = [{"date": d, "close": by_date[d]} for d in sorted(by_date)]
+    hist, n_drop = _filter_fx_outliers(hist)
+    if n_drop:
+        print(f"    dropped {n_drop} FX outlier print(s) (> ±30%/day)", file=sys.stderr)
+    return hist
 
 
 def run(since: str = "2020-01-01") -> dict:
