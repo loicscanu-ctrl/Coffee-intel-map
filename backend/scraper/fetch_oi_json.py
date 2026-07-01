@@ -18,7 +18,7 @@ import asyncio
 import json
 import os
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pathlib import Path
@@ -41,7 +41,7 @@ BARCHART_INIT_URL = "https://www.barchart.com/futures/quotes/KCK26/overview"
 def _prev_biz_day(d: date, n: int = 2) -> str:
     """Return d minus n business days as YYYY-MM-DD.
 
-    The 2 am fetch sees, per Barchart's reporting lag:
+    Relative to the reference date (see _reference_date), per Barchart's lag:
       n=1 → the PRICE date (previous business day's settlement)
       n=2 → the OI date   (ICE open-interest is published a further day behind)
     """
@@ -51,6 +51,26 @@ def _prev_biz_day(d: date, n: int = 2) -> str:
         if d.weekday() < 5:
             count += 1
     return d.isoformat()
+
+
+# The settle-date offsets above assume the job runs the MORNING AFTER a session,
+# so date.today() − 1 biz day is the session that just settled. To let the job
+# also run in the EVENING of the session itself (after ICE settlements publish,
+# ~17:30 London robusta / ~13:30 ET arabica), we advance the reference date to
+# "tomorrow" once past this UTC hour on a weekday — so the same N-1/N-2 offsets
+# still land on the just-settled session. Morning runs are unchanged.
+_SETTLE_HOUR_UTC = 20
+
+
+def _reference_date(now: "datetime | None" = None) -> date:
+    """Date the N-1/N-2 settlement offsets are computed from. Backward-compatible:
+    a pre-settle (morning/daytime) run reuses today; a post-settle evening run on
+    a weekday advances to the next day so an evening capture stamps the correct
+    (just-settled) session instead of the prior one."""
+    now = now or datetime.now(timezone.utc)
+    d = now.date()
+    settled_today = d.weekday() < 5 and now.hour >= _SETTLE_HOUR_UTC
+    return d + timedelta(days=1) if settled_today else d
 
 
 async def _fetch_chains() -> dict:
@@ -236,10 +256,10 @@ async def main() -> None:
     kc = _parse(chains.get("kc"))
     rm = _parse(chains.get("rm"))
 
-    today = date.today()
-    oi_date    = _prev_biz_day(today, n=2)   # OI lag: N-2 biz days
-    price_date = _prev_biz_day(today, n=1)   # price: N-1 biz day
-    print(f"[fetch_oi_json] fetch={today.isoformat()}  price_date(N-1)={price_date}  oi_date(N-2)={oi_date}")
+    ref = _reference_date()
+    oi_date    = _prev_biz_day(ref, n=2)   # OI lag: N-2 biz days
+    price_date = _prev_biz_day(ref, n=1)   # price: N-1 biz day
+    print(f"[fetch_oi_json] ref={ref.isoformat()}  price_date(N-1)={price_date}  oi_date(N-2)={oi_date}")
     print(f"[fetch_oi_json] Arabica contracts: {[c['symbol'] for c in kc]}")
     print(f"[fetch_oi_json] Robusta contracts:  {[c['symbol'] for c in rm]}")
 
