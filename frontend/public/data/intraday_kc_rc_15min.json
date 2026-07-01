@@ -17682,8 +17682,20 @@
     "rc_last_1730": 3663.0,
     "kc_last_1730": 297.95,
     "kc_last_1830": 302.15,
-    "rc_settle": null,
-    "kc_settle": null,
+    "rc_settle": 3658.0,
+    "kc_settle": 296.45,
+    "rc_symbol": "RMU26",
+    "kc_symbol": "KCU26"
+  },
+  {
+    "date": "2026-07-01",
+    "rc_open_first": 3678.0,
+    "rc_open_0915": 3684.0,
+    "rc_last_1730": 3771.0,
+    "kc_last_1730": 310.05,
+    "kc_last_1830": 314.6,
+    "rc_settle": 3771.0,
+    "kc_settle": 309.9,
     "rc_symbol": "RMU26",
     "kc_symbol": "KCU26"
   }
