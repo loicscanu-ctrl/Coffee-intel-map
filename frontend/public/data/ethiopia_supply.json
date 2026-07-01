@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-06-30T06:41:55.013545Z",
+  "scraped_at": "2026-07-01T06:58:18.679853Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -341,7 +341,7 @@
   },
   "ecx_price": {
     "etb_per_kg": 300.0,
-    "as_of": "2026-06-30",
+    "as_of": "2026-07-01",
     "source": "ECX",
     "grade": "All grades avg"
   },
@@ -355,15 +355,15 @@
         "csi_60d": 0.046,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW",
-        "rain_mtd_mm": 217.1,
-        "rain_hist_min": 88.5,
-        "rain_hist_max": 305.4
+        "rain_mtd_mm": 32.7,
+        "rain_hist_min": 0.2,
+        "rain_hist_max": 8.7
       },
       {
         "name": "Harrar",
         "drought": "NONE",
         "csi_30d": 0.14,
-        "csi_60d": 0.42,
+        "csi_60d": 0.444,
         "csi_30d_level": "LOW",
         "csi_60d_level": "MED"
       },
@@ -477,7 +477,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "-",
           "-",
@@ -514,6 +513,7 @@
           "L",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -657,9 +657,9 @@
           "-",
           "-",
           "-",
+          "L",
+          "L",
           "-",
-          "L",
-          "L",
           "-",
           "-",
           "-",
@@ -800,7 +800,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Ethiopia arabica output expected",
-    "last_updated": "2026-06-30"
+    "last_updated": "2026-07-01"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Jan",
