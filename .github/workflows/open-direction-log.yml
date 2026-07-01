@@ -1,0 +1,57 @@
+name: "1.16 – Open-Direction Prediction Log"
+
+# Stage 1 of the open-price-direction rollout: append-only track record.
+# Runs pre-open, logs a fresh Robusta overnight-gap prediction for the upcoming
+# session and resolves any prior pending predictions. Reads the intraday 15-min
+# file (refreshed 20:13 UTC prior eve) + the per-contract archive (02:13 UTC),
+# so both are fresh by 03:00 UTC. Does NOT touch the live panel yet.
+
+on:
+  schedule:
+    - cron: '0 3 * * 1-5'   # 03:00 UTC weekdays, before the London open
+  workflow_dispatch:
+
+concurrency:
+  group: data-commit          # serialize with the other main-pushers
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install numpy pandas
+
+      - name: Run open-direction prediction log
+        working-directory: backend
+        run: python -m scraper.quant_model.open_direction_log
+
+      - name: Commit updated history if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/data/open_direction_history.json
+          git diff --cached --quiet \
+            && echo "No changes." \
+            || (git commit -m "data: open-direction prediction log [skip ci]" \
+                && git pull --rebase --autostash --strategy-option=theirs origin main \
+                && git push)
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
