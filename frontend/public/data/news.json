@@ -1,5 +1,57 @@
 [
   {
+    "id": 7575,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-06-29",
+    "body": "ICE-EU RC Open Interest changed by +180 over the last session, with +107 on nearby two contracts and +73 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-06-29\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +180 over the last session, with +107 on nearby two contracts and +73 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-01T03:20:42.217321",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +180 over the last session, with +107 on nearby two contracts and +73 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 7574,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-06-29",
+    "body": "IFUS KC Open Interest changed by -1,060 over the last session, with -1,468 on nearby two contracts and +408 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-06-29\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -1,060 over the last session, with -1,468 on nearby two contracts and +408 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-01T03:20:39.071115",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -1,060 over the last session, with -1,468 on nearby two contracts and +408 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
     "id": 7573,
     "title": "Fertilizer Prices \u2013 2026-07",
     "body": null,
@@ -3992,35 +4044,5 @@
     ],
     "meta": "https://sprudge.com/here-are-the-winners-of-the-2026-us-barista-championship-1098421.html",
     "pub_date": "2026-06-21T23:22:15"
-  },
-  {
-    "id": 7381,
-    "title": "The 2026 US Barista Championship: Finals",
-    "body": "A live recap of the Finals of the 2026 US Barista Championship.",
-    "source": "Sprudge",
-    "category": "general",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/the-2026-us-barista-championship-finals-1098386.html",
-    "pub_date": "2026-06-21T16:55:16"
-  },
-  {
-    "id": 7382,
-    "title": "If You Were A Coffee Would You Brew Yourself? I Know I Would. I\u2019d Be Delicious",
-    "body": "A weekly curated selection of coffee from the Sprudge Roaster's Village.",
-    "source": "Sprudge",
-    "category": "demand",
-    "lat": null,
-    "lng": null,
-    "tags": [
-      "news",
-      "sprudge"
-    ],
-    "meta": "https://sprudge.com/if-you-were-a-coffee-would-you-brew-yourself-i-know-i-would-id-be-delicious-1095698.html",
-    "pub_date": "2026-06-21T12:00:49"
   }
 ]
