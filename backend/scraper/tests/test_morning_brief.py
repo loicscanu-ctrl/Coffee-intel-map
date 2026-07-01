@@ -60,3 +60,40 @@ def test_supply_weather_rain_mode(monkeypatch):
     assert "MTD 42mm" in out
     assert "18–96" in out
     assert "normal" in out
+
+
+# ── Freshness gate ────────────────────────────────────────────────────────────
+
+def test_expected_session_rolls_over_weekend():
+    from datetime import datetime, timezone
+    from scraper.morning_brief import _expected_session
+    # Monday 03:00 UTC → expected session is the prior Friday.
+    mon = datetime(2026, 6, 29, 3, 0, tzinfo=timezone.utc)   # 2026-06-29 is a Monday
+    assert _expected_session(mon).isoformat() == "2026-06-26"
+    # Wednesday → expected is Tuesday.
+    wed = datetime(2026, 7, 1, 3, 0, tzinfo=timezone.utc)
+    assert _expected_session(wed).isoformat() == "2026-06-30"
+
+
+def test_send_decision(monkeypatch):
+    from datetime import date, datetime, timezone
+    import scraper.morning_brief as mb
+
+    def at(h):
+        return datetime(2026, 7, 1, h, 0, tzinfo=timezone.utc)   # Wed → expected 06-30
+
+    # fresh data (futures shows the expected session) inside the window → send
+    monkeypatch.setattr(mb, "_futures_pub_date", lambda: date(2026, 6, 30))
+    assert mb._send_decision(at(4))[0] is True
+
+    # stale data before the fallback hour → skip (wait for fresh)
+    monkeypatch.setattr(mb, "_futures_pub_date", lambda: date(2026, 6, 29))
+    assert mb._send_decision(at(4))[0] is False
+
+    # stale data past the fallback hour → send anyway (holiday / pipeline failure)
+    assert mb._send_decision(at(8))[0] is True
+
+    # outside the morning window → skip regardless of freshness
+    monkeypatch.setattr(mb, "_futures_pub_date", lambda: date(2026, 6, 30))
+    assert mb._send_decision(at(21))[0] is False
+    assert mb._send_decision(at(1))[0] is False

@@ -108,14 +108,29 @@ jobs:
         run: pip install requests
 
       - name: Send morning brief
+        id: send
         working-directory: backend
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python -m scraper.morning_brief
+        # Exit 75 = the freshness gate skipped (data not yet the latest session,
+        # or outside the morning window). We surface it as a job FAILURE so the
+        # idempotency guard doesn't record this run as a delivered brief — a
+        # later trigger (once the pipeline lands fresh data) sends it — but we
+        # suppress the Telegram failure alert for it (it's not a real failure).
+        run: |
+          set +e
+          python -m scraper.morning_brief
+          rc=$?
+          if [ "$rc" -eq 75 ]; then
+            echo "Brief gate skipped (not yet fresh / outside window) — will deliver on a later trigger."
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          exit $rc
 
       - name: Notify on failure
-        if: failure()
+        if: failure() && steps.send.outputs.skipped != 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}

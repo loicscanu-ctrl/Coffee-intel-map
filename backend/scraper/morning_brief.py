@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -26,6 +27,56 @@ sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID", "")
+
+# ── Send policy (freshness gate) ──────────────────────────────────────────────
+# The brief must show the latest session's prices. It used to RACE the pipeline —
+# the settle lands in futures_chain.json ~03:20 UTC, the brief fired ~03:21, and
+# on the losing side it sent yesterday's file; the once-per-day idempotency guard
+# then blocked the fresh re-fire. The gate below makes the brief send only inside
+# a morning window AND once the data is actually the latest session, with a
+# fallback so a holiday / stalled pipeline never leaves the brief unsent.
+_SEND_WINDOW_UTC  = (2, 9)    # only send between 02:00 and 09:00 UTC
+_STALE_FALLBACK_H = 7         # if still stale by 07:00 UTC, send anyway (holiday / pipeline failure)
+_SKIP_EXIT_CODE   = 75        # "skipped, not a failure — a later trigger will deliver it"
+
+
+def _expected_session(now: datetime) -> date:
+    """Most recent trading session the brief should already reflect: the latest
+    weekday strictly before `now`'s UTC date (Fri covers Sat/Sun/Mon mornings)."""
+    d = now.date() - timedelta(days=1)
+    while d.weekday() >= 5:          # Sat=5, Sun=6 → roll back
+        d -= timedelta(days=1)
+    return d
+
+
+def _futures_pub_date() -> date | None:
+    """Session date carried by futures_chain.json (the price the brief quotes)."""
+    fc = _load("futures_chain.json")
+    if not isinstance(fc, dict):
+        return None
+    for mkt in ("robusta", "arabica"):
+        pub = (fc.get(mkt) or {}).get("pub_date")
+        if pub:
+            try:
+                return date.fromisoformat(str(pub)[:10])
+            except ValueError:
+                continue
+    return None
+
+
+def _send_decision(now: datetime) -> tuple[bool, str]:
+    """(should_send, reason). Gate the brief to the morning window + fresh data,
+    with a fallback send once past _STALE_FALLBACK_H so it's never silently
+    skipped on a holiday or a stalled pipeline."""
+    h = now.hour
+    if not (_SEND_WINDOW_UTC[0] <= h < _SEND_WINDOW_UTC[1]):
+        return False, f"outside send window {_SEND_WINDOW_UTC[0]:02d}-{_SEND_WINDOW_UTC[1]:02d} UTC (h={h})"
+    pub, exp = _futures_pub_date(), _expected_session(now)
+    if pub is not None and pub >= exp:
+        return True, f"fresh (futures {pub} >= expected {exp})"
+    if h >= _STALE_FALLBACK_H:
+        return True, f"stale (futures {pub} < expected {exp}) but past {_STALE_FALLBACK_H:02d}:00 fallback — sending anyway"
+    return False, f"stale (futures {pub} < expected {exp}) before {_STALE_FALLBACK_H:02d}:00 — waiting for fresh data"
 
 
 # ── JSON loader (kept for backwards-compat with existing tests) ───────────────
@@ -192,12 +243,21 @@ def send_telegram(text: str) -> bool:
 
 def main():
     # The brief reads only the published static JSON (no DB) and posts once, so
-    # there's no DB connection and no heavy deps — just build and send.
+    # there's no DB connection and no heavy deps — just gate, build, and send.
+    now = datetime.now(timezone.utc)
+    should_send, reason = _send_decision(now)
+    print(f"[morning_brief] send decision @ {now:%Y-%m-%d %H:%M UTC}: "
+          f"{'SEND' if should_send else 'SKIP'} — {reason}")
+    if not should_send:
+        # Exit non-zero so the workflow's once-per-day idempotency guard does NOT
+        # record this run as a delivered brief — a later trigger (once the data
+        # lands / the window opens) will send it.
+        sys.exit(_SKIP_EXIT_CODE)
     msg = build_message()
     print("[morning_brief] Message preview:\n")
     print(msg.encode("ascii", "replace").decode())
     print()
-    send_telegram(msg)
+    sys.exit(0 if send_telegram(msg) else 1)
 
 
 if __name__ == "__main__":
