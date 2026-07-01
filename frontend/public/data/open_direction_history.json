@@ -1,0 +1,8982 @@
+[
+ {
+  "date": "2022-01-31",
+  "prob_up": 0.4786,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.638,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-01",
+  "prob_up": 0.5177,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.369,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-02",
+  "prob_up": 0.6045,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.046,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-04",
+  "prob_up": 0.3608,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.135,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-09",
+  "prob_up": 0.3442,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.447,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-10",
+  "prob_up": 0.5121,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.044,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-11",
+  "prob_up": 0.4577,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.309,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-14",
+  "prob_up": 0.5542,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.309,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-15",
+  "prob_up": 0.5125,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.223,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-16",
+  "prob_up": 0.4759,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.088,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-17",
+  "prob_up": 0.5666,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.044,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-18",
+  "prob_up": 0.4533,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.308,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-21",
+  "prob_up": 0.4308,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.31,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-23",
+  "prob_up": 0.4395,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.753,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-24",
+  "prob_up": 0.3728,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.357,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-25",
+  "prob_up": 0.407,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.092,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-02-28",
+  "prob_up": 0.3714,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.184,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-01",
+  "prob_up": 0.5149,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.335,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-02",
+  "prob_up": 0.3396,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.911,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-03",
+  "prob_up": 0.2379,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.345,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-04",
+  "prob_up": 0.5162,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.05,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-07",
+  "prob_up": 0.5139,
+  "direction": "Abstain",
+  "actual_gap_pct": 1.13,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-08",
+  "prob_up": 0.4104,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.393,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-09",
+  "prob_up": 0.477,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.286,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-10",
+  "prob_up": 0.5142,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.048,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-11",
+  "prob_up": 0.5054,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-14",
+  "prob_up": 0.4041,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.43,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-29",
+  "prob_up": 0.6316,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.374,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-30",
+  "prob_up": 0.5155,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.094,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-03-31",
+  "prob_up": 0.6867,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.093,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-01",
+  "prob_up": 0.5777,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.092,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-04",
+  "prob_up": 0.6067,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.467,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-06",
+  "prob_up": 0.4931,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.19,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-07",
+  "prob_up": 0.4922,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.287,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-08",
+  "prob_up": 0.4784,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.531,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-11",
+  "prob_up": 0.5566,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.667,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-12",
+  "prob_up": 0.5466,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.142,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-13",
+  "prob_up": 0.4346,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.142,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-14",
+  "prob_up": 0.5463,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.333,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-20",
+  "prob_up": 0.4232,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.096,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-21",
+  "prob_up": 0.3506,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.096,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-22",
+  "prob_up": 0.4109,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.047,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-25",
+  "prob_up": 0.2806,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.755,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-26",
+  "prob_up": 0.564,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.241,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-27",
+  "prob_up": 0.2936,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.244,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-28",
+  "prob_up": 0.3974,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.098,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-04-29",
+  "prob_up": 0.4939,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.096,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-04",
+  "prob_up": 0.5078,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.189,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-05",
+  "prob_up": 0.3284,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-06",
+  "prob_up": 0.3528,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.468,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-09",
+  "prob_up": 0.3864,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.481,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-10",
+  "prob_up": 0.3201,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.099,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-11",
+  "prob_up": 0.4334,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.199,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-12",
+  "prob_up": 0.3415,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.152,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-13",
+  "prob_up": 0.424,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.726,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-16",
+  "prob_up": 0.5893,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.392,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-17",
+  "prob_up": 0.6484,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.335,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-18",
+  "prob_up": 0.5724,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-19",
+  "prob_up": 0.4835,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.437,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-20",
+  "prob_up": 0.5142,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.53,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-23",
+  "prob_up": 0.5417,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-24",
+  "prob_up": 0.5139,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.147,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-25",
+  "prob_up": 0.5384,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.343,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-26",
+  "prob_up": 0.4583,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.048,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-27",
+  "prob_up": 0.4159,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.238,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-05-30",
+  "prob_up": 0.3726,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.191,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-01",
+  "prob_up": 0.5742,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.475,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-07",
+  "prob_up": 0.2773,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.373,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-08",
+  "prob_up": 0.4612,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.047,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-09",
+  "prob_up": 0.3109,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.284,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-10",
+  "prob_up": 0.476,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.19,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-13",
+  "prob_up": 0.3399,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.573,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-14",
+  "prob_up": 0.6063,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.243,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-15",
+  "prob_up": 0.3478,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.195,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-16",
+  "prob_up": 0.4903,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-17",
+  "prob_up": 0.3963,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.238,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-20",
+  "prob_up": 0.3234,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.24,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-22",
+  "prob_up": 0.4333,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.286,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-23",
+  "prob_up": 0.5187,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.33,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-24",
+  "prob_up": 0.3742,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.431,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-27",
+  "prob_up": 0.5152,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.637,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-28",
+  "prob_up": 0.5078,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.49,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-29",
+  "prob_up": 0.4939,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.05,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-06-30",
+  "prob_up": 0.4276,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.244,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-01",
+  "prob_up": 0.5403,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.098,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-04",
+  "prob_up": 0.4825,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.3,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-06",
+  "prob_up": 0.5425,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.357,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-07",
+  "prob_up": 0.4455,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.154,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-08",
+  "prob_up": 0.5078,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.155,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-11",
+  "prob_up": 0.5447,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-12",
+  "prob_up": 0.5125,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.559,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-13",
+  "prob_up": 0.6456,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.154,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-14",
+  "prob_up": 0.5078,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.152,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-15",
+  "prob_up": 0.5791,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.052,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-18",
+  "prob_up": 0.6739,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.416,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-19",
+  "prob_up": 0.5943,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.15,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-20",
+  "prob_up": 0.6118,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.451,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-21",
+  "prob_up": 0.4855,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.1,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-22",
+  "prob_up": 0.6038,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.604,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-25",
+  "prob_up": 0.5031,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.51,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-26",
+  "prob_up": 0.503,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.558,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-27",
+  "prob_up": 0.536,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.203,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-28",
+  "prob_up": 0.3869,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.299,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-07-29",
+  "prob_up": 0.7213,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.297,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-01",
+  "prob_up": 0.693,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.395,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-02",
+  "prob_up": 0.6814,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.247,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-03",
+  "prob_up": 0.6357,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.148,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-04",
+  "prob_up": 0.7536,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.099,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-05",
+  "prob_up": 0.6719,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-09",
+  "prob_up": 0.3372,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.386,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-10",
+  "prob_up": 0.4334,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.048,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-11",
+  "prob_up": 0.4608,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.232,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-12",
+  "prob_up": 0.3974,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-15",
+  "prob_up": 0.5097,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.133,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-16",
+  "prob_up": 0.5319,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.397,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-17",
+  "prob_up": 0.3704,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.089,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-18",
+  "prob_up": 0.4649,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.269,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-19",
+  "prob_up": 0.4638,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.045,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-22",
+  "prob_up": 0.486,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.314,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-23",
+  "prob_up": 0.3789,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.089,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-24",
+  "prob_up": 0.5199,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.133,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-25",
+  "prob_up": 0.5987,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.17,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-26",
+  "prob_up": 0.4292,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.043,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-08-31",
+  "prob_up": 0.4144,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.266,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-01",
+  "prob_up": 0.4604,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.488,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-02",
+  "prob_up": 0.4227,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.313,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-05",
+  "prob_up": 0.4115,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.226,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-07",
+  "prob_up": 0.3321,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.088,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-08",
+  "prob_up": 0.4193,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.358,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-09",
+  "prob_up": 0.5701,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.396,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-12",
+  "prob_up": 0.6084,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.266,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-13",
+  "prob_up": 0.5267,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.177,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-14",
+  "prob_up": 0.5485,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.134,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-15",
+  "prob_up": 0.5329,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.358,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-16",
+  "prob_up": 0.5915,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.449,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-21",
+  "prob_up": 0.4507,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.268,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-22",
+  "prob_up": 0.4102,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.045,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-23",
+  "prob_up": 0.44,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.357,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-26",
+  "prob_up": 0.3697,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.358,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-27",
+  "prob_up": 0.2933,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.727,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-28",
+  "prob_up": 0.4007,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.366,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-29",
+  "prob_up": 0.3965,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.136,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-09-30",
+  "prob_up": 0.5018,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-03",
+  "prob_up": 0.3521,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.278,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-04",
+  "prob_up": 0.4113,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.692,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-05",
+  "prob_up": 0.3116,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.046,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-06",
+  "prob_up": 0.5143,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.276,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-10",
+  "prob_up": 0.3506,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.139,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-11",
+  "prob_up": 0.3145,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.046,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-12",
+  "prob_up": 0.3542,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.465,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-13",
+  "prob_up": 0.3513,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.28,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-14",
+  "prob_up": 0.431,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.143,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-17",
+  "prob_up": 0.3918,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-18",
+  "prob_up": 0.5022,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.244,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-19",
+  "prob_up": 0.3999,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.295,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-20",
+  "prob_up": 0.3546,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.05,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-21",
+  "prob_up": 0.2401,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.295,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-24",
+  "prob_up": 0.2484,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.599,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-25",
+  "prob_up": 0.5653,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.564,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-26",
+  "prob_up": 0.3249,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.256,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-27",
+  "prob_up": 0.4247,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.267,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-28",
+  "prob_up": 0.4841,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.053,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-10-31",
+  "prob_up": 0.8622,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.107,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-08",
+  "prob_up": 0.5825,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.323,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-09",
+  "prob_up": 0.5306,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.055,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-10",
+  "prob_up": 0.477,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.055,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-11",
+  "prob_up": 0.4974,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.11,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-14",
+  "prob_up": 0.4275,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.109,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-15",
+  "prob_up": 0.4993,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.274,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-16",
+  "prob_up": 0.7597,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.389,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-17",
+  "prob_up": 0.496,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.67,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-18",
+  "prob_up": 0.5082,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.055,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-21",
+  "prob_up": 0.6004,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.166,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-22",
+  "prob_up": 0.5964,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.221,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-23",
+  "prob_up": 0.6433,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.109,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-24",
+  "prob_up": 0.656,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.11,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-28",
+  "prob_up": 0.5385,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-29",
+  "prob_up": 0.6412,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.27,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-11-30",
+  "prob_up": 0.5349,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.054,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-01",
+  "prob_up": 0.689,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.106,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-02",
+  "prob_up": 0.4134,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.529,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-05",
+  "prob_up": 0.5438,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.37,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-07",
+  "prob_up": 0.423,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-08",
+  "prob_up": 0.4446,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.107,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-09",
+  "prob_up": 0.583,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.427,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-12",
+  "prob_up": 0.3456,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.214,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-13",
+  "prob_up": 0.5255,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.319,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-14",
+  "prob_up": 0.5048,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.054,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-15",
+  "prob_up": 0.4932,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.695,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-16",
+  "prob_up": 0.4324,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.584,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-19",
+  "prob_up": 0.5898,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.483,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-20",
+  "prob_up": 0.4918,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.215,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-21",
+  "prob_up": 0.6048,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.107,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-22",
+  "prob_up": 0.393,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.159,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-23",
+  "prob_up": 0.5225,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.585,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-29",
+  "prob_up": 0.4316,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.375,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2022-12-30",
+  "prob_up": 0.4289,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.383,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-03",
+  "prob_up": 0.34,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.111,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-04",
+  "prob_up": 0.4637,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.54,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-05",
+  "prob_up": 0.4526,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.107,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-06",
+  "prob_up": 0.3699,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.219,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-09",
+  "prob_up": 0.4319,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.109,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-10",
+  "prob_up": 0.3072,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.269,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-11",
+  "prob_up": 0.2469,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.054,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-12",
+  "prob_up": 0.4161,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.498,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-13",
+  "prob_up": 0.4172,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.106,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-16",
+  "prob_up": 0.2683,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.365,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-18",
+  "prob_up": 0.6034,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-19",
+  "prob_up": 0.2905,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.158,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-20",
+  "prob_up": 0.5485,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.313,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-23",
+  "prob_up": 0.4735,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.206,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-24",
+  "prob_up": 0.4959,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.206,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-25",
+  "prob_up": 0.5921,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.103,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-26",
+  "prob_up": 0.5221,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.152,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-27",
+  "prob_up": 0.5426,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-30",
+  "prob_up": 0.5036,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.049,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-01-31",
+  "prob_up": 0.5773,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-01",
+  "prob_up": 0.5645,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.428,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-02",
+  "prob_up": 0.599,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.097,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-03",
+  "prob_up": 0.6715,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.049,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-07",
+  "prob_up": 0.4689,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.049,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-08",
+  "prob_up": 0.4659,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.048,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-09",
+  "prob_up": 0.4045,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-10",
+  "prob_up": 0.4987,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.393,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-13",
+  "prob_up": 0.4207,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.148,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-14",
+  "prob_up": 0.4506,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.049,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-15",
+  "prob_up": 0.306,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.193,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-16",
+  "prob_up": 0.4227,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.097,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-17",
+  "prob_up": 0.4567,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.048,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-20",
+  "prob_up": 0.4897,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.239,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-22",
+  "prob_up": 0.6537,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.094,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-23",
+  "prob_up": 0.4375,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.317,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-24",
+  "prob_up": 0.5891,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.232,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-27",
+  "prob_up": 0.4598,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.233,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-02-28",
+  "prob_up": 0.5648,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.281,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-01",
+  "prob_up": 0.4018,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.047,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-02",
+  "prob_up": 0.5783,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.276,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-03",
+  "prob_up": 0.4521,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.138,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-06",
+  "prob_up": 0.4859,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.231,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-07",
+  "prob_up": 0.5056,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.232,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-08",
+  "prob_up": 0.463,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.093,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-09",
+  "prob_up": 0.4586,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.093,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-10",
+  "prob_up": 0.4779,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.138,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-13",
+  "prob_up": 0.4831,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.233,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-28",
+  "prob_up": 0.5047,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.18,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-29",
+  "prob_up": 0.6484,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.596,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-30",
+  "prob_up": 0.6399,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.23,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-03-31",
+  "prob_up": 0.637,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.181,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-04",
+  "prob_up": 0.3642,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.182,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-05",
+  "prob_up": 0.4712,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.27,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-06",
+  "prob_up": 0.5035,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.747,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-12",
+  "prob_up": 0.2533,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.344,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-13",
+  "prob_up": 0.4437,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.086,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-14",
+  "prob_up": 0.4479,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.126,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-17",
+  "prob_up": 0.515,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.085,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-18",
+  "prob_up": 0.4527,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.338,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-19",
+  "prob_up": 0.2003,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.294,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-20",
+  "prob_up": 0.3674,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.21,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-21",
+  "prob_up": 0.5025,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.042,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-24",
+  "prob_up": 0.4132,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.042,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-25",
+  "prob_up": 0.4588,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.287,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-26",
+  "prob_up": 0.5201,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.041,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-27",
+  "prob_up": 0.4553,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-04-28",
+  "prob_up": 0.4813,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.457,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-03",
+  "prob_up": 0.3927,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.124,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-04",
+  "prob_up": 0.3492,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.165,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-05",
+  "prob_up": 0.5298,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.083,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-10",
+  "prob_up": 0.4325,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.284,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-11",
+  "prob_up": 0.2999,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.281,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-12",
+  "prob_up": 0.3801,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.251,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-15",
+  "prob_up": 0.3695,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.041,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-16",
+  "prob_up": 0.2745,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.885,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-17",
+  "prob_up": 0.4477,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.159,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-18",
+  "prob_up": 0.4184,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.233,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-19",
+  "prob_up": 0.4301,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.276,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-22",
+  "prob_up": 0.3424,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.232,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-23",
+  "prob_up": 0.402,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.038,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-24",
+  "prob_up": 0.4726,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.195,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-25",
+  "prob_up": 0.4508,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.078,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-26",
+  "prob_up": 0.4552,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.274,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-05-30",
+  "prob_up": 0.3124,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.465,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-02",
+  "prob_up": 0.4575,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.077,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-06",
+  "prob_up": 0.3847,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.233,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-07",
+  "prob_up": 0.624,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.116,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-08",
+  "prob_up": 0.467,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.342,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-09",
+  "prob_up": 0.5861,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.183,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-12",
+  "prob_up": 0.5399,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.407,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-13",
+  "prob_up": 0.5214,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-14",
+  "prob_up": 0.4114,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.224,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-15",
+  "prob_up": 0.4304,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-16",
+  "prob_up": 0.4974,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.217,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-19",
+  "prob_up": 0.5026,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.328,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-21",
+  "prob_up": 0.5788,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.398,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-22",
+  "prob_up": 0.4742,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.22,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-23",
+  "prob_up": 0.39,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.145,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-26",
+  "prob_up": 0.3601,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.41,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-27",
+  "prob_up": 0.4336,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.294,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-28",
+  "prob_up": 0.5023,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.074,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-29",
+  "prob_up": 0.458,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.345,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-06-30",
+  "prob_up": 0.6009,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.623,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-03",
+  "prob_up": 0.5281,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.281,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-04",
+  "prob_up": 0.5245,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.592,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-06",
+  "prob_up": 0.4926,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.119,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-07",
+  "prob_up": 0.6494,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.279,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-10",
+  "prob_up": 0.3741,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.076,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-11",
+  "prob_up": 0.6073,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.116,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-12",
+  "prob_up": 0.5317,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.234,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-13",
+  "prob_up": 0.5693,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.275,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-14",
+  "prob_up": 0.6372,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-17",
+  "prob_up": 0.4812,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.236,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-18",
+  "prob_up": 0.5025,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.039,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-19",
+  "prob_up": 0.4579,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.079,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-20",
+  "prob_up": 0.6257,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.077,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-21",
+  "prob_up": 0.6809,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.118,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-24",
+  "prob_up": 0.4828,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.307,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-25",
+  "prob_up": 0.5196,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.302,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-26",
+  "prob_up": 0.6657,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.267,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-27",
+  "prob_up": 0.6241,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.076,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-28",
+  "prob_up": 0.4425,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.037,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-07-31",
+  "prob_up": 0.5775,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.231,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-01",
+  "prob_up": 0.7545,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.152,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-02",
+  "prob_up": 0.6642,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.19,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-03",
+  "prob_up": 0.5289,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.149,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-04",
+  "prob_up": 0.5727,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.038,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-08",
+  "prob_up": 0.3591,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.039,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-09",
+  "prob_up": 0.4006,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.235,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-10",
+  "prob_up": 0.373,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.079,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-11",
+  "prob_up": 0.4167,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.355,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-14",
+  "prob_up": 0.3115,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.159,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-15",
+  "prob_up": 0.382,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.041,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-16",
+  "prob_up": 0.5857,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.206,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-17",
+  "prob_up": 0.4923,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.295,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-18",
+  "prob_up": 0.2919,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.334,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-21",
+  "prob_up": 0.5464,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.381,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-22",
+  "prob_up": 0.4338,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.127,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-23",
+  "prob_up": 0.5801,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.463,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-24",
+  "prob_up": 0.5126,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.5,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-25",
+  "prob_up": 0.396,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.042,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-30",
+  "prob_up": 0.4369,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.327,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-08-31",
+  "prob_up": 0.3989,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.12,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-01",
+  "prob_up": 0.4189,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.28,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-04",
+  "prob_up": 0.4489,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.241,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-06",
+  "prob_up": 0.4227,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.325,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-07",
+  "prob_up": 0.3057,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.688,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-08",
+  "prob_up": 0.5379,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.124,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-11",
+  "prob_up": 0.4378,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.334,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-12",
+  "prob_up": 0.4083,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.164,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-13",
+  "prob_up": 0.5187,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.082,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-14",
+  "prob_up": 0.4429,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.04,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-15",
+  "prob_up": 0.4654,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.2,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-18",
+  "prob_up": 0.5416,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.117,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-19",
+  "prob_up": 0.651,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.078,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-20",
+  "prob_up": 0.5664,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.079,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-21",
+  "prob_up": 0.4785,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.397,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-22",
+  "prob_up": 0.5518,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.122,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-25",
+  "prob_up": 0.3876,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.163,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-26",
+  "prob_up": 0.4257,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.204,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-27",
+  "prob_up": 0.4582,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.163,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-28",
+  "prob_up": 0.4168,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.122,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-09-29",
+  "prob_up": 0.4935,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.203,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-02",
+  "prob_up": 0.372,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.406,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-03",
+  "prob_up": 0.4868,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.486,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-04",
+  "prob_up": 0.5459,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.125,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-05",
+  "prob_up": 0.4946,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.294,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-06",
+  "prob_up": 0.48,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-10",
+  "prob_up": 0.5067,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.178,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-11",
+  "prob_up": 0.4251,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.356,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-12",
+  "prob_up": 0.4386,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.224,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-13",
+  "prob_up": 0.4895,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.222,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-16",
+  "prob_up": 0.492,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.132,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-17",
+  "prob_up": 0.4557,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.131,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-18",
+  "prob_up": 0.5039,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.604,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-19",
+  "prob_up": 0.5341,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.128,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-20",
+  "prob_up": 0.4104,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.333,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-23",
+  "prob_up": 0.5643,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.805,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-24",
+  "prob_up": 0.4951,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.04,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-25",
+  "prob_up": 0.5321,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.321,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-26",
+  "prob_up": 0.4193,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.041,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-27",
+  "prob_up": 0.5603,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.289,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-10-30",
+  "prob_up": 0.4189,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.084,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-07",
+  "prob_up": 0.6207,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.041,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-08",
+  "prob_up": 0.5875,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.339,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-09",
+  "prob_up": 0.5977,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.208,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-10",
+  "prob_up": 0.5002,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-13",
+  "prob_up": 0.3461,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.29,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-14",
+  "prob_up": 0.5071,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.359,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-15",
+  "prob_up": 0.592,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.202,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-16",
+  "prob_up": 0.6904,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.039,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-17",
+  "prob_up": 0.5925,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.39,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-20",
+  "prob_up": 0.5897,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.356,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-21",
+  "prob_up": 0.4582,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.12,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-22",
+  "prob_up": 0.5423,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.201,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-23",
+  "prob_up": 0.594,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-27",
+  "prob_up": 0.4489,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.236,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-28",
+  "prob_up": 0.7144,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.118,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-11-29",
+  "prob_up": 0.5301,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.236,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-01",
+  "prob_up": 0.5609,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.275,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-04",
+  "prob_up": 0.2651,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.119,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-05",
+  "prob_up": 0.6521,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.159,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-06",
+  "prob_up": 0.4215,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.156,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-07",
+  "prob_up": 0.4405,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.556,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-08",
+  "prob_up": 0.5364,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.039,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-11",
+  "prob_up": 0.5409,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.119,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-12",
+  "prob_up": 0.4974,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.115,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-13",
+  "prob_up": 0.703,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.258,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-14",
+  "prob_up": 0.5419,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.036,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-15",
+  "prob_up": 0.4374,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.25,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-18",
+  "prob_up": 0.5427,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.247,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-19",
+  "prob_up": 0.8278,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.322,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-20",
+  "prob_up": 0.5732,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.204,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-21",
+  "prob_up": 0.62,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.277,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-22",
+  "prob_up": 0.4696,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.441,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-28",
+  "prob_up": 0.3784,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.175,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2023-12-29",
+  "prob_up": 0.4357,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.034,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-02",
+  "prob_up": 0.3774,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.106,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-03",
+  "prob_up": 0.5219,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.142,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-04",
+  "prob_up": 0.4633,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.254,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-05",
+  "prob_up": 0.4318,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.358,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-08",
+  "prob_up": 0.3195,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.393,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-09",
+  "prob_up": 0.5997,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.173,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-10",
+  "prob_up": 0.5273,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.646,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-11",
+  "prob_up": 0.4168,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.136,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-12",
+  "prob_up": 0.3801,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.239,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-15",
+  "prob_up": 0.4831,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.339,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-17",
+  "prob_up": 0.4485,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.063,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-18",
+  "prob_up": 0.546,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.064,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-19",
+  "prob_up": 0.7214,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.358,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-22",
+  "prob_up": 0.4199,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.064,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-23",
+  "prob_up": 0.514,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.031,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-24",
+  "prob_up": 0.6358,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.314,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-25",
+  "prob_up": 0.5379,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.156,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-26",
+  "prob_up": 0.578,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.215,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-01-29",
+  "prob_up": 0.4219,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.275,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-02",
+  "prob_up": 0.4307,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.032,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-05",
+  "prob_up": 0.3486,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.064,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-06",
+  "prob_up": 0.352,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.229,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-07",
+  "prob_up": 0.4291,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.161,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-08",
+  "prob_up": 0.4126,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.064,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-09",
+  "prob_up": 0.5082,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.032,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-12",
+  "prob_up": 0.3495,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.343,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-13",
+  "prob_up": 0.3938,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.157,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-14",
+  "prob_up": 0.3768,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.442,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-15",
+  "prob_up": 0.5791,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.032,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-16",
+  "prob_up": 0.546,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.064,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-19",
+  "prob_up": 0.3946,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.064,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-21",
+  "prob_up": 0.6649,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-22",
+  "prob_up": 0.4202,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-23",
+  "prob_up": 0.5236,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.096,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-26",
+  "prob_up": 0.4768,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.033,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-27",
+  "prob_up": 0.5178,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.564,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-28",
+  "prob_up": 0.4274,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.163,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-02-29",
+  "prob_up": 0.4242,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.033,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-01",
+  "prob_up": 0.4998,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.129,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-04",
+  "prob_up": 0.6094,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.223,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-05",
+  "prob_up": 0.4313,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-06",
+  "prob_up": 0.5935,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.315,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-07",
+  "prob_up": 0.5552,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.061,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-08",
+  "prob_up": 0.3163,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.03,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-03-11",
+  "prob_up": 0.4935,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-03",
+  "prob_up": 0.3409,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.245,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-04",
+  "prob_up": 0.7413,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.895,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-08",
+  "prob_up": 0.4936,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.245,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-09",
+  "prob_up": 0.2548,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.433,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-10",
+  "prob_up": 0.3506,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.109,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-11",
+  "prob_up": 0.4165,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.242,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-12",
+  "prob_up": 0.5811,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.211,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-15",
+  "prob_up": 0.1084,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.468,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-16",
+  "prob_up": 0.5876,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.126,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-17",
+  "prob_up": 0.4797,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.352,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-18",
+  "prob_up": 0.4662,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-19",
+  "prob_up": 0.5538,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.074,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-22",
+  "prob_up": 0.4798,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.393,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-23",
+  "prob_up": 0.65,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.145,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-24",
+  "prob_up": 0.4028,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-25",
+  "prob_up": 0.6159,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.164,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-26",
+  "prob_up": 0.2758,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.255,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-29",
+  "prob_up": 0.4651,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.024,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-04-30",
+  "prob_up": 0.537,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.58,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-01",
+  "prob_up": 0.2229,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.199,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-02",
+  "prob_up": 0.3618,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.226,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-03",
+  "prob_up": 0.5569,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.109,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-08",
+  "prob_up": 0.327,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.178,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-09",
+  "prob_up": 0.4915,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.559,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-10",
+  "prob_up": 0.2908,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.116,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-13",
+  "prob_up": 0.3758,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.292,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-14",
+  "prob_up": 0.4205,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.851,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-15",
+  "prob_up": 0.4631,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.321,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-16",
+  "prob_up": 0.3781,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.059,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-17",
+  "prob_up": 0.4064,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.029,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-20",
+  "prob_up": 0.33,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.369,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-21",
+  "prob_up": 0.516,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.257,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-22",
+  "prob_up": 0.5349,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.134,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-23",
+  "prob_up": 0.4845,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-24",
+  "prob_up": 0.5069,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.131,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-28",
+  "prob_up": 0.3754,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.282,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-29",
+  "prob_up": 0.404,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.073,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-30",
+  "prob_up": 0.5044,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.718,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-05-31",
+  "prob_up": 0.57,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.399,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-03",
+  "prob_up": 0.3836,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.073,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-04",
+  "prob_up": 0.4928,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.28,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-06",
+  "prob_up": 0.4093,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.37,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-07",
+  "prob_up": 0.2815,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.372,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-10",
+  "prob_up": 0.5098,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.145,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-11",
+  "prob_up": 0.4316,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.049,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-12",
+  "prob_up": 0.3028,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.248,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-13",
+  "prob_up": 0.2837,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.416,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-14",
+  "prob_up": 0.3925,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.269,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-17",
+  "prob_up": 0.6066,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.349,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-18",
+  "prob_up": 0.3047,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-19",
+  "prob_up": 0.4736,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.25,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-21",
+  "prob_up": 0.4122,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.36,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-24",
+  "prob_up": 0.4549,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.659,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-25",
+  "prob_up": 0.5195,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.471,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-26",
+  "prob_up": 0.5197,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.097,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-27",
+  "prob_up": 0.5134,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.517,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-06-28",
+  "prob_up": 0.4893,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.346,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-01",
+  "prob_up": 0.4991,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-02",
+  "prob_up": 0.5034,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.148,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-03",
+  "prob_up": 0.4162,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.122,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-04",
+  "prob_up": 0.3857,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.222,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-08",
+  "prob_up": 0.5763,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.238,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-09",
+  "prob_up": 0.4966,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.162,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-10",
+  "prob_up": 0.3135,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.065,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-11",
+  "prob_up": 0.6782,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.891,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-12",
+  "prob_up": 0.5829,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.175,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-15",
+  "prob_up": 0.5145,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.929,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-16",
+  "prob_up": 0.4802,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.087,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-17",
+  "prob_up": 0.5762,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.131,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-18",
+  "prob_up": 0.6219,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.022,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-19",
+  "prob_up": 0.4816,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.223,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-22",
+  "prob_up": 0.5297,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.133,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-23",
+  "prob_up": 0.5072,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.022,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-24",
+  "prob_up": 0.5485,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.313,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-25",
+  "prob_up": 0.558,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.116,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-26",
+  "prob_up": 0.381,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.388,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-29",
+  "prob_up": 0.5637,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.742,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-30",
+  "prob_up": 0.5563,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.188,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-07-31",
+  "prob_up": 0.4804,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.07,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-01",
+  "prob_up": 0.6033,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.353,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-02",
+  "prob_up": 0.539,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-06",
+  "prob_up": 0.6418,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.621,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-07",
+  "prob_up": 0.4583,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.385,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-08",
+  "prob_up": 0.3509,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.117,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-09",
+  "prob_up": 0.4319,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.023,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-12",
+  "prob_up": 0.3235,
+  "direction": "Bearish",
+  "actual_gap_pct": 4.693,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-13",
+  "prob_up": 0.4415,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.305,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-14",
+  "prob_up": 0.4338,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.024,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-15",
+  "prob_up": 0.5118,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.163,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-16",
+  "prob_up": 0.4693,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.023,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-19",
+  "prob_up": 0.4287,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.18,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-20",
+  "prob_up": 0.434,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.758,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-21",
+  "prob_up": 0.2243,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.649,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-22",
+  "prob_up": 0.4526,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.022,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-23",
+  "prob_up": 0.4398,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.153,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-28",
+  "prob_up": 0.4629,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.268,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-29",
+  "prob_up": 0.4748,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.647,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-08-30",
+  "prob_up": 0.6099,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.123,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-02",
+  "prob_up": 0.3622,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.183,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-04",
+  "prob_up": 0.3489,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.736,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-05",
+  "prob_up": 0.3628,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.265,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-06",
+  "prob_up": 0.2945,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.609,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-09",
+  "prob_up": 0.3519,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.312,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-10",
+  "prob_up": 0.349,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.245,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-11",
+  "prob_up": 0.44,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.73,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-12",
+  "prob_up": 0.4865,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.22,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-13",
+  "prob_up": 0.4665,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.059,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-16",
+  "prob_up": 0.3553,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.266,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-17",
+  "prob_up": 0.521,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.19,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-18",
+  "prob_up": 0.3886,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.264,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-19",
+  "prob_up": 0.1958,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.339,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-20",
+  "prob_up": 0.6088,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.076,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-23",
+  "prob_up": 0.6911,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.849,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-24",
+  "prob_up": 0.4591,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.019,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-25",
+  "prob_up": 0.3992,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.264,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-26",
+  "prob_up": 0.3896,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.293,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-27",
+  "prob_up": 0.4214,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.415,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-09-30",
+  "prob_up": 0.4145,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.674,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-01",
+  "prob_up": 0.6653,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.383,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-02",
+  "prob_up": 0.5269,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.607,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-03",
+  "prob_up": 0.5419,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.392,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-04",
+  "prob_up": 0.7398,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.407,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-08",
+  "prob_up": 0.5689,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-09",
+  "prob_up": 0.3493,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.15,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-10",
+  "prob_up": 0.3096,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.763,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-11",
+  "prob_up": 0.3436,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.189,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-14",
+  "prob_up": 0.4631,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.235,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-15",
+  "prob_up": 0.2983,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.041,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-16",
+  "prob_up": 0.3368,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.498,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-17",
+  "prob_up": 0.3267,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.126,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-18",
+  "prob_up": 0.3388,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.022,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-21",
+  "prob_up": 0.2902,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.062,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-22",
+  "prob_up": 0.4561,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.155,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-23",
+  "prob_up": 0.4551,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.158,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-24",
+  "prob_up": 0.401,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.045,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-25",
+  "prob_up": 0.3878,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-10-28",
+  "prob_up": 0.3595,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.159,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-05",
+  "prob_up": 0.4206,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.093,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-06",
+  "prob_up": 0.5244,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.639,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-07",
+  "prob_up": 0.5674,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.255,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-08",
+  "prob_up": 0.3751,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.022,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-11",
+  "prob_up": 0.5541,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.935,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-12",
+  "prob_up": 0.4887,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.29,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-13",
+  "prob_up": 0.5091,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.484,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-14",
+  "prob_up": 0.6028,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.022,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-15",
+  "prob_up": 0.552,
+  "direction": "Bullish",
+  "actual_gap_pct": -1.323,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-18",
+  "prob_up": 0.618,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.461,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-19",
+  "prob_up": 0.708,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-20",
+  "prob_up": 0.7381,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.043,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-21",
+  "prob_up": 0.6312,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.916,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-22",
+  "prob_up": 0.546,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.334,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-25",
+  "prob_up": 0.6183,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.06,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-26",
+  "prob_up": 0.6495,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.02,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-27",
+  "prob_up": 0.5616,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.388,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-11-28",
+  "prob_up": 0.7344,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.361,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-02",
+  "prob_up": 0.696,
+  "direction": "Bullish",
+  "actual_gap_pct": -1.199,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-04",
+  "prob_up": 0.4802,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.759,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-05",
+  "prob_up": 0.2822,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.316,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-06",
+  "prob_up": 0.4344,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.86,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-09",
+  "prob_up": 0.4986,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.079,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-10",
+  "prob_up": 0.6697,
+  "direction": "Bullish",
+  "actual_gap_pct": 2.275,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-11",
+  "prob_up": 0.582,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.383,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-12",
+  "prob_up": 0.4289,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-13",
+  "prob_up": 0.3202,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.449,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-16",
+  "prob_up": 0.3375,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.353,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-17",
+  "prob_up": 0.264,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.5,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-18",
+  "prob_up": 0.5732,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.271,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-19",
+  "prob_up": 0.5513,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.078,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-20",
+  "prob_up": 0.4279,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.237,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-23",
+  "prob_up": 0.3209,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.18,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-24",
+  "prob_up": 0.3531,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.18,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-30",
+  "prob_up": 0.387,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.504,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2024-12-31",
+  "prob_up": 0.3176,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.204,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-02",
+  "prob_up": 0.5361,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.637,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-03",
+  "prob_up": 0.2989,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.378,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-06",
+  "prob_up": 0.4997,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.381,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-07",
+  "prob_up": 0.4992,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.1,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-08",
+  "prob_up": 0.3451,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.279,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-09",
+  "prob_up": 0.6715,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.443,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-10",
+  "prob_up": 0.4152,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.201,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-13",
+  "prob_up": 0.5361,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.141,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-14",
+  "prob_up": 0.3892,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.184,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-15",
+  "prob_up": 0.4268,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.165,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-16",
+  "prob_up": 0.4462,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.224,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-17",
+  "prob_up": 0.4266,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.082,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-20",
+  "prob_up": 0.3176,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.38,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-22",
+  "prob_up": 0.5254,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.171,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-23",
+  "prob_up": 0.5491,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.258,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-24",
+  "prob_up": 0.6316,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.273,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-27",
+  "prob_up": 0.4157,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.936,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-28",
+  "prob_up": 0.558,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.146,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-29",
+  "prob_up": 0.5146,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.271,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-01-30",
+  "prob_up": 0.4464,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.285,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-03",
+  "prob_up": 0.4232,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.333,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-04",
+  "prob_up": 0.6122,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.108,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-05",
+  "prob_up": 0.4301,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.198,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-06",
+  "prob_up": 0.6081,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.515,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-07",
+  "prob_up": 0.4383,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.426,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-10",
+  "prob_up": 0.7732,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.359,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-11",
+  "prob_up": 0.7305,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.334,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-12",
+  "prob_up": 0.5126,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.194,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-13",
+  "prob_up": 0.3586,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.446,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-14",
+  "prob_up": 0.2312,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.052,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-17",
+  "prob_up": 0.4251,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-19",
+  "prob_up": 0.6694,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.718,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-20",
+  "prob_up": 0.6111,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.035,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-21",
+  "prob_up": 0.4275,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.089,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-24",
+  "prob_up": 0.4176,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.07,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-25",
+  "prob_up": 0.3219,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.486,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-26",
+  "prob_up": 0.368,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.167,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-27",
+  "prob_up": 0.2303,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.906,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-02-28",
+  "prob_up": 0.4427,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.948,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-03",
+  "prob_up": 0.443,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-04",
+  "prob_up": 0.4545,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.164,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-05",
+  "prob_up": 0.6665,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.089,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-06",
+  "prob_up": 0.4734,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.674,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-07",
+  "prob_up": 0.5233,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.239,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-03-10",
+  "prob_up": 0.6945,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.956,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-01",
+  "prob_up": 0.3762,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.076,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-03",
+  "prob_up": 0.3518,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.372,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-04",
+  "prob_up": 0.4397,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.164,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-07",
+  "prob_up": 0.5426,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.078,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-08",
+  "prob_up": 0.1693,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.652,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-09",
+  "prob_up": 0.3174,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.416,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-10",
+  "prob_up": 0.9344,
+  "direction": "Bullish",
+  "actual_gap_pct": 4.614,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-11",
+  "prob_up": 0.3138,
+  "direction": "Bearish",
+  "actual_gap_pct": 1.083,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-14",
+  "prob_up": 0.4774,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.434,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-15",
+  "prob_up": 0.5064,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.038,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-16",
+  "prob_up": 0.4337,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.766,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-17",
+  "prob_up": 0.5914,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.464,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-23",
+  "prob_up": 0.4694,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.609,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-24",
+  "prob_up": 0.3641,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.689,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-25",
+  "prob_up": 0.3541,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.976,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-28",
+  "prob_up": 0.4005,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.37,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-29",
+  "prob_up": 0.4325,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.315,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-04-30",
+  "prob_up": 0.5402,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.17,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-01",
+  "prob_up": 0.4904,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.112,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-02",
+  "prob_up": 0.4068,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.447,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-07",
+  "prob_up": 0.4514,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.038,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-08",
+  "prob_up": 0.5033,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.057,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-09",
+  "prob_up": 0.3973,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.342,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-12",
+  "prob_up": 0.4292,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.345,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-13",
+  "prob_up": 0.4682,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.97,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-16",
+  "prob_up": 0.3394,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.343,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-19",
+  "prob_up": 0.3709,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.557,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-20",
+  "prob_up": 0.422,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.281,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-21",
+  "prob_up": 0.4063,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.307,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-22",
+  "prob_up": 0.3346,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.511,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-23",
+  "prob_up": 0.4592,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.21,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-27",
+  "prob_up": 0.349,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.021,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-28",
+  "prob_up": 0.3557,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.808,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-05-29",
+  "prob_up": 0.3817,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-09",
+  "prob_up": 0.3896,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.253,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-12",
+  "prob_up": 0.2816,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.163,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-13",
+  "prob_up": 0.3608,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.163,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-16",
+  "prob_up": 0.4136,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.21,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-17",
+  "prob_up": 0.4338,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-18",
+  "prob_up": 0.4264,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.265,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-19",
+  "prob_up": 0.2484,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.462,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-27",
+  "prob_up": 0.2746,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.599,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-06-30",
+  "prob_up": 0.3878,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.246,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-03",
+  "prob_up": 0.3282,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.278,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-09",
+  "prob_up": 0.4155,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.535,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-10",
+  "prob_up": 0.3971,
+  "direction": "Bearish",
+  "actual_gap_pct": -2.334,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-15",
+  "prob_up": 0.3276,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.83,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-16",
+  "prob_up": 0.5053,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.088,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-17",
+  "prob_up": 0.3366,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-07-18",
+  "prob_up": 0.6277,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.513,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-08-22",
+  "prob_up": 0.4078,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.143,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-08-28",
+  "prob_up": 0.2559,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.926,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-12",
+  "prob_up": 0.299,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.191,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-19",
+  "prob_up": 0.4176,
+  "direction": "Bearish",
+  "actual_gap_pct": 1.806,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-22",
+  "prob_up": 0.337,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.552,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-23",
+  "prob_up": 0.4353,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-24",
+  "prob_up": 0.5581,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.377,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-25",
+  "prob_up": 0.4456,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.293,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-26",
+  "prob_up": 0.4632,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.575,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-29",
+  "prob_up": 0.5344,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.318,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-09-30",
+  "prob_up": 0.4949,
+  "direction": "Abstain",
+  "actual_gap_pct": 1.227,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-01",
+  "prob_up": 0.4365,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.511,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-02",
+  "prob_up": 0.4923,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.303,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-03",
+  "prob_up": 0.5559,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.448,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-06",
+  "prob_up": 0.3235,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.884,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-07",
+  "prob_up": 0.4512,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.137,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-08",
+  "prob_up": 0.377,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.395,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-09",
+  "prob_up": 0.4645,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.046,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-10",
+  "prob_up": 0.4957,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.459,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-13",
+  "prob_up": 0.5065,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.536,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-14",
+  "prob_up": 0.3382,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.807,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-15",
+  "prob_up": 0.4036,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.72,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-16",
+  "prob_up": 0.2512,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.394,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-17",
+  "prob_up": 0.4596,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.411,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-20",
+  "prob_up": 0.3739,
+  "direction": "Bearish",
+  "actual_gap_pct": 1.635,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-21",
+  "prob_up": 0.4872,
+  "direction": "Abstain",
+  "actual_gap_pct": 1.083,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-22",
+  "prob_up": 0.5444,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.135,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-23",
+  "prob_up": 0.5662,
+  "direction": "Bullish",
+  "actual_gap_pct": -1.072,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-24",
+  "prob_up": 0.4173,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.114,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-10-27",
+  "prob_up": 0.3411,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.046,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-04",
+  "prob_up": 0.5533,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.242,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-05",
+  "prob_up": 0.6358,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-06",
+  "prob_up": 0.5752,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.636,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-07",
+  "prob_up": 0.5103,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.384,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-10",
+  "prob_up": 0.6324,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.422,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-11",
+  "prob_up": 0.4931,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.4,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-12",
+  "prob_up": 0.5811,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.089,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-13",
+  "prob_up": 0.4211,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.238,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-14",
+  "prob_up": 0.4676,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.24,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-17",
+  "prob_up": 0.5943,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.27,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-18",
+  "prob_up": 0.5632,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.746,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-19",
+  "prob_up": 0.4386,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.23,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-20",
+  "prob_up": 0.7086,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.49,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-21",
+  "prob_up": 0.5933,
+  "direction": "Bullish",
+  "actual_gap_pct": -4.197,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-24",
+  "prob_up": 0.6858,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.749,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-25",
+  "prob_up": 0.5724,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.636,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-26",
+  "prob_up": 0.5686,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.625,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-11-27",
+  "prob_up": 0.5449,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.396,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-01",
+  "prob_up": 0.4537,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.693,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-02",
+  "prob_up": 0.6573,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.164,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-03",
+  "prob_up": 0.5125,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.29,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-04",
+  "prob_up": 0.6264,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.46,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-05",
+  "prob_up": 0.4489,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.12,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-08",
+  "prob_up": 0.5095,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.682,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-09",
+  "prob_up": 0.6577,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.075,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-10",
+  "prob_up": 0.5314,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.074,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-11",
+  "prob_up": 0.5855,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.074,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-12",
+  "prob_up": 0.5821,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.224,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-15",
+  "prob_up": 0.6135,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.787,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-16",
+  "prob_up": 0.6396,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.441,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-17",
+  "prob_up": 0.6164,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.24,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-18",
+  "prob_up": 0.6056,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.709,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-19",
+  "prob_up": 0.5803,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.331,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-22",
+  "prob_up": 0.5805,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.11,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-23",
+  "prob_up": 0.6903,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.484,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-24",
+  "prob_up": 0.5823,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-30",
+  "prob_up": 0.3885,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.079,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2025-12-31",
+  "prob_up": 0.4719,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.647,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-02",
+  "prob_up": 0.3549,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.026,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-05",
+  "prob_up": 0.3236,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.026,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-06",
+  "prob_up": 0.3844,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.13,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-07",
+  "prob_up": 0.3539,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.737,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-08",
+  "prob_up": 0.5209,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.621,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-09",
+  "prob_up": 0.3801,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.698,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-12",
+  "prob_up": 0.3154,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.602,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-13",
+  "prob_up": 0.511,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.416,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-14",
+  "prob_up": 0.4844,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-15",
+  "prob_up": 0.4306,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.464,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-16",
+  "prob_up": 0.4813,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.788,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-19",
+  "prob_up": 0.4444,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.152,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-21",
+  "prob_up": 0.4197,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.362,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-22",
+  "prob_up": 0.4258,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.503,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-23",
+  "prob_up": 0.4904,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.076,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-26",
+  "prob_up": 0.5216,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-27",
+  "prob_up": 0.5519,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.024,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-28",
+  "prob_up": 0.626,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.167,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-29",
+  "prob_up": 0.4777,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.245,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-01-30",
+  "prob_up": 0.4396,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.707,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-02",
+  "prob_up": 0.5528,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.471,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-03",
+  "prob_up": 0.6725,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.735,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-04",
+  "prob_up": 0.3208,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.753,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-05",
+  "prob_up": 0.6533,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.735,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-06",
+  "prob_up": 0.4467,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.053,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-09",
+  "prob_up": 0.2787,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.191,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-10",
+  "prob_up": 0.3403,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.582,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-11",
+  "prob_up": 0.4195,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.244,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-12",
+  "prob_up": 0.4919,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.784,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-13",
+  "prob_up": 0.5632,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.027,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-16",
+  "prob_up": 0.3842,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.211,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-18",
+  "prob_up": 0.5587,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.248,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-19",
+  "prob_up": 0.5268,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.461,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-20",
+  "prob_up": 0.5508,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.028,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-23",
+  "prob_up": 0.5449,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.558,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-24",
+  "prob_up": 0.5632,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.365,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-25",
+  "prob_up": 0.4312,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.11,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-26",
+  "prob_up": 0.5377,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.081,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-02-27",
+  "prob_up": 0.4399,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.247,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-02",
+  "prob_up": 0.4638,
+  "direction": "Bearish",
+  "actual_gap_pct": -1.35,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-03",
+  "prob_up": 0.5223,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.186,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-04",
+  "prob_up": 0.4946,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.487,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-05",
+  "prob_up": 0.5021,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.428,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-06",
+  "prob_up": 0.9053,
+  "direction": "Bullish",
+  "actual_gap_pct": 1.094,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-03-09",
+  "prob_up": 0.6578,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-01",
+  "prob_up": 0.3731,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.531,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-02",
+  "prob_up": 0.5759,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.497,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-08",
+  "prob_up": 0.4557,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.496,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-09",
+  "prob_up": 0.3971,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-10",
+  "prob_up": 0.4769,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-13",
+  "prob_up": 0.4784,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.247,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-14",
+  "prob_up": 0.3971,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.031,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-15",
+  "prob_up": 0.5005,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.566,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-16",
+  "prob_up": 0.4465,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.206,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-17",
+  "prob_up": 0.4869,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.479,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-20",
+  "prob_up": 0.3849,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.153,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-21",
+  "prob_up": 0.4492,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.148,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-22",
+  "prob_up": 0.8204,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.628,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-23",
+  "prob_up": 0.4797,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.323,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-24",
+  "prob_up": 0.5495,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.057,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-27",
+  "prob_up": 0.5094,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.777,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-28",
+  "prob_up": 0.4585,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.029,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-29",
+  "prob_up": 0.5698,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.373,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-04-30",
+  "prob_up": 0.4476,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.058,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-01",
+  "prob_up": 0.4883,
+  "direction": "Abstain",
+  "actual_gap_pct": 0.297,
+  "actual_dir": "Up",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-06",
+  "prob_up": 0.4314,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.594,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-07",
+  "prob_up": 0.4134,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.0,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-08",
+  "prob_up": 0.3688,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.849,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-11",
+  "prob_up": 0.3719,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.175,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-12",
+  "prob_up": 0.3443,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.342,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-13",
+  "prob_up": 0.4446,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.172,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-14",
+  "prob_up": 0.4606,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.477,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-15",
+  "prob_up": 0.3769,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.029,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-18",
+  "prob_up": 0.3775,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.536,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-19",
+  "prob_up": 0.6611,
+  "direction": "Bullish",
+  "actual_gap_pct": 0.849,
+  "actual_dir": "Up",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-20",
+  "prob_up": 0.4638,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.42,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-21",
+  "prob_up": 0.4946,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.151,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-22",
+  "prob_up": 0.3314,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.059,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-26",
+  "prob_up": 0.3835,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.145,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-27",
+  "prob_up": 0.29,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.425,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-28",
+  "prob_up": 0.6105,
+  "direction": "Bullish",
+  "actual_gap_pct": -0.144,
+  "actual_dir": "Down",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-05-29",
+  "prob_up": 0.4588,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.225,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-01",
+  "prob_up": 0.4848,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.345,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-02",
+  "prob_up": 0.4358,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.35,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-03",
+  "prob_up": 0.4528,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.087,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-05",
+  "prob_up": 0.3897,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.031,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-08",
+  "prob_up": 0.4456,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.062,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-09",
+  "prob_up": 0.3716,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.123,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-10",
+  "prob_up": 0.5029,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.31,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-11",
+  "prob_up": 0.4597,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.182,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-12",
+  "prob_up": 0.5018,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.91,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-15",
+  "prob_up": 0.4513,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.341,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-16",
+  "prob_up": 0.4354,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.057,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-17",
+  "prob_up": 0.4694,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.083,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-18",
+  "prob_up": 0.4414,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.44,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-19",
+  "prob_up": 0.3358,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.414,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-23",
+  "prob_up": 0.3099,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.423,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-24",
+  "prob_up": 0.4388,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.197,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-25",
+  "prob_up": 0.4851,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.25,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-26",
+  "prob_up": 0.462,
+  "direction": "Bearish",
+  "actual_gap_pct": -0.627,
+  "actual_dir": "Down",
+  "hit": true,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-29",
+  "prob_up": 0.5121,
+  "direction": "Abstain",
+  "actual_gap_pct": -0.11,
+  "actual_dir": "Down",
+  "hit": null,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-06-30",
+  "prob_up": 0.4487,
+  "direction": "Bearish",
+  "actual_gap_pct": 0.14,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "backtest"
+ },
+ {
+  "date": "2026-07-01",
+  "prob_up": 0.4518,
+  "direction": "Bearish",
+  "actual_gap_pct": null,
+  "actual_dir": null,
+  "hit": null,
+  "status": "pending",
+  "source": "live"
+ }
+]
