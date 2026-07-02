@@ -35,7 +35,12 @@ TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID", "")
 # then blocked the fresh re-fire. The gate below makes the brief send only inside
 # a morning window AND once the data is actually the latest session, with a
 # fallback so a holiday / stalled pipeline never leaves the brief unsent.
-_SEND_WINDOW_UTC  = (2, 9)    # only send between 02:00 and 09:00 UTC
+# Window opens at 03:00 (not 02:00): the pre-open RC call is produced by the
+# 1.16 open-direction job at 03:00 UTC and the brief chains on its completion.
+# Opening earlier let the 1.4-chained trigger (~02:55) burn the once-per-day
+# send BEFORE the prediction existed. Pre-03:00 fires skip with exit 75 (not
+# recorded as delivered), so the 1.16-chained fire still delivers.
+_SEND_WINDOW_UTC  = (3, 9)    # only send between 03:00 and 09:00 UTC
 _STALE_FALLBACK_H = 7         # if still stale by 07:00 UTC, send anyway (holiday / pipeline failure)
 _SKIP_EXIT_CODE   = 75        # "skipped, not a failure — a later trigger will deliver it"
 

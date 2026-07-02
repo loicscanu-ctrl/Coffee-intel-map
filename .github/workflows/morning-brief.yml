@@ -2,30 +2,30 @@ name: "1.6 – Morning Brief"
 
 on:
   schedule:
-    # 03:09 UTC ≈ 10:09 Vietnam time (UTC+7). Primary delivery target.
-    # Upstream chain ends well before this:
+    # 03:41 UTC ≈ 10:41 Vietnam time (UTC+7) — FALLBACK only. The primary
+    # trigger is now the workflow_run chain on "1.16 – Open-Direction
+    # Prediction Log" (03:00 UTC weekdays): the brief includes that job's
+    # pre-open RC call, so it must fire AFTER it. On the normal path the log
+    # completes ~03:05–03:20 and chains the brief immediately; this cron only
+    # matters on weekends (no 1.16 run) or when the 03:00 cron was skipped.
+    # Upstream data chain ends well before either path:
     #   01:07 UTC  scraper-daily       (~30-50 min)
     #   02:13 UTC  daily_oi            (~3 min, weekdays)
     #   02:19 UTC  scraper-freight     (~5 min)
     #   02:41 UTC  export-and-publish  (~10 min)
-    # → all done by ~02:55 UTC, leaving ~15 min headroom before 10am VN.
-    # All five workflows use off-:00/:30 minutes (7, 13, 19, 41, 9) to dodge
-    # GH Actions' well-known cron skip on top-of-hour and :30 marks. Before
-    # this change, scraper-daily was firing 4-5h late (~05:30 UTC), so the
-    # 03:00 brief read 24h-stale JSONs from yesterday's run.
-    - cron: '9 3 * * *'
+    #   03:00 UTC  open-direction log  (~5-10 min, weekdays)
+    # Off-:00/:30 minutes dodge GH Actions' cron skip on round marks.
+    - cron: '41 3 * * *'
   workflow_run:
-    # Safety net for skipped scheduled runs. GH Actions cron has a known
-    # skip rate during peak load (esp. :00/:30 minute slots) — empirically
-    # observed 2026-05-15: 01:30 UTC export-and-publish skipped, didn't bot-commit
-    # until 04:58 UTC; the 02:30 UTC brief never fired and no failure alert
-    # was sent (because it never started, so the on-failure step couldn't run).
-    #
-    # When export-and-publish completes successfully, this workflow ALSO fires.
-    # A guard step inside the job ensures the brief only sends once per UTC day:
-    # if today's brief already went out (via cron or earlier workflow_run), the
-    # job exits silently. So this is purely additive — never causes a double-send.
-    workflows: ["1.4 – Export and Publish Static JSON"]
+    # Two chained triggers, one dedup guard (once per UTC day):
+    #  * 1.16 Open-Direction Prediction Log — the PRIMARY morning path; firing
+    #    right after it guarantees the fresh pre-open RC call is in the brief.
+    #  * 1.4 Export and Publish — safety net for skipped scheduled runs.
+    #    GH Actions cron has a known skip rate during peak load; empirically
+    #    observed 2026-05-15 (export skipped, brief never fired, no alert).
+    # The in-job guard ensures the brief only sends once per UTC day, so the
+    # multiple triggers are purely additive — never a double-send.
+    workflows: ["1.16 – Open-Direction Prediction Log", "1.4 – Export and Publish Static JSON"]
     types: [completed]
   workflow_dispatch:        # manual trigger from GitHub UI
 

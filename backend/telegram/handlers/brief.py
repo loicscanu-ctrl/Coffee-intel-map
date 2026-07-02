@@ -952,6 +952,36 @@ def _load_archive() -> dict | None:
     return None
 
 
+def _open_direction_block(today: date) -> str | None:
+    """One-liner from the pre-open overnight-gap model (03:00 UTC run).
+
+    Shown only when the prediction is FOR today's session — the brief chains on
+    the 1.16 log workflow, so normally it is. A stale/absent payload renders
+    nothing rather than yesterday's call.
+    """
+    q = load("quant_report.json")
+    od = (q or {}).get("open_direction") or {}
+    if not od.get("available") or od.get("for_session") != today.isoformat():
+        return None
+    p_up = od.get("prob_up")
+    direction = od.get("direction")
+    if p_up is None or direction is None:
+        return None
+    if direction == "Abstain":
+        head = f"🔮 RC open call: <b>Abstain</b> ({p_up * 100:.0f}% up — inside the no-call band)"
+    else:
+        conf = p_up if direction == "Bullish" else 1 - p_up
+        head = f"🔮 RC open call: <b>{direction}</b> {conf * 100:.0f}%"
+    drivers = []
+    for f in (od.get("features") or [])[:2]:
+        usd = f.get("usd_per_ton")
+        usd_s = f" ({'+' if usd > 0 else ''}{usd:,.0f}$/t)" if isinstance(usd, (int, float)) else ""
+        drivers.append(f"{f.get('label')} {f.get('raw_fmt')}{usd_s}")
+    if drivers:
+        head += "\n     " + " · ".join(drivers)
+    return head
+
+
 def build_brief_message(db=None) -> str:
     now = datetime.now(UTC)
     today = now.date()
@@ -1003,6 +1033,9 @@ def build_brief_message(db=None) -> str:
     parts: list[str] = [f"☕ <b>Coffee Intel · {day_str}</b>", ""]
     parts.append(rc_line)
     parts.append(kc_line)
+    open_call = _open_direction_block(today)
+    if open_call:
+        parts.append(open_call)
     # Blank line between futures (RC/KC + their spread lines) and the
     # physical block — visual break since the two groups read differently
     # (futures = on-exchange, physical = farmgate-to-FOB basis).
