@@ -187,8 +187,10 @@ export default function PriceDirectionSection() {
                       </td>
                     )}
                   </tr>
-                  {/* Factor detail: the components written down beneath the row. */}
-                  {f.detail && (
+                  {/* Factor detail: the components written down beneath the row.
+                      Guarded on .text so a transitional old-shape payload
+                      (pre-gap-spec detail object) renders nothing. */}
+                  {f.detail?.text && (
                     <tr className={i % 2 ? "bg-slate-900/60" : ""}>
                       <td colSpan={3} className="px-4 pb-2 pt-0">
                         <div className="text-[10px] text-slate-500 font-mono leading-relaxed border-l-2 border-slate-700 pl-3">
