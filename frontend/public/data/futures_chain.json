@@ -1,6 +1,6 @@
 {
   "arabica": {
-    "pub_date": "2026-06-30",
+    "pub_date": "2026-07-01",
     "contracts": [
       {
         "contract": "Coffee (Jul '26)",
@@ -86,7 +86,7 @@
     ]
   },
   "robusta": {
-    "pub_date": "2026-06-30",
+    "pub_date": "2026-07-01",
     "contracts": [
       {
         "contract": "Robusta Coffee 10-T (Jul '26)",
@@ -94,7 +94,7 @@
         "last": 3958,
         "chg": 113,
         "oi": 158,
-        "volume": null,
+        "volume": 0,
         "symbol": "RMN26"
       },
       {
