@@ -26,6 +26,19 @@ consistency, significance and calibration checks.
 | harvest / frost / day-of-year seasonality | **DROP (this model)** | All ≤0 marginal, unstable — frequency-mismatched + too few annual cycles. Reserve for the longer-horizon model. |
 | term structure, daily-BRL, index-roll, month-end, weekend | **DROP** | No usable edge on this target. |
 
+## Vietnam physical overnight (candidate 1a) — DATA-STARVED, WAIT
+Hypothesis: VN domestic robusta (giacaphe, Dak Lak) moves during Asia hours —
+before London opens — so its fresh-morning change should lead the RC open.
+Investigated 2026-07: **timing confirmed viable** — the daily scrape (01:07
+UTC = 08:07 VN) captures the same-morning price, i.e. the feature is genuinely
+knowable pre-open with correct alignment. **But only ~50 days of history
+exist** (`origin_prices_history.json` accumulator started 2026-05-14), far
+below the ~300 sessions the walk-forward gate needs. Per the evidence rule, it
+does NOT enter the model now. Path forward: the accumulator grows daily with
+zero new infrastructure — revisit at ~300 rows (~early 2027), or earlier via a
+DB backfill if `physical_prices` holds deeper giacaphe history than the
+exporter surfaces.
+
 ## COT industry × harvest (interaction hypothesis) — INCONCLUSIVE
 Hypothesis: commercial (`pmpu`) positioning conditioned on harvest predicts a
 **multi-day** move (min-short during harvest = unsold crop overhang = bearish).
