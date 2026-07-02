@@ -22,7 +22,7 @@ interface HistRow {
 const STATE = {
   hit:     { bg: "#10b981", glyph: "✓", label: "Correct" },
   miss:    { bg: "#ef4444", glyph: "✗", label: "Wrong" },
-  abstain: { bg: "#64748b", glyph: "·", label: "Abstained" },
+  abstain: { bg: "#64748b", glyph: "·", label: "Undefined" },
   void:    { bg: "#1e293b", glyph: "–", label: "Void (roll/holiday)" },
   pending: { bg: "transparent", glyph: "?", label: "Pending (awaiting open)" },
 } as const;
@@ -166,7 +166,7 @@ export default function OpenDirectionCalendar() {
           <div className="text-xl font-bold font-mono text-slate-100">
             {stats.coverage != null ? pct(stats.coverage) : "—"}
           </div>
-          <div className="text-[9px] text-slate-500">calls made (rest abstained)</div>
+          <div className="text-[9px] text-slate-500">calls made (rest Undefined)</div>
         </div>
         <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
           <div className="text-[10px] text-slate-400 uppercase tracking-wide">Pending</div>
@@ -232,7 +232,7 @@ export default function OpenDirectionCalendar() {
                     <div className="hidden group-hover:block absolute z-20 bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[220px]
                                     bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-[10px] text-slate-200 shadow-lg whitespace-nowrap">
                       <div className="font-semibold">{iso} · {r.source}</div>
-                      <div>Call: {r.direction} ({pct(r.prob_up, 1)} up)</div>
+                      <div>Call: {r.direction === "Abstain" ? "Undefined" : r.direction} ({pct(r.prob_up, 1)} up)</div>
                       {r.status === "resolved" && r.actual_gap_pct != null && (
                         <div>Open: {r.actual_dir} {r.actual_gap_pct > 0 ? "+" : ""}{r.actual_gap_pct.toFixed(2)}%
                           {r.hit != null && <span className={r.hit ? " text-emerald-400" : " text-red-400"}> · {r.hit ? "correct" : "wrong"}</span>}
@@ -286,7 +286,7 @@ export default function OpenDirectionCalendar() {
                   <td className={`py-1.5 pr-2 font-semibold ${
                     r.direction === "Bullish" ? "text-emerald-400"
                     : r.direction === "Bearish" ? "text-red-400" : "text-slate-400"}`}>
-                    {r.direction}
+                    {r.direction === "Abstain" ? "Undefined" : r.direction}
                   </td>
                   <td className="py-1.5 pr-2 text-right font-mono text-slate-300">{pct(r.prob_up, 1)}</td>
                   <td className={`py-1.5 pr-2 text-right font-mono ${

@@ -108,6 +108,8 @@ export default function PriceDirectionSection() {
   }
 
   const dir = data?.direction ?? "Bearish";
+  // Stored value stays "Abstain" (record continuity); the product name is "Undefined".
+  const dirLabel = dir === "Abstain" ? "Undefined" : dir;
   const dirCls = dir === "Bullish" ? "text-emerald-400"
     : dir === "Bearish" ? "text-red-400" : "text-amber-400";
   const probUp = data?.prob_up ?? 0.5;
@@ -167,7 +169,7 @@ export default function PriceDirectionSection() {
                     </td>
                     {i === 0 && (
                       <td className={`px-4 py-2 text-center font-bold text-sm ${dirCls}`} rowSpan={features.length}>
-                        {dir}
+                        {dirLabel}
                         {data.expected_gap_usd_mt != null && (
                           <div className="text-[10px] font-mono font-normal text-slate-400 mt-0.5">
                             exp. {fmtUsdTon(data.expected_gap_usd_mt)}
@@ -316,7 +318,7 @@ export default function PriceDirectionSection() {
                 <span className="text-[11px] text-slate-500"> (n={data.model?.acted_n ?? 0})</span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400">Abstain rate: </span>
+                <span className="text-[11px] text-slate-400">Undefined rate: </span>
                 <span className="text-[11px] font-mono text-amber-400">
                   {data.model?.abstain_rate != null ? fmtPct(data.model.abstain_rate, 1) : "—"}
                 </span>
@@ -332,7 +334,7 @@ export default function PriceDirectionSection() {
               out-of-sample (expanding walk-forward, standardise-on-past) vs the rolling
               majority-class baseline on the same sessions; &ldquo;acted&rdquo; restricts to
               calls outside the ±{((data.target?.abstain_band ?? 0.03) * 100).toFixed(0)}pp
-              abstain band, where the model abstains rather than forcing a coin-flip call.
+              band, inside which the call is &ldquo;Undefined&rdquo; rather than a forced coin-flip.
               Every 03:00 UTC prediction is logged before the open and graded after it —
               see the calendar below. Methodology: docs/research/open-price-direction-findings.md
             </p>

@@ -89,6 +89,26 @@ One prediction → two artifacts: the 03:00 job writes the history row AND
 `quant_report.json["open_direction"]` from the same fit, so the panel and the
 record can never disagree. `run_quant.py` (21:30) preserves the key untouched.
 
+## Owner decision (2026-07): ±10pp "Undefined" band
+Calls with |p−50| < 10pp are now **Undefined** (band 0.06 → 0.10). Measured on
+the 899-session walk-forward: acted hit-rate **63.6% at 36% coverage** (~1
+call per 2.7 sessions), capture +$5.0/t per call vs +$2.1 acting on
+everything. Stored direction value remains "Abstain" for record continuity;
+all UI surfaces render "Undefined". The seed-regeneration trigger also fires
+on band changes so backtest rows relabel consistently (live rows untouched).
+
+## Bearish-call asymmetry (2026-07 analysis) — base rate, not model magic
+Raw hit-rates (bear 60.4% vs bull 52.3%) look asymmetric, but robusta gaps
+DOWN 55.4% of overnight sessions. Against the correct blind baselines the
+skill is roughly symmetric — actually higher on bullish calls:
+  bear 60.4% vs blind-bear 55.4% → **+5.0pp skill**
+  bull 52.3% vs blind-bull 44.6% → **+7.7pp skill**
+Bear-call share varies by month (22%→80%) but tracks each month's own
+down-drift (e.g. Oct: 32% up-rate → 74% bear share, 74% bear hit) and each
+year's regime (2024: 37% up-rate → bear 68%; 2025: 50% → bear 53%) — i.e.
+regime-following via the intercept + drivers, not a calendar anomaly. No
+evidence of a flaw; per-month samples (~75) too thin to trade separately.
+
 ## Enhancements (2026-07, second wave)
 - **Abstain band retuned 0.03 → 0.06** on the real walk-forward probs (sweep
   0.00→0.10, objective: max acted hit-rate s.t. coverage ≥60%): acted accuracy
