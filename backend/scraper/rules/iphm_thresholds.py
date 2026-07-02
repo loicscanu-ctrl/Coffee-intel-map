@@ -50,17 +50,12 @@ IPHM_RULES: list[dict] = [
         "severity": "critical",
         "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
     },
-    {
-        "threat_id": "brazil_frost_risk",
-        "name": "Critical Frost Threat",
-        "origins": ["BRA"],            # Only evaluate for Brazil
-        "months":  [5, 6, 7, 8],       # May through August only
-        "conditions": {
-            "temp_min_max": 3.0,       # Minimum temp dropping below 3 °C
-        },
-        "severity": "critical",
-        "market_impact": "Immediate systemic threat to next year's vegetative growth.",
-    },
+    # NOTE: brazil_frost_risk moved OUT of this generic ruleset in iphm-v2.
+    # Frost is now evaluated per-region with a physical model (radiative vs
+    # advective, duration, black frost) in scraper.agronomic_alerts, fed by
+    # farmer_economics.json's per-region frost_detail. The old rule applied a
+    # single country-wide forecast minimum ≤ 3 °C to every region — crude and
+    # prone to false positives (e.g. coastal Espírito Santo).
     {
         "threat_id": "blossom_drop",
         "name": "Flowering Disruption / Blossom Drop",

@@ -61,30 +61,51 @@ class TestSevereDefoliation:
         assert ae.evaluate_rule(self.RULE, {"vhi": 60.0, "spei_3": -2.0}, "VNM", 5) is None
 
 
-# ── brazil_frost_risk: BRA-only, May–Aug, temp_min ≤ 3 °C ────────────────────
+# ── Brazil frost: per-region, physics-based, graduated (iphm-v2) ─────────────
 
-class TestBrazilFrost:
-    RULE = _rule("brazil_frost_risk")
+def _fe_doc(region: str, detail: dict | None) -> dict:
+    """Minimal farmer_economics.json shape carrying one region's frost_detail."""
+    return {"weather": {"regions": [{"name": region, "frost_detail": detail}]}}
 
-    def test_fires_for_brazil_in_winter(self):
-        # May/Jun/Jul/Aug all eligible
-        for m in (5, 6, 7, 8):
-            out = ae.evaluate_rule(self.RULE, {"temp_min": 1.5}, "BRA", m)
-            assert out is not None
-            assert out["timeframe"] == "forecast"   # temp_min is forecast-only
-            assert out["severity"] == "critical"
 
-    def test_skips_other_origins_even_when_cold(self):
-        for iso in ("COL", "HND", "VNM", "ETH"):
-            assert ae.evaluate_rule(self.RULE, {"temp_min": 1.0}, iso, 6) is None
+class TestBrazilFrostAlerts:
+    def test_frost_belt_region_fires_graduated_severity(self):
+        # A deep radiative freeze in the frost belt → critical.
+        detail = {"risk": "H", "frost_type": "radiative", "surface_c": -3.0,
+                  "air_min_c": 1.0, "hours_below_0": 5, "date": "2026-07-15"}
+        out = ae.brazil_frost_alerts(_fe_doc("Sul de Minas", detail), month=7)
+        assert "Sul de Minas" in out
+        alert = out["Sul de Minas"][0]
+        assert alert["severity"] == "critical"
+        assert alert["threat_id"] == "brazil_frost_risk"
+        assert alert["timeframe"] == "forecast"
+        assert alert["triggers"]["type"] == "radiative"
 
-    def test_skips_outside_winter_months(self):
-        # Dec/Jan/Mar/Sep are outside the May-Aug window
-        for m in (1, 3, 9, 12):
-            assert ae.evaluate_rule(self.RULE, {"temp_min": 1.0}, "BRA", m) is None
+    def test_marginal_frost_is_only_a_watch(self):
+        detail = {"risk": "M", "frost_type": "none", "surface_c": 1.5,
+                  "air_min_c": 3.0, "hours_below_0": 0, "date": "2026-07-15"}
+        out = ae.brazil_frost_alerts(_fe_doc("Paraná", detail), month=7)
+        assert out["Paraná"][0]["severity"] == "watch"
 
-    def test_skips_when_warm_enough(self):
-        assert ae.evaluate_rule(self.RULE, {"temp_min": 5.0}, "BRA", 6) is None
+    def test_coastal_espirito_santo_never_fires(self):
+        # Even if a glitch put a frost_detail on the coastal region, it's not
+        # in the frost belt → no alert (kills the old country-wide false pos).
+        detail = {"risk": "H", "frost_type": "radiative", "surface_c": -2.0,
+                  "air_min_c": 1.0, "hours_below_0": 2, "date": "2026-07-15"}
+        assert ae.brazil_frost_alerts(_fe_doc("Espírito Santo", detail), month=7) == {}
+
+    def test_no_alert_out_of_frost_season(self):
+        detail = {"risk": "H", "frost_type": "radiative", "surface_c": -3.0,
+                  "air_min_c": 1.0, "hours_below_0": 5, "date": "2026-01-15"}
+        assert ae.brazil_frost_alerts(_fe_doc("Sul de Minas", detail), month=1) == {}
+
+    def test_no_frost_detail_or_missing_file_is_silent(self):
+        assert ae.brazil_frost_alerts(_fe_doc("Paraná", None), month=7) == {}
+        assert ae.brazil_frost_alerts(None, month=7) == {}
+
+    def test_removed_from_generic_ruleset(self):
+        # The crude country-wide rule is gone from IPHM_RULES.
+        assert all(r["threat_id"] != "brazil_frost_risk" for r in IPHM_RULES)
 
 
 # ── blossom_drop: drought THEN sudden heavy rain ─────────────────────────────
@@ -222,7 +243,7 @@ def test_evaluate_region_returns_all_fired_rules():
     assert "fungal_rust_outbreak" in threat_ids
     assert "severe_defoliation" in threat_ids
     assert "blossom_drop" in threat_ids
-    # brazil_frost_risk filtered out for non-BRA
+    # frost is no longer a generic rule (moved to brazil_frost_alerts in v2)
     assert "brazil_frost_risk" not in threat_ids
 
 

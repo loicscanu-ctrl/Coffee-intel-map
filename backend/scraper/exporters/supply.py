@@ -13,6 +13,7 @@ from scraper._export_common import _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
 from scraper.exporters.base import OUT_DIR, ROOT
+from scraper.rules import frost_model as _fm
 from scraper.validate_export import (
     safe_write_json,
     validate_farmer_economics,
@@ -94,6 +95,7 @@ def export_farmer_economics(db) -> None:
             drought_detail_out    = []
             current_conditions_out= []
             scraped_at_out        = None
+            _today_iso            = date.today().isoformat()
 
             for region_name in _REGIONS_ORDER:
                 snap = latest_by_region.get(region_name)
@@ -114,9 +116,17 @@ def export_farmer_economics(db) -> None:
                 from scraper.sources.farmer_economics import _calc_csi
                 csi = _calc_csi(daily)
 
+                # Per-region physics-based frost detail over the FORECAST
+                # window (Phase 1 fields on daily_data). Drives the graduated
+                # per-region frost ALERT in scraper.agronomic_alerts; None
+                # when the forecast holds no frost (e.g. coastal Espírito
+                # Santo, or out of frost season).
+                frost_detail = _fm.worst_forecast_frost(daily, _today_iso)
+
                 regions_out.append({
                     "name":           region_name,
                     "frost":          frost_badge,
+                    "frost_detail":   frost_detail,
                     "drought":        drought_badge,
                     "csi_30d":        csi["csi_30d"],
                     "csi_60d":        csi["csi_60d"],
