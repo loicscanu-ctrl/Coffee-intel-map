@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T16:01:03+00:00",
+  "generated_at": "2026-07-02T21:30:32+00:00",
   "as_of": "2026-07-01",
   "snapshots": [
     {
@@ -14287,8 +14287,8 @@
         "date": "2026-06-29",
         "report_date": "2026-06-29",
         "queue_lots": 0,
-        "forecast_lots": 50,
-        "total_pending_lots": 50
+        "forecast_lots": 0,
+        "total_pending_lots": 0
       },
       {
         "date": "2026-06-30",
