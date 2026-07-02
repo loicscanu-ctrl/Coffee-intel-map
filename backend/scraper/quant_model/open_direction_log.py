@@ -101,11 +101,16 @@ def _seed(frame: "pd.DataFrame") -> list[dict]:
 
 def _ensure_seed_factors(history: list[dict], frame: "pd.DataFrame") -> list[dict]:
     """One-time backfill: if the backtest seed predates per-row factor logging
-    (or an abstain-band retune), regenerate the backtest rows — they are
-    deterministic from data + model spec. LIVE rows are never touched: they are
-    the append-only forward record."""
+    OR an abstain-band retune (stored Abstain labels inconsistent with the
+    current band), regenerate the backtest rows — they are deterministic from
+    data + model spec. LIVE rows are never touched: they are the append-only
+    forward record."""
     bt = [r for r in history if r.get("source") == "backtest"]
-    if not bt or all(r.get("factors") for r in bt):
+    band_stale = any(
+        (r.get("direction") == "Abstain") != (abs(r.get("prob_up", 0.5) - 0.5) < _od._ABSTAIN_BAND)
+        for r in bt
+    )
+    if not bt or (all(r.get("factors") for r in bt) and not band_stale):
         return history
     live = [r for r in history if r.get("source") == "live"]
     regenerated = _seed(frame)

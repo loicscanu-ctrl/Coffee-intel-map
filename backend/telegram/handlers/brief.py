@@ -971,7 +971,7 @@ def _open_direction_block(today: date) -> str | None:
     exp_s = (f" · exp. {'+' if exp_usd > 0 else ''}{exp_usd:,.0f}$/t"
              if isinstance(exp_usd, (int, float)) else "")
     if direction == "Abstain":
-        head = f"🔮 RC open call: <b>Abstain</b> ({p_up * 100:.0f}% up — inside the no-call band)"
+        head = f"🔮 RC open call: <b>Undefined</b> ({p_up * 100:.0f}% up — inside the ±10pp no-call band)"
     else:
         conf = p_up if direction == "Bullish" else 1 - p_up
         head = f"🔮 RC open call: <b>{direction}</b> {conf * 100:.0f}%{exp_s}"

@@ -69,12 +69,14 @@ _FX_SNAPS  = _ROOT / "frontend" / "public" / "data" / "fx_intraday_snapshots.jso
 
 _KC_TO_USD_PER_MT = 22.0462   # KC ¢/lb → USD/MT
 
-# Tuned on the real walk-forward probs (898 OOS sessions, sweep 0.00→0.10):
-# objective = max acted hit-rate subject to coverage ≥60%. 0.06 gives 58.7%
-# acted accuracy at 60.1% coverage (0.03 gave 56.5% @ 79%); the monotone
-# band→accuracy curve (0.10 → 63.5% @ 36%) confirms confidence is informative.
-# Mild selection effect acknowledged — the live record is the arbiter.
-_ABSTAIN_BAND    = 0.06       # |prob_up − 0.5| below this → Abstain
+# Owner decision (2026-07): calls inside ±10pp are "Undefined" — the model
+# only speaks when it means it. Measured on the 899-session walk-forward:
+# acted hit-rate 63.6% at 36% coverage (~1 call per 2.7 sessions), capture
+# +$5.0/t per call vs +$2.1 acting on everything. The monotone band→accuracy
+# curve (0.03→56.5%, 0.06→58.7%, 0.10→63.6%) shows confidence is informative.
+# Stored direction value remains "Abstain" for record continuity; every UI
+# surface renders it as "Undefined".
+_ABSTAIN_BAND    = 0.10       # |prob_up − 0.5| below this → Undefined
 _MIN_TRAIN       = 252        # ≥ ~1y of labelled sessions before predicting
 _MIN_CCI_OVERLAP = 40         # days of FX snapshots before cci_overnight joins
 _WF_STEP         = 5          # walk-forward refit cadence (matches the ablation)
