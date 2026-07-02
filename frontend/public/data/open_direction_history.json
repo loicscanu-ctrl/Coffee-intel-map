@@ -8973,6 +8973,16 @@
   "date": "2026-07-01",
   "prob_up": 0.4518,
   "direction": "Bearish",
+  "actual_gap_pct": 0.41,
+  "actual_dir": "Up",
+  "hit": false,
+  "status": "resolved",
+  "source": "live"
+ },
+ {
+  "date": "2026-07-02",
+  "prob_up": 0.7904,
+  "direction": "Bullish",
   "actual_gap_pct": null,
   "actual_dir": null,
   "hit": null,

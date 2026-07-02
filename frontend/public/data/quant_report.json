@@ -339,7 +339,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -347,111 +347,61 @@
   "open_direction": {
     "available": true,
     "as_of": "2026-07-01",
-    "scraped_at": "2026-07-01T22:48:08.207282Z",
+    "for_session": "2026-07-02",
+    "scraped_at": "2026-07-02T00:31:10.950201Z",
     "direction": "Bullish",
-    "base_margin": 0.21534638340023407,
-    "final_margin": 0.7424400863064459,
-    "base_prob": 0.553629504348961,
-    "final_prob": 0.6775292053203528,
-    "prob_up": 0.6775292053203528,
-    "prob_down": 0.32247079467964723,
+    "base_margin": -0.14613208468922104,
+    "final_margin": 1.327604233603669,
+    "base_prob": 0.4635318525917173,
+    "final_prob": 0.7904440708036081,
+    "prob_up": 0.7904440708036081,
+    "prob_down": 0.20955592919639188,
     "features": [
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
         "raw_value": 0.014675052410901612,
         "raw_fmt": "+1.47%",
-        "usd_per_ton": 58.1,
-        "phi": 0.6219848500691099
-      },
-      {
-        "var_name": "rc_ret_1d",
-        "label": "RC 1-Day Return",
-        "raw_value": 0.0293888166449936,
-        "raw_fmt": "+2.94%",
-        "usd_per_ton": 116.3,
-        "phi": -0.2920867122359028
-      },
-      {
-        "var_name": "rc_overnight_gap",
-        "label": "RC Overnight Gap",
-        "raw_value": 0.004095004095004073,
-        "raw_fmt": "+0.41%",
-        "usd_per_ton": 16.2,
-        "phi": 0.09340581248532988
-      },
-      {
-        "var_name": "kc_rc_gap_ret",
-        "label": "NY Price Gap \u0394",
-        "raw_value": 0.058295157218233085,
-        "raw_fmt": "+5.83%",
-        "usd_per_ton": 230.7,
-        "phi": 0.058644655473570576
-      },
-      {
-        "var_name": "rc_open15_ret",
-        "label": "RC Opening 15-min Move",
-        "raw_value": 0.0016313213703098572,
-        "raw_fmt": "+0.16%",
-        "usd_per_ton": 6.5,
-        "phi": 0.03548530961999268
-      },
-      {
-        "var_name": "kc_rc_gap_z",
-        "label": "New York Price Gap (z)",
-        "raw_value": -0.27767926225315553,
-        "raw_fmt": "-0.28\u03c3",
-        "usd_per_ton": -194.6,
-        "phi": 0.0167875008202062,
+        "usd_per_ton": 55.3,
+        "phi": 1.4357536253874803,
         "detail": {
-          "kc_usd_per_mt": 7149.6,
-          "rc_usd_per_mt": 3958.0,
-          "gap_usd_per_mt": 3191.6,
-          "gap_mean_usd_per_mt": 3386.2,
-          "gap_std_usd_per_mt": 700.9,
-          "formula": "gap = KC(\u00a2/lb \u00d7 22.0462) \u2212 RC, in USD/MT; z-scored over a 260-day rolling window"
+          "text": "KC at RC close (17:30 London) 310.05¢/lb → KC close (18:30) 314.60¢/lb = +100.3 $/t on arabica; +1.47% mapped on robusta ≈ +55.3 $/t"
         }
       },
       {
-        "var_name": "cci_ret_5d",
-        "label": "Coffee Currency Index 5-Day \u0394",
-        "raw_value": 0.0011581235107331889,
-        "raw_fmt": "+0.12%",
-        "usd_per_ton": 4.6,
-        "phi": -0.007127713326094489
+        "var_name": "days_since_roll",
+        "label": "Roll-Cycle Position",
+        "raw_value": 20.0,
+        "raw_fmt": "day 20",
+        "usd_per_ton": null,
+        "phi": 0.037982692905409815,
+        "detail": {
+          "text": "day 20 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
+        }
       }
     ],
-    "barrier": {
-      "horizon_days": 5,
-      "k_sigma": 1.0,
-      "vol_window": 20
+    "target": {
+      "kind": "overnight_gap",
+      "definition": "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
+      "abstain_band": 0.03
     },
     "model": {
       "kind": "logistic_regression_l2",
       "active_features": [
-        "rc_ret_1d",
-        "kc_rc_gap_z",
-        "kc_rc_gap_ret",
         "kc_after_rc_diff",
-        "rc_open15_ret",
-        "rc_overnight_gap",
-        "cci_ret_5d"
+        "days_since_roll"
       ],
-      "n_features": 7,
-      "n_train": 846,
-      "test_accuracy": 0.56656346749226,
-      "baseline_accuracy": 0.5278637770897833,
-      "edge": 0.03869969040247678,
+      "n_features": 2,
+      "n_train": 1150,
+      "test_accuracy": 0.5712694877505567,
+      "baseline_accuracy": 0.5367483296213809,
+      "edge": 0.03452115812917589,
+      "acted_accuracy": 0.5645390070921986,
+      "acted_n": 705,
+      "abstain_rate": 0.21492204899777284,
       "eval_method": "walk_forward",
-      "n_test": 646,
-      "undefined_ratio": 0.17044334975369457,
-      "n_resolvable": 1015,
-      "n_undefined": 173,
-      "currency_axis": "coffee_currency_index",
-      "cci_available": true,
-      "kc_after_rc_active": true,
-      "rc_open15_active": true,
-      "rc_overnight_active": true,
+      "n_test": 898,
+      "cci_available": false,
       "intraday_source": "barchart_15min",
       "roll_days_excluded": 88
     }
