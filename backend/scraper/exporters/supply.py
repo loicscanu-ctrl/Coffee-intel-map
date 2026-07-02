@@ -118,10 +118,17 @@ def export_farmer_economics(db) -> None:
 
                 # Per-region physics-based frost detail over the FORECAST
                 # window (Phase 1 fields on daily_data). Drives the graduated
-                # per-region frost ALERT in scraper.agronomic_alerts; None
-                # when the forecast holds no frost (e.g. coastal Espírito
-                # Santo, or out of frost season).
+                # per-region frost ALERT in scraper.agronomic_alerts and the
+                # frontend Frost Watch panel; None when the forecast holds no
+                # frost (e.g. coastal Espírito Santo, or out of frost season).
+                # Enrich with the same severity the alert engine uses, so the
+                # UI badge and the Telegram alert can never disagree.
                 frost_detail = _fm.worst_forecast_frost(daily, _today_iso)
+                if frost_detail:
+                    frost_detail["severity"] = _fm.severity(
+                        frost_detail["risk"], frost_detail["frost_type"],
+                        frost_detail["surface_c"], frost_detail["hours_below_0"],
+                    )
 
                 regions_out.append({
                     "name":           region_name,
