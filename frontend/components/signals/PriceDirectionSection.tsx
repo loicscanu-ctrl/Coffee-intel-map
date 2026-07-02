@@ -2,21 +2,15 @@
 import { Fragment, useEffect, useState } from "react";
 
 // ── Live open-direction model output (quant_report.json["open_direction"]) ──
-// Produced daily by backend/scraper/quant_model/open_direction.py — a
-// triple-barrier-labelled logistic classifier on ICE Robusta's next-session
-// direction, with an EXACT additive (SHAP-style) decomposition. For logistic
-// regression φᵢ = βᵢ·zᵢ in log-odds space and Σφᵢ = margin(x) − base_margin
-// with zero residual, so the waterfall below is mathematically exact, not a
-// sampled approximation. Methodology: docs/research/open-price-direction-methodology.md
-
-interface GapDetail {
-  kc_usd_per_mt:       number;
-  rc_usd_per_mt:       number;
-  gap_usd_per_mt:      number;
-  gap_mean_usd_per_mt: number | null;
-  gap_std_usd_per_mt:  number | null;
-  formula:             string;
-}
+// Produced PRE-OPEN (03:00 UTC) by backend/scraper/quant_model/
+// open_direction_log.py → open_direction.py: a logistic classifier on ICE
+// Robusta's OVERNIGHT GAP (first-bar open vs prior 17:30-London close, roll
+// days excluded), with an EXACT additive (SHAP-style) decomposition. For
+// logistic regression φᵢ = βᵢ·zᵢ in log-odds space and Σφᵢ = margin(x) −
+// base_margin with zero residual, so the waterfall below is mathematically
+// exact, not a sampled approximation. Every prediction is also logged
+// append-only to open_direction_history.json and graded after the open.
+// Methodology: docs/research/open-price-direction-findings.md
 
 interface Feature {
   var_name:    string;
@@ -25,14 +19,15 @@ interface Feature {
   raw_fmt:     string;
   usd_per_ton: number | null;   // factor magnitude on the robusta USD/MT ruler
   phi:         number;          // margin (log-odds) units
-  detail?:     GapDetail;       // only on the New York Price Gap factor
+  detail?:     { text: string };
 }
 
 interface OpenDirection {
   available:     boolean;
   reason?:       string;
-  as_of?:        string;
-  direction?:    "Bullish" | "Bearish";
+  as_of?:        string;        // last session whose data fed the model
+  for_session?:  string;        // the session being predicted
+  direction?:    "Bullish" | "Bearish" | "Abstain";
   base_margin?:  number;
   final_margin?: number;
   base_prob?:    number;
@@ -40,7 +35,7 @@ interface OpenDirection {
   prob_up?:      number;
   prob_down?:    number;
   features?:     Feature[];
-  barrier?:      { horizon_days: number; k_sigma: number; vol_window: number };
+  target?:       { kind: string; definition: string; abstain_band: number };
   model?: {
     kind:            string;
     active_features: string[];
@@ -49,11 +44,11 @@ interface OpenDirection {
     test_accuracy:   number | null;
     baseline_accuracy?: number | null;
     edge?:           number | null;
+    acted_accuracy?: number | null;
+    acted_n?:        number | null;
+    abstain_rate?:   number | null;
     eval_method?:    string;
     n_test:          number;
-    undefined_ratio: number | null;
-    n_resolvable:    number;
-    n_undefined:     number;
   };
 }
 
@@ -111,7 +106,8 @@ export default function PriceDirectionSection() {
   }
 
   const dir = data?.direction ?? "Bearish";
-  const isBull = dir === "Bullish";
+  const dirCls = dir === "Bullish" ? "text-emerald-400"
+    : dir === "Bearish" ? "text-red-400" : "text-amber-400";
   const probUp = data?.prob_up ?? 0.5;
   const probDown = data?.prob_down ?? 0.5;
 
@@ -122,11 +118,11 @@ export default function PriceDirectionSection() {
         <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded">Section 1</span>
         <h2 className="text-base font-bold text-white">Open Price Direction</h2>
         <span className="text-[10px] text-slate-500">
-          Robusta · Next-Session · Triple-Barrier Classification
+          Robusta · Overnight Gap (open vs prior 17:30 close) · fires pre-open 03:00 UTC
         </span>
-        {data?.available && data.as_of && (
+        {data?.available && (
           <span className="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded ml-auto">
-            LIVE · {data.as_of}
+            LIVE · predicts {data.for_session ?? data.as_of}
           </span>
         )}
       </div>
@@ -168,7 +164,7 @@ export default function PriceDirectionSection() {
                       {fmtUsdTon(f.usd_per_ton)}
                     </td>
                     {i === 0 && (
-                      <td className={`px-4 py-2 text-center font-bold text-sm ${isBull ? "text-emerald-400" : "text-red-400"}`} rowSpan={features.length}>
+                      <td className={`px-4 py-2 text-center font-bold text-sm ${dirCls}`} rowSpan={features.length}>
                         {dir}
                       </td>
                     )}
@@ -191,25 +187,12 @@ export default function PriceDirectionSection() {
                       </td>
                     )}
                   </tr>
-                  {/* Price-gap detail: components written down beneath the row. */}
+                  {/* Factor detail: the components written down beneath the row. */}
                   {f.detail && (
                     <tr className={i % 2 ? "bg-slate-900/60" : ""}>
                       <td colSpan={3} className="px-4 pb-2 pt-0">
                         <div className="text-[10px] text-slate-500 font-mono leading-relaxed border-l-2 border-slate-700 pl-3">
-                          <span className="text-slate-400">Arabica</span> {f.detail.kc_usd_per_mt.toLocaleString()} $/t (KC ¢/lb × 22.0462)
-                          {"  −  "}
-                          <span className="text-slate-400">Robusta</span> {f.detail.rc_usd_per_mt.toLocaleString()} $/t
-                          {"  =  gap "}
-                          <span className="text-slate-200">{f.detail.gap_usd_per_mt.toLocaleString()} $/t</span>
-                          {f.detail.gap_mean_usd_per_mt != null && (
-                            <>
-                              {"  vs 260-day mean "}
-                              {f.detail.gap_mean_usd_per_mt.toLocaleString()} $/t
-                              {f.detail.gap_std_usd_per_mt != null && <> (σ {f.detail.gap_std_usd_per_mt.toLocaleString()} $/t)</>}
-                              {" → "}
-                              <span className={f.raw_value < 0 ? "text-red-400" : "text-emerald-400"}>{f.raw_fmt}</span>
-                            </>
-                          )}
+                          {f.detail.text}
                         </div>
                       </td>
                     </tr>
@@ -317,11 +300,17 @@ export default function PriceDirectionSection() {
                 <span className="text-[11px] text-slate-500"> · n={data.model?.n_test ?? 0}, {data.model?.eval_method === "walk_forward" ? "walk-forward" : "holdout"}</span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400">Undefined ratio: </span>
-                <span className="text-[11px] font-mono text-amber-400">
-                  {data.model?.undefined_ratio != null ? fmtPct(data.model.undefined_ratio, 1) : "—"}
+                <span className="text-[11px] text-slate-400">Acted accuracy: </span>
+                <span className="text-[11px] font-mono text-emerald-400">
+                  {data.model?.acted_accuracy != null ? fmtPct(data.model.acted_accuracy, 1) : "—"}
                 </span>
-                <span className="text-[11px] text-slate-500"> ({data.model?.n_undefined ?? 0}/{data.model?.n_resolvable ?? 0})</span>
+                <span className="text-[11px] text-slate-500"> (n={data.model?.acted_n ?? 0})</span>
+              </div>
+              <div>
+                <span className="text-[11px] text-slate-400">Abstain rate: </span>
+                <span className="text-[11px] font-mono text-amber-400">
+                  {data.model?.abstain_rate != null ? fmtPct(data.model.abstain_rate, 1) : "—"}
+                </span>
               </div>
               <div>
                 <span className="text-[11px] text-slate-400">Train rows: </span>
@@ -330,11 +319,13 @@ export default function PriceDirectionSection() {
               </div>
             </div>
             <p className="text-[10px] text-slate-500 leading-relaxed max-w-2xl">
-              Test accuracy is on the defined (non-abstaining) cases of a chronological
-              30% holdout; the live model refits on the full history. The undefined ratio is
-              how often the {data.barrier?.horizon_days ?? 5}-day time barrier was reached
-              before either ±{data.barrier?.k_sigma ?? 1}σ price barrier — the model abstains
-              rather than forcing a call. Methodology: docs/research/open-price-direction-methodology.md
+              Target: {data.target?.definition ?? "overnight gap direction"}. Accuracy is
+              out-of-sample (expanding walk-forward, standardise-on-past) vs the rolling
+              majority-class baseline on the same sessions; &ldquo;acted&rdquo; restricts to
+              calls outside the ±{((data.target?.abstain_band ?? 0.03) * 100).toFixed(0)}pp
+              abstain band, where the model abstains rather than forcing a coin-flip call.
+              Every 03:00 UTC prediction is logged before the open and graded after it —
+              see the calendar below. Methodology: docs/research/open-price-direction-findings.md
             </p>
           </div>
         </>

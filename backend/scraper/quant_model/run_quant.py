@@ -19,7 +19,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from database import SessionLocal
 from scraper.quant_model import sentiment as sentiment_mod
 from scraper.quant_model import robusta_factors as factors_mod
-from scraper.quant_model import open_direction as open_dir_mod
 from scraper.quant_model import calibration as calibration_mod
 from scraper.validate_export import safe_write_json
 
@@ -94,24 +93,11 @@ def main() -> None:
         else:
             print(f"  Robusta factors unavailable: {factors.get('reason')}")
 
-        # Open-direction classifier (triple-barrier + exact logistic SHAP).
-        # File/HTTP based (price archive + Stooq FX), so `db` is unused; passed
-        # for orchestration symmetry. Isolated like the others.
-        print("Running open-direction classifier...")
-        try:
-            open_dir = open_dir_mod.run(db)
-        except Exception as e:  # noqa: BLE001
-            open_dir = {"available": False, "reason": f"open_direction crashed: {e}"}
-        if open_dir.get("available"):
-            m = open_dir.get("model", {})
-            print(
-                f"  Open direction: {open_dir.get('direction')} "
-                f"p_up={open_dir.get('prob_up'):.3f} "
-                f"(n_train={m.get('n_train')}, acc={m.get('test_accuracy')}, "
-                f"feats={m.get('n_features')})"
-            )
-        else:
-            print(f"  Open direction unavailable: {open_dir.get('reason')}")
+        # NOTE: the open-direction classifier is no longer computed here. It
+        # fires pre-open (03:00 UTC) in open_direction_log.py, which owns both
+        # the track record and quant_report.json["open_direction"] — this
+        # evening run just preserves whatever that job last wrote (see the
+        # merge below, which never touches the key).
 
         # Record today's sentiment snapshot, then calibrate the accumulated
         # history against realized KC/RC moves (needs the DB → runs while open).
@@ -140,7 +126,8 @@ def main() -> None:
 
     existing["sentiment"]             = sent
     existing["robusta_factors"]       = factors
-    existing["open_direction"]        = open_dir
+    # existing["open_direction"] intentionally NOT set — owned by the 03:00
+    # open_direction_log job; preserved via the merge-into-existing pattern.
     existing["sentiment_calibration"] = calib
     existing["scraped_at"]            = datetime.utcnow().isoformat() + "Z"
 

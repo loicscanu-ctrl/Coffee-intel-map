@@ -1,25 +1,25 @@
 """
-open_direction_log.py — append-only track record for the Robusta open-price-
-direction model (Stage 1 of the live rollout).
+open_direction_log.py — pre-open runner for the Robusta open-price-direction
+model: ONE prediction per session, TWO artifacts.
 
-Runs pre-open (03:00 UTC, Mon–Fri). Each run:
+Runs at 03:00 UTC (Mon–Fri). Each run:
 
-  1. RESOLVES any still-pending predictions whose session has since traded
-     (fills the realized overnight gap + hit/miss). Resolution is decoupled
-     from prediction so the record stays honest — a prediction is written
-     before its outcome exists and never edited except to attach the actual.
-  2. EMITS a fresh prediction for the upcoming session from the locked, proven
-     feature set (`kc_after_rc_diff` + `days_since_roll`; `cci_overnight` joins
-     later once its snapshots accumulate), with an abstain band on low
-     confidence.
+  1. RESOLVES any still-pending history rows whose session has since traded
+     (fills the realized overnight gap + hit/miss; roll days become "void").
+     Resolution is decoupled from prediction so the record stays honest — a
+     prediction is written before its outcome exists and never edited except
+     to attach the actual.
+  2. Calls open_direction.run() ONCE for the upcoming session and writes:
+       • an append-only row in open_direction_history.json  (the track record)
+       • quant_report.json["open_direction"]                (the Macro panel)
+     Both artifacts therefore always show the same prediction.
 
-On first run (no history file) it seeds the record with the walk-forward
-backtest so the calendar isn't empty — those rows are tagged source="backtest";
-live rows are source="live". The model is identical in both, so the series is
-continuous.
+On first run (no history file) it seeds the record with the same model's
+walk-forward backtest so the calendar isn't empty — those rows are tagged
+source="backtest"; live rows are source="live".
 
-Target: direction of the overnight gap = RC first-bar open ÷ prior 17:30-London
-close − 1 (roll days excluded). See docs/research/open-price-direction-findings.md.
+Model + target spec: see open_direction.py and
+docs/research/open-price-direction-findings.md.
 """
 from __future__ import annotations
 
@@ -31,85 +31,21 @@ import numpy as np
 import pandas as pd
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-_ROOT      = Path(__file__).resolve().parents[3]
-_INTRADAY  = _ROOT / "frontend" / "public" / "data" / "intraday_kc_rc_15min.json"
-_HISTORY   = _ROOT / "frontend" / "public" / "data" / "open_direction_history.json"
+from scraper.quant_model import open_direction as _od
 
-_FEATURES  = ["kc_after", "dsr"]
-_ABSTAIN   = 0.03      # |prob_up − 0.5| below this → no directional call
-_MIN_TRAIN = 252       # need ~1y of resolved history before we predict
+_ROOT     = Path(__file__).resolve().parents[3]
+_HISTORY  = _ROOT / "frontend" / "public" / "data" / "open_direction_history.json"
+_QUANT    = _ROOT / "frontend" / "public" / "data" / "quant_report.json"
 
-
-# ── data assembly ────────────────────────────────────────────────────────────
-
-def _build_frame() -> "pd.DataFrame | None":
-    """Per-session frame: date index with y (up-gap label), kc_after, dsr, gap.
-
-    The last row is the most recently *traded* session; its `y`/`gap` are known.
-    Roll days carry NaN gap/label (excluded from training + never graded).
-    """
-    if not _INTRADAY.exists():
-        return None
-    rows = json.loads(_INTRADAY.read_text(encoding="utf-8"))
-    if not isinstance(rows, list) or not rows:
-        return None
-    df = pd.DataFrame(rows)
-    df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date").set_index("date")
-    for c in ("rc_open_first", "rc_last_1730", "kc_last_1730", "kc_last_1830"):
-        df[c] = pd.to_numeric(df.get(c), errors="coerce")
-
-    prev_close = df["rc_last_1730"].shift(1)
-    prev_sym   = df["rc_symbol"].shift(1)
-    roll       = df["rc_symbol"].ne(prev_sym) & prev_sym.notna()
-    gap = (df["rc_open_first"] / prev_close - 1.0).where(
-        (prev_close > 0) & df["rc_open_first"].notna() & (~roll))
-
-    kc_after = (df["kc_last_1830"] / df["kc_last_1730"] - 1.0).where(df["kc_last_1730"] > 0).shift(1)
-
-    # days since the last front-month roll (past-only, no look-ahead)
-    dsr = np.zeros(len(df)); c = 0
-    for i, is_roll in enumerate(roll.values):
-        c = 0 if is_roll else c + 1
-        dsr[i] = c
-
-    return pd.DataFrame({
-        "gap": gap,
-        "y":   (gap > 0).astype(float).where(gap.notna()),
-        "kc_after": kc_after,
-        "dsr": dsr,
-    }, index=df.index)
+_SEED_FEATURES = ["kc_after_rc_diff", "days_since_roll"]
 
 
-# ── logistic (numpy IRLS + L2, intercept unpenalised) ────────────────────────
-
-def _fit(X: np.ndarray, y: np.ndarray, l2: float = 1.0, it: int = 60) -> np.ndarray:
-    n, k = X.shape
-    Xb = np.column_stack([np.ones(n), X]); b = np.zeros(k + 1)
-    P = np.eye(k + 1) * l2; P[0, 0] = 0
-    for _ in range(it):
-        p = 1 / (1 + np.exp(-np.clip(Xb @ b, -30, 30)))
-        W = np.clip(p * (1 - p), 1e-6, None)
-        try:
-            step = np.linalg.solve(Xb.T @ (Xb * W[:, None]) + P, Xb.T @ (p - y) + P @ b)
-        except np.linalg.LinAlgError:
-            break
-        b -= step
-        if np.max(np.abs(step)) < 1e-8:
-            break
-    return b
-
-
-def _prob(b, mu, sd, x) -> float:
-    z = np.r_[1.0, (np.asarray(x, float) - mu) / sd] @ b
-    return float(1 / (1 + np.exp(-np.clip(z, -30, 30))))
-
-
-def _row(date, prob_up, source) -> dict:
-    ab = abs(prob_up - 0.5) < _ABSTAIN
+def _row(date_str: str, prob_up: float, source: str) -> dict:
+    ab = abs(prob_up - 0.5) < _od._ABSTAIN_BAND
     return {
-        "date": pd.Timestamp(date).strftime("%Y-%m-%d"),
+        "date": date_str,
         "prob_up": round(prob_up, 4),
         "direction": "Abstain" if ab else ("Bullish" if prob_up >= 0.5 else "Bearish"),
         "actual_gap_pct": None, "actual_dir": None, "hit": None,
@@ -117,18 +53,21 @@ def _row(date, prob_up, source) -> dict:
     }
 
 
-# ── walk-forward seed (first run only) ───────────────────────────────────────
-
 def _seed(frame: "pd.DataFrame") -> list[dict]:
-    d = frame.dropna(subset=["y"] + _FEATURES)
-    X = d[_FEATURES].values; y = d["y"].values; gap = d["gap"].values
-    out = []; b = mu = sd = None
-    for i in range(_MIN_TRAIN, len(d)):
-        if (i - _MIN_TRAIN) % 5 == 0 or b is None:
-            Xtr = X[:i]; mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1
-            b = _fit((Xtr - mu) / sd, y[:i])
-        p = _prob(b, mu, sd, X[i])
-        r = _row(d.index[i], p, "backtest")
+    """Walk-forward backtest → resolved rows (source='backtest'), same model."""
+    d = frame.dropna(subset=["y"] + _SEED_FEATURES)
+    X = d[_SEED_FEATURES].values
+    y = d["y"].values.astype(float)
+    gap = d["gap"].values
+    out: list[dict] = []
+    b = mu = sd = None
+    for i in range(_od._MIN_TRAIN, len(d)):
+        if (i - _od._MIN_TRAIN) % _od._WF_STEP == 0 or b is None:
+            Xtr = X[:i]
+            mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1.0
+            b = _od._fit_logistic(np.column_stack([np.ones(i), (Xtr - mu) / sd]), y[:i])
+        p = _od._sigmoid(float(np.r_[1.0, (X[i] - mu) / sd] @ b))
+        r = _row(d.index[i].strftime("%Y-%m-%d"), p, "backtest")
         r["actual_gap_pct"] = round(float(gap[i]) * 100, 3)
         r["actual_dir"] = "Up" if y[i] > 0 else "Down"
         r["hit"] = None if r["direction"] == "Abstain" else bool((p >= 0.5) == (y[i] > 0))
@@ -137,57 +76,81 @@ def _seed(frame: "pd.DataFrame") -> list[dict]:
     return out
 
 
-# ── run ──────────────────────────────────────────────────────────────────────
+def _resolve(history: list[dict], frame: "pd.DataFrame") -> int:
+    resolved = 0
+    for r in history:
+        if r.get("status") != "pending":
+            continue
+        d = pd.Timestamp(r["date"])
+        if d not in frame.index:
+            continue                      # session hasn't traded yet
+        g = frame.at[d, "gap"]
+        if pd.isna(g):
+            r["status"] = "void"          # roll day / missing bar — not gradable
+            continue
+        g = float(g); up = g > 0
+        r["actual_gap_pct"] = round(g * 100, 3)
+        r["actual_dir"] = "Up" if up else "Down"
+        r["hit"] = None if r["direction"] == "Abstain" else bool(
+            (r["prob_up"] >= 0.5) == up)
+        r["status"] = "resolved"
+        resolved += 1
+    return resolved
+
+
+def _write_quant_report(payload: dict) -> None:
+    """Merge the panel payload into quant_report.json without touching the
+    other sections (mirrors run_quant's merge-into-existing pattern)."""
+    existing: dict = {}
+    if _QUANT.exists():
+        try:
+            existing = json.loads(_QUANT.read_text(encoding="utf-8"))
+        except Exception:
+            existing = {}
+    existing["open_direction"] = payload
+    _QUANT.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+
 
 def run() -> None:
-    frame = _build_frame()
+    frame = _od.build_dataset()
     if frame is None:
-        print("[open_dir_log] no intraday data — skipping"); return
+        print("[open_dir_log] no intraday data — skipping")
+        return
 
-    history = json.loads(_HISTORY.read_text(encoding="utf-8")) if _HISTORY.exists() else None
+    history: list[dict] = []
+    if _HISTORY.exists():
+        try:
+            history = json.loads(_HISTORY.read_text(encoding="utf-8"))
+        except Exception:
+            history = []
     if not history:
         history = _seed(frame)
         print(f"[open_dir_log] seeded {len(history)} backtest rows")
 
-    by_date = frame  # date-indexed
-    # 1) resolve pending rows whose session has since traded (non-roll gap known)
-    resolved = 0
-    for r in history:
-        if r["status"] != "pending":
-            continue
-        d = pd.Timestamp(r["date"])
-        if d in by_date.index and pd.notna(by_date.at[d, "gap"]):
-            g = float(by_date.at[d, "gap"]); up = g > 0
-            r["actual_gap_pct"] = round(g * 100, 3)
-            r["actual_dir"] = "Up" if up else "Down"
-            r["hit"] = None if r["direction"] == "Abstain" else bool(
-                (r["prob_up"] >= 0.5) == up)
-            r["status"] = "resolved"; resolved += 1
-        elif d in by_date.index and pd.isna(by_date.at[d, "gap"]):
-            r["status"] = "void"   # roll / no gradable session
+    resolved = _resolve(history, frame)
 
-    # 2) emit a prediction for the next session (features from the last traded day)
-    d = frame.dropna(subset=["y"] + _FEATURES)
-    last = frame.dropna(subset=_FEATURES).iloc[-1]
-    next_date = np.busday_offset(frame.index[-1].date(), 1, roll="forward")
-    have_dates = {r["date"] for r in history}
+    payload = _od.run()
     added = 0
-    if str(next_date) not in have_dates and len(d) >= _MIN_TRAIN:
-        X = d[_FEATURES].values; mu = X.mean(0); sd = X.std(0); sd[sd == 0] = 1
-        b = _fit((X - mu) / sd, d["y"].values)
-        # dsr for the upcoming session = last observed + 1 (unless a roll lands, rare)
-        feats = [last["kc_after"], last["dsr"] + 1]
-        p = _prob(b, mu, sd, feats)
-        history.append(_row(next_date, p, "live")); added = 1
+    if payload.get("available"):
+        target = payload["for_session"]
+        if target not in {r["date"] for r in history}:
+            history.append(_row(target, float(payload["prob_up"]), "live"))
+            added = 1
+        _write_quant_report(payload)
+        print(f"[open_dir_log] prediction for {target}: {payload['direction']} "
+              f"p_up={payload['prob_up']:.3f} → history + quant_report")
+    else:
+        print(f"[open_dir_log] model unavailable: {payload.get('reason')} — "
+              "history resolved only, panel payload left untouched")
 
+    history.sort(key=lambda r: r["date"])
     _HISTORY.write_text(json.dumps(history, indent=1), encoding="utf-8")
+
     live = [r for r in history if r["source"] == "live" and r["status"] == "resolved"]
     graded = [r["hit"] for r in live if r["hit"] is not None]
-    if graded:
-        print(f"[open_dir_log] rows={len(history)} resolved+{resolved} pred+{added} "
-              f"| live graded={len(graded)} hit-rate={np.mean(graded):.1%}")
-    else:
-        print(f"[open_dir_log] rows={len(history)} resolved+{resolved} pred+{added}")
+    tail = (f" | live graded={len(graded)} hit-rate={np.mean(graded):.1%}"
+            if graded else "")
+    print(f"[open_dir_log] rows={len(history)} resolved+{resolved} pred+{added}{tail}")
 
 
 if __name__ == "__main__":

@@ -1,10 +1,12 @@
 name: "1.16 – Open-Direction Prediction Log"
 
-# Stage 1 of the open-price-direction rollout: append-only track record.
-# Runs pre-open, logs a fresh Robusta overnight-gap prediction for the upcoming
-# session and resolves any prior pending predictions. Reads the intraday 15-min
-# file (refreshed 20:13 UTC prior eve) + the per-contract archive (02:13 UTC),
-# so both are fresh by 03:00 UTC. Does NOT touch the live panel yet.
+# Pre-open runner for the Robusta open-price-direction model: ONE prediction,
+# TWO artifacts. Logs a fresh overnight-gap prediction for the upcoming session
+# (append-only track record), resolves prior pending predictions, and writes
+# the SAME prediction into quant_report.json["open_direction"] (the Macro
+# panel). Reads the intraday 15-min file (refreshed 20:13 UTC prior eve) and,
+# when present, fx_intraday_snapshots.json — both fresh by 03:00 UTC. The
+# Telegram morning brief chains on this workflow's completion.
 
 on:
   schedule:
@@ -39,7 +41,8 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/open_direction_history.json
+          git add frontend/public/data/open_direction_history.json \
+                  frontend/public/data/quant_report.json
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: open-direction prediction log [skip ci]" \
