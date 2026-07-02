@@ -615,6 +615,21 @@ const ROWS: FlowMetadata[] = [
     resiliency: { onMissing: "Robusta sentiment/factors decoupled; can fail independently" },
   },
   {
+    wf: "1.16 Open-Direction Log", output: "quant_report.json (open_direction) + open_direction_history.json",
+    component: "PriceDirectionSection / OpenDirectionCalendar", visual: "Macro · Open Price Direction + Track Record",
+    cadence: { recurrence: "03:00 UTC Mon-Fri (pre-open; brief chains on completion)", trigger: "cron" },
+    transport: { provider: "intraday_kc_rc_15min + fx snapshots", method: "logistic model, exact SHAP" },
+    storage: { target: "open_direction_history.json", footprint: "append-only prediction log", units: "overnight-gap direction + prob" },
+    resiliency: { onMissing: "panel shows UNAVAILABLE; history rows stay pending until resolvable" },
+  },
+  {
+    wf: "1.16 Open-Direction Log", output: "fx_intraday_snapshots.json", component: "(model input)", visual: "feeds cci_overnight feature",
+    cadence: { recurrence: "03:00 UTC Mon-Fri (non-blocking step)", trigger: "cron" },
+    transport: { provider: "Barchart queryminutes (Playwright)", method: "15-min FX bars → 17:30-London + 03:00-UTC anchors" },
+    storage: { target: "fx_intraday_snapshots.json", footprint: "~500 days, 12 CCI pairs", units: "FX rate anchors per day" },
+    resiliency: { onMissing: "cci_overnight stays dormant; model runs on kc_after + days_since_roll" },
+  },
+  {
     wf: "1.9 Quant CCI", output: "fx_history.json", component: "FxTimeSeriesPanel", visual: "Macro · FX Pair Time-Series",
     cadence: { recurrence: "21:30 UTC Mon-Fri", trigger: "cron" },
     transport: { provider: "jsDelivr FX CDN", method: "Direct API GET" },

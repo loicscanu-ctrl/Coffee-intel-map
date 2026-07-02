@@ -45,3 +45,16 @@ Hypothesis: commercial (`pmpu`) positioning conditioned on harvest predicts a
   resolved after the open — the honest forward record, distinct from the backtest.
 - Backtest-seeded history (2022–2026): coverage 79% (abstain band ±0.03),
   hit-rate on acted days **56.5%**.
+
+## Rollout status (2026-07, all stages live)
+| Stage | What | Where |
+|---|---|---|
+| 1 | Append-only prediction log + resolver | `open_direction_log.py`, workflow **1.16** (03:00 UTC Mon–Fri) |
+| 2 | Live model swapped to this spec (gap target, proven features, abstain band, exact SHAP) | `open_direction.py`; panel + methodology page updated; DST regression + invariant tests |
+| 3 | Intraday-FX snapshots (17:30-London / 03:00-UTC anchors per CCI pair) → activates `cci_overnight` at ≥40 days | `fetch_fx_snapshots.py`, non-blocking step in 1.16 |
+| 4 | Telegram brief chains on 1.16 and carries the pre-open RC call | `morning-brief.yml` (cron now the 03:41 fallback), `telegram/handlers/brief.py` |
+| 5 | Calendar UI: prediction vs realized open, live vs backtest, stats + table view | `OpenDirectionCalendar.tsx` on the Macro tab |
+
+One prediction → two artifacts: the 03:00 job writes the history row AND
+`quant_report.json["open_direction"]` from the same fit, so the panel and the
+record can never disagree. `run_quant.py` (21:30) preserves the key untouched.

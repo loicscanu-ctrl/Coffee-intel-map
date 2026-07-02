@@ -140,9 +140,10 @@ flowchart TD
 | 1.2 | Freight | 02:00 daily | rates | DB |
 | 1.4 | **Export & Publish** | 01:30 daily + on-2.3 | *(reads DB + archive)* | ~17 static JSON + signals |
 | 1.5 | Check Scrapers Fresh | 07:00 daily | *(reads health.json)* | Telegram |
-| 1.6 | Morning Brief | 03:00 daily | *(reads JSON)* | Telegram |
+| 1.6 | Morning Brief | chained on 1.16 (fallback 03:41) | *(reads JSON incl. the pre-open RC call)* | Telegram |
 | 1.7 | Cecafe Daily | 09:00 daily | BR registrations | `cecafe_daily.json` (also pings Vercel deploy hook¹ to publish the day's `[skip ci]` data commits) |
 | 1.9 | Quant CCI | 21:30 Mon-Fri | FX + Robusta factors | `quant_report.json`+`fx_history.json` |
+| 1.16 | Open-Direction Log | 03:00 Mon-Fri (pre-open) | overnight-gap model (kc_after + days_since_roll [+ cci_overnight]) | `open_direction_history.json` + `quant_report.json (open_direction)` + `fx_intraday_snapshots.json`; brief (1.6) chains on completion |
 | **1.10** | **Weather Fetch & Accumulate** | 05:40 daily | per-origin rain+temp, Open-Meteo **forecast** API (`api.open-meteo.com`); **independent of 1.4** | `weather_history/{origin}.json` (accumulator) → rebuilds `{origin}_weather.json` ×6 |
 | Acaphe | Live Quotes Poll | every 15m | live quotes | `acaphe_live.json` |
 | 2.2 | Commodity Prices | Tue 22:55 | all-commodity prices | DB `commodity_prices` |
@@ -194,6 +195,8 @@ flowchart TD
 | **1.7 Cecafe Daily** | `cecafe_daily.json` | `DailyRegistration` | **Supply · Brazil · Daily Registration**; Telegram |
 | **1.9 Quant CCI** | `quant_report.json` | `CurrencyIndexSection` | **Macro · Coffee Currency Index** |
 | | `fx_history.json` | `FxTimeSeriesPanel` | **Macro · FX Pair Time-Series** |
+| **1.16 Open-Direction Log** | `quant_report.json (open_direction)` | `PriceDirectionSection` | **Macro · Open Price Direction** (pre-open overnight-gap call) |
+| | `open_direction_history.json` | `OpenDirectionCalendar` | **Macro · Track Record** (prediction vs realized open) |
 | **1.10 Weather Fetch** | `{origin}_weather.json` ×6 | `WeatherCharts` | **Supply · each origin · Weather charts** — monthly rain, cumulative YTD, mean temp, daily MTD accumulation, 7-day forecast (replaced the legacy drought/frost strip panels) |
 | **Acaphe poll** | `acaphe_live.json` | `AcapheLiveQuotes` | **Futures · Daily Live Quotes** |
 | **1.3b Slow-Data** (ECF·PSD·AJCA·UCDA) | `demand_stocks.json` | `StocksPanel` | **Demand · Stocks (ICE certified + PSD)** |

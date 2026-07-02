@@ -7,6 +7,7 @@ import FertilizerInputsPanel from "@/components/macro/FertilizerInputsPanel";
 import FreightContextPanel from "@/components/macro/FreightContextPanel";
 import InflationSection from "@/components/macro/InflationSection";
 import PriceDirectionSection from "@/components/signals/PriceDirectionSection";
+import OpenDirectionCalendar from "@/components/signals/OpenDirectionCalendar";
 import RobustaForecastSection from "@/components/signals/RobustaForecastSection";
 import VietnamDiffSection from "@/components/signals/VietnamDiffSection";
 import SentimentSection from "@/components/signals/SentimentSection";
@@ -33,6 +34,7 @@ export default function MacroPage() {
         <FreightContextPanel />
         {/* Derived signals & forecasts (formerly the standalone Signals tab). */}
         <PriceDirectionSection />
+        <OpenDirectionCalendar />
         <RobustaForecastSection />
         <VietnamDiffSection />
         <SentimentSection />
