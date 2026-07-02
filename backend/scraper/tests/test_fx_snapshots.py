@@ -8,7 +8,7 @@ offline (the Barchart fetch itself reuses the KC/RC mechanism proven in CI):
   * 03:00-UTC anchor = close of the LATEST bar starting ≤ 02:45 UTC that day —
     unaffected by how late the cron actually fires (later bars never shift it).
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 from scraper.fetch_fx_snapshots import _anchors, _pair_days, _parse_bars
@@ -25,9 +25,9 @@ def test_london_1730_anchor_across_dst():
     # 17:15 London starts: summer (BST, UTC+1) → 16:15Z; winter (GMT) → 17:15Z;
     # US/UK mismatch week (UK switched Oct 26 2025, US not until Nov 2) → 17:15Z.
     cases = [
-        (datetime(2025, 7, 16, 16, 15, tzinfo=timezone.utc), "2025-07-16"),
-        (datetime(2025, 1, 15, 17, 15, tzinfo=timezone.utc), "2025-01-15"),
-        (datetime(2025, 10, 29, 17, 15, tzinfo=timezone.utc), "2025-10-29"),
+        (datetime(2025, 7, 16, 16, 15, tzinfo=UTC), "2025-07-16"),
+        (datetime(2025, 1, 15, 17, 15, tzinfo=UTC), "2025-01-15"),
+        (datetime(2025, 10, 29, 17, 15, tzinfo=UTC), "2025-10-29"),
     ]
     csv = "\n".join(_csv_line(dt, 5.0 + i) for i, (dt, _) in enumerate(cases))
     l1730, _ = _anchors(_parse_bars(csv))
@@ -36,7 +36,7 @@ def test_london_1730_anchor_across_dst():
 
 
 def test_utc_0300_anchor_is_deterministic_under_cron_drift():
-    d = datetime(2025, 7, 17, tzinfo=timezone.utc)
+    d = datetime(2025, 7, 17, tzinfo=UTC)
     bars = [
         (d.replace(hour=2, minute=30), 1.10),
         (d.replace(hour=2, minute=45), 1.11),   # ← the 03:00 price

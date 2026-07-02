@@ -38,11 +38,16 @@ import pandas as pd
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scraper.utils.http import get_with_backoff                      # noqa: E402
-from scraper.sources.macro_cot import (                              # noqa: E402
-    _ICE_MARKET_COL, _ICE_DATE_COL, _CFTC_OI,
-    _COL_PMPU_LONG, _COL_PMPU_SHORT, _CFTC_MM_LONG, _CFTC_MM_SHORT,
+from scraper.sources.macro_cot import (  # noqa: E402
+    _CFTC_MM_LONG,
+    _CFTC_MM_SHORT,
+    _CFTC_OI,
+    _COL_PMPU_LONG,
+    _COL_PMPU_SHORT,
+    _ICE_DATE_COL,
+    _ICE_MARKET_COL,
 )
+from scraper.utils.http import get_with_backoff  # noqa: E402
 
 _REPO      = Path(__file__).resolve().parents[2]
 _COT_JSON  = _REPO / "frontend" / "public" / "data" / "cot.json"

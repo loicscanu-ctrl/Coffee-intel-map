@@ -18,10 +18,9 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from scraper.fetch_intraday_kc_rc import _parse_csv_to_london          # noqa: E402
-from scraper.quant_model import open_direction as od                   # noqa: E402
-from scraper.quant_model import open_direction_log as odl              # noqa: E402
-
+from scraper.fetch_intraday_kc_rc import _parse_csv_to_london  # noqa: E402
+from scraper.quant_model import open_direction as od  # noqa: E402
+from scraper.quant_model import open_direction_log as odl  # noqa: E402
 
 # ── DST regression on the bar anchoring ──────────────────────────────────────
 # Barchart stamps bars in America/Chicago; the 17:30-London price is the CLOSE

@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -249,7 +249,7 @@ def send_telegram(text: str) -> bool:
 def main():
     # The brief reads only the published static JSON (no DB) and posts once, so
     # there's no DB connection and no heavy deps — just gate, build, and send.
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     should_send, reason = _send_decision(now)
     print(f"[morning_brief] send decision @ {now:%Y-%m-%d %H:%M UTC}: "
           f"{'SEND' if should_send else 'SKIP'} — {reason}")

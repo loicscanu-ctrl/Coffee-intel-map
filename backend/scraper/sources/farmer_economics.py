@@ -11,6 +11,8 @@ from datetime import date, datetime
 
 import requests
 
+from scraper.rules import frost_model as _fm
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -69,26 +71,11 @@ def _vpd_kpa(temp_c: float, dew_point_c: float) -> float:
 
 
 def _frost_risk(min_temp: float, cloud_cover: float, wind_kmh: float, dew_point: float) -> str:
-    """Estimate leaf-surface temperature and return frost risk (H/M/L/-).
-
-    Radiation cooling lowers the surface below the 2m air temperature on
-    clear, calm nights. Formula:
-        T_surface = min_temp
-                    − (1 − cloud/100) × max(0, 5 − 0.4 × wind_kmh)
-                    − 0.5  if dew_point < 2°C  (dry air amplifies cooling)
-
-    Thresholds (°C):  < 0 → H,  0–3 → M,  3–6 → L,  ≥ 6 → —
-    """
-    radiation_cooling = (1 - cloud_cover / 100) * max(0.0, 5.0 - 0.4 * wind_kmh)
-    dew_correction    = 0.5 if dew_point < 2.0 else 0.0
-    t_surface = min_temp - radiation_cooling - dew_correction
-    if t_surface < 0:
-        return "H"
-    if t_surface < 3:
-        return "M"
-    if t_surface < 6:
-        return "L"
-    return "-"
+    """Single-hour frost-risk letter (H/M/L/-). Thin delegate to the shared
+    physics model — kept for callers that only have the conditions at the
+    minimum-temperature hour. The per-day path below uses the duration-aware
+    assess_night() instead."""
+    return _fm.risk_letter(min_temp, cloud_cover, wind_kmh, dew_point)
 
 
 def _root_zone_moisture(sm_0_9: float, sm_9_27: float, sm_27_81: float) -> float:
@@ -323,16 +310,11 @@ def _aggregate_hourly_to_daily(hourly: dict, region_name: str = "") -> list[dict
         mean_sm4     = sum(sm4_day) / len(sm4_day) if sm4_day else 0.24
         root_zone    = _root_zone_moisture(mean_surface, mean_sm3, mean_sm4)
 
-        # Frost: conditions at hour of minimum temperature
-        min_idx      = min(idxs, key=lambda i: temp[i] if temp[i] is not None else float("inf"))
-        cloud_at_min = cloud[min_idx] if cloud[min_idx] is not None else (
-            sum(cloud_day) / len(cloud_day) if cloud_day else 0.0
-        )
-        wind_at_min  = wind[min_idx] if wind[min_idx] is not None else (
-            max(wind_day) if wind_day else 0.0
-        )
-        dew_at_min   = dew[min_idx] if dew[min_idx] is not None else (
-            sum(dew_day) / len(dew_day) if dew_day else 0.0
+        # Frost: full physics over the day's hourly slice (duration-aware,
+        # advective & black-frost detection). See scraper.rules.frost_model.
+        frost = _fm.assess_night(
+            [temp[i] for i in idxs], [cloud[i] for i in idxs],
+            [wind[i] for i in idxs], [dew[i] for i in idxs],
         )
 
         # VPD from daily max temp + mean dew point
@@ -358,7 +340,11 @@ def _aggregate_hourly_to_daily(hourly: dict, region_name: str = "") -> list[dict
             "et0_mm":            round(daily_et0_mm, 2),
             "soil_moisture":     round(root_zone, 3),
             "vpd":               round(vpd, 2),
-            "frost_risk":        _frost_risk(min_t, cloud_at_min, wind_at_min, dew_at_min),
+            "frost_risk":        frost.risk,
+            "frost_type":        frost.frost_type,
+            "frost_surface_c":   frost.surface_min_c,
+            "frost_air_min_c":   frost.air_min_c,
+            "frost_hours_below_0": frost.hours_below_0,
             "drought_risk":      "-",            # filled by _apply_drought_modifiers
             "_drought_score_raw": raw_score,
         })

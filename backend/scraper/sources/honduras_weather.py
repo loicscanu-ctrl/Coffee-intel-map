@@ -10,6 +10,8 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import date, datetime
 
+from scraper.rules import frost_model as _fm
+
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; CoffeeIntelScraper/1.0)"}
 
 REGIONS = [
@@ -57,14 +59,9 @@ def _drought_score(precip_mm: float, et0_mm: float, root_zone_sm: float) -> floa
 
 
 def _frost_risk(min_temp: float, cloud_cover: float, wind_kmh: float, dew_point: float) -> str:
-    """Light frost assessment for high-altitude Honduras plots."""
-    radiation_cooling = (1 - cloud_cover / 100) * max(0.0, 5.0 - 0.4 * wind_kmh)
-    dew_correction    = 0.5 if dew_point < 2.0 else 0.0
-    t_surface = min_temp - radiation_cooling - dew_correction
-    if t_surface < 0:   return "H"
-    if t_surface < 3:   return "M"
-    if t_surface < 6:   return "L"
-    return "-"
+    """Single-hour frost-risk letter for high-altitude Honduras plots. Thin
+    delegate to the shared physics model (scraper.rules.frost_model)."""
+    return _fm.risk_letter(min_temp, cloud_cover, wind_kmh, dew_point)
 
 
 def _apply_drought_modifiers(days: list[dict]) -> list[dict]:
@@ -135,15 +132,14 @@ def _aggregate_hourly_to_daily(hourly: dict, region_name: str = "") -> list[dict
         daily_precip = sum(pm_day) if pm_day else 0.0
         daily_et0    = sum(et0_day) if et0_day else 0.0
 
-        # Frost: only checked for high-altitude regions
-        frost = "-"
+        # Frost: only checked for high-altitude regions. Full physics over
+        # the day's hourly slice (duration-aware, advective/black detection).
+        frost = _fm.FrostAssessment("-", "none", 99.0, 99.0, 0, 0)
         if check_frost:
-            min_t = min(temps_day)
-            min_idx  = min(idxs, key=lambda i: temp[i] if temp[i] is not None else float("inf"))
-            cloud_at = cloud[min_idx] if cloud[min_idx] is not None else (sum(cloud_day)/len(cloud_day) if cloud_day else 0.0)
-            wind_at  = wind[min_idx]  if wind[min_idx]  is not None else (max(wind_day) if wind_day else 0.0)
-            dew_at   = dew[min_idx]   if dew[min_idx]   is not None else (sum(dew_day)/len(dew_day) if dew_day else 0.0)
-            frost = _frost_risk(min_t, cloud_at, wind_at, dew_at)
+            frost = _fm.assess_night(
+                [temp[i] for i in idxs], [cloud[i] for i in idxs],
+                [wind[i] for i in idxs], [dew[i] for i in idxs],
+            )
 
         days.append({
             "date":               day_str,
@@ -156,7 +152,11 @@ def _aggregate_hourly_to_daily(hourly: dict, region_name: str = "") -> list[dict
             "precip_mm":          round(daily_precip, 1),
             "et0_mm":             round(daily_et0, 2),
             "soil_moisture":      round(root_zone, 3),
-            "frost_risk":         frost,
+            "frost_risk":         frost.risk,
+            "frost_type":         frost.frost_type,
+            "frost_surface_c":    frost.surface_min_c,
+            "frost_air_min_c":    frost.air_min_c,
+            "frost_hours_below_0": frost.hours_below_0,
             "drought_risk":       "-",
             "_drought_score_raw": _drought_score(daily_precip, daily_et0, root_zone),
         })

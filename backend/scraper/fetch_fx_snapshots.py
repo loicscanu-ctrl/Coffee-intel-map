@@ -38,7 +38,7 @@ import argparse
 import asyncio
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -50,7 +50,7 @@ OUT_PATH = _REPO / "frontend" / "public" / "data" / "fx_intraday_snapshots.json"
 
 _CHICAGO = ZoneInfo("America/Chicago")
 _LONDON  = ZoneInfo("Europe/London")
-_UTC     = timezone.utc
+_UTC     = UTC
 
 _KEEP_DAYS = 500
 

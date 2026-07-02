@@ -1,4 +1,5 @@
 import datetime
+from datetime import UTC
 
 from scraper.morning_brief import (
     _pct_change,
@@ -65,22 +66,24 @@ def test_supply_weather_rain_mode(monkeypatch):
 # ── Freshness gate ────────────────────────────────────────────────────────────
 
 def test_expected_session_rolls_over_weekend():
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from scraper.morning_brief import _expected_session
     # Monday 03:00 UTC → expected session is the prior Friday.
-    mon = datetime(2026, 6, 29, 3, 0, tzinfo=timezone.utc)   # 2026-06-29 is a Monday
+    mon = datetime(2026, 6, 29, 3, 0, tzinfo=UTC)   # 2026-06-29 is a Monday
     assert _expected_session(mon).isoformat() == "2026-06-26"
     # Wednesday → expected is Tuesday.
-    wed = datetime(2026, 7, 1, 3, 0, tzinfo=timezone.utc)
+    wed = datetime(2026, 7, 1, 3, 0, tzinfo=UTC)
     assert _expected_session(wed).isoformat() == "2026-06-30"
 
 
 def test_send_decision(monkeypatch):
-    from datetime import date, datetime, timezone
+    from datetime import date, datetime
+
     import scraper.morning_brief as mb
 
     def at(h):
-        return datetime(2026, 7, 1, h, 0, tzinfo=timezone.utc)   # Wed → expected 06-30
+        return datetime(2026, 7, 1, h, 0, tzinfo=UTC)   # Wed → expected 06-30
 
     # fresh data (futures shows the expected session) inside the window → send
     monkeypatch.setattr(mb, "_futures_pub_date", lambda: date(2026, 6, 30))
