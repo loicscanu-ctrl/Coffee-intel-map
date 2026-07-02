@@ -10,7 +10,12 @@ name: "1.16 – Open-Direction Prediction Log"
 
 on:
   schedule:
-    - cron: '0 3 * * 1-5'   # 03:00 UTC weekdays, before the London open
+    # 03:07 UTC weekdays, pre-open. Off the :00 mark — top-of-hour slots hit
+    # GH Actions' well-known cron skip/delay (observed 2026-07-02: the 03:00
+    # slot drifted to 06:41). The FX 03:00-UTC anchor is unaffected by fire
+    # time by construction (close of the ≤02:45 bar), and the brief's 03:41
+    # fallback cron still sits safely after this.
+    - cron: '7 3 * * 1-5'
   workflow_dispatch:
 
 concurrency:
