@@ -118,3 +118,61 @@ def test_risk_letter_advective_case_now_high_where_old_model_said_low():
     # old model returned 'H' only via the radiative path; with wind+cloud it
     # under-called. New model → advective High.
     assert fm.risk_letter(-1.0, 80.0, 16.0, -1.0) == "H"
+
+
+# ── severity ladder (Phase 2 alerting) ───────────────────────────────────────
+
+def test_severity_critical_for_advective_black_deep_or_prolonged():
+    assert fm.severity("H", "advective", -0.5, 1) == "critical"   # cold air mass
+    assert fm.severity("H", "black",     -0.5, 1) == "critical"   # dry hard freeze
+    assert fm.severity("H", "radiative", -2.5, 1) == "critical"   # deep (< −2)
+    assert fm.severity("H", "radiative", -0.5, 4) == "critical"   # prolonged (≥4h)
+
+
+def test_severity_alert_for_shallow_brief_radiative_freeze():
+    # surface just below 0, short duration, not advective/black → alert.
+    assert fm.severity("H", "radiative", -0.5, 2) == "alert"
+
+
+def test_severity_watch_for_marginal_and_none_below():
+    assert fm.severity("M", "none", 1.5, 0) == "watch"
+    assert fm.severity("L", "none", 4.0, 0) is None
+    assert fm.severity("-", "none", 8.0, 0) is None
+
+
+def test_severity_handles_missing_surface_temp():
+    # No surface temp known → don't fabricate a deep-freeze critical.
+    assert fm.severity("M", "none", None, 0) == "watch"
+
+
+# ── worst_forecast_frost: selects the most severe upcoming day ────────────────
+
+def _fday(date, risk, surface=None, ftype="radiative", air=None, hrs=0):
+    return {"date": date, "frost_risk": risk, "frost_type": ftype,
+            "frost_surface_c": surface, "frost_air_min_c": air, "frost_hours_below_0": hrs}
+
+
+def test_worst_forecast_frost_ignores_past_and_picks_severest():
+    daily = [
+        _fday("2026-06-01", "H", -3.0),        # past — ignored even though severe
+        _fday("2026-06-11", "L", 4.0),
+        _fday("2026-06-12", "H", -1.0, hrs=2),
+        _fday("2026-06-13", "M", 1.0),
+    ]
+    got = fm.worst_forecast_frost(daily, today_iso="2026-06-10")
+    assert got["date"] == "2026-06-12"          # severest FUTURE day
+    assert got["risk"] == "H"
+
+
+def test_worst_forecast_frost_tiebreak_by_coldest_surface():
+    daily = [
+        _fday("2026-06-12", "H", -1.0),
+        _fday("2026-06-13", "H", -4.0),         # same letter, colder → wins
+    ]
+    got = fm.worst_forecast_frost(daily, today_iso="2026-06-10")
+    assert got["date"] == "2026-06-13"
+
+
+def test_worst_forecast_frost_none_when_no_upcoming_frost():
+    daily = [_fday("2026-06-12", "-", 8.0), _fday("2026-06-13", "-", 7.0)]
+    assert fm.worst_forecast_frost(daily, today_iso="2026-06-10") is None

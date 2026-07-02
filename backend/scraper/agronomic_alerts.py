@@ -28,6 +28,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from scraper.rules import frost_model as _fm
 from scraper.rules.iphm_thresholds import IPHM_RULES
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -90,10 +91,10 @@ def extract_region_values(
     if fc_rain:
         out["forecast_7d_rain"] = float(sum(fc_rain))
 
-    # forecast_7d temps live at the doc level, not per-province (one
-    # forecast track per origin in the chart). Apply the country-level
-    # minimum to every region — fine for v1 frost detection since the
-    # frost belt is regional, not point-source.
+    # Country-level 7-day forecast minimum. No IPHM rule consumes this
+    # anymore — frost moved to the per-region physics engine in v2
+    # (brazil_frost_alerts) — but it's kept in the field catalogue for
+    # any future generic rule and for the field documentation.
     fc_doc = weather_doc.get("forecast_7d") or []
     temp_mins = [r.get("temp_min_c") for r in fc_doc
                  if isinstance(r, dict) and r.get("temp_min_c") is not None]
@@ -170,6 +171,90 @@ def evaluate_region(values: dict[str, float], iso3: str, month: int,
     return fired
 
 
+# ── Brazil frost: per-region, physics-based, graduated (Phase 2) ─────────────
+
+# Regions the physics can actually frost. Espírito Santo (coastal, warm) is
+# intentionally excluded — the old country-wide rule applied a single national
+# minimum to every region and would false-positive there. Kept explicit so a
+# data glitch can't fire a spurious coastal frost alert.
+BRAZIL_FROST_REGIONS = {"Sul de Minas", "Cerrado", "Paraná"}
+
+# Southern-hemisphere frost season, with April/September shoulders. The
+# physics is the real gate (no frost is produced in warm months); this only
+# stops a freak off-season cold-front reading from raising an alert.
+FROST_MONTHS = {4, 5, 6, 7, 8, 9}
+
+FROST_THREAT_ID = "brazil_frost_risk"
+_FROST_TYPE_LABEL = {
+    "advective": "advective (wind-driven cold air mass)",
+    "black":     "black frost (dry hard freeze)",
+    "radiative": "radiative (clear, calm night)",
+    "none":      "marginal",
+}
+
+
+def _frost_message(detail: dict, severity: str) -> str:
+    """Human-readable, severity- and mechanism-aware market-impact line."""
+    surf = detail.get("surface_c")
+    surf_txt = f"{surf:.1f} °C canopy" if isinstance(surf, (int, float)) else "sub-zero canopy"
+    hrs = detail.get("hours_below_0") or 0
+    mech = _FROST_TYPE_LABEL.get(detail.get("frost_type", "none"), "frost")
+    when = detail.get("date", "the forecast window")
+    if severity == _fm.SEV_CRITICAL:
+        return (f"Critical frost on {when}: {mech}, {surf_txt}"
+                f"{f', {hrs} h below 0' if hrs else ''}. Systemic damage to next "
+                f"season's vegetative growth likely — physical-market impact.")
+    if severity == _fm.SEV_ALERT:
+        return (f"Frost on {when}: {mech}, {surf_txt}. Protective action advised; "
+                f"leaf burn / tip dieback possible.")
+    return (f"Marginal frost risk on {when}: {surf_txt}. Monitor overnight lows.")
+
+
+def _frost_alert(detail: dict, severity: str) -> dict:
+    """One alert dict in the same shape evaluate_rule() emits."""
+    return {
+        "threat_id":     FROST_THREAT_ID,
+        "name":          f"{severity.title()} Frost Threat",
+        "severity":      severity,
+        "timeframe":     "forecast",
+        "market_impact": _frost_message(detail, severity),
+        "triggers": {
+            "type":          detail.get("frost_type", "none"),
+            "surface_c":     detail.get("surface_c"),
+            "air_min_c":     detail.get("air_min_c"),
+            "hours_below_0": detail.get("hours_below_0", 0),
+            "date":          detail.get("date"),
+        },
+    }
+
+
+def brazil_frost_alerts(fe_doc: dict | None, month: int) -> dict[str, list[dict]]:
+    """Per-region graduated frost alerts for Brazil, read from the physics
+    engine's per-region `frost_detail` (published in farmer_economics.json by
+    the supply exporter). Returns {region: [alert]} for regions with a
+    fireable frost; empty out of season or when the data is absent (degrades
+    silently — no false alarms on a missing/stale file)."""
+    if month not in FROST_MONTHS:
+        return {}
+    weather = (fe_doc or {}).get("weather") or {}
+    out: dict[str, list[dict]] = {}
+    for region in weather.get("regions") or []:
+        name = region.get("name")
+        if name not in BRAZIL_FROST_REGIONS:
+            continue
+        detail = region.get("frost_detail")
+        if not detail:
+            continue
+        sev = _fm.severity(
+            detail.get("risk", "-"), detail.get("frost_type", "none"),
+            detail.get("surface_c"), detail.get("hours_below_0", 0),
+        )
+        if sev is None:
+            continue
+        out[name] = [_frost_alert(detail, sev)]
+    return out
+
+
 # ── Driver — read JSONs, evaluate, write outputs ─────────────────────────────
 
 def _load_json(path: Path) -> dict | None:
@@ -219,9 +304,21 @@ def build() -> dict[str, Any]:
         if per_region:
             origins_out[origin] = per_region
 
+    # Brazil frost is handled separately from the generic IPHM rules: it's
+    # per-region and physics-based (advective / duration / black frost), read
+    # from farmer_economics.json's frost_detail rather than a country-wide
+    # forecast minimum. Merge its graduated alerts into the Brazil block.
+    fe_doc = _load_json(DATA_DIR / "farmer_economics.json")
+    for region, alerts in brazil_frost_alerts(fe_doc, cur_month).items():
+        origins_out.setdefault("brazil", {}).setdefault(region, []).extend(alerts)
+        for a in alerts:
+            severity_counter[a["severity"]] += 1
+            threat_counter[a["threat_id"]] += 1
+            total += 1
+
     return {
         "generated_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
-        "ruleset_version": "iphm-v1",
+        "ruleset_version": "iphm-v2-frost",
         "origins": origins_out,
         "summary": {
             "total_alerts": total,

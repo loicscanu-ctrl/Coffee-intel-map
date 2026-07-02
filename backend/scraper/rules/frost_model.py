@@ -205,3 +205,70 @@ def risk_letter(min_temp: float, cloud_cover: float, wind_kmh: float,
     conditions at the minimum-temperature hour (no hourly slice). Uses the
     same physics as assess_night but can't measure duration."""
     return assess_night([min_temp], [cloud_cover], [wind_kmh], [dew_point]).risk
+
+
+# ── alert severity ladder (Phase 2) ──────────────────────────────────────────
+
+# Hours below the surface freezing line that make a radiative event
+# "systemic" rather than a brief touch (about half a winter night).
+CRITICAL_HOURS_BELOW_0 = 4
+
+# Alert-severity tiers the agronomic engine emits (lowercase to match the
+# existing quant-signal convention).
+SEV_CRITICAL = "critical"
+SEV_ALERT = "alert"
+SEV_WATCH = "watch"
+
+
+def severity(risk: str, frost_type: str, surface_min_c: float | None,
+             hours_below_0: int) -> str | None:
+    """Map a night's frost physics to an alert tier, or None for no alert.
+
+    The ladder (systemic → monitor):
+      * critical — a damaging freeze of the kind that scars next season:
+        an advective (wind-driven sub-zero cold mass) or black (dry hard)
+        frost, a deep radiative freeze (surface < HARD_FROST_C), or a
+        prolonged one (≥ CRITICAL_HOURS_BELOW_0 hours of canopy ice).
+      * alert    — a real but shallow/brief radiative freeze (surface < 0
+        °C) warranting protective action.
+      * watch    — marginal: surface in the 0–3 °C band (risk "M").
+      * None     — risk "L" / "-": nothing to raise.
+    """
+    s = surface_min_c if surface_min_c is not None else 99.0
+    if (frost_type in ("advective", "black")
+            or s < HARD_FROST_C
+            or hours_below_0 >= CRITICAL_HOURS_BELOW_0):
+        return SEV_CRITICAL
+    if risk == "H":
+        return SEV_ALERT
+    if risk == "M":
+        return SEV_WATCH
+    return None
+
+
+def worst_forecast_frost(daily: list[dict], today_iso: str) -> dict | None:
+    """Pick the most severe FORECAST-window frost day from a region's daily
+    series (each dict as emitted by the weather aggregators, carrying
+    frost_risk / frost_type / frost_surface_c / frost_air_min_c /
+    frost_hours_below_0 and a `date`). Only days on/after today_iso count —
+    we alert on upcoming frost, not past. Returns a compact detail dict, or
+    None when the forecast holds no frost.
+    """
+    fut = [d for d in daily
+           if d.get("date", "") >= today_iso and d.get("frost_risk", "-") != "-"]
+    if not fut:
+        return None
+    # Most severe = highest risk letter, then coldest surface as tiebreak.
+    order = {"-": 0, "L": 1, "M": 2, "H": 3}
+    worst = max(fut, key=lambda d: (
+        order.get(d.get("frost_risk", "-"), 0),
+        -(d.get("frost_surface_c") if d.get("frost_surface_c") is not None else 99.0),
+    ))
+    return {
+        "date":          worst.get("date"),
+        "risk":          worst.get("frost_risk", "-"),
+        "frost_type":    worst.get("frost_type", "none"),
+        "surface_c":     worst.get("frost_surface_c"),
+        "air_min_c":     worst.get("frost_air_min_c"),
+        "hours_below_0": worst.get("frost_hours_below_0", 0),
+    }
