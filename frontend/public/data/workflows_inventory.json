@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T00:14:27.311721Z",
+  "generated_at": "2026-07-02T00:22:01.092406Z",
   "count": 67,
   "workflows": [
     {
@@ -339,9 +339,10 @@
         "workflow_run"
       ],
       "crons": [
-        "9 3 * * *"
+        "41 3 * * *"
       ],
       "workflow_run_deps": [
+        "1.16 \u2013 Open-Direction Prediction Log",
         "1.4 \u2013 Export and Publish Static JSON"
       ],
       "concurrency_group": "morning-brief",
