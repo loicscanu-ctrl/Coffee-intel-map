@@ -348,10 +348,10 @@
     "available": true,
     "as_of": "2026-07-01",
     "for_session": "2026-07-02",
-    "scraped_at": "2026-07-02T00:31:10.950201Z",
+    "scraped_at": "2026-07-02T06:41:17.982641Z",
     "direction": "Bullish",
-    "base_margin": -0.14613208468922104,
-    "final_margin": 1.327604233603669,
+    "base_margin": -0.146132084689221,
+    "final_margin": 1.3276042336036693,
     "base_prob": 0.4635318525917173,
     "final_prob": 0.7904440708036081,
     "prob_up": 0.7904440708036081,
@@ -363,7 +363,7 @@
         "raw_value": 0.014675052410901612,
         "raw_fmt": "+1.47%",
         "usd_per_ton": 55.3,
-        "phi": 1.4357536253874803,
+        "phi": 1.4357536253874805,
         "detail": {
           "text": "KC at RC close (17:30 London) 310.05¢/lb → KC close (18:30) 314.60¢/lb = +100.3 $/t on arabica; +1.47% mapped on robusta ≈ +55.3 $/t"
         }
@@ -374,7 +374,7 @@
         "raw_value": 20.0,
         "raw_fmt": "day 20",
         "usd_per_ton": null,
-        "phi": 0.037982692905409815,
+        "phi": 0.03798269290540982,
         "detail": {
           "text": "day 20 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
         }
