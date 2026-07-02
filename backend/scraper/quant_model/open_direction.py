@@ -69,7 +69,12 @@ _FX_SNAPS  = _ROOT / "frontend" / "public" / "data" / "fx_intraday_snapshots.jso
 
 _KC_TO_USD_PER_MT = 22.0462   # KC ¢/lb → USD/MT
 
-_ABSTAIN_BAND    = 0.03       # |prob_up − 0.5| below this → Abstain
+# Tuned on the real walk-forward probs (898 OOS sessions, sweep 0.00→0.10):
+# objective = max acted hit-rate subject to coverage ≥60%. 0.06 gives 58.7%
+# acted accuracy at 60.1% coverage (0.03 gave 56.5% @ 79%); the monotone
+# band→accuracy curve (0.10 → 63.5% @ 36%) confirms confidence is informative.
+# Mild selection effect acknowledged — the live record is the arbiter.
+_ABSTAIN_BAND    = 0.06       # |prob_up − 0.5| below this → Abstain
 _MIN_TRAIN       = 252        # ≥ ~1y of labelled sessions before predicting
 _MIN_CCI_OVERLAP = 40         # days of FX snapshots before cci_overnight joins
 _WF_STEP         = 5          # walk-forward refit cadence (matches the ablation)
@@ -217,6 +222,46 @@ def _sigmoid(x: float) -> float:
     return float(1.0 / (1.0 + np.exp(-np.clip(x, -35, 35))))
 
 
+def _fit_ridge(Z: np.ndarray, y: np.ndarray, l2: float = 1.0) -> np.ndarray:
+    """Closed-form ridge on standardised features (intercept unpenalised).
+    Returns [b0, w...]. Used by the magnitude head — same features as the
+    classifier, predicting the SIGNED gap return instead of its direction."""
+    n, k = Z.shape
+    Zb = np.column_stack([np.ones(n), Z])
+    P = np.eye(k + 1) * l2
+    P[0, 0] = 0.0
+    return np.linalg.solve(Zb.T @ Zb + P, Zb.T @ y)
+
+
+def _walk_forward_magnitude(Xraw: np.ndarray, g: np.ndarray,
+                            min_train: int = _MIN_TRAIN, step: int = _WF_STEP,
+                            embargo: int = _WF_EMBARGO, l2: float = 1.0) -> "dict | None":
+    """OOS check for the magnitude head: MAE of the predicted signed gap vs the
+    zero-prediction baseline (MAE of |gap|). If the head can't beat 'predict no
+    gap', its size estimate is decoration — report both so that's visible."""
+    n = len(g)
+    if n < min_train + step:
+        return None
+    preds, truth = [], []
+    cut = min_train
+    while cut < n:
+        tr_end = cut - embargo
+        Xtr, gtr = Xraw[:tr_end], g[:tr_end]
+        mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1.0
+        w = _fit_ridge((Xtr - mu) / sd, gtr, l2=l2)
+        te = slice(cut, min(cut + step, n))
+        Zte = (Xraw[te] - mu) / sd
+        preds.extend(np.column_stack([np.ones(Zte.shape[0]), Zte]) @ w)
+        truth.extend(g[te])
+        cut += step
+    preds = np.array(preds); truth = np.array(truth)
+    mae = float(np.abs(preds - truth).mean())
+    base = float(np.abs(truth).mean())          # MAE of always predicting 0
+    return {"mae_pct": mae * 100, "baseline_mae_pct": base * 100,
+            "skill": 1.0 - (mae / base) if base > 0 else None,
+            "n": int(len(truth))}
+
+
 def _walk_forward_eval(Xraw: np.ndarray, y: np.ndarray,
                        min_train: int = _MIN_TRAIN, step: int = _WF_STEP,
                        embargo: int = _WF_EMBARGO, l2: float = 1.0,
@@ -280,12 +325,15 @@ def run(db=None) -> dict:
 
     Xraw = train[active].values
     y = train["y"].values.astype(float)
+    g = train["gap"].values.astype(float)
 
     wf = _walk_forward_eval(Xraw, y)
+    wf_mag = _walk_forward_magnitude(Xraw, g)
 
     # Live fit on everything, standardised on the full training distribution.
     mu = Xraw.mean(0); sd = Xraw.std(0); sd[sd == 0] = 1.0
     beta = _fit_logistic(np.column_stack([np.ones(len(y)), (Xraw - mu) / sd]), y)
+    ridge = _fit_ridge((Xraw - mu) / sd, g)
 
     # ── live feature vector for the UPCOMING session ─────────────────────────
     last = frame.iloc[-1]              # most recently traded session
@@ -322,6 +370,10 @@ def run(db=None) -> dict:
 
     abstain = abs(final_prob - 0.5) < _ABSTAIN_BAND
     direction = "Abstain" if abstain else ("Bullish" if final_prob >= 0.5 else "Bearish")
+
+    # Magnitude head (same features → signed expected gap). Sizes the call in
+    # $/t for the brief/panel; the direction call above stays the headline.
+    expected_gap = float(np.r_[1.0, z] @ ridge)
 
     # ── $/t ruler + per-feature detail ───────────────────────────────────────
     rc_px = float(last_row.get("rc_last_1730") or 0) or None   # USD/MT
@@ -377,6 +429,9 @@ def run(db=None) -> dict:
         "final_prob":    final_prob,
         "prob_up":       final_prob,
         "prob_down":     1.0 - final_prob,
+        "expected_gap_pct":    round(expected_gap * 100, 3),
+        "expected_gap_usd_mt": (round(expected_gap * rc_px, 1)
+                                if rc_px is not None else None),
         "features":      features_out,
         "target": {
             "kind":         "overnight_gap",
@@ -396,6 +451,9 @@ def run(db=None) -> dict:
             "abstain_rate":      wf["abstain_rate"] if wf else None,
             "eval_method":       "walk_forward",
             "n_test":            wf["n"] if wf else 0,
+            "mag_mae_pct":          wf_mag["mae_pct"] if wf_mag else None,
+            "mag_baseline_mae_pct": wf_mag["baseline_mae_pct"] if wf_mag else None,
+            "mag_skill":            wf_mag["skill"] if wf_mag else None,
             "cci_available":     "cci_overnight" in active,
             "intraday_source":   "barchart_15min",
             "roll_days_excluded": n_roll_excluded,

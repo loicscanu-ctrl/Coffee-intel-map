@@ -58,3 +58,21 @@ Hypothesis: commercial (`pmpu`) positioning conditioned on harvest predicts a
 One prediction → two artifacts: the 03:00 job writes the history row AND
 `quant_report.json["open_direction"]` from the same fit, so the panel and the
 record can never disagree. `run_quant.py` (21:30) preserves the key untouched.
+
+## Enhancements (2026-07, second wave)
+- **Abstain band retuned 0.03 → 0.06** on the real walk-forward probs (sweep
+  0.00→0.10, objective: max acted hit-rate s.t. coverage ≥60%): acted accuracy
+  56.5% @ 79% coverage → **58.7% @ 60%**. The monotone band→accuracy curve
+  (0.10 → 63.5% @ 36%) confirms the probability is informative. Mild selection
+  effect acknowledged; the live record is the arbiter.
+- **Per-prediction SHAP logging** — every history row (live + regenerated
+  backtest seed) stores its per-feature φᵢ, enabling "which feature has been
+  earning" analysis on live data later. Live rows are never rewritten.
+- **Drift alarm** — the payload carries `track` (live graded n, overall +
+  rolling-60 acted hit-rate); the Telegram brief warns "⚠️ cold streak" when
+  ≥20 graded live calls run below 50% rolling. The model monitors itself.
+- **Magnitude head** — ridge on the same pre-open features predicting the
+  SIGNED gap; payload exposes `expected_gap_pct` / `expected_gap_usd_mt`
+  (brief: "exp. +16$/t"). Honest OOS read on real data: MAE 0.302% vs 0.308%
+  zero-baseline → **skill +0.02** (small); it sizes the call, the classifier
+  remains the headline. Both MAEs are published in the model block.

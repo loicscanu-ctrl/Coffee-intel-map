@@ -114,6 +114,21 @@ def test_payload_invariants(synthetic_env):
     assert p["for_session"] > p["as_of"]
 
 
+def test_magnitude_head(synthetic_env):
+    p = od.run()
+    assert p["available"]
+    # expected gap present, consistent between % and $/t
+    assert isinstance(p["expected_gap_pct"], float)
+    if p["expected_gap_usd_mt"] is not None:
+        assert (p["expected_gap_pct"] >= 0) == (p["expected_gap_usd_mt"] >= 0)
+    # planted signal (gap = 0.6·kc_after_prev) → the head must beat the
+    # zero-prediction baseline out-of-sample
+    m = p["model"]
+    assert m["mag_mae_pct"] is not None
+    assert m["mag_mae_pct"] < m["mag_baseline_mae_pct"]
+    assert m["mag_skill"] > 0.1
+
+
 def test_no_lookahead_alignment(synthetic_env):
     frame = od.build_dataset()
     rows = json.loads(synthetic_env["intraday"].read_text())
@@ -169,3 +184,45 @@ def test_log_lifecycle(synthetic_env):
     assert len(new_pend) == 1
     assert new_pend[0]["date"] == q["open_direction"]["for_session"]
     assert abs(new_pend[0]["prob_up"] - round(q["open_direction"]["prob_up"], 4)) < 1e-9
+    # 3b: every row (seed + live) carries per-feature attribution
+    for r in h3:
+        assert r.get("factors"), f"row {r['date']} missing factors"
+        names = {f["var_name"] for f in r["factors"]}
+        assert {"kc_after_rc_diff", "days_since_roll"} <= names
+        assert all(isinstance(f["phi"], float) for f in r["factors"])
+    # 3a: track stats attached to the payload
+    tr = q["open_direction"]["track"]
+    assert set(tr) >= {"live_graded", "rolling_hit_rate", "rolling_n", "cold_streak"}
+
+
+def test_seed_factor_backfill_preserves_live_rows(synthetic_env):
+    # simulate a pre-3b history: seed without factors + one live row
+    odl.run()
+    h = json.loads(synthetic_env["history"].read_text())
+    for r in h:
+        r.pop("factors", None)
+    live_row = next(r for r in h if r["source"] == "live")
+    live_row["prob_up"] = 0.4242          # marker that must survive backfill
+    synthetic_env["history"].write_text(json.dumps(h), encoding="utf-8")
+    odl.run()
+    h2 = json.loads(synthetic_env["history"].read_text())
+    bt = [r for r in h2 if r["source"] == "backtest"]
+    assert bt and all(r.get("factors") for r in bt)          # backfilled
+    survived = next(r for r in h2 if r["date"] == live_row["date"])
+    assert survived["prob_up"] == 0.4242                     # live row untouched
+
+
+def test_track_stats_cold_streak():
+    def live(d, hit):
+        return {"date": d, "source": "live", "status": "resolved",
+                "direction": "Bullish", "hit": hit}
+    # 25 graded live rows, 9 hits (36%) → cold
+    hist = [live(f"2026-01-{i+1:02d}", i % 25 < 9) for i in range(25)]
+    tr = odl._track_stats(hist)
+    assert tr["live_graded"] == 25 and tr["cold_streak"] is True
+    # same rate but under the min-n threshold → no call
+    tr2 = odl._track_stats(hist[:10])
+    assert tr2["cold_streak"] is False
+    # healthy record → no alarm
+    hist3 = [live(f"2026-02-{i+1:02d}", i % 25 < 15) for i in range(25)]
+    assert odl._track_stats(hist3)["cold_streak"] is False

@@ -34,6 +34,8 @@ interface OpenDirection {
   final_prob?:   number;
   prob_up?:      number;
   prob_down?:    number;
+  expected_gap_pct?:    number | null;
+  expected_gap_usd_mt?: number | null;
   features?:     Feature[];
   target?:       { kind: string; definition: string; abstain_band: number };
   model?: {
@@ -166,6 +168,11 @@ export default function PriceDirectionSection() {
                     {i === 0 && (
                       <td className={`px-4 py-2 text-center font-bold text-sm ${dirCls}`} rowSpan={features.length}>
                         {dir}
+                        {data.expected_gap_usd_mt != null && (
+                          <div className="text-[10px] font-mono font-normal text-slate-400 mt-0.5">
+                            exp. {fmtUsdTon(data.expected_gap_usd_mt)}
+                          </div>
+                        )}
                       </td>
                     )}
                     {i === 0 && (

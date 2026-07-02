@@ -967,11 +967,14 @@ def _open_direction_block(today: date) -> str | None:
     direction = od.get("direction")
     if p_up is None or direction is None:
         return None
+    exp_usd = od.get("expected_gap_usd_mt")
+    exp_s = (f" · exp. {'+' if exp_usd > 0 else ''}{exp_usd:,.0f}$/t"
+             if isinstance(exp_usd, (int, float)) else "")
     if direction == "Abstain":
         head = f"🔮 RC open call: <b>Abstain</b> ({p_up * 100:.0f}% up — inside the no-call band)"
     else:
         conf = p_up if direction == "Bullish" else 1 - p_up
-        head = f"🔮 RC open call: <b>{direction}</b> {conf * 100:.0f}%"
+        head = f"🔮 RC open call: <b>{direction}</b> {conf * 100:.0f}%{exp_s}"
     drivers = []
     for f in (od.get("features") or [])[:2]:
         usd = f.get("usd_per_ton")
@@ -979,6 +982,14 @@ def _open_direction_block(today: date) -> str | None:
         drivers.append(f"{f.get('label')} {f.get('raw_fmt')}{usd_s}")
     if drivers:
         head += "\n     " + " · ".join(drivers)
+    # Drift alarm: the model monitors its own live record and says so when it
+    # is running cold, instead of letting a decayed model keep calling quietly.
+    track = od.get("track") or {}
+    if track.get("cold_streak"):
+        rate = track.get("rolling_hit_rate")
+        n = track.get("rolling_n")
+        head += (f"\n     ⚠️ <b>cold streak</b> — live hit-rate "
+                 f"{rate * 100:.0f}% over last {n} calls; treat with caution")
     return head
 
 
