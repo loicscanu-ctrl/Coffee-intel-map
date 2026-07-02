@@ -1,60 +1,54 @@
 """
 open_direction.py
-Daily next-session direction classifier for ICE Robusta (RC), with an
-exact additive (SHAP-style) decomposition of the latest prediction.
+Pre-open direction classifier for ICE Robusta's OVERNIGHT GAP, with an exact
+additive (SHAP-style) decomposition of the latest prediction.
 
-Background
-==========
-The Signals tab's "Open Price Direction" panel was a hand-coded mock: a
-SHAP waterfall with frozen numbers and a "MOCK DATA" banner. The original
-design targeted the first 30 minutes after the ICE RC open and labelled
-observations with a López-de-Prado triple-barrier scheme — but that needs
-an intraday RC tick feed we don't have.
+Model spec (locked 2026-07 — see docs/research/open-price-direction-findings.md)
+================================================================================
+TARGET   direction of the overnight gap:
+             gap_t = RC first-bar open_t / RC 17:30-London close_{t-1} − 1
+         Roll days are EXCLUDED (front-month change ⇒ the two prices are
+         different delivery months; the calendar spread would masquerade as a
+         gap). An ABSTAIN band suppresses the call when |p−0.5| < band.
 
-This module makes the panel LIVE by reformulating the same idea on the
-data we DO ship daily:
+FIRES    pre-open (03:00 UTC weekdays) via open_direction_log.py, which owns
+         both artifacts of the one prediction: the append-only track record
+         (open_direction_history.json) and this panel payload
+         (quant_report.json["open_direction"]). run_quant.py no longer
+         computes this section — it preserves whatever is present.
 
-  * 5y of RC + KC front-month daily settles (contract_prices_archive.json)
-  * The Coffee Currency Index (CCI) — our own coffee-trade-weighted basket
-    of producer vs consumer currencies — reconstructed from the component
-    FX pairs in fx_history.json with the SAME weights + orientation as the
-    published index (fetch_currency_index.py). This is the currency axis
-    instead of the generic dollar index: the CCI is coffee-relevant
-    (higher = origin currencies strengthening = bullish coffee), needs no
-    extra network call, and works wherever the rest of the quant step does.
+FEATURES (all knowable pre-open; each earned its place in a walk-forward
+          ablation — expanding window, standardise-on-past, vs the rolling
+          majority-class baseline):
+  kc_after_rc_diff  NY arabica's move in the hour AFTER London robusta closes:
+                    KC(18:30 London) / KC(17:30 London) − 1, prior session.
+                    Same KC contract, same day → roll-immune. The core lead
+                    signal (+2.8pp OOS edge, sign-stable).
+  days_since_roll   trading days since the front contract last rolled —
+                    position in the bi-monthly contract cycle. (+1.1pp marginal
+                    over kc_after; confirmed on an untouched holdout. Gaps tilt
+                    down mid-cycle, up late-cycle.)
+  cci_overnight     Coffee Currency Index move from 17:30 London (RC close) to
+                    03:00 UTC, reconstructed from intraday FX snapshots
+                    (fx_intraday_snapshots.json). No historical intraday FX
+                    exists, so this ships live and is graded forward-only; it
+                    activates once ≥ _MIN_CCI_OVERLAP days accumulate.
 
-The label is still a triple barrier — just applied to the DAILY RC path
-instead of an intraday one: from each day, an upper and lower price
-barrier (±k·σ) race against a vertical H-day time barrier. Up if the
-upper is hit first, Down if the lower is hit first, UNDEFINED (abstain)
-if the time barrier is reached first. Abstention is a feature, not a bug:
-when neither price barrier is touched in H days the move wasn't
-decisive, and forcing a call there is how you manufacture false
-confidence.
+DROPPED after testing (see the findings doc): rc_ret_1d, KC−RC arbitrage gap
+(level z at 7/15/21d and its daily change), harvest/frost/day-of-year
+seasonality, term structure, daily BRL, calendar dummies. rc_open15_ret and
+rc_overnight_gap are OUTCOMES the model is graded against, not inputs.
 
-Why logistic regression (and why the SHAP is exact, not approximated)
-=====================================================================
-We fit an ordinary logistic regression on standardised features. For a
-logistic model the SHAP value of feature i is *closed-form exact* in the
-log-odds (margin) space:
+Why logistic regression (and why the SHAP is exact)
+===================================================
+Ordinary L2 logistic regression on standardised features. For a logistic model
+the SHAP value of feature i is closed-form exact in log-odds (margin) space:
 
-    margin(x)   = β0 + Σ βi · zi              (zi = standardised feature)
-    base_margin = β0                          (E[zi] = 0 by construction)
-    φi          = βi · zi
-    Σ φi        = margin(x) − base_margin      (exactly)
+    margin(x)   = β0 + Σ βi · zi          (zi = standardised feature)
+    base_margin = β0                      (E[zi] = 0 by construction)
+    φi          = βi · zi ,   Σ φi = margin(x) − base_margin   (exactly)
 
-So the waterfall is mathematically exact: the per-feature bars sum to the
-gap between the base log-odds and the prediction's log-odds with zero
-residual. No Shapley sampling, no `shap` dependency (which matters for the
-lightweight GitHub-Actions deploy), no tree-SHAP approximation error. The
-endpoints are reported in BOTH margin units (where the bars are additive)
-and probability units (via the sigmoid) so the UI can show "Bullish 43%"
-while keeping an honest additive chart underneath.
-
-Output (merged into quant_report.json under "open_direction") — see the
-schema in `_unavailable` / the bottom of `run` for the exact shape.
-
-Methodology paper: docs/research/open-price-direction-methodology.md
+No Shapley sampling, no `shap` dependency, pure numpy.
 """
 from __future__ import annotations
 
@@ -68,78 +62,24 @@ import numpy as np
 import pandas as pd
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-# Coffee Currency Index weights + orientation, reused verbatim from the CCI
-# module so the model's CCI feature stays in lock-step with the published
-# index (no second copy of the weights to drift). Importing these is
-# side-effect-free (the fetch logic is guarded behind __main__).
-from scraper.quant_model.fetch_currency_index import (  # noqa: E402
-    EXPORTERS,
-    IMPORTERS,
-    _strength_sign,
-)
+_ROOT      = Path(__file__).resolve().parents[3]
+_INTRADAY  = _ROOT / "frontend" / "public" / "data" / "intraday_kc_rc_15min.json"
+_FX_SNAPS  = _ROOT / "frontend" / "public" / "data" / "fx_intraday_snapshots.json"
 
-_ROOT       = Path(__file__).resolve().parents[3]
-_ARCHIVE    = _ROOT / "data" / "contract_prices_archive.json"
-_FX_HISTORY = _ROOT / "frontend" / "public" / "data" / "fx_history.json"
-_KC_AT_RC_CLOSE = _ROOT / "frontend" / "public" / "data" / "kc_at_rc_close_history.json"
-# Precise 15-min intraday points (RM + KC) — Barchart-backfilled ~5.7y, plus
-# forward-captured going forward. Supersedes the coarse hourly kc_at_rc_close
-# for kc_after_rc_diff and adds the robusta overnight-gap feature.
-_INTRADAY = _ROOT / "frontend" / "public" / "data" / "intraday_kc_rc_15min.json"
-
-# An intraday-derived feature turns on once enough days overlap the training
-# window (both the 15-min source and the legacy hourly fallback).
-_MIN_KC_RC_OVERLAP = 40
-
-# ── Triple-barrier hyper-parameters ──────────────────────────────────────────
-# H = horizon in trading days the vertical (time) barrier sits at.
-# K = barrier half-width in units of the trailing daily-return σ.
-# These pin "what counts as a decisive move": ±1σ over a trading week.
-_BARRIER_H = 5
-_BARRIER_K = 1.0
-_VOL_WINDOW = 20          # trailing window for the per-day σ estimate
 _KC_TO_USD_PER_MT = 22.0462   # KC ¢/lb → USD/MT
-_MIN_DEFINED = 80         # need at least this many labelled (non-abstain) rows
 
-# Display metadata per feature: the order + human label + raw-value formatter.
-# var_name is the stable key surfaced to the frontend / methodology doc.
-#
-# This 7-feature set was chosen by a walk-forward back-test (expanding window,
-# refit monthly, standardise-on-past, H-day embargo, accuracy vs the
-# majority-class baseline on the same OOS rows). It lifts the out-of-sample edge
-# from ~+3.3pp (the old 6-feature set) to ~+5.7pp over baseline. See the
-# methodology paper §5 for the full selection / ablation table.
-#
-# Currency axis — the Coffee Currency Index (CCI), a coffee-trade-weighted basket
-# of producer vs consumer currencies (NOT the dollar index). The back-test found
-# the index's 5-DAY momentum (cci_ret_5d) carries the signal; the 1-day move and
-# the level z-score did not (cci_z was net negative), so only cci_ret_5d is kept.
-# Higher CCI = origin currencies strengthening vs USD = origin costs up = bullish.
-# Needs the deep fx_history (backfilled to 2020) so it isn't data-starved.
-#
-# NY price gap (KC−RC arbitrage) enters as BOTH its level z-score (kc_rc_gap_z)
-# and its daily change (kc_rc_gap_ret).
-#
-# Three intraday-derived features from the 15-min RM+KC history:
-#   kc_after_rc_diff — the NY-only move in the hour AFTER London robusta closes
-#     (KC 18:30 ÷ KC 17:30 − 1). WITHIN-DAY, WITHIN-CONTRACT → roll-immune.
-#   rc_open15_ret — robusta's opening 15-min move (RC 09:15 ÷ RC open − 1).
-#     WITHIN-DAY → roll-immune.
-#   rc_overnight_gap — robusta's overnight gap (RC open ÷ prior RC 17:30 − 1).
-#     CROSS-DAY, so on a roll day (today's front ≠ yesterday's) the two prices
-#     are different delivery months and the calendar spread would masquerade as a
-#     huge gap — those days are EXCLUDED (NaN) so they never pollute the stats.
-# Each only activates once enough days overlap the training window.
+_ABSTAIN_BAND    = 0.03       # |prob_up − 0.5| below this → Abstain
+_MIN_TRAIN       = 252        # ≥ ~1y of labelled sessions before predicting
+_MIN_CCI_OVERLAP = 40         # days of FX snapshots before cci_overnight joins
+_WF_STEP         = 5          # walk-forward refit cadence (matches the ablation)
+_WF_EMBARGO      = 1          # single-session labels don't overlap; 1 day guard
+
+# Display metadata per feature (order = canonical panel order).
 _FEATURE_SPECS = [
-    ("rc_ret_1d",        "RC 1-Day Return",          lambda v: f"{v*100:+.2f}%"),
-    ("kc_rc_gap_z",      "New York Price Gap (z)",   lambda v: f"{v:+.2f}σ"),
-    ("kc_rc_gap_ret",    "NY Price Gap Δ",           lambda v: f"{v*100:+.2f}%"),
-    ("kc_after_rc_diff", "NY after RC-Close Move",   lambda v: f"{v*100:+.2f}%"),
-    ("rc_open15_ret",    "RC Opening 15-min Move",   lambda v: f"{v*100:+.2f}%"),
-    ("rc_overnight_gap", "RC Overnight Gap",         lambda v: f"{v*100:+.2f}%"),
-    ("cci_ret_5d",       "Coffee Currency Index 5-Day Δ", lambda v: f"{v*100:+.2f}%"),
+    ("kc_after_rc_diff", "NY after RC-Close Move",  lambda v: f"{v*100:+.2f}%"),
+    ("days_since_roll",  "Roll-Cycle Position",     lambda v: f"day {v:.0f}"),
+    ("cci_overnight",    "CCI Overnight Move",      lambda v: f"{v*100:+.2f}%"),
 ]
 _FEATURE_KEYS = [k for k, _, _ in _FEATURE_SPECS]
 
@@ -148,370 +88,118 @@ def _unavailable(reason: str) -> dict:
     return {"available": False, "reason": reason}
 
 
-# ── Price-archive loading ────────────────────────────────────────────────────
+# ── dataset ──────────────────────────────────────────────────────────────────
 
-def _front_series(archive_market: dict) -> "pd.Series | None":
-    """Front-month daily settle series from one side of the archive.
+def build_dataset() -> "pd.DataFrame | None":
+    """Per-session frame indexed by session date.
 
-    Each day maps {contract_symbol: {"price": float}}. The front month is the
-    contract with the nearest expiry; the archive lists contracts in expiry
-    order, so the first key per day is the front. We read its price.
-    """
-    dates, prices = [], []
-    for day in sorted(archive_market.keys()):
-        contracts = archive_market[day]
-        if not isinstance(contracts, dict) or not contracts:
-            continue
-        first_sym = next(iter(contracts))
-        rec = contracts.get(first_sym) or {}
-        px = rec.get("price")
-        if px is None:
-            continue
-        try:
-            dates.append(pd.Timestamp(day))
-            prices.append(float(px))
-        except (ValueError, TypeError):
-            continue
-    if not prices:
-        return None
-    return pd.Series(prices, index=pd.DatetimeIndex(dates)).sort_index()
+    Columns:
+      gap        overnight gap of that session (NaN on roll days / missing bars)
+      y          1.0 gap up, 0.0 gap down, NaN unlabelled
+      kc_after_rc_diff  PRIOR session's KC 17:30→18:30 move  (pre-open info)
+      days_since_roll   trading days since the last front-month roll
+      cci_overnight     CCI 17:30(prev) → 03:00 UTC move, when snapshots exist
+      rc_close_prev     prior 17:30 RC close (USD/MT ruler for $/t displays)
+      kc_1730_prev / kc_1830_prev  prior session KC anchors (¢/lb, for detail)
 
-
-def _load_prices() -> "tuple[pd.Series, pd.Series] | None":
-    """(rc_front, kc_front) daily settle series, or None if archive missing."""
-    if not _ARCHIVE.exists():
-        return None
-    try:
-        arch = json.loads(_ARCHIVE.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    rc = _front_series(arch.get("robusta") or {})
-    kc = _front_series(arch.get("arabica") or {})
-    if rc is None or kc is None:
-        return None
-    return rc, kc
-
-
-# ── Coffee Currency Index (CCI) — coffee-trade-weighted FX basket ────────────
-# Built from the same component pairs in fx_history.json the published CCI uses,
-# with identical weights + strength orientation (imported from the CCI module).
-# Replaces the dollar-centric EUR/USD + DXY + USD/BRL features with one
-# coffee-relevant currency axis. fx_history.json is produced by the CCI
-# workflow via a GitHub-Actions-reachable CDN FX API (jsdelivr), so this needs
-# no extra network call and works wherever the rest of the quant step does.
-
-def _fx_history_pairs() -> dict:
-    """All per-pair daily close series from fx_history.json, keyed by ticker
-    (e.g. 'BRL=X'). Empty dict on any failure."""
-    if not _FX_HISTORY.exists():
-        return {}
-    try:
-        doc = json.loads(_FX_HISTORY.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    out: dict[str, pd.Series] = {}
-    for ticker, p in (doc.get("pairs") or {}).items():
-        dates, closes = [], []
-        for row in p.get("history") or []:
-            d, c = row.get("date"), row.get("close")
-            if d is None or c is None:
-                continue
-            try:
-                dates.append(pd.Timestamp(d))
-                closes.append(float(c))
-            except (ValueError, TypeError):
-                continue
-        if closes:
-            out[ticker] = pd.Series(closes, index=pd.DatetimeIndex(dates)).sort_index()
-    return out
-
-
-def _compute_cci_index() -> "pd.Series | None":
-    """Reconstruct the daily Coffee Currency Index level series (base 100) from
-    the fx_history component pairs.
-
-    Mirrors fetch_currency_index._compute_index_series exactly: each pair's
-    daily return is normalised to a USD-strength return via _strength_sign(),
-    exporters add (+w) and importers subtract (−w), and the weighted ΔI is
-    accumulated from a base of 100. Higher index = producer currencies
-    strengthening vs USD. Returns None if no component pairs are available.
-    """
-    pairs = _fx_history_pairs()
-    if not pairs:
-        return None
-    returns = {t: s.pct_change() for t, s in pairs.items()}
-    df = pd.DataFrame(returns).dropna(how="all")
-    if df.empty:
-        return None
-    delta_i = pd.Series(0.0, index=df.index)
-    used = 0
-    for ticker, _name, w in EXPORTERS:
-        if ticker in df.columns:
-            delta_i += df[ticker].fillna(0) * (w * _strength_sign(ticker))
-            used += 1
-    for ticker, _name, w in IMPORTERS:
-        if ticker in df.columns:
-            delta_i += df[ticker].fillna(0) * (-w * _strength_sign(ticker))
-            used += 1
-    if used == 0:
-        return None
-    return (1 + delta_i).cumprod() * 100.0
-
-
-def _load_kc_after_rc(kc: "pd.Series") -> "pd.Series | None":
-    """{date → kc_after_rc_diff} = the NY-only return from RC close (17:30
-    London) to KC settle. Two row shapes are supported in the history file:
-
-      * backfill rows carry the diff directly (`kc_after_rc_diff`) — computed
-        within a single intraday series so the contract level cancels;
-      * forward-capture rows carry the 17:30 price (`kc_at_rc_close`), and we
-        derive the diff as KC_settle / price − 1 using the same-day archive
-        settle. (acaphe's front ≈ the archive front, so this stays single-
-        contract in practice — unlike Yahoo's continuous series, which is why
-        the backfill stores the diff pre-computed.)
-
-    Returns None when the file is absent/empty — the feature stays off until
-    enough days accumulate.
-    """
-    if not _KC_AT_RC_CLOSE.exists():
-        return None
-    try:
-        rows = json.loads(_KC_AT_RC_CLOSE.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    if not isinstance(rows, list) or not rows:
-        return None
-    dates, vals = [], []
-    for r in rows:
-        d = r.get("date")
-        if d is None:
-            continue
-        try:
-            ts = pd.Timestamp(d)
-        except (ValueError, TypeError):
-            continue
-        diff = r.get("kc_after_rc_diff")
-        if diff is None:
-            price = r.get("kc_at_rc_close")
-            if price is None or ts not in kc.index:
-                continue
-            try:
-                diff = float(kc.loc[ts]) / float(price) - 1.0
-            except (ValueError, TypeError, ZeroDivisionError):
-                continue
-        try:
-            vals.append(float(diff))
-            dates.append(ts)
-        except (ValueError, TypeError):
-            continue
-    if not vals:
-        return None
-    return pd.Series(vals, index=pd.DatetimeIndex(dates)).sort_index()
-
-
-def _load_intraday() -> "pd.DataFrame | None":
-    """Two roll-aware features from intraday_kc_rc_15min.json (15-min RM+KC):
-
-      kc_after_rc_diff = kc_last_1830 / kc_last_1730 − 1
-        The NY-only move in the hour after London robusta closes. Within-day,
-        within the same KC contract → immune to rolls.
-
-      rc_open15_ret = rc_open_0915 / rc_open_first − 1
-        Robusta's opening 15-min move (first bar's close ÷ first trade). Within-
-        day, within the same RC contract → immune to rolls.
-
-      rc_overnight_gap = rc_open_first / rc_last_1730.shift(1) − 1
-        Robusta's overnight gap from yesterday's 17:30 close to today's open.
-        CROSS-DAY → on a roll day (rc_symbol today ≠ yesterday) the two prices
-        are different delivery months; that calendar spread would show up as a
-        spurious gap, so those days are EXCLUDED (NaN) — never polluting the
-        stats. (Reported via `roll_days_excluded` in the model block.)
-
-    Returns a DataFrame indexed by date with both columns (+ `_rc_roll`), or
-    None if the file is absent/empty. Days missing the needed prices are NaN.
+    Alignment: every feature in row t is knowable strictly BEFORE session t's
+    open — kc_after and the KC anchors are shift(1); dsr on non-roll days
+    equals dsr_{t-1}+1 and the roll calendar is deterministic.
     """
     if not _INTRADAY.exists():
         return None
-    try:
-        rows = json.loads(_INTRADAY.read_text(encoding="utf-8"))
-    except Exception:
-        return None
+    rows = json.loads(_INTRADAY.read_text(encoding="utf-8"))
     if not isinstance(rows, list) or not rows:
         return None
+    df = pd.DataFrame(rows)
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date").set_index("date")
+    for c in ("rc_open_first", "rc_last_1730", "kc_last_1730", "kc_last_1830"):
+        df[c] = pd.to_numeric(df.get(c), errors="coerce")
 
-    recs = []
+    prev_close = df["rc_last_1730"].shift(1)
+    prev_sym   = df["rc_symbol"].shift(1)
+    roll       = df["rc_symbol"].ne(prev_sym) & prev_sym.notna()
+    gap = (df["rc_open_first"] / prev_close - 1.0).where(
+        (prev_close > 0) & df["rc_open_first"].notna() & (~roll))
+
+    kc_after = (df["kc_last_1830"] / df["kc_last_1730"] - 1.0).where(df["kc_last_1730"] > 0)
+
+    dsr = np.zeros(len(df)); c = 0
+    for i, is_roll in enumerate(roll.values):
+        c = 0 if is_roll else c + 1
+        dsr[i] = c
+
+    out = pd.DataFrame({
+        "gap":              gap,
+        "y":                (gap > 0).astype(float).where(gap.notna()),
+        "kc_after_rc_diff": kc_after.shift(1),
+        "days_since_roll":  dsr,
+        "rc_close_prev":    prev_close,
+        "kc_1730_prev":     df["kc_last_1730"].shift(1),
+        "kc_1830_prev":     df["kc_last_1830"].shift(1),
+        "_roll":            roll,
+    }, index=df.index)
+
+    cci = _cci_overnight_series()
+    if cci is not None:
+        out["cci_overnight"] = cci.reindex(out.index)
+    return out
+
+
+def _cci_overnight_series() -> "pd.Series | None":
+    """{session date → CCI % move 17:30-London(prev) → 03:00 UTC} from the
+    intraday FX snapshot file, weighted with the published CCI weights.
+
+    Snapshot rows: {"date": session date, "pairs": {ticker: {"prev_1730": r,
+    "at_0300": r}}} where rates are the raw stored orientation of
+    fx_history.json. Each pair's overnight return is normalised to a
+    USD-strength return via _strength_sign, then exporters add (+w) and
+    importers subtract (−w) — identical construction to the published index.
+    Returns None when the file is absent or empty (feature stays dormant).
+    """
+    if not _FX_SNAPS.exists():
+        return None
+    try:
+        from scraper.quant_model.fetch_currency_index import (
+            EXPORTERS, IMPORTERS, _strength_sign)
+        doc = json.loads(_FX_SNAPS.read_text(encoding="utf-8"))
+        rows = doc.get("days") or []
+    except Exception:
+        return None
+    weights = {t: w * _strength_sign(t) for t, _n, w in EXPORTERS}
+    weights.update({t: -w * _strength_sign(t) for t, _n, w in IMPORTERS})
+    out = {}
     for r in rows:
-        d = r.get("date")
+        d = r.get("date"); pairs = r.get("pairs") or {}
         if not d:
             continue
-        try:
-            ts = pd.Timestamp(d)
-        except (ValueError, TypeError):
-            continue
-        recs.append((ts, r))
-    if not recs:
+        delta = 0.0; used = 0
+        for ticker, w in weights.items():
+            p = pairs.get(ticker) or {}
+            a, b = p.get("prev_1730"), p.get("at_0300")
+            if a and b and a > 0:
+                delta += (b / a - 1.0) * w
+                used += 1
+        if used >= 6:   # require a majority of the basket
+            out[pd.Timestamp(d)] = delta
+    if not out:
         return None
-    recs.sort(key=lambda x: x[0])
-    idx = pd.DatetimeIndex([t for t, _ in recs])
-
-    def col(key):
-        out = []
-        for _, r in recs:
-            v = r.get(key)
-            try:
-                out.append(float(v) if v is not None else np.nan)
-            except (ValueError, TypeError):
-                out.append(np.nan)
-        return pd.Series(out, index=idx)
-
-    kc_1730 = col("kc_last_1730")
-    kc_1830 = col("kc_last_1830")
-    rc_1730 = col("rc_last_1730")
-    rc_open = col("rc_open_first")
-    rc_0915 = col("rc_open_0915")
-    rc_sym  = pd.Series([r.get("rc_symbol") for _, r in recs], index=idx)
-
-    # Within-day NY move (roll-immune).
-    kc_after = (kc_1830 / kc_1730 - 1.0).where((kc_1730 > 0) & kc_1830.notna())
-
-    # Within-day robusta opening 15-min move (roll-immune).
-    rc_open15 = (rc_0915 / rc_open - 1.0).where((rc_open > 0) & rc_0915.notna())
-
-    # Cross-day RC overnight gap; exclude roll days (contract changed vs prior).
-    prev_rc_1730 = rc_1730.shift(1)
-    prev_sym     = rc_sym.shift(1)
-    is_roll      = rc_sym.ne(prev_sym) & prev_sym.notna()
-    rc_gap = (rc_open / prev_rc_1730 - 1.0).where(
-        (prev_rc_1730 > 0) & rc_open.notna() & (~is_roll)
-    )
-
-    df = pd.DataFrame({
-        "kc_after_rc_diff": kc_after,
-        "rc_open15_ret":    rc_open15,
-        "rc_overnight_gap": rc_gap,
-        "_rc_roll":         is_roll.fillna(False),
-    }, index=idx)
-    return df
+    return pd.Series(out).sort_index()
 
 
-# ── Feature + label construction ─────────────────────────────────────────────
-
-def _zscore_rolling(s: pd.Series, window: int = 52 * 5) -> pd.Series:
-    mu = s.rolling(window, min_periods=20).mean()
-    sd = s.rolling(window, min_periods=20).std()
-    return (s - mu) / sd.replace(0, np.nan)
-
-
-def _triple_barrier_labels(rc: pd.Series) -> pd.Series:
-    """Label each day by which barrier the RC path touches first over the next
-    H trading days. 1.0 = up, 0.0 = down, NaN = undefined (time barrier first).
-
-    σ_t is the trailing daily-return std; barriers are price_t·(1 ± K·σ_t).
-    """
-    rets = rc.pct_change()
-    sigma = rets.rolling(_VOL_WINDOW, min_periods=10).std()
-    vals = rc.values
-    sig = sigma.values
-    n = len(vals)
-    out = np.full(n, np.nan)
-    for t in range(n):
-        s = sig[t]
-        if not np.isfinite(s) or s <= 0:
-            continue
-        upper = vals[t] * (1 + _BARRIER_K * s)
-        lower = vals[t] * (1 - _BARRIER_K * s)
-        hi = min(t + _BARRIER_H, n - 1)
-        label = np.nan
-        for j in range(t + 1, hi + 1):
-            if vals[j] >= upper:
-                label = 1.0
-                break
-            if vals[j] <= lower:
-                label = 0.0
-                break
-        out[t] = label
-    return pd.Series(out, index=rc.index)
-
-
-def _build_frame(rc: pd.Series, kc: pd.Series, cci: "pd.Series | None",
-                 intraday: "pd.DataFrame | None" = None) -> "tuple[pd.DataFrame, list[str]] | None":
-    """Assemble the aligned daily feature+label frame.
-
-    Returns (frame, active_feature_keys). Optional features (CCI, the intraday
-    NY-after-RC-close move + RC overnight gap) are DROPPED rather than failing
-    the whole model when their inputs are unavailable — the two price-archive-
-    only features (rc_ret_1d, kc_rc_gap_z) keep it alive. Returns None only when
-    even those can't be built.
-    """
-    cols: dict[str, pd.Series] = {"rc": rc}
-    active: list[str] = []
-
-    # Always-on: RC's own daily move + the KC−RC arbitrage gap (price-archive
-    # only, no external dependency).
-    cols["rc_ret_1d"] = rc.pct_change()
-    active.append("rc_ret_1d")
-
-    kc_usd = kc * _KC_TO_USD_PER_MT
-    gap = (kc_usd - rc).dropna()
-    gap_z = _zscore_rolling(gap)
-    cols["kc_rc_gap_z"] = gap_z.reindex(rc.index, method="ffill")
-    active.append("kc_rc_gap_z")
-    # The gap's daily change (not just its level) — a distinct, additive signal.
-    cols["kc_rc_gap_ret"] = gap.pct_change().reindex(rc.index, method="ffill")
-    active.append("kc_rc_gap_ret")
-
-    # Coffee Currency Index feature (when fx_history yields the index):
-    #   cci_ret_5d — the index's 5-day momentum (origin-vs-consumer currency
-    #     shift over a trading week). The back-test found this is the CCI signal;
-    #     the 1-day move and the level z-score did not help, so only this is kept.
-    if cci is not None and not cci.empty:
-        cci_re = cci.reindex(rc.index, method="ffill")
-        cols["cci_ret_5d"] = cci_re.pct_change(5)
-        active.append("cci_ret_5d")
-
-    # Intraday features (15-min RM+KC): the NY-after-RC-close move, robusta's
-    # opening 15-min move, and its overnight gap. Each is added independently when
-    # it has enough overlap with the price-archive index. No ffill — only real
-    # days contribute; missing / roll-excluded days stay NaN and drop out of
-    # training (dropna in run()).
-    if intraday is not None and not intraday.empty:
-        for key in ("kc_after_rc_diff", "rc_open15_ret", "rc_overnight_gap"):
-            if key not in intraday.columns:
-                continue
-            s = intraday[key].dropna()
-            if len(s.index.intersection(rc.index)) >= _MIN_KC_RC_OVERLAP:
-                cols[key] = s.reindex(rc.index)
-                active.append(key)
-
-    if len(active) < 2:
-        return None
-
-    frame = pd.DataFrame(cols)
-    frame["label"] = _triple_barrier_labels(rc)
-    # Order active features per the canonical _FEATURE_KEYS display order.
-    active_ordered = [k for k in _FEATURE_KEYS if k in active]
-    return frame, active_ordered
-
-
-# ── Pure-numpy logistic regression (IRLS) ────────────────────────────────────
+# ── logistic (numpy IRLS + L2, intercept unpenalised) ────────────────────────
 
 def _fit_logistic(X: np.ndarray, y: np.ndarray, l2: float = 1.0,
                   iters: int = 100, tol: float = 1e-8) -> np.ndarray:
-    """Newton-Raphson / IRLS logistic fit with L2 ridge (not penalising the
-    intercept). X already includes a leading column of 1s. Returns the
-    coefficient vector β (length = X.shape[1]). Pure numpy — no sklearn/scipy
-    so the GH-Actions quant step stays dependency-light.
-    """
     n, p = X.shape
     beta = np.zeros(p)
     ridge = np.eye(p) * l2
-    ridge[0, 0] = 0.0  # don't regularise the intercept
+    ridge[0, 0] = 0.0
     for _ in range(iters):
         eta = X @ beta
         mu = 1.0 / (1.0 + np.exp(-np.clip(eta, -35, 35)))
-        W = mu * (1.0 - mu)
-        W = np.clip(W, 1e-6, None)
-        # Gradient + Hessian of the penalised log-likelihood.
+        W = np.clip(mu * (1.0 - mu), 1e-6, None)
         grad = X.T @ (y - mu) - ridge @ beta
         H = -(X.T * W) @ X - ridge
         try:
@@ -520,260 +208,196 @@ def _fit_logistic(X: np.ndarray, y: np.ndarray, l2: float = 1.0,
             break
         beta_new = beta - step
         if np.max(np.abs(beta_new - beta)) < tol:
-            beta = beta_new
-            break
+            return beta_new
         beta = beta_new
     return beta
 
 
 def _sigmoid(x: float) -> float:
-    return 1.0 / (1.0 + np.exp(-np.clip(x, -35, 35)))
+    return float(1.0 / (1.0 + np.exp(-np.clip(x, -35, 35))))
 
 
-def _walk_forward_eval(Xraw: np.ndarray, y: np.ndarray, min_train: int = 200,
-                       step: int = 21, embargo: int = _BARRIER_H,
-                       l2: float = 1.0) -> "dict | None":
-    """Honest out-of-sample accuracy via an expanding-window walk-forward:
-    refit every `step` days on all rows up to `cut − embargo`, predict the next
-    block, standardise on the TRAINING rows only. The embargo drops the H rows
-    straddling the split because the triple-barrier labels overlap H days (a
-    naive split would leak). Reported next to the majority-class baseline on the
-    same OOS rows — the only accuracy worth comparing against. Returns None when
-    there aren't enough rows (caller falls back to a single holdout).
+def _walk_forward_eval(Xraw: np.ndarray, y: np.ndarray,
+                       min_train: int = _MIN_TRAIN, step: int = _WF_STEP,
+                       embargo: int = _WF_EMBARGO, l2: float = 1.0,
+                       band: float = _ABSTAIN_BAND) -> "dict | None":
+    """Honest OOS read: expanding window, refit every `step` sessions,
+    standardise on training rows only. Reports accuracy on ALL predictions,
+    accuracy on ACTED (outside the abstain band) predictions, the rolling
+    majority-class baseline on the same rows, and the abstain rate.
     """
     n = len(y)
     if n < min_train + step:
         return None
-    preds, truth = [], []
+    probs, truth, bases = [], [], []
     cut = min_train
     while cut < n:
         tr_end = cut - embargo
-        if tr_end >= min_train // 2:
-            Xtr, ytr = Xraw[:tr_end], y[:tr_end]
-            mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1.0
-            Ztr = (Xtr - mu) / sd
-            beta = _fit_logistic(np.column_stack([np.ones(len(Ztr)), Ztr]), ytr, l2=l2)
-            te = slice(cut, min(cut + step, n))
-            Zte = (Xraw[te] - mu) / sd
-            p = _sigmoid(np.column_stack([np.ones(Zte.shape[0]), Zte]) @ beta)
-            preds.extend((np.asarray(p) >= 0.5).astype(float))
-            truth.extend(y[te])
+        Xtr, ytr = Xraw[:tr_end], y[:tr_end]
+        mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1.0
+        beta = _fit_logistic(np.column_stack([np.ones(tr_end), (Xtr - mu) / sd]), ytr, l2=l2)
+        te = slice(cut, min(cut + step, n))
+        Zte = (Xraw[te] - mu) / sd
+        p = 1.0 / (1.0 + np.exp(-np.clip(np.column_stack([np.ones(Zte.shape[0]), Zte]) @ beta, -35, 35)))
+        probs.extend(p); truth.extend(y[te])
+        bases.extend([1.0 if ytr.mean() >= 0.5 else 0.0] * (te.stop - te.start))
         cut += step
-    if not truth:
-        return None
-    preds, truth = np.array(preds), np.array(truth)
-    base = float(max(truth.mean(), 1.0 - truth.mean()))
-    acc = float((preds == truth).mean())
-    return {"accuracy": acc, "baseline": base, "edge": acc - base, "n": int(len(truth))}
+    probs = np.array(probs); truth = np.array(truth); bases = np.array(bases)
+    yhat = (probs >= 0.5).astype(float)
+    acted = np.abs(probs - 0.5) >= band
+    out = {
+        "accuracy":       float((yhat == truth).mean()),
+        "baseline":       float((bases == truth).mean()),
+        "n":              int(len(truth)),
+        "abstain_rate":   float((~acted).mean()),
+        "acted_accuracy": float((yhat[acted] == truth[acted]).mean()) if acted.any() else None,
+        "acted_n":        int(acted.sum()),
+    }
+    out["edge"] = out["accuracy"] - out["baseline"]
+    return out
 
+
+# ── payload ──────────────────────────────────────────────────────────────────
 
 def run(db=None) -> dict:
-    """Build features, fit the classifier, and return the live prediction +
-    exact SHAP decomposition. `db` is accepted for run_quant symmetry but
-    unused — all inputs are file/HTTP based.
+    """Fit on all labelled history and return the pre-open prediction for the
+    UPCOMING session + exact SHAP decomposition. `db` accepted for orchestration
+    symmetry; unused (all inputs are file-based).
     """
     warnings.filterwarnings("ignore")
 
-    prices = _load_prices()
-    if prices is None:
-        return _unavailable("contract_prices_archive.json missing or unreadable")
-    rc, kc = prices
+    frame = build_dataset()
+    if frame is None:
+        return _unavailable("intraday_kc_rc_15min.json missing or unreadable")
 
-    cci = _compute_cci_index()
-    # Prefer the precise 15-min intraday source; fall back to the coarse hourly
-    # kc_at_rc_close history (kc_after_rc_diff only) when intraday isn't present.
-    intraday = _load_intraday()
-    if intraday is None:
-        legacy = _load_kc_after_rc(kc)
-        intraday = (legacy.to_frame("kc_after_rc_diff")
-                    if legacy is not None and not legacy.empty else None)
-    n_roll_excluded = int(intraday["_rc_roll"].sum()) if (
-        intraday is not None and "_rc_roll" in intraday.columns) else 0
-    built = _build_frame(rc, kc, cci, intraday)
-    if built is None:
-        return _unavailable("Could not assemble even the price-only features")
-    frame, active_keys = built
+    active = ["kc_after_rc_diff", "days_since_roll"]
+    if "cci_overnight" in frame.columns and frame["cci_overnight"].notna().sum() >= _MIN_CCI_OVERLAP:
+        active.append("cci_overnight")
 
-    feat = frame[active_keys]
-    # Rows usable for TRAINING: complete features AND a defined label.
-    train = frame.dropna(subset=active_keys + ["label"])
-    if len(train) < _MIN_DEFINED:
-        return _unavailable(
-            f"Only {len(train)} defined training rows (need ≥{_MIN_DEFINED})"
-        )
+    train = frame.dropna(subset=["y"] + active)
+    if len(train) < _MIN_TRAIN:
+        return _unavailable(f"Only {len(train)} labelled sessions (need ≥{_MIN_TRAIN})")
 
-    # The LATEST row we can score: complete features (label is naturally NaN
-    # for the most recent H days — that's the live, not-yet-resolved case).
-    feat_complete = feat.dropna()
-    if feat_complete.empty:
-        return _unavailable("No complete feature row to score")
-    latest_date = feat_complete.index[-1]
-    x_raw = feat_complete.iloc[-1]
+    Xraw = train[active].values
+    y = train["y"].values.astype(float)
 
-    # Standardise on the TRAINING distribution (store μ/σ for the live row).
-    mu = train[active_keys].mean()
-    sd = train[active_keys].std().replace(0, 1.0)
-    Z_train = ((train[active_keys] - mu) / sd).values
-    y = train["label"].values.astype(float)
+    wf = _walk_forward_eval(Xraw, y)
 
-    # Honest accuracy read: expanding-window walk-forward (refit monthly,
-    # standardise-on-past, H-day embargo) on the raw training features, reported
-    # against the majority-class baseline. Falls back to a single 70/30 holdout
-    # for samples too small to walk-forward.
-    acc_defined = baseline_acc = edge_acc = None
-    n_test = 0
-    wf = _walk_forward_eval(train[active_keys].values, y)
-    if wf is not None:
-        acc_defined, baseline_acc, edge_acc, n_test = (
-            wf["accuracy"], wf["baseline"], wf["edge"], wf["n"])
-    else:
-        split = int(len(Z_train) * 0.7)
-        if split >= _MIN_DEFINED // 2 and (len(Z_train) - split) >= 20:
-            Xtr = np.column_stack([np.ones(split), Z_train[:split]])
-            beta_tr = _fit_logistic(Xtr, y[:split])
-            Zte = Z_train[split:]
-            Xte = np.column_stack([np.ones(len(Zte)), Zte])
-            p_te = _sigmoid(Xte @ beta_tr)
-            pred = (np.asarray(p_te) >= 0.5).astype(float)
-            n_test = len(y[split:])
-            acc_defined = float((pred == y[split:]).mean())
-            baseline_acc = float(max(y[split:].mean(), 1.0 - y[split:].mean()))
-            edge_acc = acc_defined - baseline_acc
+    # Live fit on everything, standardised on the full training distribution.
+    mu = Xraw.mean(0); sd = Xraw.std(0); sd[sd == 0] = 1.0
+    beta = _fit_logistic(np.column_stack([np.ones(len(y)), (Xraw - mu) / sd]), y)
 
-    # Live fit on everything.
-    X_all = np.column_stack([np.ones(len(Z_train)), Z_train])
-    beta = _fit_logistic(X_all, y)
+    # ── live feature vector for the UPCOMING session ─────────────────────────
+    last = frame.iloc[-1]              # most recently traded session
+    last_date = frame.index[-1]
+    for_session = pd.Timestamp(np.busday_offset(last_date.date(), 1, roll="forward"))
 
-    # Standardise the live row with the same μ/σ.
-    z_latest = ((x_raw - mu) / sd).values
-    base_margin  = float(beta[0])                      # β0 (E[z]=0)
-    coefs        = beta[1:]
-    phis         = coefs * z_latest                    # exact logistic SHAP
+    # kc_after for the upcoming session = the move computed ON the last traded
+    # day (the frame stores it shift(1), i.e. it would sit on the NEXT row).
+    # Read the anchors straight from the last intraday record.
+    rows = json.loads(_INTRADAY.read_text(encoding="utf-8"))
+    last_row = max(rows, key=lambda r: r.get("date", ""))
+    k1730, k1830 = last_row.get("kc_last_1730"), last_row.get("kc_last_1830")
+    if not k1730 or not k1830:
+        return _unavailable(f"last session {last_row.get('date')} missing KC 17:30/18:30 anchors")
+    live_vals = {
+        "kc_after_rc_diff": float(k1830) / float(k1730) - 1.0,
+        "days_since_roll":  float(last["days_since_roll"]) + 1.0,
+    }
+    if "cci_overnight" in active:
+        cci = _cci_overnight_series()
+        v = cci.get(for_session) if cci is not None else None
+        if v is None:
+            # snapshot for this morning not present → predict without the
+            # feature by imputing the training mean (z = 0 ⇒ φ = 0).
+            v = float(mu[active.index("cci_overnight")])
+        live_vals["cci_overnight"] = float(v)
+
+    x_raw = np.array([live_vals[k] for k in active], dtype=float)
+    z = (x_raw - mu) / sd
+    base_margin  = float(beta[0])
+    phis         = beta[1:] * z
     final_margin = base_margin + float(phis.sum())
+    final_prob   = _sigmoid(final_margin)
 
-    base_prob  = _sigmoid(base_margin)
-    final_prob = _sigmoid(final_margin)
-    direction  = "Bullish" if final_prob >= 0.5 else "Bearish"
+    abstain = abs(final_prob - 0.5) < _ABSTAIN_BAND
+    direction = "Abstain" if abstain else ("Bullish" if final_prob >= 0.5 else "Bearish")
 
-    # Undefined ratio over the FULL feature-complete sample (how often the
-    # method abstains): rows with complete features but a NaN (time-barrier)
-    # label, excluding the trailing H rows that simply haven't resolved yet.
-    resolvable = frame.dropna(subset=active_keys).iloc[:-_BARRIER_H] \
-        if len(frame) > _BARRIER_H else frame.dropna(subset=active_keys)
-    n_resolvable = len(resolvable)
-    n_undef = int(resolvable["label"].isna().sum())
-    undefined_ratio = (n_undef / n_resolvable) if n_resolvable else None
-
-    # ── USD/ton ruler + price-gap detail ─────────────────────────────────────
-    # Each factor is also quantified in robusta USD/MT so the magnitudes are
-    # comparable on one dollar ruler. For the four return/level features the
-    # USD/MT is the move expressed on the latest robusta price (the common
-    # ruler); for the New-York Price Gap it's the LITERAL gap (KC$/MT − RC$/MT).
-    def _at(series, dt):
-        try:
-            v = series.reindex([dt], method="ffill").iloc[0]
-            return float(v) if pd.notna(v) else None
-        except Exception:
-            return None
-
-    rc_px  = _at(rc, latest_date)                                   # robusta USD/MT
-    kc_px  = _at(kc, latest_date)                                   # arabica ¢/lb
-    kc_usd = kc_px * _KC_TO_USD_PER_MT if kc_px is not None else None
-
-    # Price-gap components, written down: KC$/MT, RC$/MT, the gap, and the
-    # rolling mean/std the z-score is built from (260-day window, see _build_frame).
-    gap_series = (kc * _KC_TO_USD_PER_MT - rc).dropna()
-    g_mu = gap_series.rolling(52 * 5, min_periods=20).mean()
-    g_sd = gap_series.rolling(52 * 5, min_periods=20).std()
-    gap_raw  = _at(gap_series, latest_date)
-    gap_mean = _at(g_mu, latest_date)
-    gap_std  = _at(g_sd, latest_date)
-    gap_detail = None
-    if None not in (kc_usd, rc_px, gap_raw):
-        gap_detail = {
-            "kc_usd_per_mt":       round(kc_usd, 1),
-            "rc_usd_per_mt":       round(rc_px, 1),
-            "gap_usd_per_mt":      round(gap_raw, 1),
-            "gap_mean_usd_per_mt": round(gap_mean, 1) if gap_mean is not None else None,
-            "gap_std_usd_per_mt":  round(gap_std, 1) if gap_std is not None else None,
-            "formula": "gap = KC(¢/lb × 22.0462) − RC, in USD/MT; z-scored over a 260-day rolling window",
-        }
-
-    def _usd_per_ton(key: str, raw: float) -> "float | None":
-        if rc_px is None:
-            return None
-        if key == "kc_rc_gap_z":
-            # The gap LEVEL z-score reports its DEVIATION from the rolling mean in
-            # USD/MT — comparable to the daily-move factors. The literal gap level
-            # lives in `detail`.
-            if gap_raw is None or gap_mean is None:
-                return None
-            return round(gap_raw - gap_mean, 1)
-        # Return-type features (rc_ret_1d, kc_rc_gap_ret, kc_after_rc_diff,
-        # rc_open15_ret, rc_overnight_gap, cci_ret_5d): the % move expressed on the
-        # robusta price = USD/MT magnitude on the common ruler.
-        return round(raw * rc_px, 1)
+    # ── $/t ruler + per-feature detail ───────────────────────────────────────
+    rc_px = float(last_row.get("rc_last_1730") or 0) or None   # USD/MT
+    kc_move_usd = (float(k1830) - float(k1730)) * _KC_TO_USD_PER_MT
 
     spec_by_key = {k: (label, fmt) for k, label, fmt in _FEATURE_SPECS}
     features_out = []
-    for key, raw, phi in zip(active_keys, x_raw.values, phis):
+    for key, raw, phi in zip(active, x_raw, phis):
         label, fmt = spec_by_key[key]
+        usd = None
+        if rc_px is not None and key != "days_since_roll":
+            usd = round(raw * rc_px, 1)
         item = {
             "var_name":    key,
             "label":       label,
             "raw_value":   float(raw),
             "raw_fmt":     fmt(float(raw)),
-            "usd_per_ton": _usd_per_ton(key, float(raw)),
-            "phi":         float(phi),   # margin (log-odds) units; Σ = gap exactly
+            "usd_per_ton": usd,
+            "phi":         float(phi),
         }
-        if key == "kc_rc_gap_z" and gap_detail is not None:
-            item["detail"] = gap_detail
+        if key == "kc_after_rc_diff":
+            item["detail"] = {
+                "text": (f"KC at RC close (17:30 London) {float(k1730):,.2f}¢/lb → "
+                         f"KC close (18:30) {float(k1830):,.2f}¢/lb = "
+                         f"{kc_move_usd:+,.1f} $/t on arabica; "
+                         f"{raw*100:+.2f}% mapped on robusta ≈ {usd:+,.1f} $/t"
+                         if usd is not None else
+                         f"KC 17:30 {float(k1730):,.2f} → 18:30 {float(k1830):,.2f} ¢/lb")
+            }
+        elif key == "days_since_roll":
+            item["detail"] = {
+                "text": (f"day {raw:.0f} of the bi-monthly front-contract cycle — "
+                         "gaps historically tilt down mid-cycle (~day 10), up late-cycle")
+            }
+        elif key == "cci_overnight":
+            item["detail"] = {
+                "text": "Coffee Currency Index move 17:30 London → 03:00 UTC (intraday FX snapshots)"
+            }
         features_out.append(item)
-    # Show the steepest contributors first (largest |φ|) — matches how a SHAP
-    # waterfall is conventionally ordered.
     features_out.sort(key=lambda f: abs(f["phi"]), reverse=True)
 
+    n_roll_excluded = int(frame["_roll"].sum())
+
     return {
-        "available":       True,
-        "as_of":           latest_date.strftime("%Y-%m-%d"),
-        "scraped_at":      datetime.utcnow().isoformat() + "Z",
-        "direction":       direction,
-        "base_margin":     base_margin,
-        "final_margin":    final_margin,
-        "base_prob":       base_prob,    # E[f(x)] as a probability
-        "final_prob":      final_prob,   # f(x)
-        "prob_up":         final_prob,
-        "prob_down":       1.0 - final_prob,
-        "features":        features_out,
-        "barrier": {
-            "horizon_days": _BARRIER_H,
-            "k_sigma":      _BARRIER_K,
-            "vol_window":   _VOL_WINDOW,
+        "available":     True,
+        "as_of":         last_date.strftime("%Y-%m-%d"),          # last data used
+        "for_session":   for_session.strftime("%Y-%m-%d"),        # session predicted
+        "scraped_at":    datetime.utcnow().isoformat() + "Z",
+        "direction":     direction,
+        "base_margin":   base_margin,
+        "final_margin":  final_margin,
+        "base_prob":     _sigmoid(base_margin),
+        "final_prob":    final_prob,
+        "prob_up":       final_prob,
+        "prob_down":     1.0 - final_prob,
+        "features":      features_out,
+        "target": {
+            "kind":         "overnight_gap",
+            "definition":   "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
+            "abstain_band": _ABSTAIN_BAND,
         },
         "model": {
-            "kind":            "logistic_regression_l2",
-            "active_features": active_keys,
-            "n_features":      len(active_keys),
-            "n_train":         int(len(Z_train)),
-            "test_accuracy":   acc_defined,     # walk-forward OOS, defined cases
-            "baseline_accuracy": baseline_acc,  # majority class on same OOS rows
-            "edge":            edge_acc,        # test_accuracy − baseline
-            "eval_method":     "walk_forward" if wf is not None else "holdout_70_30",
-            "n_test":          int(n_test),
-            "undefined_ratio": undefined_ratio,
-            "n_resolvable":    int(n_resolvable),
-            "n_undefined":     int(n_undef),
-            "currency_axis":   "coffee_currency_index",
-            "cci_available":   "cci_ret_5d" in active_keys,
-            "kc_after_rc_active":   "kc_after_rc_diff" in active_keys,
-            "rc_open15_active":     "rc_open15_ret" in active_keys,
-            "rc_overnight_active":  "rc_overnight_gap" in active_keys,
-            "intraday_source":      "barchart_15min" if _INTRADAY.exists() else "hourly_fallback",
-            "roll_days_excluded":   n_roll_excluded,
+            "kind":              "logistic_regression_l2",
+            "active_features":   active,
+            "n_features":        len(active),
+            "n_train":           int(len(y)),
+            "test_accuracy":     wf["accuracy"] if wf else None,
+            "baseline_accuracy": wf["baseline"] if wf else None,
+            "edge":              wf["edge"] if wf else None,
+            "acted_accuracy":    wf["acted_accuracy"] if wf else None,
+            "acted_n":           wf["acted_n"] if wf else None,
+            "abstain_rate":      wf["abstain_rate"] if wf else None,
+            "eval_method":       "walk_forward",
+            "n_test":            wf["n"] if wf else 0,
+            "cci_available":     "cci_overnight" in active,
+            "intraday_source":   "barchart_15min",
+            "roll_days_excluded": n_roll_excluded,
         },
     }
-
-
-if __name__ == "__main__":
-    out = run()
-    print(json.dumps(out, indent=2, ensure_ascii=False)[:2000])

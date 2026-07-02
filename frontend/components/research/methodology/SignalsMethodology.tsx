@@ -21,32 +21,26 @@ export default function SignalsMethodology() {
         stocks-to-use pipeline and renders <em>example</em> numbers to show the model shape, not a tradeable call.
       </Highlight>
 
-      <H2>1 · Open price direction — triple-barrier classifier + exact SHAP (live)</H2>
+      <H2>1 · Open price direction — pre-open overnight-gap classifier + exact SHAP (live)</H2>
       <P>
-        A directional call on ICE Robusta&rsquo;s next session. Labels come from a <strong>triple-barrier</strong>{" "}
-        scheme (López de Prado): each day gets an upper price barrier and a lower price barrier (both at{" "}
-        <Code>±K·σ</Code> of the trailing daily volatility) and a vertical <em>time</em> barrier <Code>H</Code> days
-        out. The label is whichever barrier the RC settle path touches first. If the time barrier is reached before
-        either price barrier, the case is <strong>undefined</strong> and the model abstains rather than forcing a
-        guess. Defaults: <Code>H</Code> = 5 trading days, <Code>K</Code> = 1σ.
+        A <strong>pre-open</strong> call on ICE Robusta&rsquo;s <strong>overnight gap</strong>: will today&rsquo;s
+        first print open above or below yesterday&rsquo;s 17:30-London close? The model fires at{" "}
+        <Code>03:00 UTC</Code> — hours before the London open — using only information that exists at that moment,
+        and feeds the Telegram morning brief. Roll days (front-contract change) are excluded: the two prices would be
+        different delivery months, so the calendar spread would masquerade as a gap. When the probability sits inside
+        a <Code>±3pp</Code> band around 50%, the model <strong>abstains</strong> rather than forcing a coin-flip call.
       </P>
       <P>
-        The original design targeted the first 30 minutes after the open with intraday ticks — a feed we don&rsquo;t
-        ingest. This live version reformulates the same idea on daily bars from the data we already ship: 5y of RC + KC
-        front-month settles (<Code>contract_prices_archive.json</Code>) plus the <strong>Coffee Currency Index</strong>
-        {" "}— our own coffee-trade-weighted basket of producer vs consumer currencies, not the generic dollar index.
-        The features are RC&rsquo;s own daily move, the CCI&rsquo;s daily move, the CCI level (z-scored, i.e. how
-        stretched the currency basket is), and the KC&minus;RC New-York arbitrage gap (z-scored). Using the CCI in
-        place of EUR/USD + DXY + USD/BRL keeps the currency axis coffee-relevant and drops the DXY dependency.
-      </P>
-      <P>
-        A fifth feature, <Code>kc_after_rc_diff</Code> (&ldquo;NY after RC-close move&rdquo;), is the most
-        economically-motivated: London robusta closes at 17:30 London, but New-York arabica trades ~1 more hour and
-        settles at 13:30&nbsp;ET, so the NY move in that final hour is information robusta hasn&rsquo;t traded on yet —
-        and robusta tends to gap toward it at the next open. We capture KC&rsquo;s price at 17:30 London each day
-        (from the live quote feed) and the model uses <Code>KC_settle ÷ KC_at_RC_close − 1</Code>. Because there&rsquo;s
-        no intraday history to backfill, this one is forward-accumulating: it switches on automatically once ~40
-        captured days build up.
+        The feature set is deliberately small — every candidate had to earn its place in a walk-forward ablation
+        (expanding window, standardise-on-past, scored vs the rolling majority-class baseline), and most failed it.
+        Survivors: <Code>kc_after_rc_diff</Code> — New York arabica&rsquo;s move in the hour <em>after</em> London
+        robusta closes (<Code>KC 18:30 ÷ KC 17:30 London − 1</Code>, same contract → roll-immune; the core lead
+        signal), and <Code>days_since_roll</Code> — position in the bi-monthly contract cycle (gaps historically tilt
+        down mid-cycle, up late-cycle; confirmed on an untouched holdout). A third,{" "}
+        <Code>cci_overnight</Code> — the Coffee Currency Index&rsquo;s move from 17:30 London to 03:00 UTC — has no
+        backtestable intraday FX history, so it ships live and is graded forward-only, activating once ~40 snapshot
+        days accumulate. Tested and <em>dropped</em>: the prior day&rsquo;s RC return, the KC−RC arbitrage gap (level
+        and change), harvest/frost seasonality, term structure, daily BRL, and calendar dummies.
       </P>
       <P>
         A <strong>logistic regression</strong> outputs the probability, decomposed with <strong>SHAP</strong> drawn as
@@ -57,10 +51,11 @@ export default function SignalsMethodology() {
         additive); endpoints are labelled with the implied probability.
       </P>
       <P className="text-[11px] text-slate-500">
-        Accuracy is reported on a chronological 30% holdout (no shuffling → no look-ahead), conditional on a{" "}
-        <em>defined</em> outcome; the live coefficients refit on the full history. The undefined ratio — how often the
-        time barrier wins — is shown alongside, because the headline accuracy only describes the cases the model chose
-        to call. Full write-up: <Code>docs/research/open-price-direction-methodology.md</Code>.
+        Accuracy is out-of-sample (expanding walk-forward, no shuffling → no look-ahead) vs the rolling majority-class
+        baseline; &ldquo;acted&rdquo; accuracy restricts to calls outside the abstain band. Every 03:00 prediction is
+        also appended to <Code>open_direction_history.json</Code> <em>before</em> the open and graded after it — the
+        calendar on the Macro tab is that record. Full write-up + ablation evidence:{" "}
+        <Code>docs/research/open-price-direction-findings.md</Code>.
       </P>
 
       <H2>2 · Robusta futures forecast — multi-factor OLS (live)</H2>
