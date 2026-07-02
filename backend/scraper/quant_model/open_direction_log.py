@@ -42,19 +42,36 @@ _QUANT    = _ROOT / "frontend" / "public" / "data" / "quant_report.json"
 _SEED_FEATURES = ["kc_after_rc_diff", "days_since_roll"]
 
 
-def _row(date_str: str, prob_up: float, source: str) -> dict:
+def _row(date_str: str, prob_up: float, source: str,
+         factors: "list[dict] | None" = None) -> dict:
     ab = abs(prob_up - 0.5) < _od._ABSTAIN_BAND
-    return {
+    out = {
         "date": date_str,
         "prob_up": round(prob_up, 4),
         "direction": "Abstain" if ab else ("Bullish" if prob_up >= 0.5 else "Bearish"),
         "actual_gap_pct": None, "actual_dir": None, "hit": None,
         "status": "pending", "source": source,
     }
+    if factors:
+        out["factors"] = factors
+    return out
+
+
+def _payload_factors(payload: dict) -> list[dict]:
+    """Compact per-feature attribution stored with every prediction (item 3b):
+    exact SHAP φᵢ + raw value per feature. Cheap to store now, impossible to
+    reconstruct later — enables 'which feature has been earning' on live data."""
+    return [{
+        "var_name":  f["var_name"],
+        "raw_value": round(float(f["raw_value"]), 6),
+        "raw_fmt":   f.get("raw_fmt"),
+        "phi":       round(float(f["phi"]), 4),
+    } for f in (payload.get("features") or [])]
 
 
 def _seed(frame: "pd.DataFrame") -> list[dict]:
-    """Walk-forward backtest → resolved rows (source='backtest'), same model."""
+    """Walk-forward backtest → resolved rows (source='backtest'), same model.
+    Each row carries its per-feature φ (same exact-SHAP identity as live rows)."""
     d = frame.dropna(subset=["y"] + _SEED_FEATURES)
     X = d[_SEED_FEATURES].values
     y = d["y"].values.astype(float)
@@ -66,14 +83,65 @@ def _seed(frame: "pd.DataFrame") -> list[dict]:
             Xtr = X[:i]
             mu = Xtr.mean(0); sd = Xtr.std(0); sd[sd == 0] = 1.0
             b = _od._fit_logistic(np.column_stack([np.ones(i), (Xtr - mu) / sd]), y[:i])
-        p = _od._sigmoid(float(np.r_[1.0, (X[i] - mu) / sd] @ b))
-        r = _row(d.index[i].strftime("%Y-%m-%d"), p, "backtest")
+        z = (X[i] - mu) / sd
+        p = _od._sigmoid(float(np.r_[1.0, z] @ b))
+        factors = [{
+            "var_name":  k,
+            "raw_value": round(float(X[i][j]), 6),
+            "phi":       round(float(b[1 + j] * z[j]), 4),
+        } for j, k in enumerate(_SEED_FEATURES)]
+        r = _row(d.index[i].strftime("%Y-%m-%d"), p, "backtest", factors=factors)
         r["actual_gap_pct"] = round(float(gap[i]) * 100, 3)
         r["actual_dir"] = "Up" if y[i] > 0 else "Down"
         r["hit"] = None if r["direction"] == "Abstain" else bool((p >= 0.5) == (y[i] > 0))
         r["status"] = "resolved"
         out.append(r)
     return out
+
+
+def _ensure_seed_factors(history: list[dict], frame: "pd.DataFrame") -> list[dict]:
+    """One-time backfill: if the backtest seed predates per-row factor logging
+    (or an abstain-band retune), regenerate the backtest rows — they are
+    deterministic from data + model spec. LIVE rows are never touched: they are
+    the append-only forward record."""
+    bt = [r for r in history if r.get("source") == "backtest"]
+    if not bt or all(r.get("factors") for r in bt):
+        return history
+    live = [r for r in history if r.get("source") == "live"]
+    regenerated = _seed(frame)
+    live_dates = {r["date"] for r in live}
+    merged = [r for r in regenerated if r["date"] not in live_dates] + live
+    merged.sort(key=lambda r: r["date"])
+    print(f"[open_dir_log] backfilled factors: regenerated {len(regenerated)} "
+          f"backtest rows (live rows untouched: {len(live)})")
+    return merged
+
+
+# ── Live drift monitoring (item 3a) ──────────────────────────────────────────
+
+_ROLL_WINDOW  = 60    # graded acted live rows in the rolling window
+_COLD_MIN_N   = 20    # need at least this many before a cold-streak call
+_COLD_BELOW   = 0.50  # rolling hit-rate under this ⇒ cold streak
+
+
+def _track_stats(history: list[dict]) -> dict:
+    """Rolling live performance for the payload + brief: the model's own
+    monitoring. Only ACTED (non-abstain) resolved live rows are graded."""
+    graded = [r for r in history
+              if r.get("source") == "live" and r.get("status") == "resolved"
+              and r.get("hit") is not None]
+    window = graded[-_ROLL_WINDOW:]
+    hit_all = (sum(1 for r in graded if r["hit"]) / len(graded)) if graded else None
+    hit_win = (sum(1 for r in window if r["hit"]) / len(window)) if window else None
+    cold = bool(len(window) >= _COLD_MIN_N and hit_win is not None
+                and hit_win < _COLD_BELOW)
+    return {
+        "live_graded":         len(graded),
+        "live_hit_rate":       round(hit_all, 4) if hit_all is not None else None,
+        "rolling_hit_rate":    round(hit_win, 4) if hit_win is not None else None,
+        "rolling_n":           len(window),
+        "cold_streak":         cold,
+    }
 
 
 def _resolve(history: list[dict], frame: "pd.DataFrame") -> int:
@@ -126,6 +194,8 @@ def run() -> None:
     if not history:
         history = _seed(frame)
         print(f"[open_dir_log] seeded {len(history)} backtest rows")
+    else:
+        history = _ensure_seed_factors(history, frame)
 
     resolved = _resolve(history, frame)
 
@@ -134,8 +204,10 @@ def run() -> None:
     if payload.get("available"):
         target = payload["for_session"]
         if target not in {r["date"] for r in history}:
-            history.append(_row(target, float(payload["prob_up"]), "live"))
+            history.append(_row(target, float(payload["prob_up"]), "live",
+                                factors=_payload_factors(payload)))
             added = 1
+        payload["track"] = _track_stats(history)
         _write_quant_report(payload)
         print(f"[open_dir_log] prediction for {target}: {payload['direction']} "
               f"p_up={payload['prob_up']:.3f} → history + quant_report")
