@@ -1,0 +1,5523 @@
+{
+ "scraped_at": "2026-07-02T16:33:38.786429Z",
+ "source": "ICE COTHist CSVs (2011–2021) + cot.json ldn (2020→)",
+ "rows": [
+  {
+   "date": "2014-09-30",
+   "oi": 114490,
+   "pmpu_long": 43413,
+   "pmpu_short": 61687,
+   "mm_long": 30982,
+   "mm_short": 4229,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-10-07",
+   "oi": 126712,
+   "pmpu_long": 45211,
+   "pmpu_short": 74046,
+   "mm_long": 31189,
+   "mm_short": 3468,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-10-14",
+   "oi": 147075,
+   "pmpu_long": 54117,
+   "pmpu_short": 87265,
+   "mm_long": 33521,
+   "mm_short": 4667,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-10-21",
+   "oi": 139024,
+   "pmpu_long": 54384,
+   "pmpu_short": 88041,
+   "mm_long": 30938,
+   "mm_short": 2779,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-10-28",
+   "oi": 135582,
+   "pmpu_long": 55165,
+   "pmpu_short": 85631,
+   "mm_long": 29038,
+   "mm_short": 2666,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-11-04",
+   "oi": 122169,
+   "pmpu_long": 41464,
+   "pmpu_short": 78624,
+   "mm_long": 28662,
+   "mm_short": 2607,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-11-11",
+   "oi": 119667,
+   "pmpu_long": 40973,
+   "pmpu_short": 76960,
+   "mm_long": 27617,
+   "mm_short": 2129,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-11-18",
+   "oi": 129150,
+   "pmpu_long": 43676,
+   "pmpu_short": 79026,
+   "mm_long": 25158,
+   "mm_short": 2225,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-11-25",
+   "oi": 134554,
+   "pmpu_long": 44257,
+   "pmpu_short": 81233,
+   "mm_long": 26041,
+   "mm_short": 2536,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-12-02",
+   "oi": 132542,
+   "pmpu_long": 44081,
+   "pmpu_short": 78005,
+   "mm_long": 24743,
+   "mm_short": 2495,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-12-09",
+   "oi": 130109,
+   "pmpu_long": 46582,
+   "pmpu_short": 76253,
+   "mm_long": 24156,
+   "mm_short": 2993,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-12-16",
+   "oi": 131781,
+   "pmpu_long": 53631,
+   "pmpu_short": 73707,
+   "mm_long": 20646,
+   "mm_short": 4685,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-12-23",
+   "oi": 118863,
+   "pmpu_long": 55818,
+   "pmpu_short": 68016,
+   "mm_long": 17274,
+   "mm_short": 5048,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2014-12-30",
+   "oi": 118616,
+   "pmpu_long": 56926,
+   "pmpu_short": 66362,
+   "mm_long": 16639,
+   "mm_short": 5565,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-01-06",
+   "oi": 123871,
+   "pmpu_long": 57129,
+   "pmpu_short": 65394,
+   "mm_long": 18213,
+   "mm_short": 7290,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-01-13",
+   "oi": 125097,
+   "pmpu_long": 57874,
+   "pmpu_short": 67018,
+   "mm_long": 20283,
+   "mm_short": 5968,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-01-20",
+   "oi": 125106,
+   "pmpu_long": 59199,
+   "pmpu_short": 67117,
+   "mm_long": 19271,
+   "mm_short": 5294,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-01-27",
+   "oi": 126494,
+   "pmpu_long": 60836,
+   "pmpu_short": 68154,
+   "mm_long": 19598,
+   "mm_short": 5342,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-02-03",
+   "oi": 129969,
+   "pmpu_long": 63618,
+   "pmpu_short": 67532,
+   "mm_long": 21008,
+   "mm_short": 7334,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-02-10",
+   "oi": 128966,
+   "pmpu_long": 62038,
+   "pmpu_short": 65493,
+   "mm_long": 23630,
+   "mm_short": 7720,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-02-17",
+   "oi": 128332,
+   "pmpu_long": 57316,
+   "pmpu_short": 69437,
+   "mm_long": 27172,
+   "mm_short": 5409,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-02-24",
+   "oi": 121205,
+   "pmpu_long": 60438,
+   "pmpu_short": 69555,
+   "mm_long": 30492,
+   "mm_short": 8028,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-03-03",
+   "oi": 132791,
+   "pmpu_long": 65848,
+   "pmpu_short": 67013,
+   "mm_long": 34351,
+   "mm_short": 13394,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-03-10",
+   "oi": 139073,
+   "pmpu_long": 68487,
+   "pmpu_short": 67277,
+   "mm_long": 37391,
+   "mm_short": 19529,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-03-17",
+   "oi": 147087,
+   "pmpu_long": 76007,
+   "pmpu_short": 68248,
+   "mm_long": 35521,
+   "mm_short": 23035,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-03-24",
+   "oi": 149562,
+   "pmpu_long": 77933,
+   "pmpu_short": 69536,
+   "mm_long": 34651,
+   "mm_short": 23079,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-03-31",
+   "oi": 153598,
+   "pmpu_long": 78056,
+   "pmpu_short": 68086,
+   "mm_long": 33917,
+   "mm_short": 22555,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-04-07",
+   "oi": 154689,
+   "pmpu_long": 76918,
+   "pmpu_short": 68154,
+   "mm_long": 33524,
+   "mm_short": 22306,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-04-14",
+   "oi": 154018,
+   "pmpu_long": 76636,
+   "pmpu_short": 69343,
+   "mm_long": 34377,
+   "mm_short": 20596,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-04-21",
+   "oi": 147000,
+   "pmpu_long": 75267,
+   "pmpu_short": 69198,
+   "mm_long": 37307,
+   "mm_short": 20880,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-04-28",
+   "oi": 146385,
+   "pmpu_long": 74581,
+   "pmpu_short": 67096,
+   "mm_long": 39691,
+   "mm_short": 23463,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-05-05",
+   "oi": 140776,
+   "pmpu_long": 66484,
+   "pmpu_short": 58729,
+   "mm_long": 42048,
+   "mm_short": 24203,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-05-12",
+   "oi": 144733,
+   "pmpu_long": 69541,
+   "pmpu_short": 57439,
+   "mm_long": 40660,
+   "mm_short": 24715,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-05-19",
+   "oi": 146309,
+   "pmpu_long": 70850,
+   "pmpu_short": 55972,
+   "mm_long": 39654,
+   "mm_short": 25591,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-05-26",
+   "oi": 156581,
+   "pmpu_long": 82207,
+   "pmpu_short": 59859,
+   "mm_long": 34524,
+   "mm_short": 26442,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-06-02",
+   "oi": 155495,
+   "pmpu_long": 84233,
+   "pmpu_short": 60884,
+   "mm_long": 31794,
+   "mm_short": 23668,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-06-09",
+   "oi": 156976,
+   "pmpu_long": 85791,
+   "pmpu_short": 60668,
+   "mm_long": 30900,
+   "mm_short": 20043,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-06-16",
+   "oi": 156822,
+   "pmpu_long": 81146,
+   "pmpu_short": 62599,
+   "mm_long": 32753,
+   "mm_short": 17944,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-06-23",
+   "oi": 142924,
+   "pmpu_long": 71920,
+   "pmpu_short": 64785,
+   "mm_long": 34481,
+   "mm_short": 13337,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-06-30",
+   "oi": 131953,
+   "pmpu_long": 57093,
+   "pmpu_short": 57333,
+   "mm_long": 34413,
+   "mm_short": 9890,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-07-07",
+   "oi": 130823,
+   "pmpu_long": 58500,
+   "pmpu_short": 58845,
+   "mm_long": 32759,
+   "mm_short": 12215,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-07-14",
+   "oi": 130354,
+   "pmpu_long": 60676,
+   "pmpu_short": 58933,
+   "mm_long": 30482,
+   "mm_short": 14346,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-07-21",
+   "oi": 133831,
+   "pmpu_long": 62411,
+   "pmpu_short": 54556,
+   "mm_long": 27174,
+   "mm_short": 17738,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-07-28",
+   "oi": 136745,
+   "pmpu_long": 63582,
+   "pmpu_short": 53706,
+   "mm_long": 27019,
+   "mm_short": 19959,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-08-04",
+   "oi": 136199,
+   "pmpu_long": 65250,
+   "pmpu_short": 50220,
+   "mm_long": 25980,
+   "mm_short": 20508,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-08-11",
+   "oi": 140921,
+   "pmpu_long": 63760,
+   "pmpu_short": 50263,
+   "mm_long": 18049,
+   "mm_short": 18153,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-08-18",
+   "oi": 139814,
+   "pmpu_long": 66907,
+   "pmpu_short": 54761,
+   "mm_long": 16856,
+   "mm_short": 15731,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-08-25",
+   "oi": 119037,
+   "pmpu_long": 70110,
+   "pmpu_short": 48149,
+   "mm_long": 15281,
+   "mm_short": 19858,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-09-01",
+   "oi": 124454,
+   "pmpu_long": 75210,
+   "pmpu_short": 53647,
+   "mm_long": 16871,
+   "mm_short": 21687,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-09-08",
+   "oi": 131701,
+   "pmpu_long": 79001,
+   "pmpu_short": 54235,
+   "mm_long": 17454,
+   "mm_short": 25598,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-09-15",
+   "oi": 135378,
+   "pmpu_long": 80039,
+   "pmpu_short": 53149,
+   "mm_long": 17312,
+   "mm_short": 28586,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-09-22",
+   "oi": 147270,
+   "pmpu_long": 86888,
+   "pmpu_short": 55096,
+   "mm_long": 16312,
+   "mm_short": 32049,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-09-29",
+   "oi": 149310,
+   "pmpu_long": 88115,
+   "pmpu_short": 58676,
+   "mm_long": 16923,
+   "mm_short": 28996,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-10-06",
+   "oi": 149897,
+   "pmpu_long": 88819,
+   "pmpu_short": 62476,
+   "mm_long": 15594,
+   "mm_short": 26419,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-10-13",
+   "oi": 147719,
+   "pmpu_long": 87624,
+   "pmpu_short": 64672,
+   "mm_long": 12582,
+   "mm_short": 21901,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-10-20",
+   "oi": 149995,
+   "pmpu_long": 88081,
+   "pmpu_short": 64577,
+   "mm_long": 11066,
+   "mm_short": 21972,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-10-27",
+   "oi": 138384,
+   "pmpu_long": 86092,
+   "pmpu_short": 59521,
+   "mm_long": 12406,
+   "mm_short": 24216,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-11-03",
+   "oi": 134323,
+   "pmpu_long": 76770,
+   "pmpu_short": 58884,
+   "mm_long": 12395,
+   "mm_short": 21410,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-11-10",
+   "oi": 135116,
+   "pmpu_long": 77719,
+   "pmpu_short": 64065,
+   "mm_long": 11483,
+   "mm_short": 17474,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-11-17",
+   "oi": 137866,
+   "pmpu_long": 82041,
+   "pmpu_short": 62328,
+   "mm_long": 9300,
+   "mm_short": 21833,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-11-24",
+   "oi": 143752,
+   "pmpu_long": 86132,
+   "pmpu_short": 60923,
+   "mm_long": 8210,
+   "mm_short": 27129,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-12-01",
+   "oi": 151887,
+   "pmpu_long": 91772,
+   "pmpu_short": 59617,
+   "mm_long": 7921,
+   "mm_short": 30962,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-12-08",
+   "oi": 149529,
+   "pmpu_long": 91886,
+   "pmpu_short": 58911,
+   "mm_long": 8122,
+   "mm_short": 30210,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-12-15",
+   "oi": 149340,
+   "pmpu_long": 93991,
+   "pmpu_short": 56662,
+   "mm_long": 6212,
+   "mm_short": 32170,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-12-22",
+   "oi": 135644,
+   "pmpu_long": 86556,
+   "pmpu_short": 51836,
+   "mm_long": 6099,
+   "mm_short": 29638,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2015-12-29",
+   "oi": 133047,
+   "pmpu_long": 86088,
+   "pmpu_short": 51920,
+   "mm_long": 6609,
+   "mm_short": 30001,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-01-05",
+   "oi": 135608,
+   "pmpu_long": 85584,
+   "pmpu_short": 49564,
+   "mm_long": 7554,
+   "mm_short": 32417,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-01-12",
+   "oi": 145623,
+   "pmpu_long": 95613,
+   "pmpu_short": 53005,
+   "mm_long": 6077,
+   "mm_short": 34700,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-01-19",
+   "oi": 153912,
+   "pmpu_long": 100451,
+   "pmpu_short": 56888,
+   "mm_long": 6975,
+   "mm_short": 36600,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-01-26",
+   "oi": 159912,
+   "pmpu_long": 104207,
+   "pmpu_short": 61154,
+   "mm_long": 7398,
+   "mm_short": 34607,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-02-02",
+   "oi": 163980,
+   "pmpu_long": 104069,
+   "pmpu_short": 61096,
+   "mm_long": 8725,
+   "mm_short": 35023,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-02-09",
+   "oi": 159253,
+   "pmpu_long": 100650,
+   "pmpu_short": 61064,
+   "mm_long": 9073,
+   "mm_short": 31308,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-02-16",
+   "oi": 158242,
+   "pmpu_long": 97907,
+   "pmpu_short": 61057,
+   "mm_long": 10089,
+   "mm_short": 30200,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-02-23",
+   "oi": 147577,
+   "pmpu_long": 100833,
+   "pmpu_short": 59753,
+   "mm_long": 8824,
+   "mm_short": 33100,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-03-01",
+   "oi": 147541,
+   "pmpu_long": 98221,
+   "pmpu_short": 52663,
+   "mm_long": 9372,
+   "mm_short": 36886,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-03-08",
+   "oi": 151046,
+   "pmpu_long": 99809,
+   "pmpu_short": 53562,
+   "mm_long": 11317,
+   "mm_short": 39717,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-03-15",
+   "oi": 145185,
+   "pmpu_long": 94301,
+   "pmpu_short": 52957,
+   "mm_long": 14187,
+   "mm_short": 36063,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-03-22",
+   "oi": 141169,
+   "pmpu_long": 87013,
+   "pmpu_short": 57132,
+   "mm_long": 18529,
+   "mm_short": 29082,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-03-29",
+   "oi": 137577,
+   "pmpu_long": 83641,
+   "pmpu_short": 58140,
+   "mm_long": 19405,
+   "mm_short": 25896,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-04-05",
+   "oi": 137232,
+   "pmpu_long": 81717,
+   "pmpu_short": 55712,
+   "mm_long": 17804,
+   "mm_short": 25305,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-04-12",
+   "oi": 134263,
+   "pmpu_long": 75299,
+   "pmpu_short": 59568,
+   "mm_long": 16891,
+   "mm_short": 22079,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-04-19",
+   "oi": 131045,
+   "pmpu_long": 74076,
+   "pmpu_short": 61538,
+   "mm_long": 15755,
+   "mm_short": 21052,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-04-26",
+   "oi": 133111,
+   "pmpu_long": 73890,
+   "pmpu_short": 64205,
+   "mm_long": 14398,
+   "mm_short": 18812,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-05-03",
+   "oi": 129832,
+   "pmpu_long": 69992,
+   "pmpu_short": 62867,
+   "mm_long": 14768,
+   "mm_short": 15912,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-05-10",
+   "oi": 139381,
+   "pmpu_long": 65741,
+   "pmpu_short": 71111,
+   "mm_long": 21756,
+   "mm_short": 12343,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-05-17",
+   "oi": 147370,
+   "pmpu_long": 64988,
+   "pmpu_short": 76557,
+   "mm_long": 22262,
+   "mm_short": 11300,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-05-24",
+   "oi": 146915,
+   "pmpu_long": 65009,
+   "pmpu_short": 79844,
+   "mm_long": 21383,
+   "mm_short": 10426,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-05-31",
+   "oi": 146550,
+   "pmpu_long": 64577,
+   "pmpu_short": 80434,
+   "mm_long": 20758,
+   "mm_short": 11162,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-06-07",
+   "oi": 144398,
+   "pmpu_long": 62474,
+   "pmpu_short": 77322,
+   "mm_long": 18765,
+   "mm_short": 11961,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-06-14",
+   "oi": 137265,
+   "pmpu_long": 62299,
+   "pmpu_short": 74102,
+   "mm_long": 16148,
+   "mm_short": 13787,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-06-21",
+   "oi": 130896,
+   "pmpu_long": 58601,
+   "pmpu_short": 72860,
+   "mm_long": 21042,
+   "mm_short": 14428,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-06-28",
+   "oi": 131826,
+   "pmpu_long": 57305,
+   "pmpu_short": 70690,
+   "mm_long": 24665,
+   "mm_short": 12890,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-07-05",
+   "oi": 130720,
+   "pmpu_long": 45222,
+   "pmpu_short": 67280,
+   "mm_long": 29574,
+   "mm_short": 12865,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-07-12",
+   "oi": 136268,
+   "pmpu_long": 41646,
+   "pmpu_short": 71710,
+   "mm_long": 32392,
+   "mm_short": 11559,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-07-19",
+   "oi": 137449,
+   "pmpu_long": 40975,
+   "pmpu_short": 72754,
+   "mm_long": 33103,
+   "mm_short": 11800,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-07-26",
+   "oi": 138910,
+   "pmpu_long": 41241,
+   "pmpu_short": 73255,
+   "mm_long": 32713,
+   "mm_short": 10784,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-08-02",
+   "oi": 139860,
+   "pmpu_long": 40757,
+   "pmpu_short": 74962,
+   "mm_long": 32801,
+   "mm_short": 8255,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-08-09",
+   "oi": 143442,
+   "pmpu_long": 40191,
+   "pmpu_short": 74491,
+   "mm_long": 33728,
+   "mm_short": 8342,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-08-16",
+   "oi": 141512,
+   "pmpu_long": 41459,
+   "pmpu_short": 71932,
+   "mm_long": 35577,
+   "mm_short": 9892,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-08-23",
+   "oi": 125604,
+   "pmpu_long": 41621,
+   "pmpu_short": 69286,
+   "mm_long": 34701,
+   "mm_short": 10717,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-08-30",
+   "oi": 129142,
+   "pmpu_long": 43957,
+   "pmpu_short": 73108,
+   "mm_long": 35959,
+   "mm_short": 9294,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-09-06",
+   "oi": 133589,
+   "pmpu_long": 33105,
+   "pmpu_short": 69753,
+   "mm_long": 38328,
+   "mm_short": 6202,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-09-13",
+   "oi": 143893,
+   "pmpu_long": 40528,
+   "pmpu_short": 82750,
+   "mm_long": 40819,
+   "mm_short": 4741,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-09-20",
+   "oi": 141845,
+   "pmpu_long": 35454,
+   "pmpu_short": 81196,
+   "mm_long": 41275,
+   "mm_short": 4199,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-09-27",
+   "oi": 152154,
+   "pmpu_long": 40655,
+   "pmpu_short": 84418,
+   "mm_long": 38824,
+   "mm_short": 3815,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-10-04",
+   "oi": 152762,
+   "pmpu_long": 42498,
+   "pmpu_short": 83161,
+   "mm_long": 36030,
+   "mm_short": 4203,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-10-11",
+   "oi": 160538,
+   "pmpu_long": 45286,
+   "pmpu_short": 86158,
+   "mm_long": 38394,
+   "mm_short": 4666,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-10-18",
+   "oi": 180542,
+   "pmpu_long": 54245,
+   "pmpu_short": 95929,
+   "mm_long": 38315,
+   "mm_short": 4457,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-10-25",
+   "oi": 160785,
+   "pmpu_long": 50721,
+   "pmpu_short": 94078,
+   "mm_long": 41364,
+   "mm_short": 5297,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-11-01",
+   "oi": 145383,
+   "pmpu_long": 39692,
+   "pmpu_short": 81515,
+   "mm_long": 42319,
+   "mm_short": 4849,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-11-08",
+   "oi": 141738,
+   "pmpu_long": 41802,
+   "pmpu_short": 78271,
+   "mm_long": 38292,
+   "mm_short": 5365,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-11-15",
+   "oi": 136599,
+   "pmpu_long": 50694,
+   "pmpu_short": 80110,
+   "mm_long": 33350,
+   "mm_short": 3500,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-11-22",
+   "oi": 140753,
+   "pmpu_long": 52680,
+   "pmpu_short": 81066,
+   "mm_long": 33736,
+   "mm_short": 1918,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-11-29",
+   "oi": 145333,
+   "pmpu_long": 57420,
+   "pmpu_short": 84032,
+   "mm_long": 32672,
+   "mm_short": 2123,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-12-06",
+   "oi": 147035,
+   "pmpu_long": 57964,
+   "pmpu_short": 84166,
+   "mm_long": 31677,
+   "mm_short": 2468,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-12-13",
+   "oi": 149081,
+   "pmpu_long": 63092,
+   "pmpu_short": 85393,
+   "mm_long": 30251,
+   "mm_short": 1556,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-12-20",
+   "oi": 163657,
+   "pmpu_long": 63254,
+   "pmpu_short": 94917,
+   "mm_long": 35273,
+   "mm_short": 1773,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2016-12-27",
+   "oi": 140767,
+   "pmpu_long": 54010,
+   "pmpu_short": 84109,
+   "mm_long": 33452,
+   "mm_short": 1493,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-01-03",
+   "oi": 147119,
+   "pmpu_long": 54469,
+   "pmpu_short": 89159,
+   "mm_long": 36261,
+   "mm_short": 1889,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-01-10",
+   "oi": 160839,
+   "pmpu_long": 57127,
+   "pmpu_short": 98667,
+   "mm_long": 42351,
+   "mm_short": 3180,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-01-17",
+   "oi": 182150,
+   "pmpu_long": 59973,
+   "pmpu_short": 110908,
+   "mm_long": 49589,
+   "mm_short": 3369,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-01-24",
+   "oi": 190081,
+   "pmpu_long": 61424,
+   "pmpu_short": 111541,
+   "mm_long": 50602,
+   "mm_short": 3544,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-01-31",
+   "oi": 190893,
+   "pmpu_long": 60541,
+   "pmpu_short": 110194,
+   "mm_long": 50052,
+   "mm_short": 3653,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-02-07",
+   "oi": 191820,
+   "pmpu_long": 66132,
+   "pmpu_short": 112473,
+   "mm_long": 48361,
+   "mm_short": 4860,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-02-14",
+   "oi": 192575,
+   "pmpu_long": 71463,
+   "pmpu_short": 109591,
+   "mm_long": 45177,
+   "mm_short": 5495,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-02-21",
+   "oi": 177861,
+   "pmpu_long": 68572,
+   "pmpu_short": 105659,
+   "mm_long": 43287,
+   "mm_short": 4577,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-02-28",
+   "oi": 177349,
+   "pmpu_long": 73463,
+   "pmpu_short": 108147,
+   "mm_long": 43056,
+   "mm_short": 5265,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-03-07",
+   "oi": 178410,
+   "pmpu_long": 67772,
+   "pmpu_short": 107361,
+   "mm_long": 43489,
+   "mm_short": 4453,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-03-14",
+   "oi": 188463,
+   "pmpu_long": 75061,
+   "pmpu_short": 112916,
+   "mm_long": 42427,
+   "mm_short": 4722,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-03-21",
+   "oi": 191588,
+   "pmpu_long": 76907,
+   "pmpu_short": 113852,
+   "mm_long": 43839,
+   "mm_short": 5073,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-03-28",
+   "oi": 193875,
+   "pmpu_long": 78269,
+   "pmpu_short": 113929,
+   "mm_long": 44265,
+   "mm_short": 5935,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-04-04",
+   "oi": 195438,
+   "pmpu_long": 82430,
+   "pmpu_short": 115923,
+   "mm_long": 53725,
+   "mm_short": 6499,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-04-11",
+   "oi": 199774,
+   "pmpu_long": 84747,
+   "pmpu_short": 118710,
+   "mm_long": 55740,
+   "mm_short": 6697,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-04-18",
+   "oi": 200147,
+   "pmpu_long": 84916,
+   "pmpu_short": 125728,
+   "mm_long": 53454,
+   "mm_short": 6685,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-04-25",
+   "oi": 183627,
+   "pmpu_long": 87014,
+   "pmpu_short": 107024,
+   "mm_long": 37352,
+   "mm_short": 9041,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-05-02",
+   "oi": 182574,
+   "pmpu_long": 87609,
+   "pmpu_short": 102450,
+   "mm_long": 33909,
+   "mm_short": 9645,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-05-09",
+   "oi": 186548,
+   "pmpu_long": 89761,
+   "pmpu_short": 103737,
+   "mm_long": 35037,
+   "mm_short": 10573,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-05-16",
+   "oi": 185970,
+   "pmpu_long": 92976,
+   "pmpu_short": 101329,
+   "mm_long": 32838,
+   "mm_short": 12049,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-05-23",
+   "oi": 187079,
+   "pmpu_long": 92455,
+   "pmpu_short": 98785,
+   "mm_long": 32333,
+   "mm_short": 13439,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-05-30",
+   "oi": 189836,
+   "pmpu_long": 91307,
+   "pmpu_short": 99759,
+   "mm_long": 33225,
+   "mm_short": 12901,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-06-06",
+   "oi": 189584,
+   "pmpu_long": 95227,
+   "pmpu_short": 103387,
+   "mm_long": 30904,
+   "mm_short": 12279,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-06-13",
+   "oi": 189564,
+   "pmpu_long": 94752,
+   "pmpu_short": 102147,
+   "mm_long": 31037,
+   "mm_short": 12081,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-06-20",
+   "oi": 182131,
+   "pmpu_long": 87342,
+   "pmpu_short": 100136,
+   "mm_long": 30553,
+   "mm_short": 8994,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-06-27",
+   "oi": 142115,
+   "pmpu_long": 66914,
+   "pmpu_short": 80487,
+   "mm_long": 29866,
+   "mm_short": 9166,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-07-04",
+   "oi": 142736,
+   "pmpu_long": 68347,
+   "pmpu_short": 82884,
+   "mm_long": 30142,
+   "mm_short": 8439,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-07-11",
+   "oi": 141944,
+   "pmpu_long": 68152,
+   "pmpu_short": 81329,
+   "mm_long": 28702,
+   "mm_short": 9411,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-07-18",
+   "oi": 142088,
+   "pmpu_long": 65230,
+   "pmpu_short": 83113,
+   "mm_long": 29277,
+   "mm_short": 8080,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-07-25",
+   "oi": 143531,
+   "pmpu_long": 65655,
+   "pmpu_short": 83578,
+   "mm_long": 28835,
+   "mm_short": 8206,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-08-01",
+   "oi": 149387,
+   "pmpu_long": 68451,
+   "pmpu_short": 89345,
+   "mm_long": 28831,
+   "mm_short": 6040,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-08-08",
+   "oi": 154963,
+   "pmpu_long": 67888,
+   "pmpu_short": 93422,
+   "mm_long": 30789,
+   "mm_short": 5669,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-08-15",
+   "oi": 148666,
+   "pmpu_long": 68392,
+   "pmpu_short": 88667,
+   "mm_long": 27872,
+   "mm_short": 7083,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-08-22",
+   "oi": 124072,
+   "pmpu_long": 58609,
+   "pmpu_short": 77566,
+   "mm_long": 26576,
+   "mm_short": 5936,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-08-29",
+   "oi": 121859,
+   "pmpu_long": 55937,
+   "pmpu_short": 74523,
+   "mm_long": 27615,
+   "mm_short": 6938,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-09-05",
+   "oi": 118151,
+   "pmpu_long": 57922,
+   "pmpu_short": 68520,
+   "mm_long": 21067,
+   "mm_short": 10788,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-09-12",
+   "oi": 129185,
+   "pmpu_long": 70711,
+   "pmpu_short": 69562,
+   "mm_long": 18136,
+   "mm_short": 18445,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-09-19",
+   "oi": 126290,
+   "pmpu_long": 69403,
+   "pmpu_short": 65784,
+   "mm_long": 16923,
+   "mm_short": 18800,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-09-26",
+   "oi": 122438,
+   "pmpu_long": 66796,
+   "pmpu_short": 63766,
+   "mm_long": 16342,
+   "mm_short": 16399,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-10-03",
+   "oi": 121628,
+   "pmpu_long": 66795,
+   "pmpu_short": 61793,
+   "mm_long": 15211,
+   "mm_short": 17635,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-10-10",
+   "oi": 122197,
+   "pmpu_long": 69197,
+   "pmpu_short": 64491,
+   "mm_long": 15247,
+   "mm_short": 16399,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-10-17",
+   "oi": 122150,
+   "pmpu_long": 68879,
+   "pmpu_short": 62941,
+   "mm_long": 14050,
+   "mm_short": 16547,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-10-24",
+   "oi": 114855,
+   "pmpu_long": 64814,
+   "pmpu_short": 61573,
+   "mm_long": 14685,
+   "mm_short": 20154,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-10-31",
+   "oi": 122755,
+   "pmpu_long": 70604,
+   "pmpu_short": 65128,
+   "mm_long": 14876,
+   "mm_short": 21611,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-11-07",
+   "oi": 133306,
+   "pmpu_long": 73779,
+   "pmpu_short": 60588,
+   "mm_long": 15492,
+   "mm_short": 30549,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-11-14",
+   "oi": 135801,
+   "pmpu_long": 72945,
+   "pmpu_short": 59230,
+   "mm_long": 16320,
+   "mm_short": 31327,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-11-21",
+   "oi": 142905,
+   "pmpu_long": 76926,
+   "pmpu_short": 63282,
+   "mm_long": 16607,
+   "mm_short": 30778,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-11-28",
+   "oi": 158717,
+   "pmpu_long": 87369,
+   "pmpu_short": 65654,
+   "mm_long": 12124,
+   "mm_short": 32343,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-12-05",
+   "oi": 160988,
+   "pmpu_long": 86952,
+   "pmpu_short": 65691,
+   "mm_long": 10696,
+   "mm_short": 31904,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-12-12",
+   "oi": 165822,
+   "pmpu_long": 90029,
+   "pmpu_short": 68065,
+   "mm_long": 10474,
+   "mm_short": 32871,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-12-19",
+   "oi": 164530,
+   "pmpu_long": 93658,
+   "pmpu_short": 67498,
+   "mm_long": 10022,
+   "mm_short": 34498,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2017-12-26",
+   "oi": 139753,
+   "pmpu_long": 83873,
+   "pmpu_short": 57449,
+   "mm_long": 9977,
+   "mm_short": 35511,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-01-02",
+   "oi": 135124,
+   "pmpu_long": 83488,
+   "pmpu_short": 57386,
+   "mm_long": 9777,
+   "mm_short": 36665,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-01-09",
+   "oi": 141750,
+   "pmpu_long": 85853,
+   "pmpu_short": 60039,
+   "mm_long": 9875,
+   "mm_short": 36450,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-01-16",
+   "oi": 141138,
+   "pmpu_long": 82691,
+   "pmpu_short": 61298,
+   "mm_long": 11586,
+   "mm_short": 34763,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-01-23",
+   "oi": 137478,
+   "pmpu_long": 76045,
+   "pmpu_short": 64240,
+   "mm_long": 14684,
+   "mm_short": 30641,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-01-30",
+   "oi": 140271,
+   "pmpu_long": 78981,
+   "pmpu_short": 65874,
+   "mm_long": 13596,
+   "mm_short": 31274,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-02-06",
+   "oi": 142471,
+   "pmpu_long": 75912,
+   "pmpu_short": 69278,
+   "mm_long": 15764,
+   "mm_short": 28780,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-02-13",
+   "oi": 144664,
+   "pmpu_long": 77080,
+   "pmpu_short": 71733,
+   "mm_long": 16039,
+   "mm_short": 28128,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-02-20",
+   "oi": 145452,
+   "pmpu_long": 79416,
+   "pmpu_short": 71712,
+   "mm_long": 14658,
+   "mm_short": 29279,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-02-27",
+   "oi": 132655,
+   "pmpu_long": 76401,
+   "pmpu_short": 67284,
+   "mm_long": 13596,
+   "mm_short": 30973,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-03-06",
+   "oi": 132218,
+   "pmpu_long": 73915,
+   "pmpu_short": 68630,
+   "mm_long": 14705,
+   "mm_short": 27265,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-03-13",
+   "oi": 136226,
+   "pmpu_long": 76820,
+   "pmpu_short": 72496,
+   "mm_long": 15103,
+   "mm_short": 26930,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-03-20",
+   "oi": 144301,
+   "pmpu_long": 83327,
+   "pmpu_short": 72730,
+   "mm_long": 14248,
+   "mm_short": 31247,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-03-27",
+   "oi": 146296,
+   "pmpu_long": 87044,
+   "pmpu_short": 70948,
+   "mm_long": 11900,
+   "mm_short": 33501,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-04-03",
+   "oi": 147200,
+   "pmpu_long": 88138,
+   "pmpu_short": 72918,
+   "mm_long": 12912,
+   "mm_short": 33824,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-04-10",
+   "oi": 144456,
+   "pmpu_long": 86345,
+   "pmpu_short": 75855,
+   "mm_long": 13562,
+   "mm_short": 30726,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-04-17",
+   "oi": 139143,
+   "pmpu_long": 83123,
+   "pmpu_short": 70307,
+   "mm_long": 12645,
+   "mm_short": 30968,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-04-24",
+   "oi": 132802,
+   "pmpu_long": 81865,
+   "pmpu_short": 71240,
+   "mm_long": 14846,
+   "mm_short": 29174,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-05-01",
+   "oi": 117937,
+   "pmpu_long": 69530,
+   "pmpu_short": 57694,
+   "mm_long": 15846,
+   "mm_short": 28266,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-05-08",
+   "oi": 115097,
+   "pmpu_long": 65397,
+   "pmpu_short": 62903,
+   "mm_long": 19012,
+   "mm_short": 22816,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-05-15",
+   "oi": 116064,
+   "pmpu_long": 70815,
+   "pmpu_short": 57527,
+   "mm_long": 11719,
+   "mm_short": 25734,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-05-22",
+   "oi": 122151,
+   "pmpu_long": 73376,
+   "pmpu_short": 62610,
+   "mm_long": 13793,
+   "mm_short": 24519,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-05-29",
+   "oi": 120947,
+   "pmpu_long": 75562,
+   "pmpu_short": 61047,
+   "mm_long": 11266,
+   "mm_short": 25380,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-06-05",
+   "oi": 123971,
+   "pmpu_long": 76645,
+   "pmpu_short": 59880,
+   "mm_long": 11307,
+   "mm_short": 28804,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-06-12",
+   "oi": 126296,
+   "pmpu_long": 81484,
+   "pmpu_short": 58084,
+   "mm_long": 10328,
+   "mm_short": 33292,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-06-19",
+   "oi": 130011,
+   "pmpu_long": 81858,
+   "pmpu_short": 53100,
+   "mm_long": 9219,
+   "mm_short": 38597,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-06-26",
+   "oi": 126092,
+   "pmpu_long": 82064,
+   "pmpu_short": 50144,
+   "mm_long": 5686,
+   "mm_short": 40197,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-07-03",
+   "oi": 133553,
+   "pmpu_long": 87177,
+   "pmpu_short": 53604,
+   "mm_long": 6690,
+   "mm_short": 42338,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-07-10",
+   "oi": 145684,
+   "pmpu_long": 97008,
+   "pmpu_short": 62189,
+   "mm_long": 7190,
+   "mm_short": 43925,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-07-17",
+   "oi": 146269,
+   "pmpu_long": 95780,
+   "pmpu_short": 59749,
+   "mm_long": 7031,
+   "mm_short": 45844,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-07-24",
+   "oi": 144980,
+   "pmpu_long": 92189,
+   "pmpu_short": 60614,
+   "mm_long": 10494,
+   "mm_short": 43568,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-07-31",
+   "oi": 152029,
+   "pmpu_long": 96628,
+   "pmpu_short": 65151,
+   "mm_long": 10144,
+   "mm_short": 44113,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-08-07",
+   "oi": 154184,
+   "pmpu_long": 101255,
+   "pmpu_short": 69959,
+   "mm_long": 9292,
+   "mm_short": 42997,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-08-14",
+   "oi": 143935,
+   "pmpu_long": 89400,
+   "pmpu_short": 60039,
+   "mm_long": 9679,
+   "mm_short": 41312,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-08-21",
+   "oi": 142906,
+   "pmpu_long": 87313,
+   "pmpu_short": 57699,
+   "mm_long": 11119,
+   "mm_short": 43348,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-08-28",
+   "oi": 147632,
+   "pmpu_long": 90985,
+   "pmpu_short": 58399,
+   "mm_long": 12376,
+   "mm_short": 46482,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-09-04",
+   "oi": 162063,
+   "pmpu_long": 100592,
+   "pmpu_short": 64073,
+   "mm_long": 14138,
+   "mm_short": 50478,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-09-11",
+   "oi": 167557,
+   "pmpu_long": 103285,
+   "pmpu_short": 66310,
+   "mm_long": 15912,
+   "mm_short": 51350,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-09-18",
+   "oi": 171375,
+   "pmpu_long": 106807,
+   "pmpu_short": 68539,
+   "mm_long": 15746,
+   "mm_short": 51211,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-09-25",
+   "oi": 166776,
+   "pmpu_long": 98155,
+   "pmpu_short": 61403,
+   "mm_long": 16808,
+   "mm_short": 51825,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-10-02",
+   "oi": 168697,
+   "pmpu_long": 97269,
+   "pmpu_short": 66347,
+   "mm_long": 16085,
+   "mm_short": 47527,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-10-09",
+   "oi": 154970,
+   "pmpu_long": 92734,
+   "pmpu_short": 71964,
+   "mm_long": 13858,
+   "mm_short": 32865,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-10-16",
+   "oi": 149911,
+   "pmpu_long": 88058,
+   "pmpu_short": 74663,
+   "mm_long": 11621,
+   "mm_short": 23833,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-10-23",
+   "oi": 126356,
+   "pmpu_long": 73903,
+   "pmpu_short": 66802,
+   "mm_long": 10634,
+   "mm_short": 18445,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-10-30",
+   "oi": 121069,
+   "pmpu_long": 69878,
+   "pmpu_short": 68898,
+   "mm_long": 10354,
+   "mm_short": 15140,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-11-06",
+   "oi": 121071,
+   "pmpu_long": 71730,
+   "pmpu_short": 69004,
+   "mm_long": 10290,
+   "mm_short": 13870,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-11-13",
+   "oi": 118231,
+   "pmpu_long": 69943,
+   "pmpu_short": 71519,
+   "mm_long": 11075,
+   "mm_short": 10799,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-11-20",
+   "oi": 121246,
+   "pmpu_long": 69529,
+   "pmpu_short": 72207,
+   "mm_long": 10950,
+   "mm_short": 11250,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-11-27",
+   "oi": 126484,
+   "pmpu_long": 70001,
+   "pmpu_short": 73920,
+   "mm_long": 13302,
+   "mm_short": 11746,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-12-04",
+   "oi": 131351,
+   "pmpu_long": 72766,
+   "pmpu_short": 72899,
+   "mm_long": 12481,
+   "mm_short": 15163,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-12-11",
+   "oi": 134321,
+   "pmpu_long": 77904,
+   "pmpu_short": 70343,
+   "mm_long": 10047,
+   "mm_short": 20295,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-12-18",
+   "oi": 144481,
+   "pmpu_long": 81238,
+   "pmpu_short": 65200,
+   "mm_long": 9664,
+   "mm_short": 30719,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-12-24",
+   "oi": 127597,
+   "pmpu_long": 75578,
+   "pmpu_short": 57908,
+   "mm_long": 6950,
+   "mm_short": 32563,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2018-12-31",
+   "oi": 129249,
+   "pmpu_long": 77022,
+   "pmpu_short": 60031,
+   "mm_long": 6873,
+   "mm_short": 32657,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-01-08",
+   "oi": 130776,
+   "pmpu_long": 74681,
+   "pmpu_short": 61520,
+   "mm_long": 9175,
+   "mm_short": 32826,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-01-15",
+   "oi": 138214,
+   "pmpu_long": 79559,
+   "pmpu_short": 63327,
+   "mm_long": 8460,
+   "mm_short": 35301,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-01-22",
+   "oi": 141853,
+   "pmpu_long": 82214,
+   "pmpu_short": 65314,
+   "mm_long": 8229,
+   "mm_short": 36236,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-01-29",
+   "oi": 140019,
+   "pmpu_long": 79894,
+   "pmpu_short": 63166,
+   "mm_long": 8440,
+   "mm_short": 35246,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-02-05",
+   "oi": 136588,
+   "pmpu_long": 77127,
+   "pmpu_short": 63980,
+   "mm_long": 8929,
+   "mm_short": 31173,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-02-12",
+   "oi": 134434,
+   "pmpu_long": 77820,
+   "pmpu_short": 62998,
+   "mm_long": 8468,
+   "mm_short": 32392,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-02-19",
+   "oi": 133352,
+   "pmpu_long": 74257,
+   "pmpu_short": 59323,
+   "mm_long": 8640,
+   "mm_short": 33265,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-02-26",
+   "oi": 123627,
+   "pmpu_long": 70789,
+   "pmpu_short": 55183,
+   "mm_long": 9474,
+   "mm_short": 34585,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-03-05",
+   "oi": 126552,
+   "pmpu_long": 71610,
+   "pmpu_short": 56375,
+   "mm_long": 9125,
+   "mm_short": 35224,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-03-12",
+   "oi": 130305,
+   "pmpu_long": 75820,
+   "pmpu_short": 58303,
+   "mm_long": 8633,
+   "mm_short": 35600,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-03-19",
+   "oi": 137190,
+   "pmpu_long": 82436,
+   "pmpu_short": 58941,
+   "mm_long": 7922,
+   "mm_short": 40449,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-03-26",
+   "oi": 138673,
+   "pmpu_long": 82238,
+   "pmpu_short": 60893,
+   "mm_long": 8776,
+   "mm_short": 38621,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-04-02",
+   "oi": 148368,
+   "pmpu_long": 85968,
+   "pmpu_short": 63208,
+   "mm_long": 7865,
+   "mm_short": 41533,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-04-09",
+   "oi": 147114,
+   "pmpu_long": 86105,
+   "pmpu_short": 63029,
+   "mm_long": 8510,
+   "mm_short": 41245,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-04-16",
+   "oi": 155026,
+   "pmpu_long": 92592,
+   "pmpu_short": 64888,
+   "mm_long": 7604,
+   "mm_short": 44125,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-04-23",
+   "oi": 147902,
+   "pmpu_long": 92008,
+   "pmpu_short": 62752,
+   "mm_long": 6273,
+   "mm_short": 45823,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-04-30",
+   "oi": 152718,
+   "pmpu_long": 94400,
+   "pmpu_short": 69331,
+   "mm_long": 6331,
+   "mm_short": 45402,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-05-07",
+   "oi": 156303,
+   "pmpu_long": 97755,
+   "pmpu_short": 68752,
+   "mm_long": 5919,
+   "mm_short": 47285,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-05-14",
+   "oi": 162388,
+   "pmpu_long": 95086,
+   "pmpu_short": 72187,
+   "mm_long": 5709,
+   "mm_short": 43337,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-05-21",
+   "oi": 170033,
+   "pmpu_long": 104521,
+   "pmpu_short": 78405,
+   "mm_long": 6189,
+   "mm_short": 42348,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-05-28",
+   "oi": 167168,
+   "pmpu_long": 98173,
+   "pmpu_short": 71916,
+   "mm_long": 6164,
+   "mm_short": 41057,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-06-04",
+   "oi": 155276,
+   "pmpu_long": 88728,
+   "pmpu_short": 68726,
+   "mm_long": 5082,
+   "mm_short": 30928,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-06-11",
+   "oi": 144633,
+   "pmpu_long": 80374,
+   "pmpu_short": 65086,
+   "mm_long": 5273,
+   "mm_short": 29535,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-06-18",
+   "oi": 155312,
+   "pmpu_long": 91508,
+   "pmpu_short": 71384,
+   "mm_long": 5036,
+   "mm_short": 32940,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-06-25",
+   "oi": 134491,
+   "pmpu_long": 77607,
+   "pmpu_short": 66250,
+   "mm_long": 4698,
+   "mm_short": 33950,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-07-02",
+   "oi": 133022,
+   "pmpu_long": 76549,
+   "pmpu_short": 63123,
+   "mm_long": 4845,
+   "mm_short": 32258,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-07-09",
+   "oi": 133975,
+   "pmpu_long": 76669,
+   "pmpu_short": 65773,
+   "mm_long": 4320,
+   "mm_short": 30150,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-07-16",
+   "oi": 138219,
+   "pmpu_long": 77158,
+   "pmpu_short": 63229,
+   "mm_long": 4700,
+   "mm_short": 31879,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-07-23",
+   "oi": 141892,
+   "pmpu_long": 80410,
+   "pmpu_short": 63357,
+   "mm_long": 4759,
+   "mm_short": 34814,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-07-30",
+   "oi": 148945,
+   "pmpu_long": 85560,
+   "pmpu_short": 63589,
+   "mm_long": 5023,
+   "mm_short": 41638,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-08-06",
+   "oi": 162450,
+   "pmpu_long": 95954,
+   "pmpu_short": 67485,
+   "mm_long": 5297,
+   "mm_short": 49111,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-08-13",
+   "oi": 163504,
+   "pmpu_long": 98399,
+   "pmpu_short": 67808,
+   "mm_long": 4714,
+   "mm_short": 50133,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-08-20",
+   "oi": 173882,
+   "pmpu_long": 104495,
+   "pmpu_short": 75795,
+   "mm_long": 4896,
+   "mm_short": 48661,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-08-27",
+   "oi": 145774,
+   "pmpu_long": 86445,
+   "pmpu_short": 60328,
+   "mm_long": 4897,
+   "mm_short": 46484,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-09-03",
+   "oi": 144927,
+   "pmpu_long": 84823,
+   "pmpu_short": 60194,
+   "mm_long": 4578,
+   "mm_short": 47466,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-09-10",
+   "oi": 148311,
+   "pmpu_long": 87407,
+   "pmpu_short": 59232,
+   "mm_long": 4244,
+   "mm_short": 49678,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-09-17",
+   "oi": 151543,
+   "pmpu_long": 89656,
+   "pmpu_short": 59288,
+   "mm_long": 4451,
+   "mm_short": 51808,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-09-24",
+   "oi": 154453,
+   "pmpu_long": 90977,
+   "pmpu_short": 59407,
+   "mm_long": 5120,
+   "mm_short": 51665,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-10-01",
+   "oi": 157529,
+   "pmpu_long": 91438,
+   "pmpu_short": 57302,
+   "mm_long": 5289,
+   "mm_short": 54415,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-10-08",
+   "oi": 169774,
+   "pmpu_long": 101542,
+   "pmpu_short": 60426,
+   "mm_long": 4882,
+   "mm_short": 59735,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-10-15",
+   "oi": 176751,
+   "pmpu_long": 109851,
+   "pmpu_short": 63729,
+   "mm_long": 4850,
+   "mm_short": 62230,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-10-22",
+   "oi": 164302,
+   "pmpu_long": 107560,
+   "pmpu_short": 58147,
+   "mm_long": 4192,
+   "mm_short": 61533,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-10-29",
+   "oi": 157116,
+   "pmpu_long": 99665,
+   "pmpu_short": 61451,
+   "mm_long": 4703,
+   "mm_short": 58538,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-11-05",
+   "oi": 153819,
+   "pmpu_long": 96332,
+   "pmpu_short": 58909,
+   "mm_long": 4965,
+   "mm_short": 55422,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-11-12",
+   "oi": 138725,
+   "pmpu_long": 87998,
+   "pmpu_short": 62938,
+   "mm_long": 5401,
+   "mm_short": 38407,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-11-19",
+   "oi": 131190,
+   "pmpu_long": 81296,
+   "pmpu_short": 65844,
+   "mm_long": 5554,
+   "mm_short": 27184,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-11-26",
+   "oi": 136751,
+   "pmpu_long": 80444,
+   "pmpu_short": 69140,
+   "mm_long": 5313,
+   "mm_short": 22736,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-12-03",
+   "oi": 144098,
+   "pmpu_long": 89746,
+   "pmpu_short": 77592,
+   "mm_long": 4867,
+   "mm_short": 21385,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-12-10",
+   "oi": 136778,
+   "pmpu_long": 79710,
+   "pmpu_short": 72641,
+   "mm_long": 6990,
+   "mm_short": 17059,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-12-17",
+   "oi": 124701,
+   "pmpu_long": 70713,
+   "pmpu_short": 60501,
+   "mm_long": 6732,
+   "mm_short": 14789,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-12-24",
+   "oi": 109576,
+   "pmpu_long": 65573,
+   "pmpu_short": 51892,
+   "mm_long": 4984,
+   "mm_short": 18005,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2019-12-31",
+   "oi": 112247,
+   "pmpu_long": 67156,
+   "pmpu_short": 52726,
+   "mm_long": 5143,
+   "mm_short": 19928,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-01-07",
+   "oi": 115716,
+   "pmpu_long": 70469,
+   "pmpu_short": 55746,
+   "mm_long": 5770,
+   "mm_short": 23101,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-01-14",
+   "oi": 124220,
+   "pmpu_long": 76190,
+   "pmpu_short": 57884,
+   "mm_long": 6516,
+   "mm_short": 29094,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-01-21",
+   "oi": 132738,
+   "pmpu_long": 80168,
+   "pmpu_short": 59688,
+   "mm_long": 6491,
+   "mm_short": 31750,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-01-28",
+   "oi": 139649,
+   "pmpu_long": 84954,
+   "pmpu_short": 65225,
+   "mm_long": 6769,
+   "mm_short": 31148,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-02-04",
+   "oi": 149610,
+   "pmpu_long": 88163,
+   "pmpu_short": 65589,
+   "mm_long": 6074,
+   "mm_short": 33344,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-02-11",
+   "oi": 153834,
+   "pmpu_long": 95656,
+   "pmpu_short": 62884,
+   "mm_long": 4861,
+   "mm_short": 42408,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-02-18",
+   "oi": 163788,
+   "pmpu_long": 96997,
+   "pmpu_short": 62772,
+   "mm_long": 5471,
+   "mm_short": 45075,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-02-25",
+   "oi": 157655,
+   "pmpu_long": 95538,
+   "pmpu_short": 60742,
+   "mm_long": 5491,
+   "mm_short": 46390,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-03-03",
+   "oi": 163705,
+   "pmpu_long": 99803,
+   "pmpu_short": 61113,
+   "mm_long": 6374,
+   "mm_short": 49849,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-03-10",
+   "oi": 169973,
+   "pmpu_long": 110111,
+   "pmpu_short": 63426,
+   "mm_long": 6342,
+   "mm_short": 46506,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-03-17",
+   "oi": 171833,
+   "pmpu_long": 109957,
+   "pmpu_short": 71103,
+   "mm_long": 4903,
+   "mm_short": 42356,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-03-24",
+   "oi": 165599,
+   "pmpu_long": 105812,
+   "pmpu_short": 72130,
+   "mm_long": 4628,
+   "mm_short": 34993,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-03-31",
+   "oi": 165951,
+   "pmpu_long": 104999,
+   "pmpu_short": 70787,
+   "mm_long": 4654,
+   "mm_short": 34773,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-04-07",
+   "oi": 167988,
+   "pmpu_long": 107158,
+   "pmpu_short": 71143,
+   "mm_long": 4793,
+   "mm_short": 35240,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-04-14",
+   "oi": 171860,
+   "pmpu_long": 109106,
+   "pmpu_short": 79156,
+   "mm_long": 4859,
+   "mm_short": 37770,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-04-21",
+   "oi": 158935,
+   "pmpu_long": 101860,
+   "pmpu_short": 69581,
+   "mm_long": 4651,
+   "mm_short": 39731,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-04-28",
+   "oi": 153396,
+   "pmpu_long": 95685,
+   "pmpu_short": 63602,
+   "mm_long": 4713,
+   "mm_short": 38825,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-05-05",
+   "oi": 156512,
+   "pmpu_long": 98052,
+   "pmpu_short": 65249,
+   "mm_long": 5097,
+   "mm_short": 39141,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-05-12",
+   "oi": 160162,
+   "pmpu_long": 97210,
+   "pmpu_short": 64822,
+   "mm_long": 6938,
+   "mm_short": 41507,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-05-19",
+   "oi": 163829,
+   "pmpu_long": 97657,
+   "pmpu_short": 64180,
+   "mm_long": 7836,
+   "mm_short": 42875,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-05-26",
+   "oi": 164263,
+   "pmpu_long": 96872,
+   "pmpu_short": 62388,
+   "mm_long": 8333,
+   "mm_short": 43185,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-06-02",
+   "oi": 170195,
+   "pmpu_long": 99068,
+   "pmpu_short": 67289,
+   "mm_long": 8886,
+   "mm_short": 44743,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-06-09",
+   "oi": 165144,
+   "pmpu_long": 92893,
+   "pmpu_short": 67556,
+   "mm_long": 9713,
+   "mm_short": 40631,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-06-16",
+   "oi": 169256,
+   "pmpu_long": 96922,
+   "pmpu_short": 68595,
+   "mm_long": 8351,
+   "mm_short": 43103,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-06-23",
+   "oi": 168461,
+   "pmpu_long": 101078,
+   "pmpu_short": 66284,
+   "mm_long": 9505,
+   "mm_short": 50310,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-06-30",
+   "oi": 165138,
+   "pmpu_long": 94946,
+   "pmpu_short": 56975,
+   "mm_long": 8827,
+   "mm_short": 53959,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-07-07",
+   "oi": 165447,
+   "pmpu_long": 92729,
+   "pmpu_short": 55292,
+   "mm_long": 9243,
+   "mm_short": 53752,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-07-14",
+   "oi": 169437,
+   "pmpu_long": 92287,
+   "pmpu_short": 57960,
+   "mm_long": 10336,
+   "mm_short": 51990,
+   "market": "ICE Robusta Coffee Futures and Options - ICE Futures Europe"
+  },
+  {
+   "date": "2020-07-21",
+   "oi": 136909,
+   "pmpu_long": 73034,
+   "pmpu_short": 61845,
+   "mm_long": 10746,
+   "mm_short": 36547,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-07-28",
+   "oi": 138307,
+   "pmpu_long": 76737,
+   "pmpu_short": 76941,
+   "mm_long": 9633,
+   "mm_short": 19376,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-08-04",
+   "oi": 139155,
+   "pmpu_long": 75996,
+   "pmpu_short": 82227,
+   "mm_long": 10629,
+   "mm_short": 13057,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-08-11",
+   "oi": 115612,
+   "pmpu_long": 56621,
+   "pmpu_short": 69545,
+   "mm_long": 11546,
+   "mm_short": 8242,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-08-18",
+   "oi": 116525,
+   "pmpu_long": 55455,
+   "pmpu_short": 71592,
+   "mm_long": 11689,
+   "mm_short": 6407,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-08-25",
+   "oi": 107805,
+   "pmpu_long": 49626,
+   "pmpu_short": 65923,
+   "mm_long": 14278,
+   "mm_short": 4971,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-09-01",
+   "oi": 110490,
+   "pmpu_long": 49291,
+   "pmpu_short": 68878,
+   "mm_long": 16715,
+   "mm_short": 3551,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-09-08",
+   "oi": 112432,
+   "pmpu_long": 47112,
+   "pmpu_short": 70556,
+   "mm_long": 18201,
+   "mm_short": 2974,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-09-15",
+   "oi": 117622,
+   "pmpu_long": 49042,
+   "pmpu_short": 73680,
+   "mm_long": 19148,
+   "mm_short": 2333,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-09-22",
+   "oi": 117126,
+   "pmpu_long": 48779,
+   "pmpu_short": 71582,
+   "mm_long": 19659,
+   "mm_short": 3059,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-09-29",
+   "oi": 119810,
+   "pmpu_long": 54474,
+   "pmpu_short": 72899,
+   "mm_long": 17900,
+   "mm_short": 4585,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-10-06",
+   "oi": 121451,
+   "pmpu_long": 59366,
+   "pmpu_short": 68016,
+   "mm_long": 13490,
+   "mm_short": 10536,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-10-13",
+   "oi": 126844,
+   "pmpu_long": 65659,
+   "pmpu_short": 65120,
+   "mm_long": 10369,
+   "mm_short": 16952,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-10-20",
+   "oi": 116037,
+   "pmpu_long": 59785,
+   "pmpu_short": 57471,
+   "mm_long": 9379,
+   "mm_short": 17854,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-10-27",
+   "oi": 111188,
+   "pmpu_long": 54413,
+   "pmpu_short": 56064,
+   "mm_long": 9826,
+   "mm_short": 18006,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-11-03",
+   "oi": 107123,
+   "pmpu_long": 53333,
+   "pmpu_short": 56258,
+   "mm_long": 9114,
+   "mm_short": 15087,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-11-10",
+   "oi": 107317,
+   "pmpu_long": 52150,
+   "pmpu_short": 57671,
+   "mm_long": 8734,
+   "mm_short": 13087,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-11-17",
+   "oi": 109757,
+   "pmpu_long": 51082,
+   "pmpu_short": 66315,
+   "mm_long": 10987,
+   "mm_short": 3532,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-11-24",
+   "oi": 104864,
+   "pmpu_long": 47508,
+   "pmpu_short": 62750,
+   "mm_long": 10746,
+   "mm_short": 3180,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-12-01",
+   "oi": 108352,
+   "pmpu_long": 50084,
+   "pmpu_short": 66545,
+   "mm_long": 11052,
+   "mm_short": 2787,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-12-08",
+   "oi": 111848,
+   "pmpu_long": 56617,
+   "pmpu_short": 65603,
+   "mm_long": 9978,
+   "mm_short": 7584,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-12-15",
+   "oi": 110777,
+   "pmpu_long": 59409,
+   "pmpu_short": 65802,
+   "mm_long": 9000,
+   "mm_short": 7768,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-12-22",
+   "oi": 98986,
+   "pmpu_long": 52096,
+   "pmpu_short": 60344,
+   "mm_long": 10010,
+   "mm_short": 5555,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2020-12-29",
+   "oi": 95936,
+   "pmpu_long": 48310,
+   "pmpu_short": 65292,
+   "mm_long": 10139,
+   "mm_short": 5947,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-01-05",
+   "oi": 98072,
+   "pmpu_long": 47507,
+   "pmpu_short": 64869,
+   "mm_long": 11125,
+   "mm_short": 7041,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-01-12",
+   "oi": 112957,
+   "pmpu_long": 59626,
+   "pmpu_short": 65138,
+   "mm_long": 10445,
+   "mm_short": 18165,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-01-19",
+   "oi": 113564,
+   "pmpu_long": 57171,
+   "pmpu_short": 55912,
+   "mm_long": 11120,
+   "mm_short": 21540,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-01-26",
+   "oi": 120757,
+   "pmpu_long": 61922,
+   "pmpu_short": 56819,
+   "mm_long": 10580,
+   "mm_short": 25901,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-02-02",
+   "oi": 126165,
+   "pmpu_long": 64329,
+   "pmpu_short": 56426,
+   "mm_long": 9407,
+   "mm_short": 29540,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-02-09",
+   "oi": 129292,
+   "pmpu_long": 61968,
+   "pmpu_short": 58880,
+   "mm_long": 13412,
+   "mm_short": 27790,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-02-16",
+   "oi": 128062,
+   "pmpu_long": 59810,
+   "pmpu_short": 60386,
+   "mm_long": 16777,
+   "mm_short": 28336,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-02-23",
+   "oi": 125724,
+   "pmpu_long": 48291,
+   "pmpu_short": 71095,
+   "mm_long": 30265,
+   "mm_short": 21510,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-03-02",
+   "oi": 118244,
+   "pmpu_long": 38277,
+   "pmpu_short": 86197,
+   "mm_long": 32476,
+   "mm_short": 6740,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-03-09",
+   "oi": 116169,
+   "pmpu_long": 41533,
+   "pmpu_short": 71331,
+   "mm_long": 26819,
+   "mm_short": 8966,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-03-16",
+   "oi": 117374,
+   "pmpu_long": 43983,
+   "pmpu_short": 70468,
+   "mm_long": 27488,
+   "mm_short": 11139,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-03-23",
+   "oi": 115588,
+   "pmpu_long": 42619,
+   "pmpu_short": 68725,
+   "mm_long": 27058,
+   "mm_short": 11434,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-03-30",
+   "oi": 120271,
+   "pmpu_long": 48645,
+   "pmpu_short": 68729,
+   "mm_long": 24801,
+   "mm_short": 13297,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-04-06",
+   "oi": 126360,
+   "pmpu_long": 55946,
+   "pmpu_short": 64070,
+   "mm_long": 19358,
+   "mm_short": 21780,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-04-13",
+   "oi": 124331,
+   "pmpu_long": 54798,
+   "pmpu_short": 61421,
+   "mm_long": 16296,
+   "mm_short": 22130,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-04-20",
+   "oi": 124584,
+   "pmpu_long": 54945,
+   "pmpu_short": 65667,
+   "mm_long": 19307,
+   "mm_short": 21766,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-04-27",
+   "oi": 118232,
+   "pmpu_long": 44672,
+   "pmpu_short": 71547,
+   "mm_long": 24654,
+   "mm_short": 17701,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-05-04",
+   "oi": 112883,
+   "pmpu_long": 36877,
+   "pmpu_short": 73146,
+   "mm_long": 29253,
+   "mm_short": 5118,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-05-11",
+   "oi": 116341,
+   "pmpu_long": 34271,
+   "pmpu_short": 75068,
+   "mm_long": 34045,
+   "mm_short": 4621,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-05-18",
+   "oi": 118372,
+   "pmpu_long": 33843,
+   "pmpu_short": 74637,
+   "mm_long": 33725,
+   "mm_short": 5448,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-05-25",
+   "oi": 116291,
+   "pmpu_long": 31626,
+   "pmpu_short": 72359,
+   "mm_long": 33601,
+   "mm_short": 5465,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-06-01",
+   "oi": 120750,
+   "pmpu_long": 31702,
+   "pmpu_short": 75854,
+   "mm_long": 37696,
+   "mm_short": 4612,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-06-08",
+   "oi": 120567,
+   "pmpu_long": 33880,
+   "pmpu_short": 77645,
+   "mm_long": 37080,
+   "mm_short": 5405,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-06-15",
+   "oi": 119865,
+   "pmpu_long": 34435,
+   "pmpu_short": 76372,
+   "mm_long": 36740,
+   "mm_short": 5243,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-06-22",
+   "oi": 119280,
+   "pmpu_long": 35889,
+   "pmpu_short": 75243,
+   "mm_long": 35390,
+   "mm_short": 6894,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-06-29",
+   "oi": 112558,
+   "pmpu_long": 29162,
+   "pmpu_short": 73741,
+   "mm_long": 35720,
+   "mm_short": 5608,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-07-06",
+   "oi": 112862,
+   "pmpu_long": 31183,
+   "pmpu_short": 75677,
+   "mm_long": 34165,
+   "mm_short": 3929,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-07-13",
+   "oi": 114758,
+   "pmpu_long": 32254,
+   "pmpu_short": 76677,
+   "mm_long": 34370,
+   "mm_short": 2674,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-07-20",
+   "oi": 116840,
+   "pmpu_long": 33203,
+   "pmpu_short": 73214,
+   "mm_long": 33629,
+   "mm_short": 2989,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-07-27",
+   "oi": 114808,
+   "pmpu_long": 37549,
+   "pmpu_short": 71620,
+   "mm_long": 28410,
+   "mm_short": 3317,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-08-03",
+   "oi": 110186,
+   "pmpu_long": 35989,
+   "pmpu_short": 68251,
+   "mm_long": 25680,
+   "mm_short": 2643,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-08-10",
+   "oi": 108324,
+   "pmpu_long": 35950,
+   "pmpu_short": 66116,
+   "mm_long": 23001,
+   "mm_short": 2721,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-08-17",
+   "oi": 111047,
+   "pmpu_long": 35179,
+   "pmpu_short": 64061,
+   "mm_long": 22425,
+   "mm_short": 3848,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-08-24",
+   "oi": 99945,
+   "pmpu_long": 28083,
+   "pmpu_short": 64409,
+   "mm_long": 22859,
+   "mm_short": 3058,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-08-31",
+   "oi": 102219,
+   "pmpu_long": 28979,
+   "pmpu_short": 65332,
+   "mm_long": 26078,
+   "mm_short": 2275,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-09-07",
+   "oi": 105750,
+   "pmpu_long": 30663,
+   "pmpu_short": 69030,
+   "mm_long": 29576,
+   "mm_short": 1998,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-09-14",
+   "oi": 108141,
+   "pmpu_long": 33858,
+   "pmpu_short": 71004,
+   "mm_long": 31829,
+   "mm_short": 2499,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-09-21",
+   "oi": 111095,
+   "pmpu_long": 33046,
+   "pmpu_short": 74379,
+   "mm_long": 36419,
+   "mm_short": 2504,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-09-28",
+   "oi": 112331,
+   "pmpu_long": 33622,
+   "pmpu_short": 75113,
+   "mm_long": 36556,
+   "mm_short": 3278,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-10-05",
+   "oi": 111749,
+   "pmpu_long": 30676,
+   "pmpu_short": 72411,
+   "mm_long": 36428,
+   "mm_short": 3512,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-10-12",
+   "oi": 107586,
+   "pmpu_long": 33003,
+   "pmpu_short": 71817,
+   "mm_long": 34499,
+   "mm_short": 3029,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-10-19",
+   "oi": 104758,
+   "pmpu_long": 31908,
+   "pmpu_short": 68737,
+   "mm_long": 34021,
+   "mm_short": 2842,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-10-26",
+   "oi": 93423,
+   "pmpu_long": 24697,
+   "pmpu_short": 67681,
+   "mm_long": 40031,
+   "mm_short": 1973,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-11-02",
+   "oi": 96235,
+   "pmpu_long": 32201,
+   "pmpu_short": 67588,
+   "mm_long": 37146,
+   "mm_short": 2058,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-11-09",
+   "oi": 95382,
+   "pmpu_long": 32346,
+   "pmpu_short": 64088,
+   "mm_long": 35101,
+   "mm_short": 2658,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-11-16",
+   "oi": 104932,
+   "pmpu_long": 38046,
+   "pmpu_short": 70913,
+   "mm_long": 35259,
+   "mm_short": 2690,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-11-23",
+   "oi": 105504,
+   "pmpu_long": 38914,
+   "pmpu_short": 72063,
+   "mm_long": 36570,
+   "mm_short": 3113,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-11-30",
+   "oi": 108266,
+   "pmpu_long": 40557,
+   "pmpu_short": 76023,
+   "mm_long": 38400,
+   "mm_short": 2646,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-12-07",
+   "oi": 112776,
+   "pmpu_long": 40779,
+   "pmpu_short": 81478,
+   "mm_long": 41120,
+   "mm_short": 1867,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-12-14",
+   "oi": 114413,
+   "pmpu_long": 39503,
+   "pmpu_short": 82681,
+   "mm_long": 43498,
+   "mm_short": 2074,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-12-21",
+   "oi": 116806,
+   "pmpu_long": 43155,
+   "pmpu_short": 82157,
+   "mm_long": 47909,
+   "mm_short": 1721,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2021-12-28",
+   "oi": 114938,
+   "pmpu_long": 39419,
+   "pmpu_short": 81640,
+   "mm_long": 50022,
+   "mm_short": 1705,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-01-04",
+   "oi": 115267,
+   "pmpu_long": 38165,
+   "pmpu_short": 83079,
+   "mm_long": 51791,
+   "mm_short": 2217,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-01-11",
+   "oi": 114661,
+   "pmpu_long": 39081,
+   "pmpu_short": 80042,
+   "mm_long": 48667,
+   "mm_short": 3905,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-01-18",
+   "oi": 109481,
+   "pmpu_long": 39909,
+   "pmpu_short": 76161,
+   "mm_long": 42327,
+   "mm_short": 3519,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-01-25",
+   "oi": 115946,
+   "pmpu_long": 47960,
+   "pmpu_short": 80274,
+   "mm_long": 37183,
+   "mm_short": 2634,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-02-01",
+   "oi": 109771,
+   "pmpu_long": 46692,
+   "pmpu_short": 76382,
+   "mm_long": 34270,
+   "mm_short": 3122,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-02-08",
+   "oi": 112492,
+   "pmpu_long": 50114,
+   "pmpu_short": 82623,
+   "mm_long": 33090,
+   "mm_short": 1869,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-02-15",
+   "oi": 121411,
+   "pmpu_long": 55243,
+   "pmpu_short": 91006,
+   "mm_long": 36596,
+   "mm_short": 1293,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-02-22",
+   "oi": 108293,
+   "pmpu_long": 42364,
+   "pmpu_short": 86937,
+   "mm_long": 40477,
+   "mm_short": 1308,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-03-01",
+   "oi": 98391,
+   "pmpu_long": 43423,
+   "pmpu_short": 74805,
+   "mm_long": 29420,
+   "mm_short": 3952,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-03-08",
+   "oi": 96925,
+   "pmpu_long": 49801,
+   "pmpu_short": 69022,
+   "mm_long": 21259,
+   "mm_short": 6417,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-03-15",
+   "oi": 92820,
+   "pmpu_long": 50258,
+   "pmpu_short": 67219,
+   "mm_long": 18678,
+   "mm_short": 4214,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-03-22",
+   "oi": 91467,
+   "pmpu_long": 48528,
+   "pmpu_short": 69028,
+   "mm_long": 21799,
+   "mm_short": 2105,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-03-29",
+   "oi": 90238,
+   "pmpu_long": 45858,
+   "pmpu_short": 65345,
+   "mm_long": 22847,
+   "mm_short": 2379,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-04-05",
+   "oi": 97957,
+   "pmpu_long": 48550,
+   "pmpu_short": 68143,
+   "mm_long": 24474,
+   "mm_short": 2277,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-04-12",
+   "oi": 96285,
+   "pmpu_long": 48244,
+   "pmpu_short": 63413,
+   "mm_long": 23224,
+   "mm_short": 3659,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-04-19",
+   "oi": 98639,
+   "pmpu_long": 52536,
+   "pmpu_short": 64146,
+   "mm_long": 21287,
+   "mm_short": 5103,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-04-26",
+   "oi": 91741,
+   "pmpu_long": 48254,
+   "pmpu_short": 58918,
+   "mm_long": 20431,
+   "mm_short": 6381,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-05-03",
+   "oi": 95655,
+   "pmpu_long": 51307,
+   "pmpu_short": 62686,
+   "mm_long": 22112,
+   "mm_short": 6013,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-05-10",
+   "oi": 103190,
+   "pmpu_long": 55892,
+   "pmpu_short": 66661,
+   "mm_long": 22557,
+   "mm_short": 5439,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-05-17",
+   "oi": 103514,
+   "pmpu_long": 56727,
+   "pmpu_short": 67431,
+   "mm_long": 21824,
+   "mm_short": 4243,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-05-24",
+   "oi": 96888,
+   "pmpu_long": 49938,
+   "pmpu_short": 64494,
+   "mm_long": 21295,
+   "mm_short": 4426,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-05-31",
+   "oi": 98728,
+   "pmpu_long": 49082,
+   "pmpu_short": 67432,
+   "mm_long": 23527,
+   "mm_short": 2665,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-06-07",
+   "oi": 103457,
+   "pmpu_long": 47677,
+   "pmpu_short": 73188,
+   "mm_long": 29848,
+   "mm_short": 2254,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-06-14",
+   "oi": 102931,
+   "pmpu_long": 52207,
+   "pmpu_short": 70134,
+   "mm_long": 26054,
+   "mm_short": 4205,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-06-21",
+   "oi": 88546,
+   "pmpu_long": 41555,
+   "pmpu_short": 59815,
+   "mm_long": 24303,
+   "mm_short": 3822,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-06-28",
+   "oi": 85672,
+   "pmpu_long": 40565,
+   "pmpu_short": 57890,
+   "mm_long": 21280,
+   "mm_short": 5095,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-07-05",
+   "oi": 89076,
+   "pmpu_long": 47177,
+   "pmpu_short": 53405,
+   "mm_long": 15031,
+   "mm_short": 10437,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-07-12",
+   "oi": 93746,
+   "pmpu_long": 54002,
+   "pmpu_short": 54012,
+   "mm_long": 12571,
+   "mm_short": 13611,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-07-19",
+   "oi": 98025,
+   "pmpu_long": 57972,
+   "pmpu_short": 56849,
+   "mm_long": 11450,
+   "mm_short": 13006,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-07-26",
+   "oi": 93170,
+   "pmpu_long": 52484,
+   "pmpu_short": 52172,
+   "mm_long": 11627,
+   "mm_short": 12803,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-08-02",
+   "oi": 90994,
+   "pmpu_long": 48284,
+   "pmpu_short": 54597,
+   "mm_long": 14640,
+   "mm_short": 8950,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-08-09",
+   "oi": 91993,
+   "pmpu_long": 48886,
+   "pmpu_short": 61274,
+   "mm_long": 15789,
+   "mm_short": 5039,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-08-16",
+   "oi": 107491,
+   "pmpu_long": 48594,
+   "pmpu_short": 75089,
+   "mm_long": 29017,
+   "mm_short": 3567,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-08-23",
+   "oi": 105458,
+   "pmpu_long": 44568,
+   "pmpu_short": 74269,
+   "mm_long": 32010,
+   "mm_short": 2684,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-08-30",
+   "oi": 99242,
+   "pmpu_long": 35153,
+   "pmpu_short": 72269,
+   "mm_long": 31710,
+   "mm_short": 2197,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-09-06",
+   "oi": 99393,
+   "pmpu_long": 35746,
+   "pmpu_short": 71321,
+   "mm_long": 30460,
+   "mm_short": 2457,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-09-13",
+   "oi": 97882,
+   "pmpu_long": 34449,
+   "pmpu_short": 66251,
+   "mm_long": 30506,
+   "mm_short": 3320,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-09-20",
+   "oi": 95049,
+   "pmpu_long": 33759,
+   "pmpu_short": 63039,
+   "mm_long": 28370,
+   "mm_short": 3657,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-09-27",
+   "oi": 94280,
+   "pmpu_long": 33310,
+   "pmpu_short": 60160,
+   "mm_long": 27775,
+   "mm_short": 5824,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-10-04",
+   "oi": 90954,
+   "pmpu_long": 34164,
+   "pmpu_short": 58140,
+   "mm_long": 23608,
+   "mm_short": 5509,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-10-11",
+   "oi": 95600,
+   "pmpu_long": 39482,
+   "pmpu_short": 61897,
+   "mm_long": 20319,
+   "mm_short": 5745,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-10-18",
+   "oi": 88520,
+   "pmpu_long": 43253,
+   "pmpu_short": 51330,
+   "mm_long": 13828,
+   "mm_short": 9739,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-10-25",
+   "oi": 83370,
+   "pmpu_long": 48507,
+   "pmpu_short": 44733,
+   "mm_long": 7609,
+   "mm_short": 14869,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-11-01",
+   "oi": 88687,
+   "pmpu_long": 51492,
+   "pmpu_short": 36521,
+   "mm_long": 6098,
+   "mm_short": 26326,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-11-08",
+   "oi": 94937,
+   "pmpu_long": 56000,
+   "pmpu_short": 38624,
+   "mm_long": 5953,
+   "mm_short": 29670,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-11-15",
+   "oi": 100339,
+   "pmpu_long": 59897,
+   "pmpu_short": 37402,
+   "mm_long": 5501,
+   "mm_short": 34260,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-11-22",
+   "oi": 103414,
+   "pmpu_long": 60130,
+   "pmpu_short": 38873,
+   "mm_long": 6371,
+   "mm_short": 36025,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-11-29",
+   "oi": 101483,
+   "pmpu_long": 58891,
+   "pmpu_short": 39521,
+   "mm_long": 6715,
+   "mm_short": 34761,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-12-06",
+   "oi": 99651,
+   "pmpu_long": 55926,
+   "pmpu_short": 44385,
+   "mm_long": 8381,
+   "mm_short": 29124,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-12-13",
+   "oi": 97579,
+   "pmpu_long": 59267,
+   "pmpu_short": 47813,
+   "mm_long": 7464,
+   "mm_short": 26044,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-12-20",
+   "oi": 100112,
+   "pmpu_long": 60086,
+   "pmpu_short": 49976,
+   "mm_long": 5687,
+   "mm_short": 25559,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2022-12-27",
+   "oi": 83256,
+   "pmpu_long": 52919,
+   "pmpu_short": 41797,
+   "mm_long": 6814,
+   "mm_short": 23301,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-01-03",
+   "oi": 90856,
+   "pmpu_long": 57841,
+   "pmpu_short": 41003,
+   "mm_long": 6728,
+   "mm_short": 29310,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-01-10",
+   "oi": 88870,
+   "pmpu_long": 55415,
+   "pmpu_short": 42132,
+   "mm_long": 6831,
+   "mm_short": 26436,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-01-17",
+   "oi": 95087,
+   "pmpu_long": 59140,
+   "pmpu_short": 54067,
+   "mm_long": 9491,
+   "mm_short": 21371,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-01-24",
+   "oi": 92513,
+   "pmpu_long": 55342,
+   "pmpu_short": 56858,
+   "mm_long": 10862,
+   "mm_short": 17311,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-01-31",
+   "oi": 101747,
+   "pmpu_long": 49983,
+   "pmpu_short": 65135,
+   "mm_long": 14592,
+   "mm_short": 9495,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-02-07",
+   "oi": 103040,
+   "pmpu_long": 46268,
+   "pmpu_short": 68747,
+   "mm_long": 19187,
+   "mm_short": 9040,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-02-14",
+   "oi": 99072,
+   "pmpu_long": 41858,
+   "pmpu_short": 63682,
+   "mm_long": 22668,
+   "mm_short": 10927,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-02-21",
+   "oi": 84747,
+   "pmpu_long": 31635,
+   "pmpu_short": 52004,
+   "mm_long": 24592,
+   "mm_short": 9729,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-02-28",
+   "oi": 88322,
+   "pmpu_long": 29723,
+   "pmpu_short": 54121,
+   "mm_long": 28039,
+   "mm_short": 8321,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-03-07",
+   "oi": 94655,
+   "pmpu_long": 31863,
+   "pmpu_short": 55577,
+   "mm_long": 30502,
+   "mm_short": 8434,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-03-14",
+   "oi": 100855,
+   "pmpu_long": 37379,
+   "pmpu_short": 60012,
+   "mm_long": 29174,
+   "mm_short": 7967,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-03-21",
+   "oi": 102713,
+   "pmpu_long": 43605,
+   "pmpu_short": 63150,
+   "mm_long": 24124,
+   "mm_short": 6353,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-03-28",
+   "oi": 110002,
+   "pmpu_long": 44019,
+   "pmpu_short": 69705,
+   "mm_long": 28899,
+   "mm_short": 4376,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-04-04",
+   "oi": 112637,
+   "pmpu_long": 45683,
+   "pmpu_short": 74034,
+   "mm_long": 31092,
+   "mm_short": 4723,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-04-11",
+   "oi": 115802,
+   "pmpu_long": 43360,
+   "pmpu_short": 80128,
+   "mm_long": 35488,
+   "mm_short": 4184,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-04-18",
+   "oi": 119266,
+   "pmpu_long": 43921,
+   "pmpu_short": 84683,
+   "mm_long": 38789,
+   "mm_short": 4078,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-04-25",
+   "oi": 107851,
+   "pmpu_long": 31517,
+   "pmpu_short": 78411,
+   "mm_long": 44045,
+   "mm_short": 4314,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-05-02",
+   "oi": 107699,
+   "pmpu_long": 30347,
+   "pmpu_short": 77532,
+   "mm_long": 45193,
+   "mm_short": 4584,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-05-09",
+   "oi": 109948,
+   "pmpu_long": 31322,
+   "pmpu_short": 79724,
+   "mm_long": 45083,
+   "mm_short": 3968,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-05-16",
+   "oi": 107329,
+   "pmpu_long": 28626,
+   "pmpu_short": 77108,
+   "mm_long": 44477,
+   "mm_short": 4106,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-05-23",
+   "oi": 109702,
+   "pmpu_long": 28417,
+   "pmpu_short": 79741,
+   "mm_long": 47248,
+   "mm_short": 3789,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-05-30",
+   "oi": 114908,
+   "pmpu_long": 31656,
+   "pmpu_short": 84242,
+   "mm_long": 47537,
+   "mm_short": 3182,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-06-06",
+   "oi": 122139,
+   "pmpu_long": 36438,
+   "pmpu_short": 88946,
+   "mm_long": 48274,
+   "mm_short": 3340,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-06-13",
+   "oi": 127427,
+   "pmpu_long": 41458,
+   "pmpu_short": 97341,
+   "mm_long": 49151,
+   "mm_short": 2733,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-06-20",
+   "oi": 125147,
+   "pmpu_long": 40119,
+   "pmpu_short": 97121,
+   "mm_long": 51185,
+   "mm_short": 2805,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-06-27",
+   "oi": 109715,
+   "pmpu_long": 35089,
+   "pmpu_short": 85121,
+   "mm_long": 52294,
+   "mm_short": 4286,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-07-04",
+   "oi": 109513,
+   "pmpu_long": 41528,
+   "pmpu_short": 82884,
+   "mm_long": 47116,
+   "mm_short": 4971,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-07-11",
+   "oi": 110222,
+   "pmpu_long": 41132,
+   "pmpu_short": 81305,
+   "mm_long": 44348,
+   "mm_short": 4420,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-07-18",
+   "oi": 116629,
+   "pmpu_long": 49209,
+   "pmpu_short": 82021,
+   "mm_long": 39143,
+   "mm_short": 5546,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-07-25",
+   "oi": 124045,
+   "pmpu_long": 54412,
+   "pmpu_short": 85292,
+   "mm_long": 39096,
+   "mm_short": 5835,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-08-01",
+   "oi": 125952,
+   "pmpu_long": 54407,
+   "pmpu_short": 86993,
+   "mm_long": 39671,
+   "mm_short": 6500,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-08-08",
+   "oi": 135392,
+   "pmpu_long": 60127,
+   "pmpu_short": 93323,
+   "mm_long": 41727,
+   "mm_short": 7369,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-08-15",
+   "oi": 128120,
+   "pmpu_long": 59260,
+   "pmpu_short": 86398,
+   "mm_long": 39511,
+   "mm_short": 9388,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-08-22",
+   "oi": 114948,
+   "pmpu_long": 56229,
+   "pmpu_short": 68276,
+   "mm_long": 31370,
+   "mm_short": 11592,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-08-29",
+   "oi": 109226,
+   "pmpu_long": 51106,
+   "pmpu_short": 62794,
+   "mm_long": 29892,
+   "mm_short": 11810,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-09-05",
+   "oi": 117488,
+   "pmpu_long": 53302,
+   "pmpu_short": 68212,
+   "mm_long": 33946,
+   "mm_short": 12287,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-09-12",
+   "oi": 106967,
+   "pmpu_long": 44754,
+   "pmpu_short": 55471,
+   "mm_long": 31105,
+   "mm_short": 12373,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-09-19",
+   "oi": 113163,
+   "pmpu_long": 38275,
+   "pmpu_short": 58140,
+   "mm_long": 41179,
+   "mm_short": 12183,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-09-26",
+   "oi": 103830,
+   "pmpu_long": 33736,
+   "pmpu_short": 51167,
+   "mm_long": 38306,
+   "mm_short": 11966,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-10-03",
+   "oi": 106785,
+   "pmpu_long": 36523,
+   "pmpu_short": 48684,
+   "mm_long": 37036,
+   "mm_short": 13810,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-10-10",
+   "oi": 106855,
+   "pmpu_long": 50217,
+   "pmpu_short": 51038,
+   "mm_long": 27483,
+   "mm_short": 14722,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-10-17",
+   "oi": 109133,
+   "pmpu_long": 53151,
+   "pmpu_short": 53339,
+   "mm_long": 25169,
+   "mm_short": 13089,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-10-24",
+   "oi": 105961,
+   "pmpu_long": 40174,
+   "pmpu_short": 58935,
+   "mm_long": 38856,
+   "mm_short": 10981,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-10-31",
+   "oi": 111799,
+   "pmpu_long": 43237,
+   "pmpu_short": 61258,
+   "mm_long": 37607,
+   "mm_short": 11353,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-11-07",
+   "oi": 111477,
+   "pmpu_long": 44313,
+   "pmpu_short": 54619,
+   "mm_long": 34307,
+   "mm_short": 13314,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-11-14",
+   "oi": 117872,
+   "pmpu_long": 42777,
+   "pmpu_short": 59439,
+   "mm_long": 39929,
+   "mm_short": 11882,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-11-21",
+   "oi": 121824,
+   "pmpu_long": 38353,
+   "pmpu_short": 61168,
+   "mm_long": 46823,
+   "mm_short": 11728,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-11-28",
+   "oi": 117080,
+   "pmpu_long": 34134,
+   "pmpu_short": 61854,
+   "mm_long": 47782,
+   "mm_short": 10939,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-12-05",
+   "oi": 117076,
+   "pmpu_long": 34125,
+   "pmpu_short": 61000,
+   "mm_long": 46022,
+   "mm_short": 9398,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-12-12",
+   "oi": 109920,
+   "pmpu_long": 33757,
+   "pmpu_short": 61754,
+   "mm_long": 42847,
+   "mm_short": 8382,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-12-19",
+   "oi": 115240,
+   "pmpu_long": 38024,
+   "pmpu_short": 67408,
+   "mm_long": 43228,
+   "mm_short": 7067,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2023-12-26",
+   "oi": 105757,
+   "pmpu_long": 30688,
+   "pmpu_short": 61562,
+   "mm_long": 40801,
+   "mm_short": 5752,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-01-02",
+   "oi": 101103,
+   "pmpu_long": 25800,
+   "pmpu_short": 58930,
+   "mm_long": 42681,
+   "mm_short": 6483,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-01-09",
+   "oi": 104780,
+   "pmpu_long": 26634,
+   "pmpu_short": 61223,
+   "mm_long": 42765,
+   "mm_short": 5886,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-01-16",
+   "oi": 115045,
+   "pmpu_long": 27506,
+   "pmpu_short": 70854,
+   "mm_long": 48525,
+   "mm_short": 2889,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-01-23",
+   "oi": 116303,
+   "pmpu_long": 28639,
+   "pmpu_short": 73017,
+   "mm_long": 47556,
+   "mm_short": 3130,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-01-30",
+   "oi": 112136,
+   "pmpu_long": 24758,
+   "pmpu_short": 72934,
+   "mm_long": 49242,
+   "mm_short": 2310,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-02-06",
+   "oi": 116801,
+   "pmpu_long": 28249,
+   "pmpu_short": 78012,
+   "mm_long": 49867,
+   "mm_short": 2665,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-02-13",
+   "oi": 113894,
+   "pmpu_long": 25035,
+   "pmpu_short": 77891,
+   "mm_long": 51621,
+   "mm_short": 2840,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-02-20",
+   "oi": 115924,
+   "pmpu_long": 28963,
+   "pmpu_short": 79607,
+   "mm_long": 50959,
+   "mm_short": 3644,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-02-27",
+   "oi": 96180,
+   "pmpu_long": 21214,
+   "pmpu_short": 64911,
+   "mm_long": 49013,
+   "mm_short": 6118,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-03-05",
+   "oi": 101275,
+   "pmpu_long": 25132,
+   "pmpu_short": 70782,
+   "mm_long": 49868,
+   "mm_short": 5375,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-03-12",
+   "oi": 103388,
+   "pmpu_long": 24814,
+   "pmpu_short": 71686,
+   "mm_long": 50694,
+   "mm_short": 5913,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-03-19",
+   "oi": 101881,
+   "pmpu_long": 24058,
+   "pmpu_short": 69977,
+   "mm_long": 49791,
+   "mm_short": 6002,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-03-26",
+   "oi": 100231,
+   "pmpu_long": 21390,
+   "pmpu_short": 67575,
+   "mm_long": 49229,
+   "mm_short": 5830,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-04-02",
+   "oi": 101762,
+   "pmpu_long": 21063,
+   "pmpu_short": 69696,
+   "mm_long": 50635,
+   "mm_short": 6485,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-04-09",
+   "oi": 103288,
+   "pmpu_long": 23542,
+   "pmpu_short": 71505,
+   "mm_long": 47774,
+   "mm_short": 6577,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-04-16",
+   "oi": 100620,
+   "pmpu_long": 23555,
+   "pmpu_short": 68042,
+   "mm_long": 43184,
+   "mm_short": 6620,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-04-23",
+   "oi": 88274,
+   "pmpu_long": 18076,
+   "pmpu_short": 60627,
+   "mm_long": 38793,
+   "mm_short": 7271,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-04-30",
+   "oi": 85881,
+   "pmpu_long": 16770,
+   "pmpu_short": 58157,
+   "mm_long": 37832,
+   "mm_short": 6827,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-05-07",
+   "oi": 77638,
+   "pmpu_long": 21503,
+   "pmpu_short": 48558,
+   "mm_long": 31538,
+   "mm_short": 7689,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-05-14",
+   "oi": 80407,
+   "pmpu_long": 28346,
+   "pmpu_short": 53208,
+   "mm_long": 28407,
+   "mm_short": 6607,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-05-21",
+   "oi": 88551,
+   "pmpu_long": 33381,
+   "pmpu_short": 59864,
+   "mm_long": 28421,
+   "mm_short": 5691,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-05-28",
+   "oi": 95413,
+   "pmpu_long": 36610,
+   "pmpu_short": 67046,
+   "mm_long": 30464,
+   "mm_short": 4841,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-06-04",
+   "oi": 93612,
+   "pmpu_long": 34344,
+   "pmpu_short": 67079,
+   "mm_long": 33275,
+   "mm_short": 4623,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-06-11",
+   "oi": 95744,
+   "pmpu_long": 36622,
+   "pmpu_short": 72635,
+   "mm_long": 36807,
+   "mm_short": 4638,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-06-18",
+   "oi": 93674,
+   "pmpu_long": 34509,
+   "pmpu_short": 70780,
+   "mm_long": 36684,
+   "mm_short": 5480,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-06-25",
+   "oi": 86378,
+   "pmpu_long": 28279,
+   "pmpu_short": 65571,
+   "mm_long": 36460,
+   "mm_short": 4567,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-07-02",
+   "oi": 84847,
+   "pmpu_long": 25618,
+   "pmpu_short": 59160,
+   "mm_long": 35752,
+   "mm_short": 4619,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-07-09",
+   "oi": 89619,
+   "pmpu_long": 24530,
+   "pmpu_short": 65058,
+   "mm_long": 42200,
+   "mm_short": 4578,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-07-16",
+   "oi": 90997,
+   "pmpu_long": 27451,
+   "pmpu_short": 67212,
+   "mm_long": 42482,
+   "mm_short": 4418,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-07-23",
+   "oi": 89913,
+   "pmpu_long": 26962,
+   "pmpu_short": 63205,
+   "mm_long": 40884,
+   "mm_short": 4410,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-07-30",
+   "oi": 85769,
+   "pmpu_long": 29049,
+   "pmpu_short": 59050,
+   "mm_long": 36926,
+   "mm_short": 4881,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-08-06",
+   "oi": 89283,
+   "pmpu_long": 35054,
+   "pmpu_short": 61089,
+   "mm_long": 32448,
+   "mm_short": 5680,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-08-13",
+   "oi": 90834,
+   "pmpu_long": 33380,
+   "pmpu_short": 61978,
+   "mm_long": 36509,
+   "mm_short": 4722,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-08-20",
+   "oi": 98789,
+   "pmpu_long": 33670,
+   "pmpu_short": 66476,
+   "mm_long": 42549,
+   "mm_short": 5076,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-08-27",
+   "oi": 86337,
+   "pmpu_long": 23767,
+   "pmpu_short": 59859,
+   "mm_long": 41786,
+   "mm_short": 3928,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-09-03",
+   "oi": 87750,
+   "pmpu_long": 24605,
+   "pmpu_short": 59563,
+   "mm_long": 42111,
+   "mm_short": 4852,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-09-10",
+   "oi": 87757,
+   "pmpu_long": 23744,
+   "pmpu_short": 58458,
+   "mm_long": 42618,
+   "mm_short": 5257,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-09-17",
+   "oi": 88856,
+   "pmpu_long": 24157,
+   "pmpu_short": 56443,
+   "mm_long": 43710,
+   "mm_short": 5439,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-09-24",
+   "oi": 92840,
+   "pmpu_long": 28808,
+   "pmpu_short": 59491,
+   "mm_long": 42557,
+   "mm_short": 6408,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-10-01",
+   "oi": 94322,
+   "pmpu_long": 27749,
+   "pmpu_short": 60714,
+   "mm_long": 43612,
+   "mm_short": 5004,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-10-08",
+   "oi": 90838,
+   "pmpu_long": 29975,
+   "pmpu_short": 56783,
+   "mm_long": 39925,
+   "mm_short": 5898,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-10-15",
+   "oi": 85640,
+   "pmpu_long": 27420,
+   "pmpu_short": 53148,
+   "mm_long": 38387,
+   "mm_short": 6310,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-10-22",
+   "oi": 73207,
+   "pmpu_long": 21186,
+   "pmpu_short": 40678,
+   "mm_long": 32050,
+   "mm_short": 8188,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-10-29",
+   "oi": 70763,
+   "pmpu_long": 20408,
+   "pmpu_short": 40580,
+   "mm_long": 28929,
+   "mm_short": 9165,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-11-05",
+   "oi": 71539,
+   "pmpu_long": 20617,
+   "pmpu_short": 37749,
+   "mm_long": 27053,
+   "mm_short": 10643,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-11-12",
+   "oi": 71682,
+   "pmpu_long": 21604,
+   "pmpu_short": 38735,
+   "mm_long": 27144,
+   "mm_short": 9739,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-11-19",
+   "oi": 75368,
+   "pmpu_long": 20290,
+   "pmpu_short": 42449,
+   "mm_long": 31419,
+   "mm_short": 8646,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-11-26",
+   "oi": 76576,
+   "pmpu_long": 18681,
+   "pmpu_short": 43700,
+   "mm_long": 32895,
+   "mm_short": 6744,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-12-03",
+   "oi": 75786,
+   "pmpu_long": 22930,
+   "pmpu_short": 42686,
+   "mm_long": 30265,
+   "mm_short": 6868,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-12-10",
+   "oi": 74733,
+   "pmpu_long": 24005,
+   "pmpu_short": 41306,
+   "mm_long": 28755,
+   "mm_short": 6347,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-12-17",
+   "oi": 72504,
+   "pmpu_long": 21205,
+   "pmpu_short": 40973,
+   "mm_long": 29385,
+   "mm_short": 6201,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-12-24",
+   "oi": 66111,
+   "pmpu_long": 19212,
+   "pmpu_short": 41015,
+   "mm_long": 27754,
+   "mm_short": 6071,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2024-12-31",
+   "oi": 65529,
+   "pmpu_long": 19645,
+   "pmpu_short": 40616,
+   "mm_long": 26454,
+   "mm_short": 6194,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-01-07",
+   "oi": 66170,
+   "pmpu_long": 19684,
+   "pmpu_short": 40841,
+   "mm_long": 28012,
+   "mm_short": 6943,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-01-14",
+   "oi": 68267,
+   "pmpu_long": 22006,
+   "pmpu_short": 37956,
+   "mm_long": 26827,
+   "mm_short": 8308,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-01-21",
+   "oi": 71252,
+   "pmpu_long": 20293,
+   "pmpu_short": 41382,
+   "mm_long": 29932,
+   "mm_short": 9538,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-01-28",
+   "oi": 73795,
+   "pmpu_long": 17869,
+   "pmpu_short": 44838,
+   "mm_long": 34521,
+   "mm_short": 8286,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-02-04",
+   "oi": 73280,
+   "pmpu_long": 16215,
+   "pmpu_short": 46335,
+   "mm_long": 35158,
+   "mm_short": 7178,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-02-11",
+   "oi": 81643,
+   "pmpu_long": 23843,
+   "pmpu_short": 51544,
+   "mm_long": 35780,
+   "mm_short": 6387,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-02-18",
+   "oi": 78223,
+   "pmpu_long": 18576,
+   "pmpu_short": 47228,
+   "mm_long": 37307,
+   "mm_short": 4613,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-02-25",
+   "oi": 75025,
+   "pmpu_long": 19497,
+   "pmpu_short": 43964,
+   "mm_long": 35244,
+   "mm_short": 4822,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-03-04",
+   "oi": 73420,
+   "pmpu_long": 19525,
+   "pmpu_short": 43636,
+   "mm_long": 32768,
+   "mm_short": 4161,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-03-11",
+   "oi": 71964,
+   "pmpu_long": 21968,
+   "pmpu_short": 42435,
+   "mm_long": 30544,
+   "mm_short": 4313,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-03-18",
+   "oi": 71142,
+   "pmpu_long": 22477,
+   "pmpu_short": 41655,
+   "mm_long": 29627,
+   "mm_short": 4192,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-03-25",
+   "oi": 72851,
+   "pmpu_long": 19890,
+   "pmpu_short": 41133,
+   "mm_long": 31347,
+   "mm_short": 3781,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-04-01",
+   "oi": 74258,
+   "pmpu_long": 25214,
+   "pmpu_short": 39146,
+   "mm_long": 27537,
+   "mm_short": 4942,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-04-08",
+   "oi": 74746,
+   "pmpu_long": 33538,
+   "pmpu_short": 38497,
+   "mm_long": 19591,
+   "mm_short": 5290,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-04-15",
+   "oi": 72408,
+   "pmpu_long": 38867,
+   "pmpu_short": 40631,
+   "mm_long": 17390,
+   "mm_short": 5828,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-04-22",
+   "oi": 68611,
+   "pmpu_long": 34459,
+   "pmpu_short": 38697,
+   "mm_long": 18200,
+   "mm_short": 5862,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-04-29",
+   "oi": 69613,
+   "pmpu_long": 29310,
+   "pmpu_short": 40028,
+   "mm_long": 24778,
+   "mm_short": 5428,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-05-06",
+   "oi": 71053,
+   "pmpu_long": 30223,
+   "pmpu_short": 38304,
+   "mm_long": 23566,
+   "mm_short": 5025,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-05-13",
+   "oi": 72119,
+   "pmpu_long": 32672,
+   "pmpu_short": 38373,
+   "mm_long": 20894,
+   "mm_short": 5279,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-05-20",
+   "oi": 73815,
+   "pmpu_long": 36854,
+   "pmpu_short": 37687,
+   "mm_long": 16779,
+   "mm_short": 7935,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-05-27",
+   "oi": 78856,
+   "pmpu_long": 40922,
+   "pmpu_short": 38076,
+   "mm_long": 15524,
+   "mm_short": 10324,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-06-03",
+   "oi": 85301,
+   "pmpu_long": 46688,
+   "pmpu_short": 41984,
+   "mm_long": 15162,
+   "mm_short": 12291,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-06-10",
+   "oi": 86656,
+   "pmpu_long": 46875,
+   "pmpu_short": 44319,
+   "mm_long": 15584,
+   "mm_short": 12244,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-06-17",
+   "oi": 84016,
+   "pmpu_long": 42749,
+   "pmpu_short": 38613,
+   "mm_long": 14804,
+   "mm_short": 12610,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-06-24",
+   "oi": 79362,
+   "pmpu_long": 38910,
+   "pmpu_short": 35957,
+   "mm_long": 15436,
+   "mm_short": 12750,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-07-01",
+   "oi": 80828,
+   "pmpu_long": 39642,
+   "pmpu_short": 36764,
+   "mm_long": 15987,
+   "mm_short": 13116,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-07-08",
+   "oi": 81400,
+   "pmpu_long": 40598,
+   "pmpu_short": 33432,
+   "mm_long": 15926,
+   "mm_short": 14593,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-07-15",
+   "oi": 83342,
+   "pmpu_long": 38059,
+   "pmpu_short": 31633,
+   "mm_long": 18193,
+   "mm_short": 17020,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-07-22",
+   "oi": 81252,
+   "pmpu_long": 36124,
+   "pmpu_short": 27420,
+   "mm_long": 17008,
+   "mm_short": 18092,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-07-29",
+   "oi": 84250,
+   "pmpu_long": 37821,
+   "pmpu_short": 27995,
+   "mm_long": 16959,
+   "mm_short": 19062,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-08-05",
+   "oi": 81307,
+   "pmpu_long": 37279,
+   "pmpu_short": 25647,
+   "mm_long": 17363,
+   "mm_short": 18511,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-08-12",
+   "oi": 81755,
+   "pmpu_long": 37175,
+   "pmpu_short": 27144,
+   "mm_long": 18880,
+   "mm_short": 16053,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-08-19",
+   "oi": 82438,
+   "pmpu_long": 37365,
+   "pmpu_short": 28245,
+   "mm_long": 23564,
+   "mm_short": 14892,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-08-26",
+   "oi": 69757,
+   "pmpu_long": 30412,
+   "pmpu_short": 24317,
+   "mm_long": 23358,
+   "mm_short": 12362,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-09-02",
+   "oi": 68809,
+   "pmpu_long": 29048,
+   "pmpu_short": 27491,
+   "mm_long": 26785,
+   "mm_short": 10781,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-09-09",
+   "oi": 70034,
+   "pmpu_long": 29341,
+   "pmpu_short": 26703,
+   "mm_long": 26996,
+   "mm_short": 11247,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-09-16",
+   "oi": 73752,
+   "pmpu_long": 30082,
+   "pmpu_short": 28131,
+   "mm_long": 28657,
+   "mm_short": 10954,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-09-23",
+   "oi": 74977,
+   "pmpu_long": 33632,
+   "pmpu_short": 28562,
+   "mm_long": 25340,
+   "mm_short": 12036,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-09-30",
+   "oi": 75813,
+   "pmpu_long": 36195,
+   "pmpu_short": 28887,
+   "mm_long": 22732,
+   "mm_short": 12608,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-10-07",
+   "oi": 78198,
+   "pmpu_long": 35764,
+   "pmpu_short": 31388,
+   "mm_long": 24703,
+   "mm_short": 11524,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-10-14",
+   "oi": 76828,
+   "pmpu_long": 34256,
+   "pmpu_short": 31024,
+   "mm_long": 26362,
+   "mm_short": 10569,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-10-21",
+   "oi": 70326,
+   "pmpu_long": 31130,
+   "pmpu_short": 32661,
+   "mm_long": 21351,
+   "mm_short": 6954,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-10-28",
+   "oi": 66876,
+   "pmpu_long": 27184,
+   "pmpu_short": 28762,
+   "mm_long": 22425,
+   "mm_short": 7164,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-11-04",
+   "oi": 71249,
+   "pmpu_long": 26618,
+   "pmpu_short": 31170,
+   "mm_long": 25484,
+   "mm_short": 6932,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-11-10",
+   "oi": 71226,
+   "pmpu_long": 26709,
+   "pmpu_short": 30005,
+   "mm_long": 24792,
+   "mm_short": 7887,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-11-18",
+   "oi": 70143,
+   "pmpu_long": 28349,
+   "pmpu_short": 29709,
+   "mm_long": 21272,
+   "mm_short": 6721,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-11-25",
+   "oi": 67350,
+   "pmpu_long": 24090,
+   "pmpu_short": 27233,
+   "mm_long": 23015,
+   "mm_short": 5811,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-12-02",
+   "oi": 69645,
+   "pmpu_long": 24350,
+   "pmpu_short": 27785,
+   "mm_long": 23380,
+   "mm_short": 4839,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-12-09",
+   "oi": 66756,
+   "pmpu_long": 27343,
+   "pmpu_short": 27592,
+   "mm_long": 20379,
+   "mm_short": 6247,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-12-16",
+   "oi": 68175,
+   "pmpu_long": 27952,
+   "pmpu_short": 24342,
+   "mm_long": 19347,
+   "mm_short": 8669,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-12-23",
+   "oi": 70224,
+   "pmpu_long": 27910,
+   "pmpu_short": 20028,
+   "mm_long": 20675,
+   "mm_short": 14502,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2025-12-30",
+   "oi": 69242,
+   "pmpu_long": 25509,
+   "pmpu_short": 18089,
+   "mm_long": 20803,
+   "mm_short": 14288,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-01-06",
+   "oi": 71465,
+   "pmpu_long": 25318,
+   "pmpu_short": 18460,
+   "mm_long": 21820,
+   "mm_short": 15280,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-01-13",
+   "oi": 74489,
+   "pmpu_long": 25470,
+   "pmpu_short": 20204,
+   "mm_long": 23484,
+   "mm_short": 15923,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-01-20",
+   "oi": 75659,
+   "pmpu_long": 21806,
+   "pmpu_short": 21915,
+   "mm_long": 26270,
+   "mm_short": 15128,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-01-27",
+   "oi": 78007,
+   "pmpu_long": 18838,
+   "pmpu_short": 30219,
+   "mm_long": 30957,
+   "mm_short": 11631,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-02-03",
+   "oi": 79091,
+   "pmpu_long": 27329,
+   "pmpu_short": 33915,
+   "mm_long": 26020,
+   "mm_short": 12072,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-02-10",
+   "oi": 86462,
+   "pmpu_long": 30682,
+   "pmpu_short": 33088,
+   "mm_long": 23475,
+   "mm_short": 16799,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-02-17",
+   "oi": 91072,
+   "pmpu_long": 34600,
+   "pmpu_short": 34507,
+   "mm_long": 25187,
+   "mm_short": 19753,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-02-24",
+   "oi": 82055,
+   "pmpu_long": 30124,
+   "pmpu_short": 25844,
+   "mm_long": 24397,
+   "mm_short": 22339,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-03-03",
+   "oi": 85576,
+   "pmpu_long": 28285,
+   "pmpu_short": 28663,
+   "mm_long": 25715,
+   "mm_short": 20241,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-03-10",
+   "oi": 85611,
+   "pmpu_long": 28520,
+   "pmpu_short": 29482,
+   "mm_long": 25589,
+   "mm_short": 18253,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-03-17",
+   "oi": 90068,
+   "pmpu_long": 33068,
+   "pmpu_short": 28060,
+   "mm_long": 22975,
+   "mm_short": 22698,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-03-24",
+   "oi": 88040,
+   "pmpu_long": 29351,
+   "pmpu_short": 31280,
+   "mm_long": 24616,
+   "mm_short": 18358,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-03-31",
+   "oi": 91089,
+   "pmpu_long": 32174,
+   "pmpu_short": 28639,
+   "mm_long": 23172,
+   "mm_short": 22320,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-04-07",
+   "oi": 88937,
+   "pmpu_long": 31460,
+   "pmpu_short": 27513,
+   "mm_long": 24801,
+   "mm_short": 23477,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-04-14",
+   "oi": 93314,
+   "pmpu_long": 31155,
+   "pmpu_short": 28761,
+   "mm_long": 26116,
+   "mm_short": 25197,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-04-21",
+   "oi": 87015,
+   "pmpu_long": 25907,
+   "pmpu_short": 28022,
+   "mm_long": 28055,
+   "mm_short": 23023,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-04-28",
+   "oi": 86566,
+   "pmpu_long": 19701,
+   "pmpu_short": 32062,
+   "mm_long": 33152,
+   "mm_short": 18453,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-05-05",
+   "oi": 85408,
+   "pmpu_long": 19343,
+   "pmpu_short": 31417,
+   "mm_long": 31398,
+   "mm_short": 20023,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-05-12",
+   "oi": 92339,
+   "pmpu_long": 19744,
+   "pmpu_short": 37450,
+   "mm_long": 34108,
+   "mm_short": 17925,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-05-19",
+   "oi": 92708,
+   "pmpu_long": 22627,
+   "pmpu_short": 36374,
+   "mm_long": 31304,
+   "mm_short": 18498,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-05-26",
+   "oi": 96965,
+   "pmpu_long": 21324,
+   "pmpu_short": 37917,
+   "mm_long": 33887,
+   "mm_short": 17211,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-06-02",
+   "oi": 99183,
+   "pmpu_long": 21716,
+   "pmpu_short": 43012,
+   "mm_long": 34929,
+   "mm_short": 14595,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-06-09",
+   "oi": 96975,
+   "pmpu_long": 26235,
+   "pmpu_short": 39796,
+   "mm_long": 31939,
+   "mm_short": 17566,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-06-16",
+   "oi": 107329,
+   "pmpu_long": 22991,
+   "pmpu_short": 54474,
+   "mm_long": 43762,
+   "mm_short": 13662,
+   "market": "cot.json ldn"
+  },
+  {
+   "date": "2026-06-23",
+   "oi": 92776,
+   "pmpu_long": 17165,
+   "pmpu_short": 55467,
+   "mm_long": 40560,
+   "mm_short": 5209,
+   "market": "cot.json ldn"
+  }
+ ]
+}
