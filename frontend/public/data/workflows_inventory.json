@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T09:17:25.303208Z",
-  "count": 67,
+  "generated_at": "2026-07-02T16:32:42.455480Z",
+  "count": 68,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -12,6 +12,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 60
+    },
+    {
+      "file": "backfill-cot-deep.yml",
+      "name": "9.4 \u2013 Backfill Deep COT History (one-off)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 25
     },
     {
       "file": "backfill-enso-thermocline.yml",
@@ -937,6 +948,11 @@
         "file": "backfill-fx-history.yml",
         "name": "1.99 \u2013 Backfill FX history (CCI, Yahoo, 2020+)",
         "version": "1.99"
+      },
+      {
+        "file": "backfill-cot-deep.yml",
+        "name": "9.4 \u2013 Backfill Deep COT History (one-off)",
+        "version": "9.4"
       }
     ],
     "stale_curation": [],
@@ -950,7 +966,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 5,
+    "uncovered_workflows_count": 6,
     "stale_curation_count": 0
   }
 }
