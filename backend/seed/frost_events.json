@@ -1,0 +1,38 @@
+{
+  "_note": "Catalogue of the major damaging frost events in the Brazilian arabica belt. Used by scraper.rules.frost_model's backtest/sanity harness to check the severity ladder classifies the historic disasters as 'critical', and by the frontend frost view for historical context. `observed_air_min_c` is a REPRESENTATIVE 2 m air minimum reported for the worst-hit region on the peak night (screen-height; the canopy/grass minimum ran several deg colder). `mechanism` is from the meteorological record of the event. These are well-established figures; precise per-station minima vary. A true blind ERA5 backtest (recomputing the model from raw hourly archive) is a separate step that needs archive-api.open-meteo.com access — see scraper.backfill_frost_backtest.",
+  "events": [
+    {
+      "id": "1975-black-frost",
+      "label": "Geada Negra (Black Frost)",
+      "peak_dates": ["1975-07-17", "1975-07-18"],
+      "regions": ["Paraná", "Sul de Minas", "São Paulo"],
+      "observed_air_min_c": -4.0,
+      "mechanism": "black",
+      "expected_severity": "critical",
+      "crop_impact": "Catastrophic: on the order of 70% of Brazil's coffee trees killed; permanent collapse of Paraná as the leading producing state. Arabica prices roughly tripled through 1976-77. A dry hard freeze under a polar air mass — literally the 'black frost'.",
+      "source": "Widely documented; the benchmark Brazilian frost disaster."
+    },
+    {
+      "id": "1994-double-frost",
+      "label": "1994 double frost",
+      "peak_dates": ["1994-06-27", "1994-07-10"],
+      "regions": ["Sul de Minas", "São Paulo", "Paraná"],
+      "observed_air_min_c": -3.0,
+      "mechanism": "radiative",
+      "expected_severity": "critical",
+      "crop_impact": "Two frosts ~two weeks apart devastated the 1995 crop; the worst since 1975. Arabica prices spiked well over 100%.",
+      "source": "Widely documented; drove the mid-1990s price spike."
+    },
+    {
+      "id": "2021-july-frosts",
+      "label": "July 2021 frosts",
+      "peak_dates": ["2021-07-20", "2021-07-30"],
+      "regions": ["Sul de Minas", "Cerrado", "São Paulo", "Paraná"],
+      "observed_air_min_c": -1.5,
+      "mechanism": "radiative",
+      "expected_severity": "critical",
+      "crop_impact": "Strong polar air mass; clear, calm radiative nights drove canopy minima well below the ~-1.5 °C screen minima. ~10-20% of the 2022/23 crop damaged; arabica futures roughly doubled over the following months.",
+      "source": "Well documented; the most damaging frost in decades."
+    }
+  ]
+}
