@@ -39,7 +39,24 @@ zero new infrastructure — revisit at ~300 rows (~early 2027), or earlier via a
 DB backfill if `physical_prices` holds deeper giacaphe history than the
 exporter surfaces.
 
-## COT industry × harvest (interaction hypothesis) — INCONCLUSIVE
+## COT industry × harvest — RE-TESTED ON DEEP DATA (2026-07): REJECTED
+The deep backfill (workflow 9.4) banked **613 weekly ICE robusta COT rows
+(2014-09 → 2026-06)** in `data/ice_cot_robusta_history.json`. Free robusta
+*price* history remains the binding constraint (~2020-10 at best: intraday
+17:30 closes + archive fronts + Barchart EOD, merged), so the joined test
+sample is 1,454 days / ~7 harvest cycles — two more than the original test,
+crucially adding the 2020-10→2021-06 regime.
+
+Result: the purged walk-forward edge FLIPS NEGATIVE — ind_z+harv **−3.8pp**
+vs baseline (95% CI [−8.1, +1.0], P(edge>0)=0.065), with 2022 alone at
+−15.9pp. The 2×2 directional shape survives qualitatively (heavy-short·harvest
++2.0% fwd-10d vs min-short·harvest −0.3%) but cannot be monetized out of
+sample. **Verdict: the earlier +1.5pp was sample luck; do NOT found a
+multi-day model on this interaction.** The deep COT file stays banked for
+future hypotheses; re-opening this one requires pre-2020 price data (paid or
+manual import) AND a materially different formulation.
+
+## COT industry × harvest (original 6y test) — INCONCLUSIVE
 Hypothesis: commercial (`pmpu`) positioning conditioned on harvest predicts a
 **multi-day** move (min-short during harvest = unsold crop overhang = bearish).
 
