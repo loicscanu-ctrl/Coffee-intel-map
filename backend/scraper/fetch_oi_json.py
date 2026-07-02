@@ -18,7 +18,7 @@ import asyncio
 import json
 import os
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pathlib import Path
@@ -67,7 +67,7 @@ def _reference_date(now: "datetime | None" = None) -> date:
     a pre-settle (morning/daytime) run reuses today; a post-settle evening run on
     a weekday advances to the next day so an evening capture stamps the correct
     (just-settled) session instead of the prior one."""
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     d = now.date()
     settled_today = d.weekday() < 5 and now.hour >= _SETTLE_HOUR_UTC
     return d + timedelta(days=1) if settled_today else d

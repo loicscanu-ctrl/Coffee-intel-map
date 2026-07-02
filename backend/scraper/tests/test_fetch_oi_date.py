@@ -6,7 +6,7 @@ AFTER a session. _reference_date advances ref to the next day once past the
 settle hour on a weekday, so an EVENING capture stamps the just-settled session
 correctly — while morning/daytime runs are unchanged.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from scraper.fetch_oi_json import _prev_biz_day, _reference_date
 
@@ -16,7 +16,7 @@ def _price_date(now):
 
 
 def _utc(y, m, d, h):
-    return datetime(y, m, d, h, 0, tzinfo=timezone.utc)
+    return datetime(y, m, d, h, 0, tzinfo=UTC)
 
 
 def test_morning_run_unchanged():

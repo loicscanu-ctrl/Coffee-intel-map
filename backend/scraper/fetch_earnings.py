@@ -7,7 +7,6 @@ Usage:
     cd backend
     python -m scraper.fetch_earnings
 """
-import json
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
