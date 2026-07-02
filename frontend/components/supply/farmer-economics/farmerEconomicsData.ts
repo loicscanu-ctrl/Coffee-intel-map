@@ -18,9 +18,23 @@ export interface InputDetail {
   usd: number;
 }
 
+// Physics-based frost detail for the worst forecast day (from the deepened
+// frost model — scraper.rules.frost_model). Absent when the forecast holds
+// no frost, or on JSON written before Phase 2.
+export interface FrostDetail {
+  date: string | null;
+  risk: DayRisk;
+  frost_type: "none" | "radiative" | "advective" | "black";
+  surface_c: number | null;   // canopy/grass-minimum estimate (°C)
+  air_min_c: number | null;   // 2 m air minimum (°C)
+  hours_below_0: number;      // hours the canopy stayed below freezing
+  severity?: "critical" | "alert" | "watch" | null;  // same tier the alert fires
+}
+
 export interface WeatherRegion {
   name: string;
   frost: RiskLevel;
+  frost_detail?: FrostDetail | null;
   drought: RiskLevel;
   csi_30d?: number;
   csi_60d?: number;

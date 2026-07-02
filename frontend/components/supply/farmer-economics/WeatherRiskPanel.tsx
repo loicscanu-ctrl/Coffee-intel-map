@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import type { FarmerEconomicsData, RiskLevel, DayRisk, CurrentCondition } from "./farmerEconomicsData";
+import FrostWatchPanel from "./FrostWatchPanel";
 
 interface Props {
   weather: NonNullable<FarmerEconomicsData["weather"]>;
@@ -99,6 +100,9 @@ export default function WeatherRiskPanel({ weather }: Props) {
           );
         })}
       </div>
+
+      {/* Frost Watch — per-region physics detail + historical anchor */}
+      <FrostWatchPanel regions={weather.regions} />
 
       {/* 14-day frost grid */}
       {weather.daily_frost.length > 0 && (
