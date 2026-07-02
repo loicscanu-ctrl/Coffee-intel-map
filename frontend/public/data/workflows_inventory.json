@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T00:22:01.092406Z",
+  "generated_at": "2026-07-02T09:17:25.303208Z",
   "count": 67,
   "workflows": [
     {
@@ -356,7 +356,7 @@
         "workflow_dispatch"
       ],
       "crons": [
-        "0 3 * * 1-5"
+        "7 3 * * 1-5"
       ],
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
@@ -914,11 +914,6 @@
   "drift": {
     "uncovered_workflows": [
       {
-        "file": "open-direction-log.yml",
-        "name": "1.16 \u2013 Open-Direction Prediction Log",
-        "version": "1.16"
-      },
-      {
         "file": "backfill-kc-at-rc-close.yml",
         "name": "1.95 \u2013 Backfill KC at RC Close (one-shot)",
         "version": "1.95"
@@ -955,7 +950,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 6,
+    "uncovered_workflows_count": 5,
     "stale_curation_count": 0
   }
 }
