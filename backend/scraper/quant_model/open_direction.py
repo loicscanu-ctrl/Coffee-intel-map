@@ -229,10 +229,15 @@ def _cci_overnight_series() -> "pd.Series | None":
 def active_features(frame: "pd.DataFrame") -> list[str]:
     """The model's feature set for a given dataset — single source of truth,
     shared by run() and the log module's seed so they can never diverge.
-    Optional features join once their data clears the coverage threshold."""
+    Optional features join once their data clears the coverage threshold.
+
+    brent_overnight is deliberately NOT here: the full-sample verdict
+    (2026-07) is that it's a 2022-oil-shock-only signal (+6.1pp that year,
+    NEGATIVE marginal every calm year; regime-gating didn't rescue it — see
+    the findings doc). It ships as a REGIME TAG instead; the anchor data
+    keeps accruing daily so it can be re-evaluated in a future oil-shock
+    regime."""
     active = ["kc_after_rc_diff", "days_since_roll"]
-    if "brent_overnight" in frame.columns and frame["brent_overnight"].notna().sum() >= _MIN_BRENT_OVERLAP:
-        active.append("brent_overnight")
     if "cci_overnight" in frame.columns and frame["cci_overnight"].notna().sum() >= _MIN_CCI_OVERLAP:
         active.append("cci_overnight")
     return active
@@ -395,18 +400,12 @@ def run(db=None) -> dict:
         "kc_after_rc_diff": float(k1830) / float(k1730) - 1.0,
         "days_since_roll":  float(last["days_since_roll"]) + 1.0,
     }
-    if "brent_overnight" in active:
-        brent = _brent_overnight_series()
-        v = brent.get(for_session) if brent is not None else None
-        if v is None:
-            # this morning's anchor not present yet → predict without the
-            # feature by imputing the training mean (z = 0 ⇒ φ = 0).
-            v = float(mu[active.index("brent_overnight")])
-        live_vals["brent_overnight"] = float(v)
     if "cci_overnight" in active:
         cci = _cci_overnight_series()
         v = cci.get(for_session) if cci is not None else None
         if v is None:
+            # snapshot for this morning not present → predict without the
+            # feature by imputing the training mean (z = 0 ⇒ φ = 0).
             v = float(mu[active.index("cci_overnight")])
         live_vals["cci_overnight"] = float(v)
 
@@ -436,6 +435,11 @@ def run(db=None) -> dict:
                   8: 0, 9: 0, 10: .20, 11: .45, 12: .45}
     harvest_w = _HARVEST_W.get(for_session.month, 0)
     ny_shock = abs(live_vals["kc_after_rc_diff"]) >= 0.008
+    # Brent overnight as CONTEXT (not a coefficient — see active_features):
+    # today's 17:30→03:00 move, flagged when it's a genuine oil jolt.
+    brent_series = _brent_overnight_series()
+    brent_val = (brent_series.get(for_session)
+                 if brent_series is not None else None)
     regime = {
         "ny_shock":        bool(ny_shock),          # 88% hit-rate setup (n=42)
         "vol_regime":      ("high" if vol_pctile is not None and vol_pctile > 0.5 else "low")
@@ -443,6 +447,9 @@ def run(db=None) -> dict:
         "vol_percentile":  round(vol_pctile, 2) if vol_pctile is not None else None,
         "harvest_weight":  harvest_w,               # robusta-origin harvest calendar
         "harvest_active":  harvest_w >= 0.30,
+        "brent_overnight_pct": (round(float(brent_val) * 100, 2)
+                                if brent_val is not None else None),
+        "oil_shock":       bool(brent_val is not None and abs(brent_val) >= 0.015),
     }
 
     # ── $/t ruler + per-feature detail ───────────────────────────────────────
