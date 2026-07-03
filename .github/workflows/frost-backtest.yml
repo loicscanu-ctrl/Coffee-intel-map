@@ -59,5 +59,17 @@ jobs:
           MODE="${{ inputs.mode || 'recent' }}"
           DAYS="${{ inputs.days || '90' }}"
           echo "::group::frost backtest ($MODE)"
+          set +e
           PYTHONPATH=. python -m scraper.backfill_frost_backtest --mode "$MODE" --days "$DAYS"
+          rc=$?
+          set -e
           echo "::endgroup::"
+          # Exit 2 = the endpoint was unreachable after retries (an Open-Meteo
+          # slow spell, or events-mode without an archive proxy). This job is
+          # informational validation — don't red-light the run for a transient
+          # upstream outage; surface it as a notice instead.
+          if [ "$rc" = "2" ]; then
+            echo "::notice::Open-Meteo unreachable for '$MODE' mode — backtest skipped (transient / no proxy). Not a failure."
+            exit 0
+          fi
+          exit "$rc"

@@ -31,11 +31,17 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 from pathlib import Path
 
 import requests
 
 from scraper.rules import frost_model as fm
+
+# Open-Meteo "occasionally goes slow (>20 s response)". Match the daily
+# weather fetcher's resilience: several attempts with progressively-longer
+# timeouts + backoff, so one slow spell doesn't fail the whole backtest.
+_FETCH_ATTEMPTS = ((10, 45), (10, 75), (10, 100))
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "seed" / "frost_events.json"
@@ -63,22 +69,31 @@ def _archive_base() -> str:
     return os.environ.get("OPEN_METEO_ARCHIVE_BASE", "").strip() or DEFAULT_ARCHIVE
 
 
+def _get_hourly(url: str, params: dict, tag: str) -> dict | None:
+    """GET the Open-Meteo `hourly` block with retries + backoff. None on
+    terminal failure (all attempts exhausted)."""
+    last = ""
+    for i, timeout in enumerate(_FETCH_ATTEMPTS):
+        try:
+            r = requests.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r.json().get("hourly")
+        except requests.RequestException as e:
+            last = f"{type(e).__name__}: {str(e)[:100]}"
+            if i < len(_FETCH_ATTEMPTS) - 1:
+                time.sleep(2 ** (i + 1))
+    print(f"    fetch failed {tag} after {len(_FETCH_ATTEMPTS)} attempts: {last}",
+          file=sys.stderr)
+    return None
+
+
 def _fetch_hourly(lat: float, lon: float, start: str, end: str) -> dict | None:
     """ERA5 hourly for [start, end] at (lat, lon). None on any failure."""
-    params = {
+    return _get_hourly(_archive_base(), {
         "latitude": lat, "longitude": lon,
         "start_date": start, "end_date": end,
-        "hourly": "temperature_2m,dew_point_2m,cloud_cover,wind_speed_10m",
-        "timezone": "America/Sao_Paulo",
-    }
-    try:
-        r = requests.get(_archive_base(), params=params, timeout=45)
-        r.raise_for_status()
-        return r.json().get("hourly")
-    except requests.RequestException as e:
-        print(f"    fetch failed ({lat},{lon}) {start}..{end}: "
-              f"{type(e).__name__}: {str(e)[:120]}", file=sys.stderr)
-        return None
+        "hourly": _HOURLY_VARS, "timezone": "America/Sao_Paulo",
+    }, tag=f"({lat},{lon}) {start}..{end}")
 
 
 def _nights(hourly: dict) -> dict[str, tuple[list, list, list, list]]:
@@ -112,20 +127,12 @@ def _reachable() -> bool:
 
 def _fetch_recent(lat: float, lon: float, past_days: int) -> dict | None:
     """Recent hourly (last `past_days`) from the FORECAST API at (lat, lon).
-    None on any failure."""
-    params = {
+    None on terminal failure (retries handled by _get_hourly)."""
+    return _get_hourly(FORECAST_URL, {
         "latitude": lat, "longitude": lon,
         "past_days": min(past_days, 92), "forecast_days": 1,
         "hourly": _HOURLY_VARS, "timezone": "America/Sao_Paulo",
-    }
-    try:
-        r = requests.get(FORECAST_URL, params=params, timeout=45)
-        r.raise_for_status()
-        return r.json().get("hourly")
-    except requests.RequestException as e:
-        print(f"    fetch failed ({lat},{lon}): {type(e).__name__}: {str(e)[:120]}",
-              file=sys.stderr)
-        return None
+    }, tag=f"({lat},{lon}) recent {past_days}d")
 
 
 def run_recent(days: int = 90) -> int:
