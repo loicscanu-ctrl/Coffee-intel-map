@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-03T06:07:52.552910Z",
-  "count": 69,
+  "generated_at": "2026-07-03T06:47:34.799632Z",
+  "count": 70,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -12,6 +12,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 60
+    },
+    {
+      "file": "backfill-brent-intraday.yml",
+      "name": "9.5 \u2013 Backfill Brent Overnight Anchors (one-off)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 30
     },
     {
       "file": "backfill-cot-deep.yml",
@@ -967,6 +978,11 @@
         "file": "backfill-cot-deep.yml",
         "name": "9.4 \u2013 Backfill Deep COT History (one-off)",
         "version": "9.4"
+      },
+      {
+        "file": "backfill-brent-intraday.yml",
+        "name": "9.5 \u2013 Backfill Brent Overnight Anchors (one-off)",
+        "version": "9.5"
       }
     ],
     "stale_curation": [],
@@ -980,7 +996,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 6,
+    "uncovered_workflows_count": 7,
     "stale_curation_count": 0
   }
 }
