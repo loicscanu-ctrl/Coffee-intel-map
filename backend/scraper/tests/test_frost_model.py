@@ -14,8 +14,11 @@ def test_surface_temp_drops_below_air_on_clear_calm_night():
 def test_surface_temp_cloud_and_wind_suppress_the_drop():
     # Full overcast → no radiative decoupling; surface ≈ air.
     assert fm.surface_temp(4.0, 100.0, 0.0, 8.0) == 4.0
-    # Strong wind (≥ 12.5 km/h) → radiative term zeroed too.
+    # Strong wind (≥ 20 km/h, post-calibration) → radiative term zeroed too.
     assert fm.surface_temp(4.0, 0.0, 20.0, 8.0) == 4.0
+    # A moderate 10 m breeze no longer wipes out the drop: at 12.5 km/h the
+    # surface still decouples (this is the calibration fix — it used to be 0).
+    assert fm.surface_temp(4.0, 0.0, 12.5, 8.0) < 4.0
 
 
 def test_surface_temp_dry_air_amplifies_cooling():

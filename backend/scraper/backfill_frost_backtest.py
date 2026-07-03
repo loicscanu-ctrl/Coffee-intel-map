@@ -121,6 +121,32 @@ def _shift(iso: str, days: int) -> str:
     return (date.fromisoformat(iso) + timedelta(days=days)).isoformat()
 
 
+def _night_detail(night: tuple[list, list, list, list]) -> dict | None:
+    """Physics detail for one night's hourly slice, for the calibration
+    report: the coldest 2 m air, the coldest modelled canopy surface, and the
+    conditions at the coldest-surface hour (so a ✗ can be read as 'ERA5 was
+    genuinely mild here' vs 'ERA5 was cold but the model under-tiered'). None
+    for an empty night."""
+    t, d, c, w = night
+    pts = [(float(tt),
+            float(cc) if cc is not None else 0.0,
+            float(ww) if ww is not None else 0.0,
+            float(dd) if dd is not None else float(tt))
+           for tt, cc, ww, dd in zip(t, c, w, d) if tt is not None]
+    if not pts:
+        return None
+    surfaces = [fm.surface_temp(air, cl, wd, dp) for (air, cl, wd, dp) in pts]
+    ci = min(range(len(surfaces)), key=lambda i: surfaces[i])
+    _air, cloud_ci, wind_ci, dew_ci = pts[ci]
+    return {
+        "air_min": min(p[0] for p in pts),
+        "canopy_min": min(surfaces),
+        "cloud_at_min": cloud_ci,
+        "wind_at_min": wind_ci,
+        "dew_at_min": dew_ci,
+    }
+
+
 def _fetch_recent(lat: float, lon: float, past_days: int) -> dict | None:
     """Recent hourly (last `past_days`) from the FORECAST API at (lat, lon).
     None on terminal failure (retries handled by _get_hourly)."""
@@ -185,10 +211,16 @@ def run_events() -> int:
     fetch failed (archive unreachable — nothing proven)."""
     events = json.loads(CATALOG.read_text(encoding="utf-8"))["events"]
     print(f"[frost-backtest] events mode — archive base: {_archive_base()}", flush=True)
+    print("  ERA5 is a ~31 km reanalysis; it smooths the valley cold-pooling "
+          "that drives real frost minima, so a grid point often reads several "
+          "°C milder than the station observation. Read air_min/canopy_min to "
+          "tell 'model under-tiered' from 'ERA5 had no frost here'.")
     total = hits = ran = 0
     rank = {None: -1, "watch": 0, "alert": 1, "critical": 2}
     for ev in events:
-        print(f"\n[{ev['id']}] {ev['label']} — expect {ev['expected_severity']}")
+        obs = ev.get("observed_air_min_c")
+        print(f"\n[{ev['id']}] {ev['label']} — expect {ev['expected_severity']}"
+              f"  (observed station air_min {obs:+.1f}°C)")
         dates = sorted(ev["peak_dates"])
         # ±1 day brackets the pre-dawn minimum across the timezone boundary.
         start, end = _shift(dates[0], -1), _shift(dates[-1], 1)
@@ -201,14 +233,32 @@ def run_events() -> int:
                 print(f"    · {region:15s} (fetch unavailable)")
                 continue
             ran += 1
-            worst_sev, worst_rank = None, -1
-            for _day, (t, d, c, w) in _nights(hourly).items():
+            # Track the night that drives the worst severity (coldest canopy
+            # as tiebreak) and keep its assessment + slice for the report.
+            best_key: tuple[int, float] = (-2, 0.0)
+            worst_sev = None
+            worst_a = None
+            worst_night: tuple[list, list, list, list] | None = None
+            worst_day = ""
+            for day, night in sorted(_nights(hourly).items()):
+                t, d, c, w = night
                 a = fm.assess_night(t, c, w, d)
                 sev = fm.severity(a.risk, a.frost_type, a.surface_min_c, a.hours_below_0)
-                if rank[sev] > worst_rank:
-                    worst_rank, worst_sev = rank[sev], sev
+                key = (rank[sev], -a.surface_min_c)
+                if key > best_key:
+                    best_key, worst_sev, worst_a, worst_night, worst_day = (
+                        key, sev, a, night, day)
             mark = "✓" if worst_sev == ev["expected_severity"] else "✗"
-            print(f"    {mark} {region:15s} worst modelled severity: {worst_sev}")
+            det = _night_detail(worst_night) if worst_night else None
+            print(f"    {mark} {region:15s} sev={str(worst_sev):8s}", end="")
+            if det and worst_a is not None:
+                print(f" | air {det['air_min']:+5.1f}  canopy {det['canopy_min']:+5.1f}"
+                      f"  dew {det['dew_at_min']:+5.1f}  cloud {det['cloud_at_min']:3.0f}%"
+                      f"  wind {det['wind_at_min']:2.0f}km/h"
+                      f" | {worst_a.hours_below_0}h<0 {worst_a.hours_below_hard}h<hard"
+                      f"  {worst_a.frost_type:9s} ({worst_day})")
+            else:
+                print()
             total += 1
             if worst_sev == ev["expected_severity"]:
                 hits += 1
@@ -220,7 +270,11 @@ def run_events() -> int:
               "Nothing proven.", file=sys.stderr)
         return 2
     print(f"\n[frost-backtest] {hits}/{total} region-events matched expected "
-          f"severity. Mismatches indicate thresholds needing calibration.")
+          f"severity on ERA5 grid data. Read each row's air_min before reading "
+          f"a miss as a model error: most are the ~31 km reanalysis sitting "
+          f"well above freezing where the station saw a hard freeze (smoothed "
+          f"valley cold-pools) — the ladder is right, the grid has no frost to "
+          f"detect there. Don't loosen thresholds to chase those.")
     return 0
 
 

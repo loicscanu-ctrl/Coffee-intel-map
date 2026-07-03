@@ -31,8 +31,18 @@ What this model adds
   frost type) that downstream alerting (Phase 2) and the UI (Phase 4) can
   use, plus the same H / M / L / - letter the current frontend expects.
 
-Thresholds are physically motivated first-pass values; Phase 3 backtests
-them against the known Brazilian frost years and tunes from there.
+Thresholds are physically motivated; they were then checked against the
+1975/1994/2021 Brazilian frost disasters with a blind ERA5 backtest
+(scraper.backfill_frost_backtest --mode events, run on GitHub Actions where
+archive-api.open-meteo.com is reachable). That backtest confirmed the
+severity ladder fires "critical" on every genuinely-cold input (Paraná 1975
+black frost; São Paulo + Paraná 1994) and does NOT false-positive on 90 days
+of recent real data. Its one actionable finding — the 10 m-wind erosion of
+the radiative drop was too strong — is folded into WIND_MIXING_PER_KMH below.
+The residual backtest misses are ERA5's ~31 km grid reading several °C warmer
+than the station observations (e.g. 1975 Sul de Minas at +10 °C air vs an
+observed −4 °C), i.e. the reanalysis has no frost to detect at that point —
+not a threshold error, and not something to chase by over-loosening.
 """
 from __future__ import annotations
 
@@ -45,9 +55,15 @@ from dataclasses import dataclass
 # thermometers in frost country routinely read 4–6 °C below the screen (2 m)
 # minimum on radiative nights — hence 5.
 RADIATIVE_MAX_DROP_C = 5.0
-# km/h of wind that erodes 1 °C of that radiative drop (mechanical mixing of
-# the surface inversion). At ≥ 12.5 km/h radiative decoupling is fully gone.
-WIND_MIXING_PER_KMH = 0.4
+# °C of the radiative drop eroded per km/h of 10 m wind (mechanical mixing of
+# the surface inversion). Calibrated against the 1975/1994/2021 ERA5 blind
+# backtest (scraper.backfill_frost_backtest --mode events): the reported
+# `wind_speed_10m` overstates the *near-surface* mixing on a radiative-
+# inversion night — the surface layer stays calm and decoupled under a
+# moderate 10 m breeze — so the original 0.4 (full decoupling gone by only
+# 12.5 km/h) zeroed the drop on nights that really did frost. 0.25 pushes full
+# suppression out to 20 km/h, matching that inversions survive a light breeze.
+WIND_MIXING_PER_KMH = 0.25
 
 # Dry-air amplification. When the dew point is low, there's little latent
 # heat released by dew/frost deposition to buffer the surface, so it cools
