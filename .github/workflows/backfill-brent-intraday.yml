@@ -8,6 +8,13 @@ name: "9.5 – Backfill Brent Overnight Anchors (one-off)"
 
 on:
   workflow_dispatch:
+    inputs:
+      from_year:
+        description: "First contract year (Barchart serves ~60 symbols per session — split ranges)"
+        default: "2020"
+      to_year:
+        description: "Last contract year"
+        default: "2027"
 
 concurrency:
   group: data-commit
@@ -40,7 +47,10 @@ jobs:
 
       - name: Run Brent anchor backfill
         working-directory: backend
-        run: python -m scraper.backfill_brent_intraday --from-year 2020 --to-year 2027
+        run: |
+          python -m scraper.backfill_brent_intraday \
+            --from-year "${{ github.event.inputs.from_year || '2020' }}" \
+            --to-year   "${{ github.event.inputs.to_year   || '2027' }}"
 
       - name: Commit backfilled anchors
         run: |
