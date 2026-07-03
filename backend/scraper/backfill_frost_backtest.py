@@ -270,7 +270,11 @@ def run_events() -> int:
               "Nothing proven.", file=sys.stderr)
         return 2
     print(f"\n[frost-backtest] {hits}/{total} region-events matched expected "
-          f"severity. Mismatches indicate thresholds needing calibration.")
+          f"severity on ERA5 grid data. Read each row's air_min before reading "
+          f"a miss as a model error: most are the ~31 km reanalysis sitting "
+          f"well above freezing where the station saw a hard freeze (smoothed "
+          f"valley cold-pools) — the ladder is right, the grid has no frost to "
+          f"detect there. Don't loosen thresholds to chase those.")
     return 0
 
 
