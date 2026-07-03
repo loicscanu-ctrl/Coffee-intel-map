@@ -89,6 +89,29 @@ One prediction → two artifacts: the 03:00 job writes the history row AND
 `quant_report.json["open_direction"]` from the same fit, so the panel and the
 record can never disagree. `run_quant.py` (21:30) preserves the key untouched.
 
+## Night batch (2026-07-03): brent_overnight PASSES — third active feature
+`brent_overnight` = Brent front-month 17:30-London(prev) → 03:00-UTC move,
+same anchors as cci_overnight, but reconstructible historically (Brent trades
+~24h) via a per-contract Barchart backfill (front = max daily volume, anchors
+same-contract → roll-immune; `data/brent_intraday_anchors.json`, ~5y).
+Walk-forward verdict: **univariate +5.4pp** (n=700, sign 100% stable, 3/4 yrs),
+**marginal +1.2pp** over kc_after+dsr, and exactly the geopolitical
+hypothesis: **2022 (oil shock) edge +14.2pp → +20.3pp with brent**. Live model
+with brent: wf edge **+5.2pp**, acted accuracy **67.5%** @ 42% coverage
+(vs +3.6pp / 63.3% without). Positive sign: brent up overnight ⇒ robusta gaps
+up (risk/energy complex tone). Daily forward capture appends new anchors from
+the continuous front (backfilled per-contract rows are never overwritten).
+
+Same-night battery — all REJECTED at the gate (marginal vs kc_after+dsr):
+vol20 −2.3pp · kc_after×low-vol +0.1 · kc_after×harvest +0.3 · harvest −0.3 ·
+days-since-session +0.2 · |kc_after| −1.3. Certified robusta stocks: only ~13
+months of history → exploratory windows too small; retest ≥350 days (~2027).
+Cecafe daily: current-values only, no committed history — not testable.
+Consequence: market situation ships as **regime TAGS** (decision support, not
+model inputs): ny_shock (the measured 88% setup), vol regime (confidence
+reliable in low-vol only), harvest window. Every factor now also reports its
+**z-score** in the payload and the logged factors.
+
 ## Owner decision (2026-07): ±10pp "Undefined" band
 Calls with |p−50| < 10pp are now **Undefined** (band 0.06 → 0.10). Measured on
 the 899-session walk-forward: acted hit-rate **63.6% at 36% coverage** (~1

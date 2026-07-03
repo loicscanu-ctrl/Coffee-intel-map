@@ -133,6 +133,48 @@ def test_cci_overnight_respects_overlap_threshold(tmp_path, monkeypatch):
     assert frame["cci_overnight"].notna().sum() >= od._MIN_CCI_OVERLAP
 
 
+# ── brent_overnight activation + series parse ────────────────────────────────
+
+def _write_brent(tmp_path, dates):
+    days = [{"date": d.strftime("%Y-%m-%d"), "symbol": "CBQ25",
+             "prev_1730": 80.0, "at_0300": 80.4} for d in dates]
+    p = tmp_path / "brent_intraday_anchors.json"
+    p.write_text(json.dumps({"days": days}), encoding="utf-8")
+    return p
+
+
+def test_brent_overnight_activation_threshold(tmp_path, monkeypatch):
+    p, rows = _write_intraday(tmp_path, n=320, roll_at=(100, 200, 300))
+    monkeypatch.setattr(od, "_INTRADAY", p)
+    monkeypatch.setattr(od, "_FX_SNAPS", tmp_path / "absent.json")
+    dates = pd.to_datetime([r["date"] for r in rows])
+
+    monkeypatch.setattr(od, "_BRENT", _write_brent(tmp_path, dates[: od._MIN_BRENT_OVERLAP - 1]))
+    frame = od.build_dataset()
+    assert "brent_overnight" not in od.active_features(frame)
+
+    monkeypatch.setattr(od, "_BRENT", _write_brent(tmp_path, dates[: od._MIN_BRENT_OVERLAP]))
+    frame = od.build_dataset()
+    assert "brent_overnight" in od.active_features(frame)
+    # return computed correctly: 80.4/80.0 − 1
+    v = frame["brent_overnight"].dropna().iloc[0]
+    assert abs(v - 0.005) < 1e-12
+
+
+def test_regime_block_present(tmp_path, monkeypatch):
+    p, _rows = _write_intraday(tmp_path, n=320, roll_at=(100, 200, 300))
+    monkeypatch.setattr(od, "_INTRADAY", p)
+    monkeypatch.setattr(od, "_FX_SNAPS", tmp_path / "absent.json")
+    monkeypatch.setattr(od, "_BRENT", tmp_path / "absent2.json")
+    out = od.run()
+    assert out["available"]
+    reg = out["regime"]
+    assert set(reg) >= {"ny_shock", "vol_regime", "harvest_weight", "harvest_active"}
+    assert isinstance(reg["ny_shock"], bool)
+    # z present on every feature
+    assert all(isinstance(f.get("z"), float) for f in out["features"])
+
+
 # ── Walk-forward abstain bookkeeping ─────────────────────────────────────────
 
 def test_walk_forward_abstain_accounting():

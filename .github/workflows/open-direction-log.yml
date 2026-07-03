@@ -68,6 +68,8 @@ jobs:
                   frontend/public/data/quant_report.json
           [ -f frontend/public/data/fx_intraday_snapshots.json ] \
             && git add frontend/public/data/fx_intraday_snapshots.json || true
+          [ -f data/brent_intraday_anchors.json ] \
+            && git add data/brent_intraday_anchors.json || true
           git diff --cached --quiet \
             && echo "No changes." \
             || (git commit -m "data: open-direction prediction log [skip ci]" \

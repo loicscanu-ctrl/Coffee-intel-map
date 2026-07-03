@@ -90,6 +90,7 @@ def synthetic_env(tmp_path, monkeypatch):
     quant.write_text(json.dumps({"currency_index": {"scraped_at": "x"}}), encoding="utf-8")
     monkeypatch.setattr(od, "_INTRADAY", intraday)
     monkeypatch.setattr(od, "_FX_SNAPS", tmp_path / "absent.json")
+    monkeypatch.setattr(od, "_BRENT", tmp_path / "absent_brent.json")
     monkeypatch.setattr(odl, "_HISTORY", history)
     monkeypatch.setattr(odl, "_QUANT", quant)
     return {"intraday": intraday, "history": history, "quant": quant}

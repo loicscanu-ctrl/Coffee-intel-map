@@ -84,7 +84,11 @@ async def _fetch_contracts(symbols: list[str], maxrecords: int) -> dict[str, str
                         const url = 'https://www.barchart.com/proxies/timeseries/queryminutes.ashx?symbol='
                             + encodeURIComponent(s)
                             + '&interval=15&maxrecords=' + maxrec
-                            + '&order=asc&volume=contract&contractroll=combined';
+                            // order=desc: when maxrecords truncates, keep the LAST
+                            // bars — each contract's liquid front window up to
+                            // expiry. asc returned the thin EARLY life for 2025+
+                            // contracts, leaving the recent tail uncovered.
+                            + '&order=desc&volume=contract&contractroll=combined';
                         try { const r = await fetch(url, h); res[s] = r.ok ? await r.text() : ''; }
                         catch (e) { res[s] = ''; }
                     }

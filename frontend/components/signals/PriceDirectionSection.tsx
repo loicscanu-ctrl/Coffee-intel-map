@@ -17,9 +17,18 @@ interface Feature {
   label:       string;
   raw_value:   number;
   raw_fmt:     string;
+  z?:          number | null;   // standardised vs the feature's own history
   usd_per_ton: number | null;   // factor magnitude on the robusta USD/MT ruler
   phi:         number;          // margin (log-odds) units
   detail?:     { text: string };
+}
+
+interface Regime {
+  ny_shock?:       boolean;
+  vol_regime?:     "low" | "high" | null;
+  vol_percentile?: number | null;
+  harvest_weight?: number;
+  harvest_active?: boolean;
 }
 
 interface OpenDirection {
@@ -34,6 +43,7 @@ interface OpenDirection {
   final_prob?:   number;
   prob_up?:      number;
   prob_down?:    number;
+  regime?:       Regime;
   expected_gap_pct?:    number | null;
   expected_gap_usd_mt?: number | null;
   features?:     Feature[];
@@ -131,6 +141,33 @@ export default function PriceDirectionSection() {
         )}
       </div>
 
+      {/* Regime tags — decision support, not model inputs. NY-shock is the
+          measured 88%-hit-rate setup; confidence is less trustworthy in
+          high-vol tape (54% vs 64% in calm markets). */}
+      {data?.available && data.regime && (
+        <div className="flex flex-wrap gap-1.5">
+          {data.regime.ny_shock && (
+            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 font-semibold">
+              ⚡ NY-shock setup — historically 88% hit-rate
+            </span>
+          )}
+          {data.regime.vol_regime && (
+            <span className={`text-[10px] px-2 py-0.5 rounded border ${
+              data.regime.vol_regime === "high"
+                ? "bg-amber-950/50 border-amber-700/50 text-amber-300"
+                : "bg-slate-800 border-slate-700 text-slate-300"}`}>
+              {data.regime.vol_regime}-vol tape
+              {data.regime.vol_regime === "high" && " — confidence less reliable"}
+            </span>
+          )}
+          {data.regime.harvest_active && (
+            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
+              robusta harvest window
+            </span>
+          )}
+        </div>
+      )}
+
       {loading && (
         <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 animate-pulse h-40" />
       )}
@@ -163,6 +200,11 @@ export default function PriceDirectionSection() {
                     <td className="px-4 py-2 text-slate-300">{f.label}</td>
                     <td className={`px-4 py-2 text-right font-mono font-semibold ${f.raw_value < 0 ? "text-red-400" : "text-slate-200"}`}>
                       {f.raw_fmt}
+                      {f.z != null && (
+                        <span className="ml-1.5 text-[9px] font-normal text-slate-500" title="standardised vs this factor's own history">
+                          z{f.z >= 0 ? "+" : ""}{f.z.toFixed(1)}
+                        </span>
+                      )}
                     </td>
                     <td className={`px-4 py-2 text-right font-mono ${(f.usd_per_ton ?? 0) < 0 ? "text-red-400" : "text-slate-300"}`}>
                       {fmtUsdTon(f.usd_per_ton)}

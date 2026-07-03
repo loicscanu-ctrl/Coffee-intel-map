@@ -172,9 +172,47 @@ def _pair_days(l1730: dict, u0300: dict) -> dict[str, dict]:
     return out
 
 
+_BRENT_SYMBOL = "CB*1"      # Barchart continuous front Brent
+_BRENT_OUT    = _REPO / "data" / "brent_intraday_anchors.json"
+
+
+def _update_brent_anchors(bars: list[tuple[datetime, float]]) -> int:
+    """Append NEW days' Brent anchors from the continuous-front bars.
+
+    The backfilled per-contract rows (backfill_brent_intraday.py) are higher
+    quality (roll-immune) and are never overwritten — this only fills dates the
+    file doesn't have yet, keeping the brent_overnight feature current daily."""
+    if not bars:
+        return 0
+    l1730, u0300 = _anchors(bars)
+    fresh = _pair_days(l1730, u0300)
+    existing = []
+    if _BRENT_OUT.exists():
+        try:
+            existing = json.loads(_BRENT_OUT.read_text(encoding="utf-8")).get("days") or []
+        except Exception:
+            existing = []
+    have = {r["date"] for r in existing}
+    added = [{"date": d, "symbol": _BRENT_SYMBOL, **rec}
+             for d, rec in fresh.items() if d not in have]
+    if not added:
+        return 0
+    days = sorted(existing + added, key=lambda r: r["date"])
+    _BRENT_OUT.write_text(json.dumps({
+        "scraped_at": datetime.utcnow().isoformat() + "Z",
+        "source": "backfill (per-contract) + daily continuous-front appends",
+        "days": days,
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(added)
+
+
 def run(maxrecords: int = 2000) -> dict:
     tickers = list(_BARCHART_FX)
-    raw = asyncio.run(_fetch_barchart_15m([_BARCHART_FX[t] for t in tickers], maxrecords))
+    symbols = [_BARCHART_FX[t] for t in tickers] + [_BRENT_SYMBOL]
+    raw = asyncio.run(_fetch_barchart_15m(symbols, maxrecords))
+
+    n_brent = _update_brent_anchors(_parse_bars(raw.get(_BRENT_SYMBOL, "")))
+    print(f"[fx_snaps] brent anchors: +{n_brent} new day(s)")
 
     per_day: dict[str, dict] = {}
     ok_pairs = 0
