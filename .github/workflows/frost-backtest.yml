@@ -1,0 +1,63 @@
+name: "0.9 – Frost model backtest (recent real data / historic events)"
+
+# Validates the frost physics model against REAL Open-Meteo data.
+#
+# RECENT mode (default) pulls the last ~90 days from the FORECAST API across
+# the Brazil frost belt and reports every day the model would have flagged
+# (severity + canopy/air minima + mechanism). The forecast host is reachable
+# from GitHub Actions, so this needs NO archive access and NO proxy — it's a
+# live end-to-end check that the model runs on real data and isn't
+# false-positiving on normal winter nights (and catches any actual in-season
+# frost). Informational only: it does not commit or alert.
+#
+# EVENTS mode runs the deep blind backtest against the 1975/1994/2021 archive
+# (ERA5). That host is blocked from CI, so events mode only works if
+# ERDDAP-style proxy access is configured — set the repo variable
+# OPEN_METEO_ARCHIVE_BASE to a Cloudflare Worker that forwards to
+# archive-api.open-meteo.com (same trick as the thermocline noaa-proxy).
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "recent (forecast API, works now) or events (needs archive proxy)"
+        required: false
+        default: "recent"
+        type: choice
+        options: ["recent", "events"]
+      days:
+        description: "Recent-mode lookback in days (max 92)."
+        required: false
+        default: "90"
+        type: string
+  schedule:
+    # 06:30 UTC on the 1st of each frost-season month (May–Sep) — a periodic
+    # live validation of the model during the window that matters.
+    - cron: '30 6 1 5-9 *'
+
+jobs:
+  frost-backtest:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run frost backtest
+        env:
+          # Optional — only used by 'events' mode. When unset, events mode
+          # exits 2 (archive unreachable); recent mode ignores it.
+          OPEN_METEO_ARCHIVE_BASE: ${{ vars.OPEN_METEO_ARCHIVE_BASE }}
+        run: |
+          cd backend
+          MODE="${{ inputs.mode || 'recent' }}"
+          DAYS="${{ inputs.days || '90' }}"
+          echo "::group::frost backtest ($MODE)"
+          PYTHONPATH=. python -m scraper.backfill_frost_backtest --mode "$MODE" --days "$DAYS"
+          echo "::endgroup::"
