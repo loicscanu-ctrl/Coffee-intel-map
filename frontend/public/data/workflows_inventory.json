@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T16:32:42.455480Z",
-  "count": 68,
+  "generated_at": "2026-07-03T05:58:21.178444Z",
+  "count": 69,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -313,6 +313,20 @@
       "crons": [],
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
+      "timeout_minutes": 10
+    },
+    {
+      "file": "frost-backtest.yml",
+      "name": "0.9 \u2013 Frost model backtest (recent real data / historic events)",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "crons": [
+        "30 6 1 5-9 *"
+      ],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
       "timeout_minutes": 10
     },
     {
