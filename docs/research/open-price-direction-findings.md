@@ -89,7 +89,28 @@ One prediction → two artifacts: the 03:00 job writes the history row AND
 `quant_report.json["open_direction"]` from the same fit, so the panel and the
 record can never disagree. `run_quant.py` (21:30) preserves the key untouched.
 
-## Night batch (2026-07-03): brent_overnight PASSES — third active feature
+## Night batch (2026-07-03): brent_overnight — TESTED, then DEMOTED TO A REGIME TAG
+Chronology matters here — this is the gate working in real time:
+1. Backfilled ~5y of roll-immune Brent overnight anchors (17:30-London →
+   03:00-UTC, per-contract, front = max daily volume;
+   `data/brent_intraday_anchors.json`, 1,757 days 2019-09 → today; the daily
+   1.16 job appends forward).
+2. On the TRUNCATED sample (backfill initially ended 2024-10): univariate
+   +5.4pp, marginal +1.2pp, sign 100% stable → looked like a keeper.
+3. On the COMPLETE sample the marginal collapsed to **+0.11pp** and the
+   per-year view exposed it as a **2022-only signal**: Δ+6.1pp in the
+   oil-shock year, NEGATIVE marginal in 2023 (−1.4), 2024 (−0.9), 2025
+   (−2.5), 2026 (−1.9).
+4. Regime-gating (brent active only in high-oil-vol regimes) did not rescue
+   it: +0.00pp overall, still −3.1 in 2025.
+**Verdict: no model coefficient.** The owner's original framing was the right
+product form — Brent matters *during geopolitical stress* — so it ships as a
+**regime tag**: `regime.brent_overnight_pct` + `oil_shock` flag (|move| ≥1.5%)
+in the payload, panel chip and brief ("🛢 Brent +2.1% overnight — oil-shock
+context"). Anchors keep accruing daily; re-evaluate as a coefficient if a
+genuine oil-shock regime returns.
+
+## (superseded) initial subsample result — kept for the audit trail
 `brent_overnight` = Brent front-month 17:30-London(prev) → 03:00-UTC move,
 same anchors as cci_overnight, but reconstructible historically (Brent trades
 ~24h) via a per-contract Barchart backfill (front = max daily volume, anchors

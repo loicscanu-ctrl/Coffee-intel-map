@@ -29,6 +29,8 @@ interface Regime {
   vol_percentile?: number | null;
   harvest_weight?: number;
   harvest_active?: boolean;
+  brent_overnight_pct?: number | null;
+  oil_shock?:      boolean;
 }
 
 interface OpenDirection {
@@ -163,6 +165,11 @@ export default function PriceDirectionSection() {
           {data.regime.harvest_active && (
             <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
               robusta harvest window
+            </span>
+          )}
+          {data.regime.oil_shock && data.regime.brent_overnight_pct != null && (
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-950/50 border border-amber-700/50 text-amber-300">
+              🛢 Brent {data.regime.brent_overnight_pct > 0 ? "+" : ""}{data.regime.brent_overnight_pct.toFixed(1)}% overnight — oil-shock context
             </span>
           )}
         </div>

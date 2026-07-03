@@ -143,22 +143,25 @@ def _write_brent(tmp_path, dates):
     return p
 
 
-def test_brent_overnight_activation_threshold(tmp_path, monkeypatch):
+def test_brent_is_context_not_coefficient(tmp_path, monkeypatch):
+    """brent_overnight was tested and REJECTED as a model feature (2022-only
+    signal — see findings doc). It must never auto-activate, but its series
+    parses correctly and feeds the oil_shock regime tag."""
     p, rows = _write_intraday(tmp_path, n=320, roll_at=(100, 200, 300))
     monkeypatch.setattr(od, "_INTRADAY", p)
     monkeypatch.setattr(od, "_FX_SNAPS", tmp_path / "absent.json")
     dates = pd.to_datetime([r["date"] for r in rows])
+    monkeypatch.setattr(od, "_BRENT", _write_brent(tmp_path, dates))
 
-    monkeypatch.setattr(od, "_BRENT", _write_brent(tmp_path, dates[: od._MIN_BRENT_OVERLAP - 1]))
     frame = od.build_dataset()
-    assert "brent_overnight" not in od.active_features(frame)
-
-    monkeypatch.setattr(od, "_BRENT", _write_brent(tmp_path, dates[: od._MIN_BRENT_OVERLAP]))
-    frame = od.build_dataset()
-    assert "brent_overnight" in od.active_features(frame)
-    # return computed correctly: 80.4/80.0 − 1
-    v = frame["brent_overnight"].dropna().iloc[0]
-    assert abs(v - 0.005) < 1e-12
+    assert "brent_overnight" not in od.active_features(frame)   # never a coefficient
+    v = frame["brent_overnight"].dropna().iloc[0]               # series still parses
+    assert abs(v - 0.005) < 1e-12                               # 80.4/80.0 − 1
+    out = od.run()
+    assert out["available"]
+    assert "brent_overnight" not in out["model"]["active_features"]
+    assert "oil_shock" in out["regime"]                          # rides as a tag
+    assert out["regime"]["oil_shock"] is False                   # +0.5% < 1.5% flag
 
 
 def test_regime_block_present(tmp_path, monkeypatch):

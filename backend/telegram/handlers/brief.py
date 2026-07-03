@@ -988,6 +988,9 @@ def _open_direction_block(today: date) -> str | None:
     reg = od.get("regime") or {}
     if reg.get("ny_shock"):
         head += "\n     ⚡ NY-shock setup (|KC after-close| ≥0.8%) — historically 88% hit-rate"
+    if reg.get("oil_shock") and reg.get("brent_overnight_pct") is not None:
+        head += (f"\n     🛢 Brent {reg['brent_overnight_pct']:+.1f}% overnight — "
+                 "oil-shock context (Brent led robusta opens in 2022-style regimes)")
     tags = []
     if reg.get("harvest_active"):
         tags.append("harvest window")
