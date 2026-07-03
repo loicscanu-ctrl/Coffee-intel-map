@@ -25,10 +25,14 @@ export default function SignalsMethodology() {
       <P>
         A <strong>pre-open</strong> call on ICE Robusta&rsquo;s <strong>overnight gap</strong>: will today&rsquo;s
         first print open above or below yesterday&rsquo;s 17:30-London close? The model fires at{" "}
-        <Code>03:00 UTC</Code> — hours before the London open — using only information that exists at that moment,
+        <Code>03:07 UTC</Code> — hours before the London open — using only information that exists at that moment,
         and feeds the Telegram morning brief. Roll days (front-contract change) are excluded: the two prices would be
         different delivery months, so the calendar spread would masquerade as a gap. When the probability sits inside
-        a <Code>±3pp</Code> band around 50%, the model <strong>abstains</strong> rather than forcing a coin-flip call.
+        the <Code>±10pp</Code> band around 50% the call is <strong>&ldquo;Undefined&rdquo;</strong> — the model only
+        speaks when it means it (band tuned on the 899-session walk-forward: acted hit-rate 63.6% at 36% coverage vs
+        57.2% acting on everything). A companion <strong>magnitude head</strong> (ridge on the same features) sizes
+        each call as an expected gap in <Code>$/t</Code>; its honest out-of-sample MAE vs the zero-prediction baseline
+        is published in the model block so the size estimate is never over-trusted.
       </P>
       <P>
         The feature set is deliberately small — every candidate had to earn its place in a walk-forward ablation
@@ -40,7 +44,15 @@ export default function SignalsMethodology() {
         <Code>cci_overnight</Code> — the Coffee Currency Index&rsquo;s move from 17:30 London to 03:00 UTC — has no
         backtestable intraday FX history, so it ships live and is graded forward-only, activating once ~40 snapshot
         days accumulate. Tested and <em>dropped</em>: the prior day&rsquo;s RC return, the KC−RC arbitrage gap (level
-        and change), harvest/frost seasonality, term structure, daily BRL, and calendar dummies.
+        and change), harvest/frost seasonality, term structure, daily BRL, calendar dummies, volatility-regime
+        features and their interactions — and, most instructively, <Code>brent_overnight</Code>: on a truncated
+        sample it looked like a keeper (+1.2pp marginal), but the complete ~5y backfill exposed a{" "}
+        <strong>2022-oil-shock-only signal</strong> (+6.1pp that year, negative marginal every calm year), so it was
+        demoted to context rather than a coefficient. Every factor also reports its <strong>z-score</strong> against
+        its own history, and each prediction carries <strong>regime tags</strong> — decision support, not model
+        inputs: <Code>⚡ NY-shock</Code> (|KC after-close| ≥0.8%, historically 88% hit-rate over 42 occurrences),
+        volatility regime (confidence is trustworthy in calm tape: 63.7% vs 54.1% in high-vol), the robusta harvest
+        window, and <Code>🛢 oil-shock</Code> (Brent overnight ≥1.5%).
       </P>
       <P>
         A <strong>logistic regression</strong> outputs the probability, decomposed with <strong>SHAP</strong> drawn as
@@ -52,9 +64,11 @@ export default function SignalsMethodology() {
       </P>
       <P className="text-[11px] text-slate-500">
         Accuracy is out-of-sample (expanding walk-forward, no shuffling → no look-ahead) vs the rolling majority-class
-        baseline; &ldquo;acted&rdquo; accuracy restricts to calls outside the abstain band. Every 03:00 prediction is
-        also appended to <Code>open_direction_history.json</Code> <em>before</em> the open and graded after it — the
-        calendar on the Macro tab is that record. Full write-up + ablation evidence:{" "}
+        baseline; &ldquo;acted&rdquo; accuracy restricts to calls outside the Undefined band. Every pre-open
+        prediction is appended to <Code>open_direction_history.json</Code> <em>before</em> the open — with its
+        per-feature SHAP φ — and graded after it: the calendar on the Macro tab is that record, and the model
+        monitors its own live hit-rate, flagging a &ldquo;cold streak&rdquo; in the brief when ≥20 graded calls run
+        below 50%. Full write-up + ablation evidence:{" "}
         <Code>docs/research/open-price-direction-findings.md</Code>.
       </P>
 
