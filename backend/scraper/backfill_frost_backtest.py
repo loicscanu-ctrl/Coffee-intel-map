@@ -32,6 +32,7 @@ import json
 import os
 import sys
 import time
+from datetime import date, timedelta
 from pathlib import Path
 
 import requests
@@ -116,15 +117,8 @@ def _nights(hourly: dict) -> dict[str, tuple[list, list, list, list]]:
     return out
 
 
-def _reachable() -> bool:
-    try:
-        r = requests.get(_archive_base(), params={
-            "latitude": -21.55, "longitude": -45.43,
-            "start_date": "2021-07-20", "end_date": "2021-07-20",
-            "hourly": "temperature_2m", "timezone": "UTC"}, timeout=20)
-        return r.ok
-    except requests.RequestException:
-        return False
+def _shift(iso: str, days: int) -> str:
+    return (date.fromisoformat(iso) + timedelta(days=days)).isoformat()
 
 
 def _fetch_recent(lat: float, lon: float, past_days: int) -> dict | None:
@@ -183,45 +177,48 @@ def run_recent(days: int = 90) -> int:
 
 
 def run_events() -> int:
-    events = json.loads(CATALOG.read_text(encoding="utf-8"))["events"]
-    print(f"[frost-backtest] archive base: {_archive_base()}")
-    if not _reachable():
-        print("[frost-backtest] FATAL: Open-Meteo archive unreachable. Set "
-              "OPEN_METEO_ARCHIVE_BASE to a proxy that forwards to "
-              "archive-api.open-meteo.com, or run where it's reachable. "
-              "Nothing proven.", file=sys.stderr)
-        return 2
+    """Blind backtest against the documented disasters using the ERA5 ARCHIVE.
+    For each event/region, fetch the real hourly around the peak dates, run
+    assess_night, and compare the worst modelled severity to the expected one.
 
-    total = hits = 0
+    Uses the robust retry fetch (no fragile preflight); exit 2 only if EVERY
+    fetch failed (archive unreachable — nothing proven)."""
+    events = json.loads(CATALOG.read_text(encoding="utf-8"))["events"]
+    print(f"[frost-backtest] events mode — archive base: {_archive_base()}", flush=True)
+    total = hits = ran = 0
+    rank = {None: -1, "watch": 0, "alert": 1, "critical": 2}
     for ev in events:
         print(f"\n[{ev['id']}] {ev['label']} — expect {ev['expected_severity']}")
-        # Fetch a window bracketing the peak dates (±1 day for the pre-dawn min).
         dates = sorted(ev["peak_dates"])
-        start, end = dates[0], dates[-1]
-        worst_by_region: dict[str, str | None] = {}
+        # ±1 day brackets the pre-dawn minimum across the timezone boundary.
+        start, end = _shift(dates[0], -1), _shift(dates[-1], 1)
         for region in ev["regions"]:
             latlon = REGION_LATLON.get(region)
             if not latlon:
                 continue
             hourly = _fetch_hourly(*latlon, start, end)
             if not hourly:
-                worst_by_region[region] = None
+                print(f"    · {region:15s} (fetch unavailable)")
                 continue
-            worst_sev = None
-            worst_rank = -1
-            rank = {None: -1, "watch": 0, "alert": 1, "critical": 2}
+            ran += 1
+            worst_sev, worst_rank = None, -1
             for _day, (t, d, c, w) in _nights(hourly).items():
                 a = fm.assess_night(t, c, w, d)
                 sev = fm.severity(a.risk, a.frost_type, a.surface_min_c, a.hours_below_0)
                 if rank[sev] > worst_rank:
                     worst_rank, worst_sev = rank[sev], sev
-            worst_by_region[region] = worst_sev
             mark = "✓" if worst_sev == ev["expected_severity"] else "✗"
             print(f"    {mark} {region:15s} worst modelled severity: {worst_sev}")
             total += 1
             if worst_sev == ev["expected_severity"]:
                 hits += 1
 
+    if ran == 0:
+        print("[frost-backtest] FATAL: archive unreachable (all fetches failed). "
+              "Set OPEN_METEO_ARCHIVE_BASE to a proxy forwarding to "
+              "archive-api.open-meteo.com, or run where it's reachable. "
+              "Nothing proven.", file=sys.stderr)
+        return 2
     print(f"\n[frost-backtest] {hits}/{total} region-events matched expected "
           f"severity. Mismatches indicate thresholds needing calibration.")
     return 0
