@@ -228,17 +228,17 @@
       }
     ]
   },
-  "scraped_at": "2026-07-03T22:34:30.639904+00:00",
+  "scraped_at": "2026-07-03T22:34:54.430094Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-02T22:37:55.718066Z",
+    "scraped_at": "2026-07-03T22:34:53.351706Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 85.0,
-    "net_index": 28.9,
-    "bull_count": 4,
-    "bear_count": 0,
-    "neutral_count": 5,
-    "total": 9,
+    "overall_confidence": 90.0,
+    "net_index": 17.5,
+    "bull_count": 3,
+    "bear_count": 1,
+    "neutral_count": 4,
+    "total": 8,
     "items": [
       {
         "headline": "Build-Outs Of Coffee: Hala Tree Coffee In Honolulu, HI",
@@ -252,23 +252,14 @@
       {
         "headline": "Royal Coffee Begins Issuing IEEPA Tariff Credits As CBP Returns Duties To Importers",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
+        "sentiment": "Bearish",
         "confidence": 60.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
+        "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 85.0,
@@ -277,10 +268,19 @@
         ]
       },
       {
-        "headline": "From Coffee Grounds To Biochar In 90 Seconds Flat",
+        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "From Coffee Grounds To Biochar In 90 Seconds Flat",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -307,16 +307,7 @@
         "headline": "Three New World Coffee Champions Were Just Crowned",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Real Resident Barista At The World Cup Is Becky Reeves",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
