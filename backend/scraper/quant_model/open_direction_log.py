@@ -39,7 +39,9 @@ _ROOT     = Path(__file__).resolve().parents[3]
 _HISTORY  = _ROOT / "frontend" / "public" / "data" / "open_direction_history.json"
 _QUANT    = _ROOT / "frontend" / "public" / "data" / "quant_report.json"
 
-_SEED_FEATURES = ["kc_after_rc_diff", "days_since_roll"]
+# Seed features come from the SAME activation logic as the live model
+# (od.active_features) so the backtest seed and live predictions can never
+# run different feature sets.
 
 
 def _row(date_str: str, prob_up: float, source: str,
@@ -65,6 +67,7 @@ def _payload_factors(payload: dict) -> list[dict]:
         "var_name":  f["var_name"],
         "raw_value": round(float(f["raw_value"]), 6),
         "raw_fmt":   f.get("raw_fmt"),
+        "z":         f.get("z"),
         "phi":       round(float(f["phi"]), 4),
     } for f in (payload.get("features") or [])]
 
@@ -72,8 +75,9 @@ def _payload_factors(payload: dict) -> list[dict]:
 def _seed(frame: "pd.DataFrame") -> list[dict]:
     """Walk-forward backtest → resolved rows (source='backtest'), same model.
     Each row carries its per-feature φ (same exact-SHAP identity as live rows)."""
-    d = frame.dropna(subset=["y"] + _SEED_FEATURES)
-    X = d[_SEED_FEATURES].values
+    feats = _od.active_features(frame)
+    d = frame.dropna(subset=["y"] + feats)
+    X = d[feats].values
     y = d["y"].values.astype(float)
     gap = d["gap"].values
     out: list[dict] = []
@@ -89,7 +93,7 @@ def _seed(frame: "pd.DataFrame") -> list[dict]:
             "var_name":  k,
             "raw_value": round(float(X[i][j]), 6),
             "phi":       round(float(b[1 + j] * z[j]), 4),
-        } for j, k in enumerate(_SEED_FEATURES)]
+        } for j, k in enumerate(feats)]
         r = _row(d.index[i].strftime("%Y-%m-%d"), p, "backtest", factors=factors)
         r["actual_gap_pct"] = round(float(gap[i]) * 100, 3)
         r["actual_dir"] = "Up" if y[i] > 0 else "Down"
@@ -100,17 +104,22 @@ def _seed(frame: "pd.DataFrame") -> list[dict]:
 
 
 def _ensure_seed_factors(history: list[dict], frame: "pd.DataFrame") -> list[dict]:
-    """One-time backfill: if the backtest seed predates per-row factor logging
-    OR an abstain-band retune (stored Abstain labels inconsistent with the
-    current band), regenerate the backtest rows — they are deterministic from
-    data + model spec. LIVE rows are never touched: they are the append-only
-    forward record."""
+    """One-time backfill: if the backtest seed predates per-row factor logging,
+    an abstain-band retune (stored Abstain labels inconsistent with the current
+    band), or a FEATURE-SET change (seed factors ≠ the current active set),
+    regenerate the backtest rows — they are deterministic from data + model
+    spec. LIVE rows are never touched: they are the append-only forward record."""
     bt = [r for r in history if r.get("source") == "backtest"]
     band_stale = any(
         (r.get("direction") == "Abstain") != (abs(r.get("prob_up", 0.5) - 0.5) < _od._ABSTAIN_BAND)
         for r in bt
     )
-    if not bt or (all(r.get("factors") for r in bt) and not band_stale):
+    current = set(_od.active_features(frame))
+    feats_stale = any(
+        r.get("factors") and {f["var_name"] for f in r["factors"]} != current
+        for r in bt[-5:]      # recent rows suffice — the whole seed regenerates
+    )
+    if not bt or (all(r.get("factors") for r in bt) and not band_stale and not feats_stale):
         return history
     live = [r for r in history if r.get("source") == "live"]
     regenerated = _seed(frame)

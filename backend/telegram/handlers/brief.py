@@ -982,6 +982,19 @@ def _open_direction_block(today: date) -> str | None:
         drivers.append(f"{f.get('label')} {f.get('raw_fmt')}{usd_s}")
     if drivers:
         head += "\n     " + " · ".join(drivers)
+    # Regime tags (decision support): the NY-shock setup is the model's
+    # highest-conviction situation (88% historical hit-rate, n=42); harvest /
+    # vol tags give the market context the numbers were made in.
+    reg = od.get("regime") or {}
+    if reg.get("ny_shock"):
+        head += "\n     ⚡ NY-shock setup (|KC after-close| ≥0.8%) — historically 88% hit-rate"
+    tags = []
+    if reg.get("harvest_active"):
+        tags.append("harvest window")
+    if reg.get("vol_regime"):
+        tags.append(f"{reg['vol_regime']}-vol tape")
+    if tags and direction != "Abstain":
+        head += f"\n     regime: {' · '.join(tags)}"
     # Drift alarm: the model monitors its own live record and says so when it
     # is running cold, instead of letting a decayed model keep calling quietly.
     track = od.get("track") or {}

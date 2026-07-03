@@ -66,6 +66,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 _ROOT      = Path(__file__).resolve().parents[3]
 _INTRADAY  = _ROOT / "frontend" / "public" / "data" / "intraday_kc_rc_15min.json"
 _FX_SNAPS  = _ROOT / "frontend" / "public" / "data" / "fx_intraday_snapshots.json"
+_BRENT     = _ROOT / "data" / "brent_intraday_anchors.json"
 
 _KC_TO_USD_PER_MT = 22.0462   # KC ¢/lb → USD/MT
 
@@ -86,8 +87,14 @@ _WF_EMBARGO      = 1          # single-session labels don't overlap; 1 day guard
 _FEATURE_SPECS = [
     ("kc_after_rc_diff", "NY after RC-Close Move",  lambda v: f"{v*100:+.2f}%"),
     ("days_since_roll",  "Roll-Cycle Position",     lambda v: f"day {v:.0f}"),
+    ("brent_overnight",  "Brent Overnight Move",    lambda v: f"{v*100:+.2f}%"),
     ("cci_overnight",    "CCI Overnight Move",      lambda v: f"{v*100:+.2f}%"),
 ]
+
+# brent_overnight needs this much history before it activates (it has ~5y of
+# backfilled anchors, so it is active from day one; the threshold guards a
+# fresh checkout with a truncated file).
+_MIN_BRENT_OVERLAP = 300
 _FEATURE_KEYS = [k for k, _, _ in _FEATURE_SPECS]
 
 
@@ -151,7 +158,31 @@ def build_dataset() -> "pd.DataFrame | None":
     cci = _cci_overnight_series()
     if cci is not None:
         out["cci_overnight"] = cci.reindex(out.index)
+    brent = _brent_overnight_series()
+    if brent is not None:
+        out["brent_overnight"] = brent.reindex(out.index)
     return out
+
+
+def _brent_overnight_series() -> "pd.Series | None":
+    """{session date → Brent % move 17:30-London(prev) → 03:00 UTC} from the
+    per-contract anchor file (backfilled ~5y + appended daily). Anchors come
+    from the SAME front contract, so the return is roll-immune. Earned its
+    model slot in the 2026-07 walk-forward: +5.4pp univariate, +1.2pp marginal
+    over kc_after+dsr, sign 100% stable, and strongest exactly in the 2022
+    oil-shock year (see the findings doc)."""
+    if not _BRENT.exists():
+        return None
+    try:
+        rows = json.loads(_BRENT.read_text(encoding="utf-8")).get("days") or []
+    except Exception:
+        return None
+    out = {}
+    for r in rows:
+        a, b = r.get("prev_1730"), r.get("at_0300")
+        if r.get("date") and a and b and a > 0:
+            out[pd.Timestamp(r["date"])] = b / a - 1.0
+    return pd.Series(out).sort_index() if out else None
 
 
 def _cci_overnight_series() -> "pd.Series | None":
@@ -193,6 +224,18 @@ def _cci_overnight_series() -> "pd.Series | None":
     if not out:
         return None
     return pd.Series(out).sort_index()
+
+
+def active_features(frame: "pd.DataFrame") -> list[str]:
+    """The model's feature set for a given dataset — single source of truth,
+    shared by run() and the log module's seed so they can never diverge.
+    Optional features join once their data clears the coverage threshold."""
+    active = ["kc_after_rc_diff", "days_since_roll"]
+    if "brent_overnight" in frame.columns and frame["brent_overnight"].notna().sum() >= _MIN_BRENT_OVERLAP:
+        active.append("brent_overnight")
+    if "cci_overnight" in frame.columns and frame["cci_overnight"].notna().sum() >= _MIN_CCI_OVERLAP:
+        active.append("cci_overnight")
+    return active
 
 
 # ── logistic (numpy IRLS + L2, intercept unpenalised) ────────────────────────
@@ -317,9 +360,7 @@ def run(db=None) -> dict:
     if frame is None:
         return _unavailable("intraday_kc_rc_15min.json missing or unreadable")
 
-    active = ["kc_after_rc_diff", "days_since_roll"]
-    if "cci_overnight" in frame.columns and frame["cci_overnight"].notna().sum() >= _MIN_CCI_OVERLAP:
-        active.append("cci_overnight")
+    active = active_features(frame)
 
     train = frame.dropna(subset=["y"] + active)
     if len(train) < _MIN_TRAIN:
@@ -354,12 +395,18 @@ def run(db=None) -> dict:
         "kc_after_rc_diff": float(k1830) / float(k1730) - 1.0,
         "days_since_roll":  float(last["days_since_roll"]) + 1.0,
     }
+    if "brent_overnight" in active:
+        brent = _brent_overnight_series()
+        v = brent.get(for_session) if brent is not None else None
+        if v is None:
+            # this morning's anchor not present yet → predict without the
+            # feature by imputing the training mean (z = 0 ⇒ φ = 0).
+            v = float(mu[active.index("brent_overnight")])
+        live_vals["brent_overnight"] = float(v)
     if "cci_overnight" in active:
         cci = _cci_overnight_series()
         v = cci.get(for_session) if cci is not None else None
         if v is None:
-            # snapshot for this morning not present → predict without the
-            # feature by imputing the training mean (z = 0 ⇒ φ = 0).
             v = float(mu[active.index("cci_overnight")])
         live_vals["cci_overnight"] = float(v)
 
@@ -377,13 +424,34 @@ def run(db=None) -> dict:
     # $/t for the brief/panel; the direction call above stays the headline.
     expected_gap = float(np.r_[1.0, z] @ ridge)
 
+    # ── Regime tags (decision support, NOT model inputs) ─────────────────────
+    # Tested as features, these add nothing (see findings doc: vol20 −2.3pp
+    # marginal, harvest/interactions ≤+0.3pp). But they condition how much to
+    # TRUST the call (measured: NY-shock days 88% hit; low-vol+confident 63.7%
+    # vs high-vol+confident 54.1%) — so they ride along as tags.
+    gap_vol = frame["gap"].rolling(20, min_periods=10).std()
+    vol_now = gap_vol.iloc[-1]
+    vol_pctile = float((gap_vol.dropna() <= vol_now).mean()) if pd.notna(vol_now) else None
+    _HARVEST_W = {1: .45, 2: .05, 3: 0, 4: .10, 5: .30, 6: .30, 7: .20,
+                  8: 0, 9: 0, 10: .20, 11: .45, 12: .45}
+    harvest_w = _HARVEST_W.get(for_session.month, 0)
+    ny_shock = abs(live_vals["kc_after_rc_diff"]) >= 0.008
+    regime = {
+        "ny_shock":        bool(ny_shock),          # 88% hit-rate setup (n=42)
+        "vol_regime":      ("high" if vol_pctile is not None and vol_pctile > 0.5 else "low")
+                           if vol_pctile is not None else None,
+        "vol_percentile":  round(vol_pctile, 2) if vol_pctile is not None else None,
+        "harvest_weight":  harvest_w,               # robusta-origin harvest calendar
+        "harvest_active":  harvest_w >= 0.30,
+    }
+
     # ── $/t ruler + per-feature detail ───────────────────────────────────────
     rc_px = float(last_row.get("rc_last_1730") or 0) or None   # USD/MT
     kc_move_usd = (float(k1830) - float(k1730)) * _KC_TO_USD_PER_MT
 
     spec_by_key = {k: (label, fmt) for k, label, fmt in _FEATURE_SPECS}
     features_out = []
-    for key, raw, phi in zip(active, x_raw, phis):
+    for key, raw, phi, z_i in zip(active, x_raw, phis, z):
         label, fmt = spec_by_key[key]
         usd = None
         if rc_px is not None and key != "days_since_roll":
@@ -393,6 +461,7 @@ def run(db=None) -> dict:
             "label":       label,
             "raw_value":   float(raw),
             "raw_fmt":     fmt(float(raw)),
+            "z":           round(float(z_i), 2),   # vs the feature's own history
             "usd_per_ton": usd,
             "phi":         float(phi),
         }
@@ -409,6 +478,12 @@ def run(db=None) -> dict:
             item["detail"] = {
                 "text": (f"day {raw:.0f} of the bi-monthly front-contract cycle — "
                          "gaps historically tilt down mid-cycle (~day 10), up late-cycle")
+            }
+        elif key == "brent_overnight":
+            item["detail"] = {
+                "text": ("Brent front-month move 17:30 London → 03:00 UTC (same-contract, "
+                         "roll-immune) — risk/energy tone while robusta was shut; "
+                         "strongest in oil-shock regimes (2022: +6pp extra edge)")
             }
         elif key == "cci_overnight":
             item["detail"] = {
@@ -431,6 +506,7 @@ def run(db=None) -> dict:
         "final_prob":    final_prob,
         "prob_up":       final_prob,
         "prob_down":     1.0 - final_prob,
+        "regime":        regime,
         "expected_gap_pct":    round(expected_gap * 100, 3),
         "expected_gap_usd_mt": (round(expected_gap * rc_px, 1)
                                 if rc_px is not None else None),
