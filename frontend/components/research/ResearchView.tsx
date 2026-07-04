@@ -192,35 +192,98 @@ function FrostRiskMethodology() {
           frost events. Damaging frosts in the Brazilian winter are overwhelmingly <strong>radiative</strong>: on a
           clear, calm, dry night the ground and leaf surface radiate heat to space and cool <em>well below</em> the air
           temperature measured at the standard 2 m height. Plants are routinely damaged at recorded air temperatures of
-          3–5 °C. So the model estimates the quantity that actually matters — the <strong>leaf-surface temperature</strong>
-          — from the variables that govern radiative cooling.
+          3–5 °C. So the model estimates the quantity that actually matters — the <strong>canopy / grass-minimum
+          surface temperature</strong> — hour by hour, from the variables that govern radiative cooling.
         </P>
 
-        <H>The model</H>
+        <H>The model — canopy surface temperature</H>
         <P>
           For each representative point we pull hourly forecast + recent history from Open-Meteo
-          (<Code>temperature_2m, dew_point_2m, cloud_cover, wind_speed_10m</Code>), take the daily minimum-temperature
-          hour, and estimate surface temperature as:
+          (<Code>temperature_2m, dew_point_2m, cloud_cover, wind_speed_10m</Code>) and estimate the canopy-surface
+          temperature for <em>every</em> hour of the night — not just the minimum-temperature hour, so we can measure
+          how long the freeze lasts:
         </P>
-        <P>
-          <Code>T_surface = T_min − (1 − cloud/100) × max(0, 5 − 0.4 × wind_kmh) − 0.5·[dew &lt; 2°C]</Code>
-        </P>
+        <Fml>{`T_surface = T_air
+            − (1 − cloud/100) · max(0, 5 − 0.25 · wind_kmh)     ← radiative decoupling
+            − min(1.5, max(0, (2 − dew_pt) · 0.25))             ← dry-air amplification`}</Fml>
         <ul className="space-y-1">
           <LI><strong>Radiation term.</strong> <Code>(1 − cloud/100)</Code> switches the cooling off under overcast
             skies (clouds re-radiate heat back down) and on fully to a ~5 °C deficit under clear skies. The
-            <Code>max(0, 5 − 0.4 × wind)</Code> factor kills the deficit once wind mixes the boundary layer — by ~12 km/h
-            there is effectively no radiative drop. This is why a cold-but-windy or cold-but-cloudy night is <em>safe</em>
-            while a milder, clear, dead-calm night is dangerous.</LI>
-          <LI><strong>Dry-air correction.</strong> A further −0.5 °C when dew point is below 2 °C: dry air holds little
-            latent heat, so there is no condensation to buffer the fall, and the surface keeps dropping.</LI>
+            {" "}<Code>max(0, 5 − 0.25 · wind)</Code> factor erodes that deficit as wind mixes the boundary layer, fully
+            gone by <strong>20 km/h</strong>. This is why a cold-but-windy or cold-but-cloudy night is <em>safe</em> while
+            a milder, clear, dead-calm night is dangerous. <span className="text-slate-400">The 0.25 coefficient is the
+            one number moved by the backtest below.</span></LI>
+          <LI><strong>Dry-air amplification.</strong> Dry air holds little latent heat, so no dew/frost deposition
+            buffers the fall and the surface keeps dropping. Graduated at −0.25 °C per °C of dew point below 2 °C, capped
+            at −1.5 °C (replacing the old flat −0.5 °C step).</LI>
         </ul>
-        <P>Surface temperature then maps to a four-level risk code:</P>
+
+        <H>Three mechanisms, not one</H>
+        <P>
+          The surface number is then read through the mechanism actually operating — because equal-temperature frosts
+          do unequal damage:
+        </P>
         <ul className="space-y-1">
-          <LI><span className="text-blue-300 font-semibold">H</span> — <Code>T_surface &lt; 0 °C</Code>: damaging frost likely.</LI>
+          <LI><strong className="text-blue-300">Radiative</strong> — the default: clear, calm night, canopy decouples
+            and freezes below the 2 m air.</LI>
+          <LI><strong className="text-blue-300">Advective</strong> — a wind-driven sub-zero <em>air mass</em>
+            {" "}(<Code>air_min ≤ 1.5 °C</Code> with <Code>wind ≥ 10 km/h</Code>). Here wind does <em>not</em> protect the
+            plant — the whole air column is cold — so breeze is a red flag, not a reprieve. The old one-line model had
+            wind only ever <em>reduce</em> cooling and so under-called these outright.</LI>
+          <LI><strong className="text-blue-300">Black frost</strong> — a hard freeze in very dry air
+            {" "}(<Code>dew ≤ −3 °C</Code>): too dry to deposit protective white hoar, so tissue desiccates. The literal
+            &ldquo;Geada Negra&rdquo; of 1975.</LI>
+        </ul>
+        <P className="text-[11px] text-slate-500">
+          Duration is tracked too — hours below 0 °C and below the −2 °C hard-freeze line — because a five-hour freeze
+          scars far worse than a one-hour touch, and the old model scored them identically.
+        </P>
+
+        <H>From surface temperature to risk &amp; alert severity</H>
+        <P>Surface temperature maps to the four-level grid code the 14-day panel renders:</P>
+        <ul className="space-y-1">
+          <LI><span className="text-blue-300 font-semibold">H</span> — <Code>T_surface &lt; 0 °C</Code> (or any
+            advective / black frost, or a sustained ≥ 3 h sub-zero spell): damaging frost likely.</LI>
           <LI><span className="text-blue-400 font-semibold">M</span> — <Code>0–3 °C</Code>: frost possible in low-lying pockets.</LI>
           <LI><span className="text-slate-300 font-semibold">L</span> — <Code>3–6 °C</Code>: cold, watch the trend.</LI>
           <LI><span className="text-slate-500 font-semibold">—</span> — <Code>≥ 6 °C</Code>: no frost concern.</LI>
         </ul>
+        <P>
+          The alert engine grades the same night into a three-tier <strong>severity ladder</strong> — what the Frost
+          Watch panel and the Telegram alert fire on:
+        </P>
+        <ul className="space-y-1">
+          <LI><span className="text-red-400 font-semibold">critical</span> — the kind that scars next season: an
+            advective or black frost, a deep radiative freeze (<Code>surface &lt; −2 °C</Code>), or a prolonged one
+            {" "}(<Code>≥ 4 h</Code> of canopy ice).</LI>
+          <LI><span className="text-orange-400 font-semibold">alert</span> — a real but shallow / brief radiative
+            freeze (risk H) warranting protective action.</LI>
+          <LI><span className="text-amber-300 font-semibold">watch</span> — marginal, the 0–3 °C band (risk M).</LI>
+        </ul>
+
+        <H>Validation — the 1975 / 1994 / 2021 blind ERA5 backtest</H>
+        <P>
+          The thresholds are checked against the three benchmark disasters by re-deriving the model from the
+          {" "}<strong>raw ERA5 hourly archive</strong> (<Code>archive-api.open-meteo.com</Code>, reachable from GitHub
+          Actions) — a genuine blind backtest, run by
+          {" "}<Code>backend/scraper/backfill_frost_backtest.py --mode events</Code>. Two results anchor the calibration:
+        </P>
+        <ul className="space-y-1">
+          <LI><strong>It fires on real cold and doesn&rsquo;t cry wolf.</strong> Every genuinely-cold ERA5 input is
+            graded <em>critical</em> (Paraná 1975 black frost; São Paulo + Paraná 1994; Paraná 2021), and a parallel run
+            over <strong>90 days of recent real forecast data returns zero false positives</strong> across the belt.</LI>
+          <LI><strong>The one tuning.</strong> The backtest showed the 10 m wind term eroding the radiative drop too
+            hard (near-misses all at 6–9 km/h), so the <Code>wind_kmh</Code> erosion was softened <Code>0.4 → 0.25</Code>.
+            That flipped 2021 Paraná to <em>critical</em> and deepened every confirmed event, while the recent run stayed
+            clean.</LI>
+        </ul>
+        <P className="text-[11px] text-slate-500">
+          The remaining backtest misses are <strong>not</strong> threshold errors: ERA5&rsquo;s ~31 km grid reads
+          several °C warmer than the station observation on these events (1975 Sul de Minas: ERA5 <Code>+10 °C</Code> air
+          vs an observed <Code>−4 °C</Code>) — it smooths away the valley cold-pooling that drives real frost minima, so
+          there is no freeze in the reanalysis at those points. Chasing them by loosening thresholds would over-fire on
+          mild nights, so the ladder is left where the zero-false-positive line sits.
+        </P>
 
         <H>Where we look</H>
         <P>
@@ -241,9 +304,9 @@ function FrostRiskMethodology() {
           <LI><strong>Cold-air pooling / topography.</strong> Frost collects in valley bottoms that a single
             representative point cannot resolve. The &ldquo;M&rdquo; band (0–3 °C) is the practical hedge for this — it
             flags nights where sheltered low spots will freeze even if the point estimate does not.</LI>
-          <LI><strong>Historical-recurrence probability.</strong> The 1975/1994/2021 events are background context, not
-            terms in the formula. This is a <em>physical nowcast</em> of tonight&rsquo;s conditions, not a climatological
-            frequency model.</LI>
+          <LI><strong>Historical-recurrence probability.</strong> The 1975/1994/2021 events are background context and
+            backtest anchors (see Validation), not terms in the formula. This is a <em>physical nowcast</em> of
+            tonight&rsquo;s conditions, not a climatological frequency model.</LI>
         </ul>
 
         <H>Caveats</H>
@@ -258,10 +321,14 @@ function FrostRiskMethodology() {
 
         <H>Where it lives</H>
         <P>
-          The estimate is computed in <Code>backend/scraper/sources/farmer_economics.py</Code> (<Code>_frost_risk</Code>),
-          mirrored for Honduras in <Code>honduras_weather.py</Code>, published into <Code>farmer_economics.json</Code>,
-          and rendered as the badges + 14-day grid in the <Code>WeatherRiskPanel</Code> on each origin&rsquo;s Farmer
-          Economics tab.
+          The physics is one shared, unit-tested module — <Code>backend/scraper/rules/frost_model.py</Code>
+          {" "}(<Code>surface_temp</Code>, <Code>assess_night</Code>, <Code>severity</Code>). The weather scrapers
+          {" "}(<Code>sources/farmer_economics.py</Code>, <Code>honduras_weather.py</Code>) feed it each night&rsquo;s
+          hourly slice and publish the structured result into <Code>farmer_economics.json</Code>; the same module drives
+          the per-region alert in <Code>scraper/agronomic_alerts.py</Code> and is validated by
+          {" "}<Code>scraper/backfill_frost_backtest.py</Code>. On the front end it renders as the badges + 14-day grid in
+          {" "}<Code>WeatherRiskPanel</Code> and the physics detail + historical anchor in <Code>FrostWatchPanel</Code>,
+          on each origin&rsquo;s Farmer Economics tab.
         </P>
       </div>
   );
