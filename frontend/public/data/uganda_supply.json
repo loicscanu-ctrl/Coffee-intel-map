@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-07-03T06:22:54.527740+00:00",
+  "scraped_at": "2026-07-04T06:01:56.478819+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-04",
@@ -752,23 +752,23 @@
     }
   },
   "ucda_price": {
-    "usd_cwt": 177.27,
-    "as_of": "2026-07-03",
+    "usd_cwt": 186.94,
+    "as_of": "2026-07-04",
     "grade": "Screen 15",
     "grades": {
-      "Screen 15": 177.27,
-      "Wugar": 289.45,
-      "Drugar": 270.45
+      "Screen 15": 186.94,
+      "Wugar": 293.2,
+      "Drugar": 274.2
     }
   },
   "weather": {
-    "scraped_at": "2026-07-02T21:14:34.986676Z",
+    "scraped_at": "2026-07-04T04:53:49.671781Z",
     "regions": [
       {
         "name": "Kasese",
         "drought": "NONE",
-        "csi_30d": 0.42,
-        "csi_60d": 0.91,
+        "csi_30d": 0.466,
+        "csi_60d": 0.934,
         "csi_30d_level": "MED",
         "csi_60d_level": "HIGH"
       },
@@ -776,7 +776,7 @@
         "name": "Mbale",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.326,
+        "csi_60d": 0.35,
         "csi_30d_level": "OK",
         "csi_60d_level": "MED"
       },
@@ -788,14 +788,14 @@
         "csi_30d_level": "OK",
         "csi_60d_level": "OK",
         "rain_mtd_mm": 16.9,
-        "rain_hist_min": 7.1,
-        "rain_hist_max": 65.7
+        "rain_hist_min": 11.8,
+        "rain_hist_max": 87.4
       },
       {
         "name": "Rwenzori",
         "drought": "NONE",
-        "csi_30d": 0.326,
-        "csi_60d": 0.746,
+        "csi_30d": 0.374,
+        "csi_60d": 0.77,
         "csi_30d_level": "MED",
         "csi_60d_level": "HIGH"
       },
@@ -803,7 +803,7 @@
         "name": "Masaka",
         "drought": "NONE",
         "csi_30d": 0.28,
-        "csi_60d": 0.63,
+        "csi_60d": 0.654,
         "csi_30d_level": "MED",
         "csi_60d_level": "HIGH"
       }
@@ -831,7 +831,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "H",
           "H",
@@ -873,11 +872,12 @@
           "M",
           "M",
           "M",
+          "M",
           "H",
           "H",
           "H",
           "H",
-          "H",
+          "M",
           "M"
         ]
       },
@@ -904,7 +904,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -950,7 +949,8 @@
           "M",
           "M",
           "M",
-          "-"
+          "M",
+          "M"
         ]
       },
       {
@@ -1048,7 +1048,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "M",
@@ -1084,6 +1083,7 @@
           "M",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -1120,7 +1120,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "M",
           "M",
@@ -1139,6 +1138,7 @@
           "L",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -1174,14 +1174,10 @@
   "enso": {
     "phase": "neutral",
     "intensity": "Weak",
-    "oni": 0.48,
+    "oni": 0.98,
     "peak_month": "Nov-25",
     "forecast_direction": "Neutral — no strong signal",
     "oni_history": [
-      {
-        "month": "Nov-24",
-        "value": -0.3
-      },
       {
         "month": "Dec-24",
         "value": -0.42
@@ -1240,8 +1236,7 @@
       },
       {
         "month": "Feb-26",
-        "value": -0.14,
-        "preliminary": true
+        "value": -0.14
       },
       {
         "month": "Mar-26",
@@ -1250,7 +1245,12 @@
       },
       {
         "month": "Apr-26",
-        "value": 0.48,
+        "value": 0.51,
+        "preliminary": true
+      },
+      {
+        "month": "May-26",
+        "value": 0.98,
         "preliminary": true
       }
     ],
@@ -1288,7 +1288,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Uganda coffee output expected",
-    "last_updated": "2026-07-03"
+    "last_updated": "2026-07-04"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Feb",

@@ -24,7 +24,7 @@
       "from": "Ho Chi Minh",
       "to": "Los Angeles",
       "rate": 6175,
-      "prev": 5742,
+      "prev": 6174,
       "unit": "USD/FEU",
       "proxy": false
     },
@@ -66,13 +66,6 @@
     }
   ],
   "history": [
-    {
-      "date": "2026-04-10",
-      "vn-eu": 2863,
-      "br-eu": 1661,
-      "et-eu": 2004,
-      "vn-us": 2184
-    },
     {
       "date": "2026-04-11",
       "vn-eu": 2863,
