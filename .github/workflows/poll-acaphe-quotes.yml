@@ -92,4 +92,6 @@ jobs:
           UPSTASH_REDIS_REST_URL:   ${{ secrets.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
           DATABASE_URL:             ${{ secrets.DATABASE_URL }}
+          ACAPHE_USER:              ${{ secrets.ACAPHE_USER }}
+          ACAPHE_PASS:              ${{ secrets.ACAPHE_PASS }}
         run: python -m scraper.acaphe_poller --once

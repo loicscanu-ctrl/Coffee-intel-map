@@ -48,8 +48,11 @@ def _push_redis(data: dict, key: str = REDIS_KEY) -> None:
         print(f"[acaphe][redis] push failed ({key}): {exc}")
 API_URL       = "https://acaphe.com/iquote.php?v="
 LOGIN_URL     = "https://acaphe.com/"
-USERNAME      = "LBS"
-PASSWORD      = "LBS"
+# Credentials come from the environment (ACAPHE_USER / ACAPHE_PASS), set as
+# GitHub secrets on the poll-acaphe-quotes workflow. Never hardcode them — this
+# repo is public. The old default was rotated out; there is no in-code fallback.
+USERNAME      = os.environ.get("ACAPHE_USER", "")
+PASSWORD      = os.environ.get("ACAPHE_PASS", "")
 POLL_INTERVAL = 30   # seconds between polls
 RELOGIN_AFTER = 3    # consecutive failures before re-login
 
@@ -213,6 +216,12 @@ def transform(raw: list) -> dict:
 async def playwright_login() -> dict:
     """Login via Playwright, return session cookies."""
     from playwright.async_api import async_playwright
+
+    if not USERNAME or not PASSWORD:
+        raise RuntimeError(
+            "ACAPHE_USER / ACAPHE_PASS not set — configure them as workflow "
+            "secrets (see poll-acaphe-quotes.yml). Refusing to log in without "
+            "credentials.")
 
     print("[acaphe] Logging in via Playwright …")
     async with async_playwright() as pw:
