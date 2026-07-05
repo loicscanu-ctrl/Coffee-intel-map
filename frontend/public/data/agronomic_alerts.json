@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T05:37:42+00:00",
+  "generated_at": "2026-07-05T05:55:27+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,7 +12,22 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 131.1
+            "forecast_7d_rain": 120.0
+          }
+        }
+      ]
+    },
+    "honduras": {
+      "Copán": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.55,
+            "forecast_7d_rain": 51.8
           }
         }
       ]
@@ -26,7 +41,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 29.77,
+            "vhi": 32.38,
             "spei_3": -2.74
           }
         }
@@ -39,7 +54,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 32.91,
+            "vhi": 27.06,
             "spei_3": -1.51
           }
         }
@@ -52,7 +67,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 30.5,
+            "vhi": 23.6,
             "spei_3": -2.16
           }
         }
@@ -65,13 +80,26 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 30.5,
+            "vhi": 23.6,
             "spei_3": -2.09
           }
         }
       ]
     },
     "ethiopia": {
+      "Limu": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.29,
+            "forecast_7d_rain": 70.6
+          }
+        }
+      ],
       "Kaffa": [
         {
           "threat_id": "severe_defoliation",
@@ -80,7 +108,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 21.74,
+            "vhi": 20.51,
             "spei_3": -1.85
           }
         },
@@ -92,7 +120,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.85,
-            "forecast_7d_rain": 53.4
+            "forecast_7d_rain": 60.7
           }
         }
       ]
@@ -107,7 +135,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.42,
-            "forecast_7d_rain": 60.3
+            "forecast_7d_rain": 81.9
           }
         }
       ],
@@ -120,7 +148,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.06,
-            "forecast_7d_rain": 94.5
+            "forecast_7d_rain": 131.9
           }
         }
       ],
@@ -133,21 +161,40 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 58.9
+            "forecast_7d_rain": 57.8
+          }
+        }
+      ]
+    },
+    "brazil": {
+      "Paraná": [
+        {
+          "threat_id": "brazil_frost_risk",
+          "name": "Watch Frost Threat",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Marginal frost risk on 2026-07-17: 2.1 °C canopy. Monitor overnight lows.",
+          "triggers": {
+            "type": "none",
+            "surface_c": 2.1,
+            "air_min_c": 5.5,
+            "hours_below_0": 0,
+            "date": "2026-07-17"
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 10,
+    "total_alerts": 13,
     "by_severity": {
-      "watch": 5,
+      "watch": 8,
       "critical": 5
     },
     "by_threat": {
-      "blossom_drop": 5,
-      "severe_defoliation": 5
+      "blossom_drop": 7,
+      "severe_defoliation": 5,
+      "brazil_frost_risk": 1
     }
   }
 }
