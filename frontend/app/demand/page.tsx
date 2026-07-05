@@ -1,12 +1,19 @@
 "use client";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 
 import NewsFeedList from "@/components/NewsFeedList";
 import AgeCohortPanel from "@/components/demand/AgeCohortPanel";
 import AjcaPanel from "@/components/demand/AjcaPanel";
-import CertifiedStocksPanel from "@/components/demand/CertifiedStocksPanel";
-import CertifiedStocksTestPanel from "@/components/demand/CertifiedStocksTestPanel";
-import ImportsVisualsLab from "@/components/demand/imports-lab/ImportsVisualsLab";
+// Code-split the certified-stocks panel: it's a ~2,460-line component that eagerly
+// parses ~2.7 MB of JSON, so a static import bloated the whole demand bundle even
+// on tabs that never open it. Load it only when the Certified tab renders.
+const CertifiedStocksPanel = dynamic(
+  () => import("@/components/demand/CertifiedStocksPanel"),
+  { ssr: false, loading: () => (
+      <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 animate-pulse h-64" />
+    ) },
+);
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
@@ -22,7 +29,7 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed" | "test";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "certified",   label: "Certified stocks" },
@@ -31,7 +38,6 @@ const TABS: { id: SubTab; label: string }[] = [
   { id: "demand",      label: "Consumption" },
   { id: "imports",     label: "Imports" },
   { id: "listed",      label: "Listed stocks" },
-  { id: "test",        label: "Test ✦" },
 ];
 const SUB_TABS = TABS.map((t) => t.id) as SubTab[];
 
@@ -166,13 +172,6 @@ function DemandPageInner() {
         <Section>
           <EarningsTable />
         </Section>
-      )}
-
-      {tab === "test" && (
-        <>
-          <Section><ImportsVisualsLab /></Section>
-          <Section><CertifiedStocksTestPanel /></Section>
-        </>
       )}
 
       <div className="flex-1 overflow-hidden">
