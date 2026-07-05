@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import re
+import sys
 from datetime import date
 from urllib.parse import urljoin
 
@@ -354,8 +355,9 @@ def _fetch_bytes(url: str) -> bytes | None:
         r = requests.get(url, headers=_HEADERS, timeout=30)
         if r.status_code == 200:
             return r.content
-    except Exception:
-        pass
+        print(f"[ecf] fetch {url} → HTTP {r.status_code}", file=sys.stderr)
+    except Exception as e:  # noqa: BLE001
+        print(f"[ecf] fetch {url} failed: {e}", file=sys.stderr)
     return None
 
 
@@ -416,9 +418,11 @@ def _fetch(url: str) -> str | None:
     try:
         r = requests.get(url, headers=_HEADERS, timeout=25, allow_redirects=True)
         if r.status_code != 200:
+            print(f"[ecf] fetch {url} → HTTP {r.status_code}", file=sys.stderr)
             return None
         return r.text
-    except Exception:
+    except Exception as e:  # noqa: BLE001
+        print(f"[ecf] fetch {url} failed: {e}", file=sys.stderr)
         return None
 
 
