@@ -120,7 +120,7 @@ def export_retail_cpi(db) -> None:
             print("  retail_cpi.json → no data")
             return
         path = OUT_DIR / "retail_cpi.json"
-        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(path, payload, ensure_ascii=False)
         n = len(payload.get("series") or {})
         print(f"  retail_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
     except Exception as e:
@@ -158,7 +158,7 @@ def export_us_cpi(db) -> None:
             print("  us_cpi.json → no data")
             return
         path = OUT_DIR / "us_cpi.json"
-        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(path, payload, ensure_ascii=False)
         n = len(payload.get("series") or {})
         print(f"  us_cpi.json → {n} series, last_updated={payload.get('last_updated')}")
     except Exception as e:

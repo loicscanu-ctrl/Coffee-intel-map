@@ -8,6 +8,8 @@ price) instead of depending on the (empty) CountryIntel DB table.
 import json
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 OUT_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "data"
 
 # (display name, lat, lng, supply file) — producing-region centroids.
@@ -115,7 +117,7 @@ def build() -> list[dict]:
 
 def export_country_pins() -> None:
     pins = build()
-    (OUT_DIR / "countries.json").write_text(json.dumps(pins, indent=2), encoding="utf-8")
+    safe_write_json(OUT_DIR / "countries.json", pins)
     print(f"  countries.json → {len(pins)} producer pins")
 
 

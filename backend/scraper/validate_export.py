@@ -287,33 +287,38 @@ def validate_kaffeesteuer(data: dict) -> tuple[bool, str]:
 
 # ── write helper ──────────────────────────────────────────────────────────────
 
-def safe_write_json(path, payload, validate_fn, indent: int = 2, sanity_fn=None,
+def safe_write_json(path, payload, validate_fn=None, indent: int = 2, sanity_fn=None,
                     ensure_ascii: bool = True, separators=None,
-                    sort_keys: bool = False) -> bool:
+                    sort_keys: bool = False, trailing_newline: bool = False) -> bool:
     """
     Validate payload then write to path atomically via a .tmp file.
 
     `validate_fn(payload) -> (ok, reason)` checks the new payload in isolation
-    (shape, freshness). `sanity_fn(old_payload, new_payload) -> (ok, reason)` is
-    an optional cross-run guard compared against the last good file (e.g. a
-    volatility/price-swing check); it is skipped on the first-ever write.
+    (shape, freshness). Pass None to write atomically WITHOUT a shape gate — use
+    this to get crash-safe (tmp-then-rename) writes on a file that doesn't yet
+    have a bespoke validator; add one later. `sanity_fn(old_payload, new_payload)
+    -> (ok, reason)` is an optional cross-run guard compared against the last good
+    file (e.g. a volatility/price-swing check); it is skipped on the first write.
 
-    `ensure_ascii`, `separators`, `sort_keys` mirror json.dumps so callers that
-    need non-ASCII content kept (e.g. Portuguese accents) or compact output can
-    migrate to the atomic writer without changing their on-disk format. Defaults
+    `ensure_ascii`, `separators`, `sort_keys` mirror json.dumps, and
+    `trailing_newline` appends a final "\\n", so a caller migrating off a raw
+    `write_text(json.dumps(...))` can preserve its exact on-disk format. Defaults
     match the original behaviour so existing callers are unaffected.
 
     Returns True if written, False if validation/sanity failed or the content
     is unchanged. On failure the existing file at `path` is left untouched.
     """
-    ok, reason = validate_fn(payload)
-    if not ok:
-        name = Path(path).name
-        print(f"[validate] {name} FAILED: {reason} — keeping existing file")
-        return False
+    if validate_fn is not None:
+        ok, reason = validate_fn(payload)
+        if not ok:
+            name = Path(path).name
+            print(f"[validate] {name} FAILED: {reason} — keeping existing file")
+            return False
 
     serialized = json.dumps(payload, indent=indent, ensure_ascii=ensure_ascii,
                             separators=separators, sort_keys=sort_keys)
+    if trailing_newline:
+        serialized += "\n"
 
     # Read the existing file once (as text) — reused by the sanity guard and the
     # content short-circuit below.

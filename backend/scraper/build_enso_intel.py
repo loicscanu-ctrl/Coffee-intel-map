@@ -16,6 +16,7 @@ from pathlib import Path
 
 from scraper.enso_analogs import aligned_series, find_analogs
 from scraper.enso_risk import build_risk_pins, risk_summary
+from scraper.validate_export import safe_write_json
 
 OUT_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "data"
 SEED_PATH = Path(__file__).resolve().parents[1] / "seed" / "oni_history_full.json"
@@ -82,9 +83,9 @@ def build() -> dict:
 
 def export_enso_intel() -> None:
     data = build()
-    (OUT_DIR / "enso.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_DIR / "enso.json", data, ensure_ascii=False)
     pins = data["risk"]["pins"]
-    (OUT_DIR / "enso_risk_pins.json").write_text(json.dumps(pins, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_DIR / "enso_risk_pins.json", pins, ensure_ascii=False)
     print(f"  enso.json → phase={data['phase']} analogs={len(data['analogs'])} "
           f"risk_pins={len(pins)} forecast_seasons={len(data['oni_forecast'])}")
 

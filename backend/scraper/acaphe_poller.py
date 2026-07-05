@@ -292,20 +292,24 @@ def _save_vn_prices_to_db(viet: dict, fetched_at: str) -> None:
 
 def fetch_and_save(cookies: dict) -> bool:
     """Fetch iquote.php, transform, write to OUTPUT. Returns True on success."""
+    backend_dir = str(Path(__file__).parents[1])
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
+    from scraper.validate_export import safe_write_json
     url = f"{API_URL}{int(time.time() * 1000)}"
     try:
         resp = requests.get(url, cookies=cookies, headers=HEADERS, timeout=10)
         resp.raise_for_status()
         raw  = resp.json()
         data = transform(raw)
-        OUTPUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(OUTPUT, data, ensure_ascii=False)
 
         # Vietnam persistence: save when live, inject last-known when absent
         viet = data.get("vietnam") or {}
         if viet.get("bmt_bid") or viet.get("hcm_bid"):
             # VN data present — save snapshot to file, Redis, and DB (once per day)
             snapshot = {**viet, "saved_at": data["fetched_at"]}
-            VIETNAM_LAST.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+            safe_write_json(VIETNAM_LAST, snapshot, ensure_ascii=False)
             _push_redis(snapshot, key="vietnam_last")
             print("[acaphe] Vietnam snapshot saved (local + Redis)")
             if DATABASE_URL:

@@ -44,6 +44,7 @@ from scraper.backfill_intraday_kc_rc import (  # noqa: E402
     _stitch,
 )
 from scraper.symbols import to_canonical  # noqa: E402
+from scraper.validate_export import safe_write_json  # noqa: E402
 
 # Nearest contracts per market: enough to cover the current front plus the one
 # that just rolled off and the next one (so the volume-stitch picks the liquid
@@ -115,7 +116,7 @@ def run() -> dict:
             existing = []
     merged, n_new = _merge(existing, fresh)
 
-    OUT_PATH.write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    safe_write_json(OUT_PATH, merged, ensure_ascii=False, trailing_newline=True)
     span = f"{merged[0]['date']} → {merged[-1]['date']}" if merged else "—"
     print(f"[refresh] refreshed {len(fresh)} recent days ({n_new} new); "
           f"file now {len(merged)} days, span {span}")

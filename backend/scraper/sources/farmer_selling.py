@@ -27,6 +27,8 @@ from urllib.parse import quote_plus
 
 import requests
 
+from scraper.validate_export import safe_write_json
+
 try:
     from bs4 import BeautifulSoup
     HAS_BS4 = True
@@ -688,7 +690,7 @@ def build_farmer_selling(db=None) -> dict:
         log.info("No changes detected — JSON unchanged")
         return data
 
-    OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_PATH, data, ensure_ascii=False)
     log.info("farmer_selling_brazil.json updated (%d bytes)", OUT_PATH.stat().st_size)
     return data
 

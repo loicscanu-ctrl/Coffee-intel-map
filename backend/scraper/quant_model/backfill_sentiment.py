@@ -26,6 +26,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from scraper.quant_model.sentiment import _aggregate, _filter_news, classify_headlines
+from scraper.validate_export import safe_write_json
 
 ROOT = Path(__file__).resolve().parents[3]
 HIST_PATH = ROOT / "frontend" / "public" / "data" / "sentiment_history.json"
@@ -103,8 +104,7 @@ def run(days: int = 120, min_per_day: int = 3, sleep_s: float = 1.0) -> int:
 
     history.sort(key=lambda h: h.get("date", ""))
     history = history[-365:]
-    with open(HIST_PATH, "w", encoding="utf-8") as f:
-        json.dump(history, f, ensure_ascii=False, separators=(",", ":"))
+    safe_write_json(HIST_PATH, history, indent=None, ensure_ascii=False, separators=(",", ":"))
     print(f"[backfill] added {added} day(s); history now {len(history)} day(s) → {HIST_PATH.name}")
     return added
 

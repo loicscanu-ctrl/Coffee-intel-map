@@ -26,6 +26,7 @@ from pathlib import Path
 import requests
 
 from scraper.sources._imports_util import merge_monthly, merge_origin_monthly
+from scraper.validate_export import safe_write_json
 
 log = logging.getLogger(__name__)
 
@@ -476,7 +477,7 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         "reporters":     reporters,
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_PATH, out, ensure_ascii=False)
     log.info("eu_coffee_imports.json written: %d reporters, bloc %d origins",
              len(reporters), len(bloc["origins"]))
     return out

@@ -21,9 +21,12 @@ import sys
 from datetime import UTC, date, datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pathlib import Path
 
 import symbols  # noqa: E402  (sibling module: KC/RM/RC conventions)
+
+from scraper.validate_export import safe_write_json  # noqa: E402
 
 # Resolve project root (works both from repo root and from backend/)
 ROOT = Path(__file__).resolve().parents[2]   # …/Coffee-intel-map
@@ -155,8 +158,7 @@ def _parse(raw: dict, min_oi: int = 100) -> list[dict]:
 
 def _save_history(history: dict) -> None:
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(history, f, indent=2)
+    safe_write_json(DATA_FILE, history)
 
 
 def _derive_oi_history_from_archive(archive: dict) -> dict:
@@ -244,9 +246,8 @@ def _trim_archive(archive: dict) -> None:
 
 def _save_archive(archive: dict) -> None:
     ARCHIVE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(ARCHIVE_FILE, "w", encoding="utf-8") as f:
-        # Compact — this file grows to ~1MB over 5y; no need for indent.
-        json.dump(archive, f, separators=(",", ":"))
+    # Compact — this file grows to ~1MB over 5y; no need for indent.
+    safe_write_json(ARCHIVE_FILE, archive, indent=None, separators=(",", ":"))
 
 
 async def main() -> None:

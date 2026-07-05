@@ -47,6 +47,8 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from scraper.validate_export import safe_write_json
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 _ROOT     = Path(__file__).parents[1]
@@ -202,7 +204,7 @@ def run(maxrecords: int = 2000) -> dict:
             "rc_symbol":     rc_sym,
         })
 
-    OUT_PATH.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    safe_write_json(OUT_PATH, rows, ensure_ascii=False, trailing_newline=True)
 
     def _cov(k): return sum(1 for r in rows if r.get(k) is not None)
     print(f"[intraday] {len(rows)} days. coverage: "

@@ -45,6 +45,8 @@ from zoneinfo import ZoneInfo
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from scraper.validate_export import safe_write_json  # noqa: E402
+
 _REPO    = Path(__file__).resolve().parents[2]
 OUT_PATH = _REPO / "frontend" / "public" / "data" / "fx_intraday_snapshots.json"
 
@@ -198,11 +200,11 @@ def _update_brent_anchors(bars: list[tuple[datetime, float]]) -> int:
     if not added:
         return 0
     days = sorted(existing + added, key=lambda r: r["date"])
-    _BRENT_OUT.write_text(json.dumps({
+    safe_write_json(_BRENT_OUT, {
         "scraped_at": datetime.utcnow().isoformat() + "Z",
         "source": "backfill (per-contract) + daily continuous-front appends",
         "days": days,
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    }, ensure_ascii=False, indent=1)
     return len(added)
 
 
@@ -242,9 +244,10 @@ def run(maxrecords: int = 2000) -> dict:
         row["pairs"].update(pairs)      # newest fetch wins per pair
 
     days = sorted(by_date.values(), key=lambda r: r["date"])[-_KEEP_DAYS:]
-    OUT_PATH.write_text(json.dumps(
+    safe_write_json(
+        OUT_PATH,
         {"scraped_at": datetime.utcnow().isoformat() + "Z", "days": days},
-        ensure_ascii=False, indent=1), encoding="utf-8")
+        ensure_ascii=False, indent=1)
 
     full = sum(1 for r in days if len(r["pairs"]) >= 6)
     print(f"[fx_snaps] pairs ok {ok_pairs}/{len(tickers)} · {len(days)} days stored "

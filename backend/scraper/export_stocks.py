@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from database import SessionLocal
 from models import NewsItem
 from scraper.sources import ajca, population, psd_coffee, un_wpp_age, usda_gain_pdf
+from scraper.validate_export import safe_write_json
 
 ROOT    = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "frontend" / "public" / "data"
@@ -377,7 +378,7 @@ def export_stocks(db) -> None:
         "world_consumption": _world_consumption(psd_data),
     }
     path = OUT_DIR / "demand_stocks.json"
-    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(path, result, ensure_ascii=False)
     prod_count = len(result["producers"] or {})
     growth_count = len(result["growth_markets"] or [])
     print(

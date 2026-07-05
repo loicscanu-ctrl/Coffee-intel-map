@@ -48,6 +48,8 @@ from pathlib import Path
 
 import requests
 
+from scraper.validate_export import safe_write_json
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -316,7 +318,7 @@ def build_payload(monthly: list[WwvMonthly], source_url: str | None) -> dict:
 
 def _persist(doc: dict) -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    safe_write_json(OUT_PATH, doc, trailing_newline=True)
 
 
 def run(*, write: bool, backfill: bool, diag: bool = False) -> int:

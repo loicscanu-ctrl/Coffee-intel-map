@@ -15,6 +15,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 ROOT = Path(__file__).resolve().parents[2]
 SEED = ROOT / "backend" / "seed" / "factories.json"
 OUT  = ROOT / "frontend" / "public" / "data" / "factory_mix.json"
@@ -106,7 +108,7 @@ def export_factory_mix() -> None:
         "regions":      regions_out,
     }
 
-    OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT, payload, ensure_ascii=False)
     print(
         f"  factory_mix.json -> "
         f"{len(regions_out)} regions, "

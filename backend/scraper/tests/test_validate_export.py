@@ -366,3 +366,23 @@ def test_safe_write_json_sanity_keeps_old_on_swing(tmp_path):
     written = safe_write_json(dest, bad, _ok_validator, sanity_fn=price_swing_guard(0.30))
     assert written is False
     assert json.loads(dest.read_text()) == good   # old data preserved
+
+
+# ── safe_write_json: atomicity-only mode + trailing newline (rollout params) ──
+
+def test_safe_write_json_no_validator_writes_atomically(tmp_path):
+    from scraper.validate_export import safe_write_json
+    p = tmp_path / "x.json"
+    assert safe_write_json(p, {"a": 1}) is True          # validate_fn=None
+    assert not (tmp_path / "x.json.tmp").exists()          # tmp renamed away
+    import json
+    assert json.loads(p.read_text()) == {"a": 1}
+
+
+def test_safe_write_json_trailing_newline_and_format(tmp_path):
+    import json
+    from scraper.validate_export import safe_write_json
+    p = tmp_path / "y.json"
+    safe_write_json(p, {"k": "é"}, ensure_ascii=False, trailing_newline=True)
+    txt = p.read_text(encoding="utf-8")
+    assert txt == json.dumps({"k": "é"}, indent=2, ensure_ascii=False) + "\n"

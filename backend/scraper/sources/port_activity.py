@@ -29,6 +29,8 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 # Repo layout: backend/scraper/sources/port_activity.py → frontend/public/data
 _OUT_DIR = (
     Path(__file__).resolve().parents[3]
@@ -207,7 +209,7 @@ def _num(v) -> float | int:
 
 
 def _write_json(path: Path, obj) -> None:
-    path.write_text(json.dumps(obj, separators=(",", ":")), encoding="utf-8")
+    safe_write_json(path, obj, indent=None, separators=(",", ":"))
 
 
 def run() -> dict | None:

@@ -48,6 +48,8 @@ try:
 except ImportError:  # pragma: no cover - bs4 is in requirements
     BeautifulSoup = None  # type: ignore
 
+from scraper.validate_export import safe_write_json
+
 _BASE = "https://attespotcoffee.azurewebsites.net/"
 _OUT = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "spot_coffee.json"
 _HIST_OUT = Path(__file__).resolve().parents[3] / "frontend" / "public" / "data" / "spot_coffee_history.json"
@@ -581,7 +583,7 @@ def full() -> int:
         "row_count": len(all_rows),
     }
     _OUT.parent.mkdir(parents=True, exist_ok=True)
-    _OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(_OUT, payload, ensure_ascii=False)
     print(f"[spot] wrote {_OUT.relative_to(Path(__file__).resolve().parents[3])} "
           f"— {len(all_rows)} rows ({by_type}), {len(headers)} columns")
     _update_history(all_rows, payload["as_of"])
@@ -703,7 +705,7 @@ def _update_history(rows: list[dict], date: str) -> None:
         "source_url": _BASE,
         "snapshots": snaps,
     }
-    _HIST_OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(_HIST_OUT, out, ensure_ascii=False)
     w = snap["wow"]
     wtxt = (f"WoW +{w['in_tons']}/-{w['out_tons']} t (net {w['net_tons']})" if w else "WoW: n/a (first snapshot)")
     print(f"[spot] history: {len(snaps)} snapshots, latest {date} "

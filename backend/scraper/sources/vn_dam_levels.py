@@ -27,6 +27,8 @@ from typing import Any
 
 import requests
 
+from scraper.validate_export import safe_write_json
+
 try:
     import pdfplumber
     HAS_PDFPLUMBER = True
@@ -278,7 +280,7 @@ def build_vn_water_levels(db=None) -> dict:
         log.warning("pdfplumber not installed — returning static seed")
         out.update(STATIC_SEED)
         out["rivers"] = STATIC_SEED["rivers"]
-        OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(OUT_PATH, out, ensure_ascii=False)
         return out
 
     pdf_url, bulletin_date = _find_latest_pdf_url()
@@ -286,7 +288,7 @@ def build_vn_water_levels(db=None) -> dict:
         log.warning("Could not find NCHMF PDF — returning static seed")
         out.update(STATIC_SEED)
         out["rivers"] = STATIC_SEED["rivers"]
-        OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+        safe_write_json(OUT_PATH, out, ensure_ascii=False)
         return out
 
     out["pdf_url"] = pdf_url
@@ -320,7 +322,7 @@ def build_vn_water_levels(db=None) -> dict:
         log.error("PDF fetch/parse failed: %s", e)
         out["rivers"] = STATIC_SEED["rivers"]
 
-    OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_PATH, out, ensure_ascii=False)
     log.info("vn_water_levels.json written (%d bytes)", OUT_PATH.stat().st_size)
     return out
 

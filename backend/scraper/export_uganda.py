@@ -18,6 +18,7 @@ from pathlib import Path
 from scraper._export_common import _badge, _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
+from scraper.validate_export import safe_write_json
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -329,7 +330,7 @@ def export_uganda(db) -> None:
     }
 
     path = OUT_DIR / "uganda_supply.json"
-    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(path, result, ensure_ascii=False)
     n_months = len((exports_out or {}).get("monthly", []))
     n_exp    = len((ucda_detail or {}).get("exporters", []))
     n_dst    = len((ucda_detail or {}).get("destinations", []))

@@ -22,6 +22,8 @@ import urllib.request
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 ROOT     = Path(__file__).resolve().parents[3]
 OUT_PATH = ROOT / "frontend" / "public" / "data" / "origin_prices_history.json"
 
@@ -402,6 +404,6 @@ def export_origin_prices_history(db) -> None:
         "scraped_at": datetime.utcnow().isoformat() + "Z",
         "origins":    origins,
     }
-    OUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_PATH, payload, ensure_ascii=False)
     total = sum(len(v.get("history", [])) for v in origins.values())
     print(f"  origin_prices_history.json → {total} total rows across {len(origins)} origins")

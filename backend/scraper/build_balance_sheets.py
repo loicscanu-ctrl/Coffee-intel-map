@@ -37,6 +37,8 @@ import json
 import sys
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "frontend" / "public" / "data"
 DEMAND_STOCKS = DATA / "demand_stocks.json"
@@ -164,7 +166,7 @@ def refresh_origin(origin: str, filename: str, demand: dict) -> list[str]:
     if changes:
         # Write back via the original document so the nested vn_farmer_economics
         # subkey case doesn't lose its sibling fields (cost_robusta, acreage…).
-        path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+        safe_write_json(path, doc, trailing_newline=True)
     return changes
 
 

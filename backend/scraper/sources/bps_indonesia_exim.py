@@ -75,6 +75,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from scraper.validate_export import safe_write_json
+
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -722,8 +724,7 @@ def _build_payload(by_month: dict[str, dict]) -> dict:
 
 def _persist(by_month: dict[str, dict]) -> None:
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(json.dumps(_build_payload(by_month), indent=2) + "\n",
-                        encoding="utf-8")
+    safe_write_json(OUT_PATH, _build_payload(by_month), trailing_newline=True)
 
 
 async def run_async(months: list[tuple[int, int]], write: bool, headed: bool = False) -> int:

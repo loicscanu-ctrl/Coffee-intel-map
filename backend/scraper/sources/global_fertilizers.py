@@ -20,6 +20,8 @@ from typing import Any
 
 import requests
 
+from scraper.validate_export import safe_write_json
+
 log = logging.getLogger(__name__)
 
 # ── Config ─────────────────────────────────────────────────────────────────────
@@ -252,7 +254,7 @@ def build_global_fertilizers(db=None) -> dict:
         "static_seed":      STATIC_SEED,
     }
 
-    OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(OUT_PATH, out, ensure_ascii=False)
     log.info("global_fertilizers.json written (%d bytes)", OUT_PATH.stat().st_size)
     return out
 

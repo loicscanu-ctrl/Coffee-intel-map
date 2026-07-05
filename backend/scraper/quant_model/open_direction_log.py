@@ -34,6 +34,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from scraper.quant_model import open_direction as _od
+from scraper.validate_export import safe_write_json
 
 _ROOT     = Path(__file__).resolve().parents[3]
 _HISTORY  = _ROOT / "frontend" / "public" / "data" / "open_direction_history.json"
@@ -190,7 +191,7 @@ def _write_quant_report(payload: dict) -> None:
         except Exception:
             existing = {}
     existing["open_direction"] = payload
-    _QUANT.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(_QUANT, existing, ensure_ascii=False)
 
 
 def run() -> None:
@@ -230,7 +231,7 @@ def run() -> None:
               "history resolved only, panel payload left untouched")
 
     history.sort(key=lambda r: r["date"])
-    _HISTORY.write_text(json.dumps(history, indent=1), encoding="utf-8")
+    safe_write_json(_HISTORY, history, indent=1)
 
     live = [r for r in history if r["source"] == "live" and r["status"] == "resolved"]
     graded = [r["hit"] for r in live if r["hit"] is not None]

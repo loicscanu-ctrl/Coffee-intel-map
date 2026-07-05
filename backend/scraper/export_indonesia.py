@@ -19,6 +19,7 @@ from pathlib import Path
 from scraper._export_common import _badge, _worst_risk
 from scraper.enso import derive_enso_phase as _derive_enso_phase
 from scraper.enso import oni_to_dots as _oni_to_dots
+from scraper.validate_export import safe_write_json
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -247,7 +248,7 @@ def export_indonesia(db) -> None:
     }
 
     path = OUT_DIR / "indonesia_supply.json"
-    path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    safe_write_json(path, result, ensure_ascii=False)
     print(
         f"  indonesia_supply.json → "
         f"exports:{exports_out is not None} "

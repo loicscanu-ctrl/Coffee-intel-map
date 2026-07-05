@@ -31,6 +31,8 @@ from pathlib import Path
 
 import requests
 
+from scraper.validate_export import safe_write_json, validate_cecafe_daily
+
 ROOT     = Path(__file__).resolve().parents[2]
 OUT_DIR  = ROOT / "frontend" / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -479,7 +481,7 @@ def main():
     # 5. Save with the dual-source schema.
     existing["updated"] = ref.isoformat()
     existing["_schema"] = "v2"
-    OUT_PATH.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
+    safe_write_json(OUT_PATH, existing, ensure_ascii=False, validate_fn=validate_cecafe_daily)
     print(f"\nWritten -> {OUT_PATH}  ({OUT_PATH.stat().st_size:,} bytes)")
     for src_key, bucket in existing["sources"].items():
         months = sorted(bucket["arabica"].keys())
