@@ -167,8 +167,12 @@ jobs:
           # `--strategy-option=theirs` during a rebase keeps the side being
           # replayed (our commit), discarding the rebase-target side (main).
           # Files we didn't `git add` flow through from main unchanged.
-          git pull --rebase --autostash --strategy-option=theirs origin main
-          git push
+          ok=0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase --autostash --strategy-option=theirs origin main && git push; then ok=1; break; fi
+            echo "push attempt $attempt failed (concurrent push?); retrying in $((5*attempt))s…"; sleep $((5 * attempt))
+          done
+          [ "$ok" = 1 ] || { echo "push failed after 5 attempts"; exit 1; }
 
       # Phase-3 sunset gate: export_static_json writes a `warnings` entry into
       # health.json when latest_prices/vn_physical_prices had to fall back to
