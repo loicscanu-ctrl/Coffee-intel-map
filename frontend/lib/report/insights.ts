@@ -195,7 +195,14 @@ interface Chain { contracts?: Contract[]; pub_date?: string; }
 const dailyQuotes: Builder = async () => {
   const d = await load<{ arabica?: Chain; robusta?: Chain }>("/data/futures_chain.json"); if (!d) return null;
   const line = (c: Chain | undefined, unit: string, dec: number) => {
-    const f = c?.contracts?.[0]; if (!f || f.last == null) return "";
+    // The liquid front is the max-open-interest contract, NOT contracts[0]:
+    // near a roll the nearest-expiry contract is a thin, stale-looking print
+    // (e.g. KCN26 on ~1 lot) while OI has moved to the next delivery. Quoting
+    // [0] put a wrong price in the exported briefing. Mirror MarketTicker.frontByOI.
+    const cs = (c?.contracts ?? []).filter(x => x.last != null);
+    if (!cs.length) return "";
+    const f = cs.reduce((best, x) => (x.oi ?? 0) > (best.oi ?? 0) ? x : best, cs[0]);
+    if (f.last == null) return "";
     const dir = (f.chg ?? 0) >= 0 ? "up" : "down";
     return `Front month **${f.symbol?.slice(0, 5) ?? f.contract}** last **${f.last.toFixed(dec)} ${unit}**, ${dir} **${f.chg != null ? Math.abs(f.chg).toFixed(dec) : "—"}** on the day; front open interest **${n0(f.oi ?? 0)}** lots.`;
   };
