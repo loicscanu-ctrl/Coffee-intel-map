@@ -78,3 +78,22 @@ def test_parse_command():
     assert _parse_command("/help") == ("help", "")
     assert _parse_command("/quote@CoffeeBot basis=+50") == ("quote", "basis=+50")
     assert _parse_command("hello") == ("", "hello")
+
+
+# ── webhook secret-token verification ─────────────────────────────────────────
+
+def test_webhook_secret_ok_when_unset_fails_open(monkeypatch):
+    monkeypatch.delenv("TELEGRAM_WEBHOOK_SECRET", raising=False)
+    from telegram.auth import webhook_secret_ok
+    # No secret configured → cannot verify → fail open (is_allowed still gates).
+    assert webhook_secret_ok(None) is True
+    assert webhook_secret_ok("anything") is True
+
+
+def test_webhook_secret_enforced_when_set(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_WEBHOOK_SECRET", "s3cr3t-token")
+    from telegram.auth import webhook_secret_ok
+    assert webhook_secret_ok("s3cr3t-token") is True
+    assert webhook_secret_ok("wrong") is False
+    assert webhook_secret_ok(None) is False
+    assert webhook_secret_ok("") is False

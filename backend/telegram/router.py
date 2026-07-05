@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request, Response
 
-from telegram.auth import is_allowed
+from telegram.auth import is_allowed, webhook_secret_ok
 from telegram.commands import DISPATCH
 from telegram.sender import send_message
 
@@ -22,6 +22,11 @@ def _parse_command(text: str) -> tuple[str, str]:
 
 @router.post("/webhook")
 async def webhook(request: Request):
+    # Reject forged deliveries BEFORE parsing the body: Telegram echoes the
+    # registered secret in this header; anything else is not from Telegram.
+    if not webhook_secret_ok(request.headers.get("X-Telegram-Bot-Api-Secret-Token")):
+        return Response(status_code=403)
+
     update = await request.json()
 
     if not is_allowed(update):

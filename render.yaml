@@ -36,5 +36,9 @@ services:
         sync: false      # set in dashboard
       - key: DATABASE_URL
         sync: false      # optional — set in dashboard if you want VN price persistence
+      - key: ACAPHE_USER
+        sync: false      # acaphe.com login — set in dashboard (no in-code default)
+      - key: ACAPHE_PASS
+        sync: false      # acaphe.com password — set in dashboard
       - key: PYTHONUNBUFFERED
         value: "1"
