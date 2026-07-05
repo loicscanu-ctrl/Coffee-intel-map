@@ -1,0 +1,49 @@
+name: "9.2 – CI Frontend"
+
+# Type-check, lint, and unit-test the Next.js frontend on every push/PR that
+# touches it. Before this, none of tsc / eslint / vitest ran in CI, so type
+# errors and broken tests shipped silently.
+
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**", ".github/workflows/ci-frontend.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["frontend/**", ".github/workflows/ci-frontend.yml"]
+  workflow_dispatch:
+
+# A newer commit on the same ref supersedes an in-flight check run.
+concurrency:
+  group: ci-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check (tsc --noEmit)
+        run: npx tsc --noEmit -p tsconfig.json
+
+      - name: Lint (next lint)
+        run: npm run lint
+
+      - name: Unit tests (vitest)
+        run: npm run test
