@@ -70,11 +70,23 @@ async function main() {
   const history   = evaluateHistoricalSignals(processed, 8);
   const lastWeek  = history[history.length - 1];
 
+  // Preserve non-COT rows (the "AGRO" agronomic alerts that the weather
+  // pipeline merges in via agronomic_alerts.merge_into_signals_json). This
+  // export owns the COT rows; without this read-merge it would clobber the
+  // agronomic block every run — the two workflows write the same file from
+  // different concurrency groups. Mirror image of the Python merge, which
+  // keeps the COT rows and replaces only AGRO.
+  let preserved = [];
+  try {
+    const prev = JSON.parse(await readFile(output, "utf8"));
+    preserved = (prev.signals || []).filter(s => s?.category === "AGRO");
+  } catch { /* no existing signals.json yet — nothing to preserve */ }
+
   const payload = {
     date:        latest.date,
     scoreNY:     lastWeek?.scoreNY  ?? 0,
     scoreLDN:    lastWeek?.scoreLDN ?? 0,
-    signals,
+    signals:     [...signals, ...preserved],
     history,
     generatedAt: new Date().toISOString(),
   };
