@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-05T21:36:18.982477Z",
-  "count": 70,
+  "generated_at": "2026-07-05T21:44:23.996274Z",
+  "count": 71,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -262,6 +262,19 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 10
+    },
+    {
+      "file": "ci-frontend.yml",
+      "name": "9.2 \u2013 CI Frontend",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "ci-frontend-${{ github.ref }}",
+      "timeout_minutes": 15
     },
     {
       "file": "ci-tests.yml",
