@@ -228,56 +228,20 @@
       }
     ]
   },
-  "scraped_at": "2026-07-06T23:18:54.046995+00:00",
+  "scraped_at": "2026-07-06T23:19:20.114826Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-03T22:34:53.351706Z",
+    "scraped_at": "2026-07-06T23:19:18.525762Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 90.0,
-    "net_index": 17.5,
-    "bull_count": 3,
+    "overall_confidence": 92.4,
+    "net_index": -13.3,
+    "bull_count": 0,
     "bear_count": 1,
-    "neutral_count": 4,
-    "total": 8,
+    "neutral_count": 5,
+    "total": 6,
     "items": [
       {
-        "headline": "Build-Outs Of Coffee: Hala Tree Coffee In Honolulu, HI",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 65.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Royal Coffee Begins Issuing IEEPA Tariff Credits As CBP Returns Duties To Importers",
-        "source": "Sprudge",
-        "sentiment": "Bearish",
-        "confidence": 60.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "From Coffee Grounds To Biochar In 90 Seconds Flat",
+        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -286,25 +250,43 @@
         ]
       },
       {
-        "headline": "Sprouts Farmers Market Expands Partnership With Klatch Coffee, Bringing In-Store Cafes To San Diego",
+        "headline": "Build-Outs Of Coffee: Hala Tree Coffee In Honolulu, HI",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 70.0,
+        "sentiment": "Neutral",
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "Build-Outs Of Coffee: Filigree Coffee In Orlando, FL",
+        "headline": "Royal Coffee Begins Issuing IEEPA Tariff Credits As CBP Returns Duties To Importers",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 65.0,
+        "sentiment": "Bearish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "Three New World Coffee Champions Were Just Crowned",
+        "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 92.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "From Coffee Grounds To Biochar In 90 Seconds Flat",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
