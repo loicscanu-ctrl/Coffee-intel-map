@@ -19757,10 +19757,10 @@
   "date": "2026-07-03",
   "prob_up": 0.4837,
   "direction": "Abstain",
-  "actual_gap_pct": null,
-  "actual_dir": null,
+  "actual_gap_pct": -0.423,
+  "actual_dir": "Down",
   "hit": null,
-  "status": "pending",
+  "status": "resolved",
   "source": "live",
   "factors": [
    {
