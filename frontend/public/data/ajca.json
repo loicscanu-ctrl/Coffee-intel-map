@@ -2,10 +2,10 @@
   "source": "AJCA",
   "source_url": "https://www.ajca.or.jp/data/",
   "unit": "metric_tonnes",
-  "last_updated": "2026-06-06",
+  "last_updated": "2026-07-06",
   "stocks": {
-    "latest_period": "2026-04",
-    "latest_total_mt": 127337,
+    "latest_period": "2026-05",
+    "latest_total_mt": 123500,
     "monthly": [
       {
         "period": "2026-01",
@@ -24,7 +24,7 @@
         },
         "total_origin": 131840,
         "total_region": 131840,
-        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-zaiko202605.pdf"
       },
       {
         "period": "2026-02",
@@ -43,7 +43,7 @@
         },
         "total_origin": 132719,
         "total_region": 132719,
-        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-zaiko202605.pdf"
       },
       {
         "period": "2026-03",
@@ -62,7 +62,7 @@
         },
         "total_origin": 131206,
         "total_region": 131206,
-        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-zaiko202605.pdf"
       },
       {
         "period": "2026-04",
@@ -81,7 +81,26 @@
         },
         "total_origin": 127337,
         "total_region": 127337,
-        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/05/j-zaiko202604.pdf"
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-zaiko202605.pdf"
+      },
+      {
+        "period": "2026-05",
+        "by_origin": {
+          "Brazil": 44791,
+          "Colombia": 14052,
+          "Indonesia": 3623,
+          "Vietnam": 19061,
+          "Central America": 17862,
+          "Others": 24111
+        },
+        "by_region": {
+          "Keihin": 73058,
+          "Chukyo": 13845,
+          "Hanshin": 36597
+        },
+        "total_origin": 123500,
+        "total_region": 123500,
+        "source_pdf": "https://coffee.ajca.or.jp/wordpress/wp-content/uploads/2026/06/j-zaiko202605.pdf"
       }
     ],
     "annual": [
@@ -530,46 +549,46 @@
     {
       "year": 2025,
       "by_country": {
-        "Brazil": 47065,
-        "Vietnam": 34150,
-        "Colombia": 11435,
-        "Guatemala": 4922,
+        "Brazil": 61225,
+        "Vietnam": 42758,
+        "Colombia": 14594,
+        "Guatemala": 6317,
         "Tanzania": 11623,
-        "Ethiopia": 3456,
-        "Indonesia": 3394,
-        "Honduras": 1321,
+        "Ethiopia": 4366,
+        "Indonesia": 4271,
+        "Honduras": 1981,
         "Peru": 4754,
         "Uganda": 4236,
-        "Papua New Guinea": 513,
-        "Costa Rica": 365,
-        "Kenya": 211,
-        "Mexico": 173,
-        "El Salvador": 182,
-        "Nicaragua": 67,
-        "Rwanda": 80,
+        "Papua New Guinea": 607,
+        "Costa Rica": 576,
+        "Kenya": 299,
+        "Mexico": 205,
+        "El Salvador": 259,
+        "Nicaragua": 144,
+        "Rwanda": 81,
         "India": 275
       }
     },
     {
       "year": 2026,
       "by_country": {
-        "Brazil": 48321,
-        "Vietnam": 34985,
-        "Colombia": 11763,
-        "Tanzania": 7444,
-        "Guatemala": 3270,
-        "Indonesia": 2797,
-        "Ethiopia": 2460,
-        "Peru": 1798,
-        "Honduras": 1308,
-        "Papua New Guinea": 375,
-        "Uganda": 298,
-        "Nicaragua": 211,
+        "Brazil": 54846,
+        "Vietnam": 43378,
+        "Colombia": 13106,
+        "Tanzania": 9585,
+        "Guatemala": 4773,
+        "Indonesia": 3441,
+        "Ethiopia": 2669,
+        "Honduras": 1948,
+        "Peru": 1804,
+        "Nicaragua": 539,
+        "Papua New Guinea": 501,
+        "Uganda": 402,
+        "Costa Rica": 390,
+        "Mexico": 332,
         "Rwanda": 197,
-        "Costa Rica": 154,
-        "El Salvador": 133,
-        "Kenya": 126,
-        "Mexico": 126
+        "Kenya": 181,
+        "El Salvador": 133
       }
     }
   ],
