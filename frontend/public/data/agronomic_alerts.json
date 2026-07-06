@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T05:55:27+00:00",
+  "generated_at": "2026-07-06T06:19:16+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,12 +12,25 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 120.0
+            "forecast_7d_rain": 120.4
           }
         }
       ]
     },
     "honduras": {
+      "El Paraíso": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.8,
+            "forecast_7d_rain": 55.4
+          }
+        }
+      ],
       "Copán": [
         {
           "threat_id": "blossom_drop",
@@ -96,7 +109,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.29,
-            "forecast_7d_rain": 70.6
+            "forecast_7d_rain": 57.8
           }
         }
       ],
@@ -135,7 +148,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.42,
-            "forecast_7d_rain": 81.9
+            "forecast_7d_rain": 104.9
           }
         }
       ],
@@ -161,25 +174,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 57.8
-          }
-        }
-      ]
-    },
-    "brazil": {
-      "Paraná": [
-        {
-          "threat_id": "brazil_frost_risk",
-          "name": "Watch Frost Threat",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Marginal frost risk on 2026-07-17: 2.1 °C canopy. Monitor overnight lows.",
-          "triggers": {
-            "type": "none",
-            "surface_c": 2.1,
-            "air_min_c": 5.5,
-            "hours_below_0": 0,
-            "date": "2026-07-17"
+            "forecast_7d_rain": 93.4
           }
         }
       ]
@@ -192,9 +187,8 @@
       "critical": 5
     },
     "by_threat": {
-      "blossom_drop": 7,
-      "severe_defoliation": 5,
-      "brazil_frost_risk": 1
+      "blossom_drop": 8,
+      "severe_defoliation": 5
     }
   }
 }
