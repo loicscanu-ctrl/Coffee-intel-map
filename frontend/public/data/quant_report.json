@@ -228,17 +228,17 @@
       }
     ]
   },
-  "scraped_at": "2026-07-07T22:38:07.149663+00:00",
+  "scraped_at": "2026-07-07T22:38:33.212276Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-06T23:19:18.525762Z",
+    "scraped_at": "2026-07-07T22:38:31.666739Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 92.4,
-    "net_index": -13.3,
+    "overall_confidence": 92.5,
+    "net_index": -15.0,
     "bull_count": 0,
     "bear_count": 1,
-    "neutral_count": 5,
-    "total": 6,
+    "neutral_count": 4,
+    "total": 5,
     "items": [
       {
         "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
@@ -262,7 +262,7 @@
         "headline": "Royal Coffee Begins Issuing IEEPA Tariff Credits As CBP Returns Duties To Importers",
         "source": "Sprudge",
         "sentiment": "Bearish",
-        "confidence": 80.0,
+        "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
@@ -271,22 +271,13 @@
         "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 92.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
         "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "From Coffee Grounds To Biochar In 90 Seconds Flat",
+        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
