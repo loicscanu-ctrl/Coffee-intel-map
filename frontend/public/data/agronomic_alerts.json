@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T06:00:46+00:00",
+  "generated_at": "2026-07-08T05:00:26+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 122.5
+            "forecast_7d_rain": 95.9
           }
         }
       ]
@@ -120,7 +120,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.85,
-            "forecast_7d_rain": 80.7
+            "forecast_7d_rain": 72.3
           }
         }
       ]
@@ -135,7 +135,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.14,
-            "forecast_7d_rain": 51.6
+            "forecast_7d_rain": 52.4
           }
         }
       ],
@@ -161,7 +161,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.06,
-            "forecast_7d_rain": 153.5
+            "forecast_7d_rain": 139.3
           }
         }
       ],
@@ -174,40 +174,21 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 63.2
-          }
-        }
-      ]
-    },
-    "brazil": {
-      "Paraná": [
-        {
-          "threat_id": "brazil_frost_risk",
-          "name": "Watch Frost Threat",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Marginal frost risk on 2026-07-09: 2.4 °C canopy. Monitor overnight lows.",
-          "triggers": {
-            "type": "none",
-            "surface_c": 2.4,
-            "air_min_c": 6.6,
-            "hours_below_0": 0,
-            "date": "2026-07-09"
+            "forecast_7d_rain": 89.4
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 14,
+    "total_alerts": 13,
     "by_severity": {
-      "watch": 9,
+      "watch": 8,
       "critical": 5
     },
     "by_threat": {
       "blossom_drop": 8,
-      "severe_defoliation": 5,
-      "brazil_frost_risk": 1
+      "severe_defoliation": 5
     }
   }
 }

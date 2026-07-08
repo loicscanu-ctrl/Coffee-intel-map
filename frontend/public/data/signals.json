@@ -178,7 +178,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=122.5]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=95.9]"
     },
     {
       "id": "AGRO_honduras_Copán_blossom_drop",
@@ -274,7 +274,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=80.7]"
+      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=72.3]"
     },
     {
       "id": "AGRO_vn_Lam_Dong_blossom_drop",
@@ -286,7 +286,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=51.6]"
+      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=52.4]"
     },
     {
       "id": "AGRO_vn_Dak_Nong_blossom_drop",
@@ -310,7 +310,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.06, forecast_7d_rain=153.5]"
+      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.06, forecast_7d_rain=139.3]"
     },
     {
       "id": "AGRO_vn_Kon_Tum_blossom_drop",
@@ -322,19 +322,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=63.2]"
-    },
-    {
-      "id": "AGRO_brazil_Paraná_brazil_frost_risk",
-      "name": "Watch Frost Threat",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "brazil/Paraná: Marginal frost risk on 2026-07-09: 2.4 °C canopy. Monitor overnight lows.  [type=none, surface_c=2.4, air_min_c=6.6, hours_below_0=0, date=2026-07-09]"
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=89.4]"
     }
   ],
   "history": [
@@ -2785,5 +2773,5 @@
       "priceLDN": 3556
     }
   ],
-  "generatedAt": "2026-07-07T22:12:12.114Z"
+  "generatedAt": "2026-07-08T05:00:26.503Z"
 }
