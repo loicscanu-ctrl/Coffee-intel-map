@@ -228,18 +228,45 @@
       }
     ]
   },
-  "scraped_at": "2026-07-08T22:32:46.483519+00:00",
+  "scraped_at": "2026-07-08T22:33:08.730941Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-07T22:38:31.666739Z",
+    "scraped_at": "2026-07-08T22:33:07.178444Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 92.5,
-    "net_index": -15.0,
-    "bull_count": 0,
-    "bear_count": 1,
-    "neutral_count": 4,
+    "overall_confidence": 93.3,
+    "net_index": 30.0,
+    "bull_count": 2,
+    "bear_count": 0,
+    "neutral_count": 3,
     "total": 5,
     "items": [
+      {
+        "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 75.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "New Study Finds That Your Espresso Shots May Be Caving To Pressure",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
         "source": "Sprudge",
@@ -252,35 +279,8 @@
       {
         "headline": "Build-Outs Of Coffee: Hala Tree Coffee In Honolulu, HI",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Royal Coffee Begins Issuing IEEPA Tariff Credits As CBP Returns Duties To Importers",
-        "source": "Sprudge",
-        "sentiment": "Bearish",
+        "sentiment": "Bullish",
         "confidence": 75.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "A Podcast About Coffee Featuring Decaf, Lavender, And Lovely New Cafes",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Exclusive! An Interview With Coffee-Loving U.S. Soccer Hero Joe Scally",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
