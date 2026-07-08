@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-07T22:02:48+00:00",
-  "as_of": "2026-07-06",
-  "source_url": "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260706.xls",
+  "generated_at": "2026-07-08T04:34:05+00:00",
+  "as_of": "2026-07-07",
+  "source_url": "https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260707.xls",
   "snapshots": [
     {
       "date": "2025-05-28",
@@ -88093,10 +88093,475 @@
           }
         }
       }
+    },
+    {
+      "date": "2026-07-07",
+      "report_date": "2026-07-07",
+      "total_bags": 362466,
+      "transition_bags": 257226,
+      "pending_grading_bags": 275,
+      "rebagging_bags": 0,
+      "passed_today_bags": 0,
+      "failed_today_bags": 0,
+      "by_port": {
+        "ANT": 243264,
+        "BAR": 0,
+        "HA/BR": 20619,
+        "HOU": 51323,
+        "MIAMI": 14071,
+        "NOLA": 26016,
+        "NY": 7173,
+        "VA": 0
+      },
+      "by_group": {
+        "Group 4": 10288,
+        "Group 2": 34057,
+        "Group 1": 250,
+        "Group 0": 317871
+      },
+      "sections": {
+        "total_certified": {
+          "grand_total": 362466,
+          "by_port": {
+            "ANT": 243264,
+            "BAR": 0,
+            "HA/BR": 20619,
+            "HOU": 51323,
+            "MIAMI": 14071,
+            "NOLA": 26016,
+            "NY": 7173,
+            "VA": 0
+          },
+          "by_group": {
+            "Group 4": 10288,
+            "Group 2": 34057,
+            "Group 1": 250,
+            "Group 0": 317871
+          },
+          "by_origin": {
+            "Brazil": {
+              "by_port": {
+                "ANT": 10288,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 4",
+              "total": 10288
+            },
+            "Burundi": {
+              "by_port": {
+                "ANT": 714,
+                "BAR": 0,
+                "HA/BR": 285,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 2",
+              "total": 999
+            },
+            "Colombia": {
+              "by_port": {
+                "ANT": 25,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 225,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 1",
+              "total": 250
+            },
+            "El Salvador": {
+              "by_port": {
+                "ANT": 2243,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 2243
+            },
+            "Guatemala": {
+              "by_port": {
+                "ANT": 1375,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 1375,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 2750
+            },
+            "Honduras": {
+              "by_port": {
+                "ANT": 35624,
+                "BAR": 0,
+                "HA/BR": 675,
+                "HOU": 49923,
+                "MIAMI": 6971,
+                "NOLA": 14742,
+                "NY": 35,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 107970
+            },
+            "India": {
+              "by_port": {
+                "ANT": 11220,
+                "BAR": 0,
+                "HA/BR": 2349,
+                "HOU": 0,
+                "MIAMI": 1030,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 2",
+              "total": 14599
+            },
+            "Kenya": {
+              "by_port": {
+                "ANT": 4628,
+                "BAR": 0,
+                "HA/BR": 1299,
+                "HOU": 0,
+                "MIAMI": 570,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 6497
+            },
+            "Mexico": {
+              "by_port": {
+                "ANT": 29154,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 10799,
+                "NY": 5720,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 45673
+            },
+            "Nicaragua": {
+              "by_port": {
+                "ANT": 25936,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 25,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 25961
+            },
+            "Papua New Guinea": {
+              "by_port": {
+                "ANT": 4663,
+                "BAR": 0,
+                "HA/BR": 10365,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 320,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 15348
+            },
+            "Peru": {
+              "by_port": {
+                "ANT": 56638,
+                "BAR": 0,
+                "HA/BR": 496,
+                "HOU": 0,
+                "MIAMI": 2000,
+                "NOLA": 0,
+                "NY": 98,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 59232
+            },
+            "Rwanda": {
+              "by_port": {
+                "ANT": 10709,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 2",
+              "total": 10709
+            },
+            "Tanzania": {
+              "by_port": {
+                "ANT": 11353,
+                "BAR": 0,
+                "HA/BR": 1830,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 13183
+            },
+            "Uganda": {
+              "by_port": {
+                "ANT": 38694,
+                "BAR": 0,
+                "HA/BR": 320,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 39014
+            },
+            "Venezuela": {
+              "by_port": {
+                "ANT": 0,
+                "BAR": 0,
+                "HA/BR": 3000,
+                "HOU": 0,
+                "MIAMI": 3500,
+                "NOLA": 250,
+                "NY": 1000,
+                "VA": 0
+              },
+              "group": "Group 2",
+              "total": 7750
+            }
+          }
+        },
+        "transition": {
+          "grand_total": 257226,
+          "by_port": {
+            "ANT": 237857,
+            "BAR": 0,
+            "HA/BR": 19369
+          },
+          "by_group": {
+            "Group 4": 10223,
+            "Group 2": 24579,
+            "Group 1": 25,
+            "Group 0": 222399
+          },
+          "by_origin": {
+            "Brazil": {
+              "by_port": {
+                "ANT": 10223,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 4",
+              "total": 10223
+            },
+            "Burundi": {
+              "by_port": {
+                "ANT": 714,
+                "BAR": 0,
+                "HA/BR": 285
+              },
+              "group": "Group 2",
+              "total": 999
+            },
+            "Colombia": {
+              "by_port": {
+                "ANT": 25,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 1",
+              "total": 25
+            },
+            "El Salvador": {
+              "by_port": {
+                "ANT": 2243,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 0",
+              "total": 2243
+            },
+            "Guatemala": {
+              "by_port": {
+                "ANT": 1375,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 0",
+              "total": 1375
+            },
+            "Honduras": {
+              "by_port": {
+                "ANT": 35121,
+                "BAR": 0,
+                "HA/BR": 675
+              },
+              "group": "Group 0",
+              "total": 35796
+            },
+            "India": {
+              "by_port": {
+                "ANT": 11215,
+                "BAR": 0,
+                "HA/BR": 2349
+              },
+              "group": "Group 2",
+              "total": 13564
+            },
+            "Kenya": {
+              "by_port": {
+                "ANT": 4628,
+                "BAR": 0,
+                "HA/BR": 1299
+              },
+              "group": "Group 0",
+              "total": 5927
+            },
+            "Mexico": {
+              "by_port": {
+                "ANT": 28798,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 0",
+              "total": 28798
+            },
+            "Nicaragua": {
+              "by_port": {
+                "ANT": 25936,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 0",
+              "total": 25936
+            },
+            "Papua New Guinea": {
+              "by_port": {
+                "ANT": 4663,
+                "BAR": 0,
+                "HA/BR": 10365
+              },
+              "group": "Group 0",
+              "total": 15028
+            },
+            "Peru": {
+              "by_port": {
+                "ANT": 56138,
+                "BAR": 0,
+                "HA/BR": 496
+              },
+              "group": "Group 0",
+              "total": 56634
+            },
+            "Rwanda": {
+              "by_port": {
+                "ANT": 7016,
+                "BAR": 0,
+                "HA/BR": 0
+              },
+              "group": "Group 2",
+              "total": 7016
+            },
+            "Tanzania": {
+              "by_port": {
+                "ANT": 11353,
+                "BAR": 0,
+                "HA/BR": 580
+              },
+              "group": "Group 0",
+              "total": 11933
+            },
+            "Uganda": {
+              "by_port": {
+                "ANT": 38409,
+                "BAR": 0,
+                "HA/BR": 320
+              },
+              "group": "Group 0",
+              "total": 38729
+            },
+            "Venezuela": {
+              "by_port": {
+                "ANT": 0,
+                "BAR": 0,
+                "HA/BR": 3000
+              },
+              "group": "Group 2",
+              "total": 3000
+            }
+          }
+        },
+        "pending_grading": {
+          "grand_total": 275,
+          "by_port": {
+            "ANT": 275,
+            "BAR": 0,
+            "HA/BR": 0,
+            "HOU": 0,
+            "MIAMI": 0,
+            "NOLA": 0,
+            "NY": 0,
+            "VA": 0
+          },
+          "by_group": {
+            "Group 0": 275
+          },
+          "by_origin": {
+            "Honduras": {
+              "by_port": {
+                "ANT": 275,
+                "BAR": 0,
+                "HA/BR": 0,
+                "HOU": 0,
+                "MIAMI": 0,
+                "NOLA": 0,
+                "NY": 0,
+                "VA": 0
+              },
+              "group": "Group 0",
+              "total": 275
+            }
+          }
+        }
+      }
     }
   ],
   "latest_detail": {
-    "report_date": "2026-07-06",
+    "report_date": "2026-07-07",
     "total_certified": {
       "ports": [
         "ANT",
@@ -88195,7 +88660,7 @@
         },
         "India": {
           "by_port": {
-            "ANT": 13392,
+            "ANT": 11220,
             "BAR": 0,
             "HA/BR": 2349,
             "HOU": 0,
@@ -88205,7 +88670,7 @@
             "VA": 0
           },
           "group": "Group 2",
-          "total": 16771
+          "total": 14599
         },
         "Kenya": {
           "by_port": {
@@ -88223,7 +88688,7 @@
         },
         "Mexico": {
           "by_port": {
-            "ANT": 30522,
+            "ANT": 29154,
             "BAR": 0,
             "HA/BR": 0,
             "HOU": 0,
@@ -88233,11 +88698,11 @@
             "VA": 0
           },
           "group": "Group 0",
-          "total": 47041
+          "total": 45673
         },
         "Nicaragua": {
           "by_port": {
-            "ANT": 26686,
+            "ANT": 25936,
             "BAR": 0,
             "HA/BR": 0,
             "HOU": 25,
@@ -88247,7 +88712,7 @@
             "VA": 0
           },
           "group": "Group 0",
-          "total": 26711
+          "total": 25961
         },
         "Papua New Guinea": {
           "by_port": {
@@ -88335,7 +88800,7 @@
         }
       },
       "by_port": {
-        "ANT": 247554,
+        "ANT": 243264,
         "BAR": 0,
         "HA/BR": 20619,
         "HOU": 51323,
@@ -88346,11 +88811,11 @@
       },
       "by_group": {
         "Group 4": 10288,
-        "Group 2": 36229,
+        "Group 2": 34057,
         "Group 1": 250,
-        "Group 0": 319989
+        "Group 0": 317871
       },
-      "grand_total": 366756
+      "grand_total": 362466
     },
     "transition": {
       "ports": [
@@ -88415,12 +88880,12 @@
         },
         "India": {
           "by_port": {
-            "ANT": 13387,
+            "ANT": 11215,
             "BAR": 0,
             "HA/BR": 2349
           },
           "group": "Group 2",
-          "total": 15736
+          "total": 13564
         },
         "Kenya": {
           "by_port": {
@@ -88433,21 +88898,21 @@
         },
         "Mexico": {
           "by_port": {
-            "ANT": 30166,
+            "ANT": 28798,
             "BAR": 0,
             "HA/BR": 0
           },
           "group": "Group 0",
-          "total": 30166
+          "total": 28798
         },
         "Nicaragua": {
           "by_port": {
-            "ANT": 26686,
+            "ANT": 25936,
             "BAR": 0,
             "HA/BR": 0
           },
           "group": "Group 0",
-          "total": 26686
+          "total": 25936
         },
         "Papua New Guinea": {
           "by_port": {
@@ -88505,17 +88970,17 @@
         }
       },
       "by_port": {
-        "ANT": 242147,
+        "ANT": 237857,
         "BAR": 0,
         "HA/BR": 19369
       },
       "by_group": {
         "Group 4": 10223,
-        "Group 2": 26751,
+        "Group 2": 24579,
         "Group 1": 25,
-        "Group 0": 224517
+        "Group 0": 222399
       },
-      "grand_total": 261516
+      "grand_total": 257226
     },
     "pending_grading": {
       "ports": [
