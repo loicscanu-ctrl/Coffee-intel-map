@@ -113,7 +113,17 @@ jobs:
 
       - name: Install Playwright browser
         if: steps.guard.outputs.skip != 'true'
-        run: playwright install chromium --with-deps
+        run: |
+          # `--with-deps` shells out to apt-get, and the Azure-hosted runner's
+          # packages.microsoft.com repo periodically ships an invalid InRelease
+          # signature ("no longer signed" / NOSPLIT), which made apt-get exit 100
+          # and failed the whole daily scrape (run 28898394939, 2026-07-07).
+          # Drop those third-party repos first — the base Chromium libs are
+          # already on the runner image — and fall back to a deps-free install if
+          # apt still misbehaves. The browser binary is restored from the cache
+          # above and never needs apt.
+          sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true
+          playwright install chromium --with-deps || playwright install chromium
 
       - name: Install Patchright (Python + Chromium)
         if: steps.guard.outputs.skip != 'true'

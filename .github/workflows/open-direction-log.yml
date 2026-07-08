@@ -45,7 +45,7 @@ jobs:
           key: playwright-chromium-${{ runner.os }}
 
       - name: Install Playwright browser
-        run: playwright install chromium --with-deps
+        run: sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true; playwright install chromium --with-deps || playwright install chromium
 
       # FX anchors for the cci_overnight feature (17:30-London / 03:00-UTC per
       # CCI pair). Forward-accumulating: the feature activates in the model

@@ -83,7 +83,7 @@ jobs:
 
       - name: Install Playwright Chromium
         if: steps.gate.outputs.skip == 'false'
-        run: playwright install chromium --with-deps
+        run: sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true; playwright install chromium --with-deps || playwright install chromium
 
       - name: Poll once and push to Upstash
         if: steps.gate.outputs.skip == 'false'
