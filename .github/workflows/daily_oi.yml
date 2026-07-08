@@ -71,7 +71,8 @@ jobs:
         # commentary. No-op when DATABASE_URL is unset.
         run: |
           pip install playwright sqlalchemy psycopg2-binary python-dotenv jinja2
-          playwright install chromium --with-deps
+          sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true
+          playwright install chromium --with-deps || playwright install chromium
 
       - name: Fetch OI (3 attempts)
         if: steps.weekday.outputs.skip != 'true'

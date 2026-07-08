@@ -41,7 +41,7 @@ jobs:
           key: playwright-chromium-${{ runner.os }}
 
       - name: Install Playwright browser
-        run: playwright install chromium --with-deps
+        run: sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true; playwright install chromium --with-deps || playwright install chromium
 
       - name: Run monthly scrapers (3 attempts)
         working-directory: backend

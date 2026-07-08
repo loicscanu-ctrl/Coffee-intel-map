@@ -39,7 +39,8 @@ jobs:
       - name: Install deps + chromium
         run: |
           pip install --quiet playwright
-          playwright install chromium --with-deps
+          sudo rm -f /etc/apt/sources.list.d/*microsoft* /etc/apt/sources.list.d/*azure* || true
+          playwright install chromium --with-deps || playwright install chromium
       - name: Refresh 15-min intraday (incremental)
         working-directory: backend
         run: python -m scraper.refresh_intraday_kc_rc
