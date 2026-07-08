@@ -1,7 +1,7 @@
 {
   "date": "2026-06-30",
   "scoreNY": 0,
-  "scoreLDN": 0,
+  "scoreLDN": -1,
   "signals": [
     {
       "id": "CP1",
@@ -37,6 +37,17 @@
       "text": "Roasters reducing coverage into rising price — may signal demand destruction or blend substitution toward Robusta."
     },
     {
+      "id": "CR7",
+      "name": "Roaster Concentration",
+      "category": "CR",
+      "categoryLabel": "Roaster",
+      "market": "LDN",
+      "severity": "warn",
+      "score": 1,
+      "magnitude": "small",
+      "text": "Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact."
+    },
+    {
       "id": "CI2",
       "name": "Commercial Convergence Bearish",
       "category": "CI",
@@ -48,15 +59,15 @@
       "text": "Both commercials aligned bearish — strong fundamental supply pressure signal."
     },
     {
-      "id": "CI4",
-      "name": "Commercial Vacuum",
+      "id": "CI3",
+      "name": "Normal Commercial Flow",
       "category": "CI",
       "categoryLabel": "Commercial",
       "market": "LDN",
-      "severity": "alert",
+      "severity": "info",
       "score": 0,
-      "magnitude": "medium",
-      "text": "No commercial activity — market driven purely by speculative flow. Highly fragile, vulnerable to sharp reversal when commercials re-engage."
+      "magnitude": "small",
+      "text": "Producers and roasters both active on their respective sides — healthy two-sided commercial flow."
     },
     {
       "id": "ML1",
@@ -77,8 +88,19 @@
       "market": "LDN",
       "severity": "warn",
       "score": -2,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "Large speculative long position (>75th pct) with stalling price — momentum failing to follow, liquidation risk if price doesn't resume."
+    },
+    {
+      "id": "ML7",
+      "name": "Long Concentration",
+      "category": "ML",
+      "categoryLabel": "MM Longs",
+      "market": "LDN",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "medium",
+      "text": "MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade."
     },
     {
       "id": "MS4",
@@ -100,6 +122,17 @@
       "severity": "warn",
       "score": 2,
       "magnitude": "large",
+      "text": "Funds adding longs and covering shorts simultaneously — strong bullish conviction."
+    },
+    {
+      "id": "MI1",
+      "name": "Speculative Conviction Bullish",
+      "category": "MI",
+      "categoryLabel": "MM Interaction",
+      "market": "LDN",
+      "severity": "warn",
+      "score": 2,
+      "magnitude": "medium",
       "text": "Funds adding longs and covering shorts simultaneously — strong bullish conviction."
     },
     {
@@ -125,6 +158,17 @@
       "text": "Funds buying against producer hedging into rising price — textbook bullish market structure. Producers locking in levels, funds betting on further upside."
     },
     {
+      "id": "MPI7",
+      "name": "Natural Market Balance",
+      "category": "MPI",
+      "categoryLabel": "MM × Producer",
+      "market": "LDN",
+      "severity": "info",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "Funds and producers both active but price going nowhere — equilibrium. Expand to MM shorts and roaster coverage to identify which actor breaks first."
+    },
+    {
       "id": "MRI3",
       "name": "Contrarian Divergence",
       "category": "MRI",
@@ -143,8 +187,19 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS6",
+      "name": "Inversion Easing",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "NY",
+      "severity": "warn",
+      "score": -1,
+      "magnitude": "large",
+      "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
       "id": "CS1",
@@ -167,6 +222,23 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "SP1",
+      "name": "Spreading Increase",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "LDN",
+      "severity": "info",
+      "score": 0,
+      "magnitude": "small",
+      "links": [
+        {
+          "label": "Cycle",
+          "href": "#cot-section-6"
+        }
+      ],
+      "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
     },
     {
       "id": "AGRO_colombia_Caldas_blossom_drop",
@@ -2635,6 +2707,17 @@
           "text": "Roasters reducing coverage into rising price — may signal demand destruction or blend substitution toward Robusta."
         },
         {
+          "id": "CR7",
+          "name": "Roaster Concentration",
+          "category": "CR",
+          "categoryLabel": "Roaster",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 1,
+          "magnitude": "small",
+          "text": "Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact."
+        },
+        {
           "id": "CI2",
           "name": "Commercial Convergence Bearish",
           "category": "CI",
@@ -2646,15 +2729,15 @@
           "text": "Both commercials aligned bearish — strong fundamental supply pressure signal."
         },
         {
-          "id": "CI4",
-          "name": "Commercial Vacuum",
+          "id": "CI3",
+          "name": "Normal Commercial Flow",
           "category": "CI",
           "categoryLabel": "Commercial",
           "market": "LDN",
-          "severity": "alert",
+          "severity": "info",
           "score": 0,
-          "magnitude": "medium",
-          "text": "No commercial activity — market driven purely by speculative flow. Highly fragile, vulnerable to sharp reversal when commercials re-engage."
+          "magnitude": "small",
+          "text": "Producers and roasters both active on their respective sides — healthy two-sided commercial flow."
         },
         {
           "id": "ML1",
@@ -2675,8 +2758,19 @@
           "market": "LDN",
           "severity": "warn",
           "score": -2,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "Large speculative long position (>75th pct) with stalling price — momentum failing to follow, liquidation risk if price doesn't resume."
+        },
+        {
+          "id": "ML7",
+          "name": "Long Concentration",
+          "category": "ML",
+          "categoryLabel": "MM Longs",
+          "market": "LDN",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "medium",
+          "text": "MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade."
         },
         {
           "id": "MS4",
@@ -2698,6 +2792,17 @@
           "severity": "warn",
           "score": 2,
           "magnitude": "large",
+          "text": "Funds adding longs and covering shorts simultaneously — strong bullish conviction."
+        },
+        {
+          "id": "MI1",
+          "name": "Speculative Conviction Bullish",
+          "category": "MI",
+          "categoryLabel": "MM Interaction",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 2,
+          "magnitude": "medium",
           "text": "Funds adding longs and covering shorts simultaneously — strong bullish conviction."
         },
         {
@@ -2723,6 +2828,17 @@
           "text": "Funds buying against producer hedging into rising price — textbook bullish market structure. Producers locking in levels, funds betting on further upside."
         },
         {
+          "id": "MPI7",
+          "name": "Natural Market Balance",
+          "category": "MPI",
+          "categoryLabel": "MM × Producer",
+          "market": "LDN",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "medium",
+          "text": "Funds and producers both active but price going nowhere — equilibrium. Expand to MM shorts and roaster coverage to identify which actor breaks first."
+        },
+        {
           "id": "MRI3",
           "name": "Contrarian Divergence",
           "category": "MRI",
@@ -2741,8 +2857,19 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "large",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS6",
+          "name": "Inversion Easing",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "NY",
+          "severity": "warn",
+          "score": -1,
+          "magnitude": "large",
+          "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
           "id": "CS1",
@@ -2765,13 +2892,30 @@
           "score": 0,
           "magnitude": "medium",
           "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+        },
+        {
+          "id": "SP1",
+          "name": "Spreading Increase",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "LDN",
+          "severity": "info",
+          "score": 0,
+          "magnitude": "small",
+          "links": [
+            {
+              "label": "Cycle",
+              "href": "#cot-section-6"
+            }
+          ],
+          "text": "Spreading OI increasing without directional price move — funds positioning across the curve. Often precedes a decisive directional move; the calendar-spread direction hints which way."
         }
       ],
       "scoreNY": 0,
-      "scoreLDN": 0,
+      "scoreLDN": -1,
       "priceNY": 296.45,
       "priceLDN": 3556
     }
   ],
-  "generatedAt": "2026-07-08T05:00:26.503Z"
+  "generatedAt": "2026-07-08T05:39:15.220Z"
 }

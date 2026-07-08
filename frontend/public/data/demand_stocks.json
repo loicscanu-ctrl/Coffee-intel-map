@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T06:32:13.088551Z",
+  "generated_at": "2026-07-08T05:39:07.903352Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -7195,8 +7195,8 @@
       "name": "Brazil",
       "latest_year": "2025",
       "consumption_mt": 1336800,
-      "population": 212812405,
-      "per_capita_kg": 6.28,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -12551,20 +12551,8 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-07-07",
+    "last_updated": "2026-07-08",
     "countries": {
-      "eu": {
-        "name": "European Union",
-        "iso3": "EUU",
-        "latest_year": "2025",
-        "latest_population": 451127411
-      },
-      "japan": {
-        "name": "Japan",
-        "iso3": "JPN",
-        "latest_year": "2025",
-        "latest_population": 123366734
-      },
       "usa": {
         "name": "United States",
         "iso3": "USA",
@@ -12582,12 +12570,6 @@
         "iso3": "IND",
         "latest_year": "2025",
         "latest_population": 1463865525
-      },
-      "brazil": {
-        "name": "Brazil",
-        "iso3": "BRA",
-        "latest_year": "2025",
-        "latest_population": 212812405
       },
       "indonesia": {
         "name": "Indonesia",
