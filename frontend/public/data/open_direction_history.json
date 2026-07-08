@@ -19776,5 +19776,31 @@
     "phi": 0.029
    }
   ]
+ },
+ {
+  "date": "2026-07-08",
+  "prob_up": 0.5542,
+  "direction": "Abstain",
+  "actual_gap_pct": null,
+  "actual_dir": null,
+  "hit": null,
+  "status": "pending",
+  "source": "live",
+  "factors": [
+   {
+    "var_name": "kc_after_rc_diff",
+    "raw_value": 0.002844,
+    "raw_fmt": "+0.28%",
+    "z": 0.7,
+    "phi": 0.2793
+   },
+   {
+    "var_name": "days_since_roll",
+    "raw_value": 24.0,
+    "raw_fmt": "day 24",
+    "z": 0.52,
+    "phi": 0.0857
+   }
+  ]
  }
 ]

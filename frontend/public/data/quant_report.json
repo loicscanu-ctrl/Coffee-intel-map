@@ -241,7 +241,7 @@
     "total": 5,
     "items": [
       {
-        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
+        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You’re Going To Get",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -294,63 +294,63 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
   },
   "open_direction": {
     "available": true,
-    "as_of": "2026-07-02",
-    "for_session": "2026-07-03",
-    "scraped_at": "2026-07-03T07:29:20.138918Z",
+    "as_of": "2026-07-07",
+    "for_session": "2026-07-08",
+    "scraped_at": "2026-07-08T07:00:10.054306Z",
     "direction": "Abstain",
-    "base_margin": -0.14411615991054133,
-    "final_margin": -0.0650491174577702,
-    "base_prob": 0.46403318944308103,
-    "final_prob": 0.4837434525442256,
-    "prob_up": 0.4837434525442256,
-    "prob_down": 0.5162565474557743,
+    "base_margin": -0.14751174122778815,
+    "final_margin": 0.2174911380644285,
+    "base_prob": 0.4631887906129393,
+    "final_prob": 0.5541594632750566,
+    "prob_up": 0.5541594632750566,
+    "prob_down": 0.4458405367249434,
     "regime": {
       "ny_shock": false,
-      "vol_regime": "low",
-      "vol_percentile": 0.42,
+      "vol_regime": "high",
+      "vol_percentile": 0.82,
       "harvest_weight": 0.2,
       "harvest_active": false,
-      "brent_overnight_pct": 1.31,
+      "brent_overnight_pct": null,
       "oil_shock": false
     },
-    "expected_gap_pct": 0.008,
-    "expected_gap_usd_mt": 0.3,
+    "expected_gap_pct": 0.083,
+    "expected_gap_usd_mt": 3.2,
     "features": [
-      {
-        "var_name": "days_since_roll",
-        "label": "Roll-Cycle Position",
-        "raw_value": 21.0,
-        "raw_fmt": "day 21",
-        "z": 0.3,
-        "usd_per_ton": null,
-        "phi": 0.05007089021813073,
-        "detail": {
-          "text": "day 21 of the bi-monthly front-contract cycle \u2014 gaps historically tilt down mid-cycle (~day 10), up late-cycle"
-        }
-      },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
-        "raw_value": 0.00033107101473262013,
-        "raw_fmt": "+0.03%",
-        "z": 0.07,
-        "usd_per_ton": 1.3,
-        "phi": 0.028996152234640398,
+        "raw_value": 0.0028436018957345155,
+        "raw_fmt": "+0.28%",
+        "z": 0.7,
+        "usd_per_ton": 11.0,
+        "phi": 0.27933537740776626,
         "detail": {
-          "text": "KC at RC close (17:30 London) 302.05\u00a2/lb \u2192 KC close (18:30) 302.15\u00a2/lb = +2.2 $/t on arabica; +0.03% mapped on robusta \u2248 +1.3 $/t"
+          "text": "KC at RC close (17:30 London) 316.50¢/lb → KC close (18:30) 317.40¢/lb = +19.8 $/t on arabica; +0.28% mapped on robusta ≈ +11.0 $/t"
+        }
+      },
+      {
+        "var_name": "days_since_roll",
+        "label": "Roll-Cycle Position",
+        "raw_value": 24.0,
+        "raw_fmt": "day 24",
+        "z": 0.52,
+        "usd_per_ton": null,
+        "phi": 0.08566750188445035,
+        "detail": {
+          "text": "day 24 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
         }
       }
     ],
     "target": {
       "kind": "overnight_gap",
-      "definition": "RC first-bar open \u00f7 prior 17:30-London close \u2212 1; roll days excluded",
+      "definition": "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
       "abstain_band": 0.1
     },
     "model": {
@@ -360,18 +360,18 @@
         "days_since_roll"
       ],
       "n_features": 2,
-      "n_train": 1151,
-      "test_accuracy": 0.5717463848720801,
-      "baseline_accuracy": 0.5361512791991101,
-      "edge": 0.03559510567296997,
-      "acted_accuracy": 0.6333333333333333,
-      "acted_n": 330,
-      "abstain_rate": 0.6329254727474972,
+      "n_train": 1153,
+      "test_accuracy": 0.5726970033296337,
+      "baseline_accuracy": 0.537180910099889,
+      "edge": 0.035516093229744694,
+      "acted_accuracy": 0.6344410876132931,
+      "acted_n": 331,
+      "abstain_rate": 0.632630410654828,
       "eval_method": "walk_forward",
-      "n_test": 899,
-      "mag_mae_pct": 0.3020795453502338,
-      "mag_baseline_mae_pct": 0.30845347618415375,
-      "mag_skill": 0.020664156270084,
+      "n_test": 901,
+      "mag_mae_pct": 0.3033987881492,
+      "mag_baseline_mae_pct": 0.30995517756388397,
+      "mag_skill": 0.021152701710661526,
       "cci_available": false,
       "intraday_source": "barchart_15min",
       "roll_days_excluded": 88
