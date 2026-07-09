@@ -228,23 +228,32 @@
       }
     ]
   },
-  "scraped_at": "2026-07-09T22:50:30.433769+00:00",
+  "scraped_at": "2026-07-09T22:50:57.173330Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-08T22:33:07.178444Z",
+    "scraped_at": "2026-07-09T22:50:55.420856Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 93.3,
-    "net_index": 30.0,
-    "bull_count": 2,
+    "overall_confidence": 91.0,
+    "net_index": 0.0,
+    "bull_count": 0,
     "bear_count": 0,
-    "neutral_count": 3,
+    "neutral_count": 5,
     "total": 5,
     "items": [
       {
+        "headline": "The Afternoon Coffee Crash Is A Myth",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
         "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 75.0,
+        "sentiment": "Neutral",
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -253,7 +262,7 @@
         "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
@@ -272,15 +281,6 @@
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Hala Tree Coffee In Honolulu, HI",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
