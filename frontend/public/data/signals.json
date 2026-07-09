@@ -191,17 +191,6 @@
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
-      "id": "CS6",
-      "name": "Inversion Easing",
-      "category": "CS",
-      "categoryLabel": "Curve Structure",
-      "market": "NY",
-      "severity": "warn",
-      "score": -1,
-      "magnitude": "large",
-      "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
-    },
-    {
       "id": "CS1",
       "name": "Backwardation Incentive",
       "category": "CS",
@@ -2873,17 +2862,6 @@
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
-          "id": "CS6",
-          "name": "Inversion Easing",
-          "category": "CS",
-          "categoryLabel": "Curve Structure",
-          "market": "NY",
-          "severity": "warn",
-          "score": -1,
-          "magnitude": "large",
-          "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
-        },
-        {
           "id": "CS1",
           "name": "Backwardation Incentive",
           "category": "CS",
@@ -2929,5 +2907,5 @@
       "priceLDN": 3556
     }
   ],
-  "generatedAt": "2026-07-09T06:30:01.698Z"
+  "generatedAt": "2026-07-09T22:29:10.206Z"
 }
