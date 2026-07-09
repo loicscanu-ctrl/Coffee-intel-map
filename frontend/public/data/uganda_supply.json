@@ -1,6 +1,6 @@
 {
   "country": "uganda",
-  "scraped_at": "2026-07-08T05:39:06.604468+00:00",
+  "scraped_at": "2026-07-09T06:29:52.819610+00:00",
   "exports": {
     "source": "UCDA Monthly Reports",
     "last_updated": "2026-04",
@@ -752,13 +752,13 @@
     }
   },
   "ucda_price": {
-    "usd_cwt": 194.77,
-    "as_of": "2026-07-08",
+    "usd_cwt": 186.97,
+    "as_of": "2026-07-09",
     "grade": "Screen 15",
     "grades": {
-      "Screen 15": 194.77,
-      "Wugar": 342.95,
-      "Drugar": 323.95
+      "Screen 15": 186.97,
+      "Wugar": 310.6,
+      "Drugar": 291.6
     }
   },
   "weather": {
@@ -776,7 +776,7 @@
         "name": "Mbale",
         "drought": "NONE",
         "csi_30d": 0.0,
-        "csi_60d": 0.444,
+        "csi_60d": 0.466,
         "csi_30d_level": "OK",
         "csi_60d_level": "MED"
       },
@@ -787,15 +787,15 @@
         "csi_60d": 0.0,
         "csi_30d_level": "OK",
         "csi_60d_level": "OK",
-        "rain_mtd_mm": 37.4,
-        "rain_hist_min": 40.3,
-        "rain_hist_max": 169.9
+        "rain_mtd_mm": 30.3,
+        "rain_hist_min": 49.5,
+        "rain_hist_max": 196.1
       },
       {
         "name": "Rwenzori",
         "drought": "NONE",
-        "csi_30d": 0.56,
-        "csi_60d": 0.864,
+        "csi_30d": 0.606,
+        "csi_60d": 0.886,
         "csi_30d_level": "HIGH",
         "csi_60d_level": "HIGH"
       },
@@ -803,7 +803,7 @@
         "name": "Masaka",
         "drought": "NONE",
         "csi_30d": 0.28,
-        "csi_60d": 0.746,
+        "csi_60d": 0.77,
         "csi_30d_level": "MED",
         "csi_60d_level": "HIGH"
       }
@@ -899,7 +899,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -948,9 +947,10 @@
           "M",
           "M",
           "M",
-          "L",
-          "L",
-          "L"
+          "M",
+          "M",
+          "M",
+          "M"
         ]
       },
       {
@@ -971,7 +971,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -1018,7 +1017,8 @@
           "L",
           "L",
           "L",
-          "L",
+          "-",
+          "-",
           "-",
           "-",
           "-",
@@ -1043,7 +1043,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "M",
@@ -1092,9 +1091,10 @@
           "M",
           "M",
           "M",
-          "L",
-          "L",
-          "L"
+          "M",
+          "M",
+          "M",
+          "M"
         ]
       },
       {
@@ -1115,7 +1115,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "M",
           "M",
@@ -1134,6 +1133,7 @@
           "L",
           "L",
           "L",
+          "M",
           "M",
           "M",
           "M",
@@ -1288,7 +1288,7 @@
       }
     ],
     "historical_stat": "Neutral ENSO: near-average Uganda coffee output expected",
-    "last_updated": "2026-07-08"
+    "last_updated": "2026-07-09"
   },
   "harvest_cal": {
     "main_crop_harvest": "Oct-Feb",

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T05:39:07.903352Z",
+  "generated_at": "2026-07-09T06:29:54.194609Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -7195,8 +7195,8 @@
       "name": "Brazil",
       "latest_year": "2025",
       "consumption_mt": 1336800,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 212812405,
+      "per_capita_kg": 6.28,
       "annual": [
         {
           "year": "1960",
@@ -8629,8 +8629,8 @@
       "name": "Vietnam",
       "latest_year": "2025",
       "consumption_mt": 294000,
-      "population": 101598527,
-      "per_capita_kg": 2.89,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -9233,8 +9233,8 @@
       "name": "Indonesia",
       "latest_year": "2025",
       "consumption_mt": 288600,
-      "population": 285721236,
-      "per_capita_kg": 1.01,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -12327,8 +12327,8 @@
       "name": "Egypt",
       "latest_year": "2025",
       "consumption_mt": 60000,
-      "population": 118365995,
-      "per_capita_kg": 0.51,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12551,8 +12551,20 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-07-08",
+    "last_updated": "2026-07-09",
     "countries": {
+      "eu": {
+        "name": "European Union",
+        "iso3": "EUU",
+        "latest_year": "2025",
+        "latest_population": 451127411
+      },
+      "japan": {
+        "name": "Japan",
+        "iso3": "JPN",
+        "latest_year": "2025",
+        "latest_population": 123366734
+      },
       "usa": {
         "name": "United States",
         "iso3": "USA",
@@ -12571,17 +12583,11 @@
         "latest_year": "2025",
         "latest_population": 1463865525
       },
-      "indonesia": {
-        "name": "Indonesia",
-        "iso3": "IDN",
+      "brazil": {
+        "name": "Brazil",
+        "iso3": "BRA",
         "latest_year": "2025",
-        "latest_population": 285721236
-      },
-      "vietnam": {
-        "name": "Vietnam",
-        "iso3": "VNM",
-        "latest_year": "2025",
-        "latest_population": 101598527
+        "latest_population": 212812405
       },
       "russia": {
         "name": "Russia",
@@ -12606,12 +12612,6 @@
         "iso3": "PHL",
         "latest_year": "2025",
         "latest_population": 116786962
-      },
-      "egypt": {
-        "name": "Egypt",
-        "iso3": "EGY",
-        "latest_year": "2025",
-        "latest_population": 118365995
       },
       "korea": {
         "name": "South Korea",
