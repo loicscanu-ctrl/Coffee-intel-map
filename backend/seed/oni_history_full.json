@@ -1,7 +1,7 @@
 {
   "_schema": "oni[] = {year, month, label, value}; NOAA CPC 3-mo running mean anchored to season centre month, 1980–present.",
   "source": "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt",
-  "updated": "2026-06-10",
+  "updated": "2026-07-10",
   "oni": [
     {
       "year": 1980,
@@ -3337,7 +3337,13 @@
       "year": 2026,
       "month": 4,
       "label": "Apr-26",
-      "value": 0.48
+      "value": 0.51
+    },
+    {
+      "year": 2026,
+      "month": 5,
+      "label": "May-26",
+      "value": 0.98
     }
   ]
 }
