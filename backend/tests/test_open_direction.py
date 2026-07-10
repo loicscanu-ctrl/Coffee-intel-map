@@ -93,6 +93,11 @@ def synthetic_env(tmp_path, monkeypatch):
     monkeypatch.setattr(od, "_BRENT", tmp_path / "absent_brent.json")
     monkeypatch.setattr(odl, "_HISTORY", history)
     monkeypatch.setattr(odl, "_QUANT", quant)
+    # odl.run() regenerates the Research-tab analysis — keep it OUT of the
+    # real public/data tree during tests (this bit us once: synthetic data
+    # overwrote the shipped JSON).
+    from scraper.quant_model import export_wf_analysis as _wfa
+    monkeypatch.setattr(_wfa, "_OUT", tmp_path / "wf_analysis.json")
     return {"intraday": intraday, "history": history, "quant": quant}
 
 
@@ -210,6 +215,28 @@ def test_seed_factor_backfill_preserves_live_rows(synthetic_env):
     assert bt and all(r.get("factors") for r in bt)          # backfilled
     survived = next(r for r in h2 if r["date"] == live_row["date"])
     assert survived["prob_up"] == 0.4242                     # live row untouched
+
+
+def test_wf_analysis_export(synthetic_env, tmp_path, monkeypatch):
+    from scraper.quant_model import export_wf_analysis as wfa
+    out = tmp_path / "wf.json"
+    monkeypatch.setattr(wfa, "_OUT", out)
+    n = wfa.run()
+    assert n > 0
+    doc = json.loads(out.read_text())
+    assert doc["n"] == n and len(doc["rows"]) == n
+    assert doc["band"] == od._ABSTAIN_BAND
+    # magnitude components sum EXACTLY to the prediction on every row
+    for r in doc["rows"][::50]:
+        assert abs(sum(r["comps"].values()) - r["pred"]) < 0.5, r
+    # headline cells: acted ⊆ all, Wilson CI brackets the point estimate
+    h = doc["headline"]
+    assert h["acted"]["n"] <= h["all"]["n"]
+    for cell in h.values():
+        if cell["hit"] is not None:
+            assert cell["ci_lo"] <= cell["hit"] <= cell["ci_hi"]
+    # bucket counts cover the sample
+    assert sum(b["n"] for b in doc["buckets"]["realized"]) == n
 
 
 def test_track_stats_cold_streak():

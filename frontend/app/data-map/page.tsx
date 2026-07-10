@@ -615,8 +615,8 @@ const ROWS: FlowMetadata[] = [
     resiliency: { onMissing: "Robusta sentiment/factors decoupled; can fail independently" },
   },
   {
-    wf: "1.16 Open-Direction Log", output: "quant_report.json (open_direction) + open_direction_history.json",
-    component: "PriceDirectionSection / OpenDirectionCalendar", visual: "Macro · Open Price Direction + Track Record",
+    wf: "1.16 Open-Direction Log", output: "quant_report.json (open_direction) + open_direction_history.json + open_direction_wf_analysis.json",
+    component: "PriceDirectionSection / OpenDirectionCalendar / OpenDirectionRecord", visual: "Macro · Open Price Direction + Track Record; Research · walk-forward record",
     cadence: { recurrence: "03:00 UTC Mon-Fri (pre-open; brief chains on completion)", trigger: "cron" },
     transport: { provider: "intraday_kc_rc_15min + fx snapshots", method: "logistic model, exact SHAP" },
     storage: { target: "open_direction_history.json", footprint: "append-only prediction log", units: "overnight-gap direction + prob" },

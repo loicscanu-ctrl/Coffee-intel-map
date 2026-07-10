@@ -9,6 +9,7 @@ import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
 import SignalsMethodology from "./methodology/SignalsMethodology";
+import OpenDirectionRecord from "./methodology/OpenDirectionRecord";
 import NewsSentimentMethodology from "./methodology/NewsSentimentMethodology";
 import FuturesMethodology from "./methodology/FuturesMethodology";
 import MacroMethodology from "./methodology/MacroMethodology";
@@ -1613,7 +1614,12 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <CotBacktestReport />
         </div>
       )}
-      {cat === "signals" && <SignalsMethodology />}
+      {cat === "signals" && (
+        <div className="space-y-4">
+          <SignalsMethodology />
+          <OpenDirectionRecord />
+        </div>
+      )}
       {cat === "sentiment" && <NewsSentimentMethodology />}
       {cat === "futures" && <FuturesMethodology />}
       {cat === "macro" && <MacroMethodology />}
