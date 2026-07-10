@@ -119,3 +119,24 @@ def test_parse_monthly_total_sums_extra_eu_partners():
                  {"BR": "Brazil", "DE": "Germany"})
     out = parse_monthly_total(cube)
     assert out == {"2024-01": 1000.0, "2024-02": 1100.0}
+
+
+def test_parse_monthly_origins_sums_product_dim_keeps_intra_eu_for_member():
+    # DE-trade fetches pass multiple HS6 codes in one cube (product dim size 2);
+    # the stride decoder must sum across them, and a member reporter keeps
+    # intra-EU partners (German re-exports go mostly to EU neighbours).
+    cube = {
+        "id": ["freq", "reporter", "partner", "product", "flow", "indicators", "time"],
+        "size": [1, 1, 2, 2, 1, 1, 2],
+        "dimension": {
+            "partner": {"category": {"index": {"BR": 0, "NL": 1},
+                                     "label": {"BR": "Brazil", "NL": "Netherlands"}}},
+            "time": {"category": {"index": {"2024-01": 0, "2024-02": 1}}},
+        },
+        # strides: partner=4, product=2, time=1 → flat = p*4 + prod*2 + t
+        "value": {"0": 10_000, "2": 5_000, "4": 2_000, "6": 1_000},
+    }
+    out = parse_monthly_origins(cube, reporter_code="DE")
+    assert out["Brazil"] == {"2024-01": 1500.0}        # 090111+090112 summed
+    assert out["Netherlands"] == {"2024-01": 300.0}    # intra-EU kept for DE
+    assert out["__total__"] == {"2024-01": 1800.0}
