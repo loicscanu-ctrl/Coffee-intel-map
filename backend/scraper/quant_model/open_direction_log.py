@@ -233,6 +233,14 @@ def run() -> None:
     history.sort(key=lambda r: r["date"])
     safe_write_json(_HISTORY, history, indent=1)
 
+    # Regenerate the Research-tab walk-forward analysis (non-fatal): the
+    # article tracks the live model spec + latest data automatically.
+    try:
+        from . import export_wf_analysis
+        export_wf_analysis.run(frame)
+    except Exception as e:  # noqa: BLE001
+        print(f"[open_dir_log] wf-analysis export failed (non-fatal): {e}")
+
     live = [r for r in history if r["source"] == "live" and r["status"] == "resolved"]
     graded = [r["hit"] for r in live if r["hit"] is not None]
     tail = (f" | live graded={len(graded)} hit-rate={np.mean(graded):.1%}"
