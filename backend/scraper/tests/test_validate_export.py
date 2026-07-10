@@ -342,6 +342,20 @@ def test_price_swing_guard_rejects_unit_error():
     assert "VN FAQ" in reason and "parsing error" in reason
 
 
+def test_price_swing_guard_handles_brazilian_format():
+    """Regression: CON T7 is Brazilian-formatted ('.' thousands, ',' decimal).
+    A move from 980,00 to 1.050,00 BRL is +7%, not a spurious ~100% swing that
+    would freeze latest_prices.json (see the June-2026 ticker freeze)."""
+    from scraper.validate_export import price_swing_guard, _first_number
+    assert _first_number("980,00 BRL ($3,158)") == 980.0
+    assert _first_number("1.050,00 BRL ($3,383)") == 1050.0
+    assert _first_number("100.000 VND ($1,234)") == 100000.0   # BR-style thousands
+    old = {"tickers": [{"label": "CON T7", "value": "980,00 BRL ($3,158)"}]}
+    new = {"tickers": [{"label": "CON T7", "value": "1.050,00 BRL ($3,383)"}]}
+    ok, reason = price_swing_guard(0.30)(old, new)
+    assert ok, reason
+
+
 def test_price_swing_guard_first_write_not_blocked(tmp_path):
     """No prior file → sanity guard is skipped, write proceeds."""
     import json
