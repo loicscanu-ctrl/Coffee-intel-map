@@ -32,6 +32,12 @@ from pathlib import Path
 import requests
 
 from . import fetch as F
+from .cohort_outflow import (
+    build_cohort_dna,
+    build_current_by_origin,
+    build_implied_outflow,
+    build_port_alltime_dna,
+)
 from .parse_age_allowance import parse_age_allowance_xlsx
 from .parse_arabica_ageing import parse_arabica_ageing
 from .parse_arabica_xls import parse_arabica_xls
@@ -551,6 +557,65 @@ def _merge_arabica(new: dict, old: dict) -> dict:
     return new
 
 
+def _gradings_per_port_month_origin(gradings_list: list) -> dict:
+    """Tenderable lots as {port: {cohort 'YYYY-MM': {origin: lots}}} from the
+    accumulated daily gradings feed — the daily-run equivalent of the workbook's
+    sheet-2 per-month split that feeds the cohort-DNA pipeline. Cohort = the
+    calendar month a lot was graded in; only tenderable lots enter the pool."""
+    out: dict = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+    for g in gradings_list or []:
+        cohort = (g.get("date") or "")[:7]
+        if len(cohort) != 7:
+            continue
+        for e in g.get("entries") or []:
+            if e.get("tenderable") is False:
+                continue
+            port = e.get("port")
+            origin = (e.get("origin") or "").strip()
+            lots = e.get("lots") or 0
+            if not port or not origin or lots <= 0:
+                continue
+            out[port][cohort][origin] += lots
+    return {p: {c: dict(o) for c, o in bc.items()} for p, bc in out.items()}
+
+
+def recompute_robusta_cohort_outflow(data: dict) -> dict:
+    """Recompute implied_outflow + current_by_origin from the data the robusta
+    JSON already accumulates (merged age_allowance with buckets + gradings feed +
+    port_origin_history). This keeps the cohort-DNA feed fresh on every run
+    instead of being frozen at the last manual workbook import.
+
+    Existing implied_outflow month_ends are preserved (published history stays
+    stable); only newly-available months are filled in. current_by_origin is
+    recomputed to the latest ageing report. No-ops when inputs are missing."""
+    monthly = data.get("monthly") or {}
+    age_reports = [r for r in (monthly.get("age_allowance") or [])
+                   if r.get("month_end") and r.get("valid", {}).get("buckets")]
+    if not age_reports:
+        return data
+    gpmo = _gradings_per_port_month_origin((data.get("recent_activity") or {}).get("gradings") or [])
+    cohort_dna = build_cohort_dna(gpmo)
+    port_alltime_dna = build_port_alltime_dna(data.get("port_origin_history") or {})
+
+    computed = build_implied_outflow(age_reports, cohort_dna, port_alltime_dna, gpmo)
+    existing = {e["month_end"]: e for e in (monthly.get("implied_outflow") or [])}
+    added = 0
+    for e in computed:
+        if e["month_end"] not in existing:
+            existing[e["month_end"]] = e
+            added += 1
+    monthly["implied_outflow"] = sorted(existing.values(), key=lambda e: e["month_end"])
+
+    latest = max(age_reports, key=lambda r: r["month_end"])
+    cbo = build_current_by_origin(latest, cohort_dna, port_alltime_dna, gpmo)
+    if cbo:
+        monthly["current_by_origin"] = cbo
+    data["monthly"] = monthly
+    print(f"  → cohort outflow recomputed: +{added} month(s), "
+          f"latest implied_outflow = {monthly['implied_outflow'][-1]['month_end']}")
+    return data
+
+
 def _merge_robusta(new: dict, old: dict) -> dict:
     # snapshots: union by date.
     by_date = {s["date"]: s for s in (old.get("snapshots") or [])}
@@ -583,8 +648,9 @@ def _merge_robusta(new: dict, old: dict) -> dict:
 
     new.setdefault("monthly", {})["iss_recv_monthly"] = _merge_monthly("iss_recv_monthly", "month")
     new["monthly"]["age_allowance"] = _merge_monthly("age_allowance", "month_end")
-    # Cohort-DNA outputs — only the workbook importer emits these. Preserve
-    # the older copy when the daily scraper run doesn't carry one.
+    # Carry over the existing cohort-DNA outputs; recompute_robusta_cohort_outflow
+    # (below) then extends implied_outflow with any newly-available months so the
+    # feed no longer freezes at the last manual workbook import.
     if not new["monthly"].get("implied_outflow") and (old.get("monthly") or {}).get("implied_outflow"):
         new["monthly"]["implied_outflow"] = old["monthly"]["implied_outflow"]
     if not new["monthly"].get("current_by_origin") and (old.get("monthly") or {}).get("current_by_origin"):
@@ -601,6 +667,10 @@ def _merge_robusta(new: dict, old: dict) -> dict:
     # doesn't carry one, so it survives across nightly merges.
     if not new.get("port_origin_history") and old.get("port_origin_history"):
         new["port_origin_history"] = old["port_origin_history"]
+
+    # Now that age_allowance, gradings and port_origin_history are all merged,
+    # recompute the cohort-DNA outflow so "cohort out" stays fresh each run.
+    recompute_robusta_cohort_outflow(new)
 
     if new["snapshots"]:
         new["as_of"] = new["snapshots"][-1]["date"]
