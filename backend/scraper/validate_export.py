@@ -37,20 +37,42 @@ def _days_since_date(date_str: str) -> int:
 def _first_number(value) -> float | None:
     """Parse the leading numeric value out of a ticker `value` field.
 
-    Ticker values are display strings, e.g. '273.45', '100,000 VND ($1,234)',
-    '1.0552 (…)'. We compare the first number (thousands-separators stripped):
+    Ticker values are display strings that mix locales — US style
+    ('100,000 VND ($1,234)', 'Q1,875.87', '273.45') where ',' groups thousands
+    and '.' is the decimal, and Brazilian/European style ('1.050,00 BRL',
+    '100.000 VND') where it's the reverse. We extract the leading number and
+    normalise both conventions so day-to-day comparison is apples-to-apples:
         '100,000 VND ($1,234)' → 100000.0
+        '1.050,00 BRL (...)'   → 1050.0
         '1.0552 (…)'           → 1.0552
     """
     if isinstance(value, (int, float)):
         return float(value)
     if not isinstance(value, str):
         return None
-    m = re.search(r"-?\d[\d,]*\.?\d*", value)
+    m = re.search(r"-?\d[\d.,]*", value)
     if not m:
         return None
+    tok = m.group(0).rstrip(".,")
+    has_dot, has_comma = "." in tok, "," in tok
+    if has_dot and has_comma:
+        # Rightmost separator is the decimal; the other is a thousands grouping.
+        if tok.rfind(",") > tok.rfind("."):
+            tok = tok.replace(".", "").replace(",", ".")   # BR: 1.050,00 → 1050.00
+        else:
+            tok = tok.replace(",", "")                      # US: 1,875.87 → 1875.87
+    elif has_comma:
+        # A single ',' with a non-3-digit tail is a decimal ('980,00'); a 3-digit
+        # tail (or several groups) is a thousands grouping ('100,000').
+        parts = tok.split(",")
+        tok = tok.replace(",", ".") if len(parts) == 2 and len(parts[1]) != 3 else tok.replace(",", "")
+    elif has_dot:
+        # Same rule for '.': '1.0552' is a decimal, '100.000' is thousands.
+        parts = tok.split(".")
+        if not (len(parts) == 2 and len(parts[1]) != 3):
+            tok = tok.replace(".", "")
     try:
-        return float(m.group(0).replace(",", ""))
+        return float(tok)
     except ValueError:
         return None
 
