@@ -1,234 +1,234 @@
 {
   "currency_index": {
-    "scraped_at": "2026-07-09T22:50:30.433769+00:00",
-    "index_value": 108.750513,
-    "daily_delta_i": -0.000292,
-    "daily_delta_pct": -0.029178,
-    "zscore": 1.721177,
-    "zscore_mean": 105.523423,
-    "zscore_std": 1.874932,
+    "scraped_at": "2026-07-10T22:32:15.175625+00:00",
+    "index_value": 107.891713,
+    "daily_delta_i": 0.001889,
+    "daily_delta_pct": 0.188948,
+    "zscore": 1.811063,
+    "zscore_mean": 104.513233,
+    "zscore_std": 1.865468,
     "currencies": [
       {
         "ticker": "BRL=X",
         "name": "Brazilian Real",
         "type": "export",
         "weight": 0.513,
-        "daily_chg": 0.213332,
-        "contribution": 0.001094
+        "daily_chg": 0.45107,
+        "contribution": 0.002314
       },
       {
         "ticker": "VND=X",
         "name": "Vietnamese Dong",
         "type": "export",
         "weight": 0.262,
-        "daily_chg": -0.010734,
-        "contribution": -2.8e-05
+        "daily_chg": 0.043544,
+        "contribution": 0.000114
       },
       {
         "ticker": "COP=X",
         "name": "Colombian Peso",
         "type": "export",
         "weight": 0.128,
-        "daily_chg": -0.230446,
-        "contribution": -0.000295
+        "daily_chg": 1.468555,
+        "contribution": 0.00188
       },
       {
         "ticker": "IDR=X",
         "name": "Indonesian Rupiah",
         "type": "export",
         "weight": 0.051,
-        "daily_chg": -0.509342,
-        "contribution": -0.00026
+        "daily_chg": 0.135046,
+        "contribution": 6.9e-05
       },
       {
         "ticker": "PEN=X",
         "name": "Peruvian Sol",
         "type": "export",
         "weight": 0.047,
-        "daily_chg": 0.127875,
-        "contribution": 6e-05
+        "daily_chg": 0.126378,
+        "contribution": 5.9e-05
       },
       {
         "ticker": "EURUSD=X",
         "name": "Euro",
         "type": "import",
         "weight": 0.673,
-        "daily_chg": 0.092024,
-        "contribution": -0.000619
+        "daily_chg": 0.223137,
+        "contribution": -0.001502
       },
       {
         "ticker": "JPY=X",
         "name": "Japanese Yen",
         "type": "import",
         "weight": 0.095,
-        "daily_chg": -0.094981,
-        "contribution": 9e-05
+        "daily_chg": 0.605892,
+        "contribution": -0.000576
       },
       {
         "ticker": "CHF=X",
         "name": "Swiss Franc",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": 0.131299,
-        "contribution": -6.8e-05
+        "daily_chg": 0.436517,
+        "contribution": -0.000227
       },
       {
         "ticker": "CNY=X",
         "name": "Chinese Yuan",
         "type": "import",
         "weight": 0.052,
-        "daily_chg": -0.029841,
-        "contribution": 1.6e-05
+        "daily_chg": 0.270084,
+        "contribution": -0.00014
       },
       {
         "ticker": "CAD=X",
         "name": "Canadian Dollar",
         "type": "import",
         "weight": 0.046,
-        "daily_chg": 0.190975,
-        "contribution": -8.8e-05
+        "daily_chg": 0.14488,
+        "contribution": -6.7e-05
       },
       {
         "ticker": "KRW=X",
         "name": "South Korean Won",
         "type": "import",
         "weight": 0.045,
-        "daily_chg": 0.185645,
-        "contribution": -8.4e-05
+        "daily_chg": -0.201376,
+        "contribution": 9.1e-05
       },
       {
         "ticker": "GBP=X",
         "name": "British Pound",
         "type": "import",
         "weight": 0.038,
-        "daily_chg": 0.289927,
-        "contribution": -0.00011
+        "daily_chg": 0.331172,
+        "contribution": -0.000126
       }
     ],
     "history": [
       {
-        "date": "2026-06-10",
-        "value": 106.542453
-      },
-      {
         "date": "2026-06-11",
-        "value": 106.631649
+        "value": 105.590071
       },
       {
         "date": "2026-06-12",
-        "value": 107.485034
+        "value": 106.43512
       },
       {
         "date": "2026-06-13",
-        "value": 108.068203
+        "value": 107.012592
       },
       {
         "date": "2026-06-14",
-        "value": 107.928877
+        "value": 106.874628
       },
       {
         "date": "2026-06-15",
-        "value": 107.824983
+        "value": 106.771748
       },
       {
         "date": "2026-06-16",
-        "value": 108.034502
+        "value": 106.97922
       },
       {
         "date": "2026-06-17",
-        "value": 107.629799
+        "value": 106.57847
       },
       {
         "date": "2026-06-18",
-        "value": 107.986641
+        "value": 106.931827
       },
       {
         "date": "2026-06-19",
-        "value": 108.25767
+        "value": 107.200209
       },
       {
         "date": "2026-06-20",
-        "value": 108.221091
+        "value": 107.163987
       },
       {
         "date": "2026-06-21",
-        "value": 108.138967
+        "value": 107.082665
       },
       {
         "date": "2026-06-22",
-        "value": 108.424043
+        "value": 107.364956
       },
       {
         "date": "2026-06-23",
-        "value": 108.543705
+        "value": 107.483449
       },
       {
         "date": "2026-06-24",
-        "value": 108.568301
+        "value": 107.507805
       },
       {
         "date": "2026-06-25",
-        "value": 108.472906
+        "value": 107.413343
       },
       {
         "date": "2026-06-26",
-        "value": 108.508297
+        "value": 107.448387
       },
       {
         "date": "2026-06-27",
-        "value": 108.557248
+        "value": 107.496861
       },
       {
         "date": "2026-06-28",
-        "value": 108.607478
+        "value": 107.5466
       },
       {
         "date": "2026-06-29",
-        "value": 108.683855
+        "value": 107.622231
       },
       {
         "date": "2026-06-30",
-        "value": 108.445627
+        "value": 107.38633
       },
       {
         "date": "2026-07-01",
-        "value": 108.694035
+        "value": 107.632312
       },
       {
         "date": "2026-07-02",
-        "value": 108.402689
+        "value": 107.343811
       },
       {
         "date": "2026-07-03",
-        "value": 108.000643
+        "value": 106.945692
       },
       {
         "date": "2026-07-04",
-        "value": 108.571789
+        "value": 107.511259
       },
       {
         "date": "2026-07-05",
-        "value": 108.518978
+        "value": 107.458964
       },
       {
         "date": "2026-07-06",
-        "value": 108.689236
+        "value": 107.627559
       },
       {
         "date": "2026-07-07",
-        "value": 108.899742
+        "value": 107.836009
       },
       {
         "date": "2026-07-08",
-        "value": 108.782253
+        "value": 107.719668
       },
       {
         "date": "2026-07-09",
-        "value": 108.750513
+        "value": 107.688238
+      },
+      {
+        "date": "2026-07-10",
+        "value": 107.891713
       }
     ]
   },
-  "scraped_at": "2026-07-09T22:50:57.173330Z",
+  "scraped_at": "2026-07-10T22:32:15.175625+00:00",
   "sentiment": {
     "available": true,
     "scraped_at": "2026-07-09T22:50:55.420856Z",
@@ -277,7 +277,7 @@
         ]
       },
       {
-        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You’re Going To Get",
+        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -294,7 +294,7 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating — 1/8 paired days",
+    "reason": "accumulating \u2014 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
@@ -332,7 +332,7 @@
         "usd_per_ton": -50.8,
         "phi": -1.267667544981454,
         "detail": {
-          "text": "KC at RC close (17:30 London) 345.80¢/lb → KC close (18:30) 341.45¢/lb = -95.9 $/t on arabica; -1.26% mapped on robusta ≈ -50.8 $/t"
+          "text": "KC at RC close (17:30 London) 345.80\u00a2/lb \u2192 KC close (18:30) 341.45\u00a2/lb = -95.9 $/t on arabica; -1.26% mapped on robusta \u2248 -50.8 $/t"
         }
       },
       {
@@ -344,13 +344,13 @@
         "usd_per_ton": null,
         "phi": 0.11045230671561397,
         "detail": {
-          "text": "day 26 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
+          "text": "day 26 of the bi-monthly front-contract cycle \u2014 gaps historically tilt down mid-cycle (~day 10), up late-cycle"
         }
       }
     ],
     "target": {
       "kind": "overnight_gap",
-      "definition": "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
+      "definition": "RC first-bar open \u00f7 prior 17:30-London close \u2212 1; roll days excluded",
       "abstain_band": 0.1
     },
     "model": {
