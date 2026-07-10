@@ -228,23 +228,41 @@
       }
     ]
   },
-  "scraped_at": "2026-07-10T22:32:15.175625+00:00",
+  "scraped_at": "2026-07-10T22:32:39.727983Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-09T22:50:55.420856Z",
+    "scraped_at": "2026-07-10T22:32:38.147054Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 91.0,
-    "net_index": 0.0,
-    "bull_count": 0,
+    "overall_confidence": 89.0,
+    "net_index": 23.7,
+    "bull_count": 2,
     "bear_count": 0,
     "neutral_count": 5,
-    "total": 5,
+    "total": 7,
     "items": [
+      {
+        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 88.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "The Afternoon Coffee Crash Is A Myth",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 78.0,
         "tags": [
           "sprudge"
         ]
@@ -253,7 +271,7 @@
         "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 92.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +280,7 @@
         "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 85.0,
+        "confidence": 70.0,
         "tags": [
           "sprudge"
         ]
@@ -271,7 +289,7 @@
         "headline": "New Study Finds That Your Espresso Shots May Be Caving To Pressure",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +298,7 @@
         "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
