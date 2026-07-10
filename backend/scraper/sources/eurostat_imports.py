@@ -343,6 +343,83 @@ def parse_monthly_origins(body: dict, reporter_code: str = REPORTER,
     return out
 
 
+# ── German roasting-trade detail (Kaffeesteuer cross-check) ──────────────────
+# The Kaffeesteuer is levied per kg on coffee RELEASED FOR CONSUMPTION in
+# Germany; exports are exempt/refunded. To separate "real domestic demand" from
+# "roasting for re-export", we need Germany's monthly HS6 trade split: green
+# (0901.11/.12) vs roasted (0901.21/.22), imports vs exports. Same Comext
+# dataset, flow=1 imports / flow=2 exports. Written to de_coffee_trade.json.
+
+DE_TRADE_OUT = Path(__file__).parents[3] / "frontend" / "public" / "data" / "de_coffee_trade.json"
+_DE = "DE"
+_HS6_GROUPS = {"green": ["090111", "090112"], "roasted": ["090121", "090122"]}
+_FLOWS = {"imports": "1", "exports": "2"}
+
+
+def _fetch_monthly_products(reporter: str, products: list[str], flow: str, last_n: int) -> dict:
+    """Monthly quantity for a reporter × HS6-product-list × flow. Repeated
+    `product` params return one cube whose product dim the parser sums over."""
+    params = [("format", "JSON"), ("freq", "M"), ("reporter", reporter),
+              ("flow", flow), ("indicators", INDICATOR),
+              ("lastTimePeriod", str(last_n))]
+    params += [("product", p) for p in products]
+    try:
+        r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
+        if r.status_code != 200:
+            log.info("Eurostat DE-trade %s flow=%s lastN=%d HTTP %s: %s",
+                     "+".join(products), flow, last_n, r.status_code, r.text[:160])
+            return {}
+        return r.json()
+    except Exception as e:
+        log.error("Eurostat DE-trade fetch error flow=%s lastN=%d: %s", flow, last_n, e)
+        return {}
+
+
+def build_de_coffee_trade() -> dict:
+    """Germany's monthly green/roasted × import/export series (MT), archived
+    with merge-on-write like the other monthly feeds."""
+    series: dict[str, dict] = {}
+    for grp, codes in _HS6_GROUPS.items():
+        for flow_name, flow_code in _FLOWS.items():
+            key = f"{grp}_{flow_name}"
+            months: dict = {}
+            for last_n in (40, 36, 30, 24, 18, 12):
+                body = _fetch_monthly_products(_DE, codes, flow_code, last_n)
+                # parse_monthly_origins with a member reporter keeps intra-EU
+                # partners (vital: German re-exports go mostly to EU neighbours)
+                # and sums the product dim implicitly; __total__ = world total.
+                months = parse_monthly_origins(body, reporter_code=_DE).get("__total__", {})
+                log.info("DE trade %s lastN=%d → %d months", key, last_n, len(months))
+                if months:
+                    break
+            series[key] = {k: v for k, v in sorted(months.items()) if v > 0}
+
+    if DE_TRADE_OUT.exists():  # archive: extend history, never shrink it
+        try:
+            prev = json.loads(DE_TRADE_OUT.read_text(encoding="utf-8")).get("series", {})
+        except Exception:
+            prev = {}
+        for key in set(series) | set(prev):
+            series[key] = merge_monthly(prev.get(key), series.get(key))
+
+    out = {
+        "updated":  datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source":   "Eurostat Comext ds-045409 — Germany HS6 coffee trade, monthly quantity (100kg→MT)",
+        "reporter": _DE,
+        "hs6":      _HS6_GROUPS,
+        "measure":  "quantity_mt",
+        "series":   series,
+    }
+    if any(series.values()):
+        DE_TRADE_OUT.parent.mkdir(parents=True, exist_ok=True)
+        safe_write_json(DE_TRADE_OUT, out, ensure_ascii=False)
+        log.info("de_coffee_trade.json written: %s",
+                 {k: len(v) for k, v in series.items()})
+    else:
+        log.warning("de_coffee_trade: nothing fetched; keeping existing file")
+    return out
+
+
 # ── Comtrade EU-bloc (for the EU↔Comtrade reconciliation) ─────────────────────
 # Comtrade re-publishes national stats with a lag; for the EU bloc, imports
 # "from World" are extra-EU (intra-EU is internal). We pull that here so the UI
@@ -480,6 +557,13 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     safe_write_json(OUT_PATH, out, ensure_ascii=False)
     log.info("eu_coffee_imports.json written: %d reporters, bloc %d origins",
              len(reporters), len(bloc["origins"]))
+
+    # German HS6 roasting-trade detail (Kaffeesteuer cross-check) — own file;
+    # never let its failure sink the main EU build.
+    try:
+        build_de_coffee_trade()
+    except Exception as e:  # noqa: BLE001
+        log.error("de_coffee_trade build failed: %s", e)
     return out
 
 

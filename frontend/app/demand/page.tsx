@@ -22,6 +22,7 @@ import OriginExplorer from "@/components/demand/imports-lab/OriginExplorer";
 import MonthlyTrend from "@/components/demand/MonthlyTrend";
 import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import KaffeesteuerChart from "@/components/demand/KaffeesteuerChart";
+import KaffeesteuerReexport from "@/components/demand/KaffeesteuerReexport";
 import RoastingMixPanel from "@/components/demand/RoastingMixPanel";
 import SpotPanel from "@/components/demand/SpotPanel";
 import StocksPanel from "@/components/demand/StocksPanel";
@@ -117,6 +118,8 @@ function DemandPageInner() {
           <Section><AgeCohortPanel /></Section>
           <Section><RoastingMixPanel /></Section>
           <Section><KaffeesteuerChart /></Section>
+          {/* Cross-check: is the tax rise real demand or roasting-for-re-export? */}
+          <Section><KaffeesteuerReexport /></Section>
         </>
       )}
 
