@@ -54,10 +54,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/data/eu_coffee_imports.json
+          # DE trade detail is best-effort — may not exist on a partial run.
+          git add frontend/public/data/de_coffee_trade.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes — JSON already up to date."
           else
-            git commit -m "data: update eu_coffee_imports.json [skip ci]"
+            git commit -m "data: update eu_coffee_imports.json + de_coffee_trade.json [skip ci]"
             git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}" || true
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
