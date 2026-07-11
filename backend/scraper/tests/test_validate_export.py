@@ -382,6 +382,62 @@ def test_safe_write_json_sanity_keeps_old_on_swing(tmp_path):
     assert json.loads(dest.read_text()) == good   # old data preserved
 
 
+# ── futures_chain / fx_history / scalar swing guards ──────────────────────────
+
+def test_futures_chain_swing_guard_passes_normal_move():
+    from scraper.validate_export import futures_chain_swing_guard
+    old = {"arabica": {"contracts": [{"symbol": "KCU26", "last": 334.25}]},
+           "robusta": {"contracts": [{"symbol": "RMN26", "last": 3872}]}}
+    new = {"arabica": {"contracts": [{"symbol": "KCU26", "last": 330.0}]},
+           "robusta": {"contracts": [{"symbol": "RMN26", "last": 3900}]}}
+    assert futures_chain_swing_guard()(old, new)[0] is True
+
+
+def test_futures_chain_swing_guard_rejects_units_error():
+    """KC (cents) misread as dollars — 334.25 → 3.34 — is rejected."""
+    from scraper.validate_export import futures_chain_swing_guard
+    old = {"arabica": {"contracts": [{"symbol": "KCU26", "last": 334.25}]}, "robusta": {"contracts": []}}
+    new = {"arabica": {"contracts": [{"symbol": "KCU26", "last": 3.34}]}, "robusta": {"contracts": []}}
+    ok, reason = futures_chain_swing_guard()(old, new)
+    assert not ok and "KCU26" in reason
+
+
+def test_futures_chain_swing_guard_skips_new_symbol():
+    """A newly-listed contract with no prior counterpart is not blocked."""
+    from scraper.validate_export import futures_chain_swing_guard
+    old = {"arabica": {"contracts": [{"symbol": "KCU26", "last": 334.25}]}, "robusta": {"contracts": []}}
+    new = {"arabica": {"contracts": [{"symbol": "KCZ26", "last": 1.0}]}, "robusta": {"contracts": []}}
+    assert futures_chain_swing_guard()(old, new)[0] is True
+
+
+def test_fx_history_swing_guard_rejects_rescale():
+    """BRL latest close 5.1 → 0.51 (a dropped digit / inversion) is rejected."""
+    from scraper.validate_export import fx_history_swing_guard
+    old = {"pairs": {"BRL=X": {"history": [{"date": "2026-07-10", "close": 5.1}]}}}
+    new = {"pairs": {"BRL=X": {"history": [{"date": "2026-07-11", "close": 0.51}]}}}
+    ok, reason = fx_history_swing_guard()(old, new)
+    assert not ok and "BRL=X" in reason
+
+
+def test_fx_history_swing_guard_passes_normal_move():
+    from scraper.validate_export import fx_history_swing_guard
+    old = {"pairs": {"BRL=X": {"history": [{"date": "2026-07-10", "close": 5.1}]}}}
+    new = {"pairs": {"BRL=X": {"history": [{"date": "2026-07-11", "close": 5.15}]}}}
+    assert fx_history_swing_guard()(old, new)[0] is True
+
+
+def test_scalar_swing_guard_on_currency_index():
+    from scraper.validate_export import scalar_swing_guard
+    g = scalar_swing_guard("currency_index", "index_value")
+    assert g({"currency_index": {"index_value": 107.9}},
+             {"currency_index": {"index_value": 108.5}})[0] is True
+    ok, reason = g({"currency_index": {"index_value": 107.9}},
+                   {"currency_index": {"index_value": 10.79}})
+    assert not ok and "index_value" in reason
+    # Missing on one side → skip (model-output sections absent on first write).
+    assert g({}, {"currency_index": {"index_value": 10.79}})[0] is True
+
+
 # ── safe_write_json: atomicity-only mode + trailing newline (rollout params) ──
 
 def test_safe_write_json_no_validator_writes_atomically(tmp_path):

@@ -114,6 +114,111 @@ def price_swing_guard(threshold: float = 0.30):
     return _check
 
 
+def futures_chain_swing_guard(threshold: float = 0.30):
+    """Build an (old, new) -> (ok, reason) guard for futures_chain.json.
+
+    futures_chain.json is `{arabica|robusta: {contracts: [{symbol, last, …}]}}`.
+    KC prints in cents (~334) and RC in dollars (~3872), so a units/parse break
+    (KC read as dollars, a dropped digit) sails past the shape/freshness
+    validator. This compares each contract's `last` to the same-`symbol` contract
+    in the previous good file and rejects a > `threshold` move. Contracts absent
+    from either side (roll-off / new listing) are skipped, not blocked.
+    """
+    def _check(old: dict, new: dict) -> tuple[bool, str]:
+        if not isinstance(old, dict) or not isinstance(new, dict):
+            return True, "ok"
+        for market in ("arabica", "robusta"):
+            old_by_sym = {
+                c.get("symbol"): c.get("last")
+                for c in ((old.get(market) or {}).get("contracts") or [])
+                if isinstance(c, dict)
+            }
+            for c in ((new.get(market) or {}).get("contracts") or []):
+                if not isinstance(c, dict):
+                    continue
+                new_v = _first_number(c.get("last"))
+                old_v = _first_number(old_by_sym.get(c.get("symbol")))
+                if old_v is None or new_v is None or old_v == 0:
+                    continue
+                change = abs(new_v - old_v) / abs(old_v)
+                if change > threshold:
+                    return False, (
+                        f"{market} {c.get('symbol')} last swung {change * 100:.0f}% "
+                        f"({old_v:g} → {new_v:g}), suspected units/parse error"
+                    )
+        return True, "ok"
+
+    return _check
+
+
+def fx_history_swing_guard(threshold: float = 0.25):
+    """Build an (old, new) -> (ok, reason) guard for fx_history.json.
+
+    fx_history.json is `{pairs: {TICKER: {history: [{date, close}, …]}}}`. The
+    per-row merge already drops single-day outliers, but a systematic re-scaling
+    (a whole pair rebased, a currency inverted) can shift every point uniformly
+    and slip through. This compares each pair's *latest* close to the previous
+    good file's latest close for that pair and rejects a > `threshold` move — no
+    FX cross legitimately moves 25% day-over-day, so that's a parse break.
+    """
+    def _latest_close(pair: dict) -> float | None:
+        hist = pair.get("history") if isinstance(pair, dict) else None
+        if not isinstance(hist, list) or not hist:
+            return None
+        last = hist[-1]
+        return _first_number(last.get("close")) if isinstance(last, dict) else None
+
+    def _check(old: dict, new: dict) -> tuple[bool, str]:
+        if not isinstance(old, dict) or not isinstance(new, dict):
+            return True, "ok"
+        old_pairs = old.get("pairs") or {}
+        for ticker, pair in (new.get("pairs") or {}).items():
+            new_v = _latest_close(pair)
+            old_v = _latest_close(old_pairs.get(ticker) or {})
+            if old_v is None or new_v is None or old_v == 0:
+                continue
+            change = abs(new_v - old_v) / abs(old_v)
+            if change > threshold:
+                return False, (
+                    f"{ticker} latest close swung {change * 100:.0f}% "
+                    f"({old_v:g} → {new_v:g}), suspected parse/rescale error"
+                )
+        return True, "ok"
+
+    return _check
+
+
+def scalar_swing_guard(*path, threshold: float = 0.30):
+    """Build an (old, new) -> (ok, reason) guard on one nested numeric field.
+
+    Follows `path` (a sequence of keys) into both payloads and rejects a
+    > `threshold` move of that scalar — e.g. `scalar_swing_guard("currency_index",
+    "index_value")` catches a units/parse break in the CCI level written into
+    quant_report.json, without touching the model-output sections that move by
+    design. Missing/non-numeric on either side → skip (don't block).
+    """
+    def _dig(d):
+        for k in path:
+            if not isinstance(d, dict):
+                return None
+            d = d.get(k)
+        return _first_number(d)
+
+    def _check(old: dict, new: dict) -> tuple[bool, str]:
+        old_v, new_v = _dig(old), _dig(new)
+        if old_v is None or new_v is None or old_v == 0:
+            return True, "ok"
+        change = abs(new_v - old_v) / abs(old_v)
+        if change > threshold:
+            return False, (
+                f"{'.'.join(map(str, path))} swung {change * 100:.0f}% "
+                f"({old_v:g} → {new_v:g}), suspected parse error"
+            )
+        return True, "ok"
+
+    return _check
+
+
 # ── validators ────────────────────────────────────────────────────────────────
 
 def validate_futures_chain(data: dict) -> tuple[bool, str]:

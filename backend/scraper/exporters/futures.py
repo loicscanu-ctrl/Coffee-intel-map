@@ -13,6 +13,7 @@ from models import NewsItem
 from scraper import symbols as _sym
 from scraper.exporters.base import OUT_DIR, ROOT
 from scraper.validate_export import (
+    futures_chain_swing_guard,
     safe_write_json,
     validate_futures_chain,
     validate_oi_fnd_chart,
@@ -90,7 +91,8 @@ def export_futures_chain(db) -> None:
             result[market] = None
 
     path = OUT_DIR / "futures_chain.json"
-    written = safe_write_json(path, result, validate_futures_chain)
+    written = safe_write_json(path, result, validate_futures_chain,
+                              sanity_fn=futures_chain_swing_guard())
     print(f"  futures_chain.json → written:{written} arabica:{result['arabica'] is not None} robusta:{result['robusta'] is not None}")
 
 

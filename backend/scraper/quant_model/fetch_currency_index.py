@@ -44,7 +44,11 @@ import numpy as np
 import pandas as pd
 import requests
 
-from scraper.validate_export import safe_write_json
+from scraper.validate_export import (
+    fx_history_swing_guard,
+    safe_write_json,
+    scalar_swing_guard,
+)
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -441,6 +445,10 @@ def main():
     safe_write_json(
         OUT_PATH, existing,
         lambda d: (d.get("currency_index") is not None, "missing currency_index"),
+        # Guard only the CCI level (a price-like scalar with parse risk); the
+        # model-output sections in quant_report.json move by design and must not
+        # be swing-gated.
+        sanity_fn=scalar_swing_guard("currency_index", "index_value"),
     )
 
     print(f"\nCCI = {today_value:.2f}  ΔI = {total_delta_i:+.4f}  Z = {zscore:+.2f}")
@@ -500,6 +508,9 @@ def main():
     safe_write_json(
         FX_OUT, fx_output,
         lambda d: (bool(d.get("pairs")), "no fx pairs"),
+        # Cross-run guard on each pair's latest close — complements the per-row
+        # outlier drop above by catching a systematic rescale/inversion.
+        sanity_fn=fx_history_swing_guard(),
     )
     print(f"Saved → {FX_OUT}  ({len(fx_pairs)} pairs, "
           f"{fx_output['history_days']} max history days)")
