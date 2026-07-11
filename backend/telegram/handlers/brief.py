@@ -4,6 +4,7 @@ import re
 from datetime import UTC, date, datetime, timedelta
 
 from telegram.data import load
+from telegram.sender import esc
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -616,7 +617,7 @@ def _weather_block(today: date) -> str | None:
     if today.month in _FROST_MONTHS:
         alerts, when = _brazil_frost_alerts(today)
         if alerts:
-            names = ", ".join(alerts[:3])
+            names = ", ".join(esc(a) for a in alerts[:3])
             when_str = when.strftime("%d %b") if when else "recent obs"
             lines.append(f"Brazil: frost season — <b>ALERT</b> {names} ({when_str} tmean cold)")
         else:
@@ -647,7 +648,7 @@ def _weather_block(today: date) -> str | None:
         if avg_vhi < _VHI_STRESS_THRESHOLD:
             flag = " <b>ALERT</b>"
         elif stressed:
-            flag = f" ({', '.join(stressed[:3])} stressed)"
+            flag = f" ({', '.join(esc(s) for s in stressed[:3])} stressed)"
         lines.append(f"VHI at {avg_vhi:.0f}{flag}")
 
     return "\n".join(lines) if len(lines) > 1 else None
@@ -925,7 +926,7 @@ def _upcoming_events_section(now: datetime | None = None) -> str | None:
     for e in upcoming:
         when = "Today   " if e["date"] == today_iso else "Tomorrow"
         cat = _EVENT_CATEGORY_LABEL.get(e.get("category") or "other", "EVT")
-        title = (e.get("title") or "").strip()
+        title = esc((e.get("title") or "").strip())
         lines.append(f"  {when} · [{cat}] {title}")
     return "\n".join(lines)
 

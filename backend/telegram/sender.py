@@ -1,10 +1,23 @@
 from __future__ import annotations
 
+import html
 import os
 
 import requests
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+
+
+def esc(text: object) -> str:
+    """Escape scraped/free text before it goes into a parse_mode=HTML message.
+
+    Telegram parses `<`, `>`, `&` as markup, so an un-escaped scraped string
+    (an event title, a region name) either breaks the whole sendMessage with a
+    400 (dropping the brief silently) or injects unintended tags. quote=False
+    keeps this for text nodes — our own template tags are written literally and
+    must not be passed through here.
+    """
+    return html.escape("" if text is None else str(text), quote=False)
 
 
 def send_message(chat_id: str | int, text: str, parse_mode: str = "HTML") -> bool:

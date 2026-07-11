@@ -189,6 +189,10 @@ def _weather_rows() -> list[dict]:
 
 
 def _supply_weather_section() -> str:
+    # `esc` escapes scraped region names before they land in this HTML message
+    # (imported lazily so this scraper module doesn't pull telegram at import).
+    from telegram.sender import esc
+
     rows = _weather_rows()
     if not rows:
         return ""
@@ -205,16 +209,16 @@ def _supply_weather_section() -> str:
                 tag_bits.append("CSI HIGH")
             tag = (" · " + ", ".join(tag_bits)) if tag_bits else ""
             out.append(
-                f"  {r['country']}/{r['name']}: MTD {r['mtd']:.0f}mm · "
+                f"  {r['country']}/{esc(r['name'])}: MTD {r['mtd']:.0f}mm · "
                 f"hist {r['lo']:.0f}–{r['hi']:.0f} (this date) · {r['cue']}{tag}"
             )
     else:
         alerts = []
         for r in rows:
             if r["drought"] == "HIGH":
-                alerts.append(f"  DROUGHT HIGH — {r['country']}/{r['name']}")
+                alerts.append(f"  DROUGHT HIGH — {r['country']}/{esc(r['name'])}")
             if r["csi"] == "HIGH":
-                alerts.append(f"  CSI HIGH — {r['country']}/{r['name']}")
+                alerts.append(f"  CSI HIGH — {r['country']}/{esc(r['name'])}")
         if len(out) == 1 and not alerts:
             return ""
         out.extend(alerts)

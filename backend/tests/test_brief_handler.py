@@ -37,6 +37,21 @@ def test_renders_today_and_tomorrow(monkeypatch):
     assert "[FND] KCN26 First Notice Day" in out
 
 
+def test_event_title_html_escaped(monkeypatch):
+    """A scraped title with HTML metacharacters is escaped, so it can't break
+    Telegram's parse_mode=HTML (400 → dropped brief) or inject markup."""
+    doc = _events(
+        {"date": "2026-05-30", "category": "wasde",
+         "title": "Coffee <b>rally</b> & AT&T note"},
+    )
+    monkeypatch.setattr(brief, "load",
+                        lambda name: doc if name == "events.json" else None)
+    out = brief._upcoming_events_section(NOW)
+    assert out is not None
+    assert "Coffee &lt;b&gt;rally&lt;/b&gt; &amp; AT&amp;T note" in out
+    assert "<b>rally</b>" not in out
+
+
 def test_today_listed_before_tomorrow(monkeypatch):
     """Chronological sort: today rows must come before tomorrow rows."""
     doc = _events(
