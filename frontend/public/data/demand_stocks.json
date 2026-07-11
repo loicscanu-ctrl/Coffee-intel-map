@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T06:29:20.504860Z",
+  "generated_at": "2026-07-11T05:29:41.243900Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -7799,8 +7799,8 @@
       "name": "Philippines",
       "latest_year": "2025",
       "consumption_mt": 405000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 116786962,
+      "per_capita_kg": 3.47,
       "annual": [
         {
           "year": "1960",
@@ -8629,8 +8629,8 @@
       "name": "Vietnam",
       "latest_year": "2025",
       "consumption_mt": 294000,
-      "population": 101598527,
-      "per_capita_kg": 2.89,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -10063,8 +10063,8 @@
       "name": "Ethiopia",
       "latest_year": "2025",
       "consumption_mt": 222000,
-      "population": 135472051,
-      "per_capita_kg": 1.64,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "1960",
@@ -10667,8 +10667,8 @@
       "name": "South Korea",
       "latest_year": "2025",
       "consumption_mt": 204000,
-      "population": 51684564,
-      "per_capita_kg": 3.95,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12327,8 +12327,8 @@
       "name": "Egypt",
       "latest_year": "2025",
       "consumption_mt": 60000,
-      "population": 118365995,
-      "per_capita_kg": 0.51,
+      "population": null,
+      "per_capita_kg": null,
       "annual": [
         {
           "year": "2002",
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-07-10",
+    "last_updated": "2026-07-11",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12577,12 +12577,6 @@
         "latest_year": "2025",
         "latest_population": 285721236
       },
-      "vietnam": {
-        "name": "Vietnam",
-        "iso3": "VNM",
-        "latest_year": "2025",
-        "latest_population": 101598527
-      },
       "russia": {
         "name": "Russia",
         "iso3": "RUS",
@@ -12601,23 +12595,11 @@
         "latest_year": "2025",
         "latest_population": 85878556
       },
-      "egypt": {
-        "name": "Egypt",
-        "iso3": "EGY",
+      "philippines": {
+        "name": "Philippines",
+        "iso3": "PHL",
         "latest_year": "2025",
-        "latest_population": 118365995
-      },
-      "korea": {
-        "name": "South Korea",
-        "iso3": "KOR",
-        "latest_year": "2025",
-        "latest_population": 51684564
-      },
-      "ethiopia": {
-        "name": "Ethiopia",
-        "iso3": "ETH",
-        "latest_year": "2025",
-        "latest_population": 135472051
+        "latest_population": 116786962
       }
     }
   },
