@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T05:29:41.860619Z",
+  "generated_at": "2026-07-11T21:17:27.019062Z",
   "tickers": [
     {
       "label": "KCU26",
@@ -18,12 +18,12 @@
     },
     {
       "label": "VN FAQ",
-      "value": "98.300 VND ($3,746)",
+      "value": "95.200 VND ($3,628)",
       "category": "physical"
     },
     {
       "label": "CON T7",
-      "value": "1.035,00 BRL ($3,373)",
+      "value": "1.040,00 BRL ($3,389)",
       "category": "physical"
     },
     {
