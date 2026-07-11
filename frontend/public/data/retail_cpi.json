@@ -1,6 +1,6 @@
 {
   "source": "BLS + Eurostat + BCB SGS",
-  "last_updated": "2026-07-01",
+  "last_updated": "2026-07-11",
   "series": {
     "us": {
       "name": "US — Roasted coffee (BLS CPI, SA)",
@@ -2753,6 +2753,11 @@
           "period": "2026-05",
           "index": 16337060.0434,
           "yoy_pct": 3.86
+        },
+        {
+          "period": "2026-06",
+          "index": 16297851.0993,
+          "yoy_pct": 3.8
         }
       ]
     }
