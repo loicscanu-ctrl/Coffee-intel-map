@@ -224,35 +224,48 @@ async def playwright_login() -> dict:
             "credentials.")
 
     print("[acaphe] Logging in via Playwright …")
+    last_err = None
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
-        ctx = await browser.new_context(user_agent=HEADERS["User-Agent"])
-        page = await ctx.new_page()
+        for attempt in (1, 2, 3):
+            browser = await pw.chromium.launch(headless=True)
+            try:
+                ctx = await browser.new_context(user_agent=HEADERS["User-Agent"])
+                page = await ctx.new_page()
 
-        await page.goto(LOGIN_URL, wait_until="networkidle", timeout=30_000)
+                # domcontentloaded, NOT networkidle: the logged-in page streams
+                # live quotes and never goes network-idle, so `networkidle` timed
+                # out (Timeout Nms exceeded) even on a perfectly good login. The
+                # DOM-ready signal settles fast and reliably.
+                await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30_000)
 
-        # Log visible inputs to detect login form structure changes
-        inputs = await page.query_selector_all("input")
-        input_types = [await i.get_attribute("type") or "text" for i in inputs]
-        print(f"[acaphe] Form inputs found: {input_types}")
+                inputs = await page.query_selector_all("input")
+                input_types = [await i.get_attribute("type") or "text" for i in inputs]
+                print(f"[acaphe] Form inputs found: {input_types}")
 
-        await page.fill('input[type="text"]',     USERNAME)
-        await page.fill('input[type="password"]', PASSWORD)
+                await page.fill('input[type="text"]',     USERNAME)
+                await page.fill('input[type="password"]', PASSWORD)
 
-        # Wait for navigation triggered by submit rather than fixed sleep
-        async with page.expect_navigation(wait_until="networkidle", timeout=20_000):
-            await page.click('input[type="submit"]')
+                async with page.expect_navigation(wait_until="domcontentloaded", timeout=15_000):
+                    await page.click('input[type="submit"]')
 
-        final_url = page.url
-        title = await page.title()
-        cookies = await ctx.cookies()
-        await browser.close()
+                final_url = page.url
+                title = await page.title()
+                cookie_dict = {c["name"]: c["value"] for c in await ctx.cookies()}
+                logged_in = await page.query_selector('input[type="password"]') is None
+                print(f"[acaphe] Post-login — url={final_url} | title={title!r} | "
+                      f"logged_in={logged_in} | cookies={list(cookie_dict.keys())}")
+                if not logged_in:
+                    print("[acaphe] WARNING: password field still present — creds may be wrong or form changed")
+                return cookie_dict
+            except Exception as e:  # noqa: BLE001 — retry transient acaphe/browser hiccups
+                last_err = repr(e)
+                print(f"[acaphe] login attempt {attempt}/3 failed: {last_err}")
+            finally:
+                await browser.close()
+            if attempt < 3:
+                await asyncio.sleep(3 * attempt)   # 3s, 6s backoff
 
-    cookie_dict = {c["name"]: c["value"] for c in cookies}
-    print(f"[acaphe] Post-login — url={final_url} | title={title!r} | cookies={list(cookie_dict.keys())}")
-    if LOGIN_URL in final_url:
-        print("[acaphe] WARNING: still on login page — credentials may be wrong or form selector changed")
-    return cookie_dict
+    raise RuntimeError(f"acaphe login failed after 3 attempts: {last_err}")
 
 
 def _save_vn_prices_to_db(viet: dict, fetched_at: str) -> None:
