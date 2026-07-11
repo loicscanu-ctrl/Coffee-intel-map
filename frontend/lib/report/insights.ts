@@ -425,6 +425,164 @@ const supplyDemand = (key: string, label: string): Builder => async () => {
     + `The production-minus-use gap drives the ending-stocks trajectory and, with it, the structural tightness of the origin.`;
 };
 
+// ── Brazil type-mix (cecafe.json) ─────────────────────────────────────────────
+const brazilTypeShare: Builder = async () => {
+  const d = await cecafe(); const s = d?.series; if (!s?.length) return null;
+  const r = s[s.length - 1]; const ya = s[s.length - 13];
+  const share = (row: CecafeRow) => {
+    const a = row.arabica ?? 0, c = row.conillon ?? 0, so = row.soluvel ?? 0;
+    const t = a + c + so || row.total || 1;
+    return { a: a / t * 100, c: c / t * 100, so: so / t * 100 };
+  };
+  const now = share(r); const then = ya ? share(ya) : null;
+  return `Arabica is **${now.a.toFixed(0)}%** of Brazil's export mix in ${monthLabel(r.date)} (conilon ${now.c.toFixed(0)}%, soluble ${now.so.toFixed(0)}%)`
+    + `${then ? `, versus **${then.a.toFixed(0)}%** arabica a year earlier` : ""}. `
+    + `A rising conilon share signals more robusta-substitutable supply reaching the market.`;
+};
+
+const brazilYoyType: Builder = async () => {
+  const d = await cecafe(); const s = d?.series; if (!s?.length) return null;
+  const r = s[s.length - 1]; const ya = s[s.length - 13]; if (!ya) return null;
+  const a = chgPct(r.arabica ?? 0, ya.arabica ?? 0);
+  const c = chgPct(r.conillon ?? 0, ya.conillon ?? 0);
+  const so = chgPct(r.soluvel ?? 0, ya.soluvel ?? 0);
+  return `Year-on-year in ${monthLabel(r.date)}: arabica exports **${pct(a)}**, conilon **${pct(c)}**, soluble **${pct(so)}**. `
+    + `Diverging growth by type shifts the arabica/robusta balance Brazil is putting on the water.`;
+};
+
+const brazilSeasonality: Builder = async () => {
+  const d = await cecafe(); const s = d?.series; if (!s?.length) return null;
+  const byMonth: Record<number, number[]> = {};
+  for (const r of s) { const m = +r.date.slice(5, 7); (byMonth[m] ||= []).push(r.total); }
+  const avg = (m: number) => (byMonth[m]?.reduce((x, y) => x + y, 0) ?? 0) / (byMonth[m]?.length || 1);
+  const peak = Object.keys(byMonth).map(Number).sort((x, y) => avg(y) - avg(x))[0];
+  const latest = s[s.length - 1]; const lm = +latest.date.slice(5, 7);
+  const vsNorm = chgPct(latest.total, avg(lm));
+  return `Brazil's shipments seasonally peak around **${MONTHS[peak - 1]}**. ${MONTHS[lm - 1]} printed **${n1(kt(latest.total))} kt** this year, `
+    + `**${pct(vsNorm)}** versus its multi-year seasonal norm — a read on whether the flow is running hot or cold for the calendar.`;
+};
+
+// ── ENSO extras (enso.json) ───────────────────────────────────────────────────
+const ensoPlume: Builder = async () => {
+  const d = await load<{ oni_forecast?: { season?: string; la_nina?: number; neutral?: number; el_nino?: number }[] }>("/data/enso.json");
+  const f = d?.oni_forecast; if (!Array.isArray(f) || !f.length) return null;
+  const first = f[0];
+  const entries: [string, number | undefined][] = [["La Niña", first.la_nina], ["Neutral", first.neutral], ["El Niño", first.el_nino]];
+  const probs = entries.filter((p) => typeof p[1] === "number").sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
+  if (!probs.length) return null;
+  const [lead, p] = probs[0];
+  return `The IRI/CPC plume favours **${lead}** at **${((p ?? 0) * 100).toFixed(0)}%** for ${first.season ?? "the coming season"}. `
+    + `The evolving phase probability sets the rainfall-risk backdrop for Brazil, Vietnam and Colombia over the next two quarters.`;
+};
+
+const ensoRiskTable: Builder = async () => {
+  const d = await load<{ risk?: { summary?: string; pins?: { region?: string; country?: string; level?: string; driver?: string; severity?: number }[] } }>("/data/enso.json");
+  const pins = d?.risk?.pins; if (!Array.isArray(pins) || !pins.length) return null;
+  const lv = (x: string) => pins.filter((p) => (p.level ?? "").toLowerCase() === x).length;
+  const high = lv("high"), mod = lv("moderate");
+  const top = [...pins].sort((a, b) => (b.severity ?? 0) - (a.severity ?? 0))[0];
+  return `Of **${pins.length}** tracked growing regions, **${high}** are flagged high-risk and **${mod}** moderate for the coming six months. `
+    + `${top?.region ? `**${top.region}${top.country ? `, ${top.country}` : ""}** carries the highest ENSO-driven risk (${top.driver ?? "—"}). ` : ""}`
+    + `A regional map of where the current phase most threatens the crop.`;
+};
+
+// ── Freight & Port (freight.json / port_activity) ─────────────────────────────
+const originFreightCosts: Builder = async () => {
+  const d = await load<{ routes?: Route[] }>("/data/freight.json"); const rs = d?.routes; if (!rs?.length) return null;
+  const moved = rs.map((r) => ({ ...r, mv: chgPct(r.rate ?? 0, r.prev ?? 0) ?? 0 })).sort((a, b) => Math.abs(b.mv) - Math.abs(a.mv));
+  const top = moved[0];
+  return `Container freight from the key coffee origins across ${rs.length} routes — biggest move **${top.from}→${top.to}** at **${n0(top.rate ?? 0)} ${top.unit ?? ""}** (**${pct(top.mv)}**). `
+    + `The VN→EU vs BR→EU spread is a robusta-vs-arabica logistics-arbitrage signal feeding delivered cost.`;
+};
+
+const portActivity: Builder = async () => {
+  const d = await load<{ label?: string; country?: string; series?: { date: string; portcalls?: number }[] }>("/data/port_activity/hcmc.json");
+  const s = d?.series; if (!Array.isArray(s) || !s.length) return null;
+  const last = s[s.length - 1].date; const yr = last.slice(0, 4); const md = last.slice(5);
+  const ytd = (y: string) => s.filter((r) => r.date.slice(0, 4) === y && r.date.slice(5) <= md).reduce((a, r) => a + (r.portcalls ?? 0), 0);
+  const cur = ytd(yr); const prev = ytd(String(+yr - 1));
+  return `**${d?.label ?? "The gateway"}** handled **${n0(cur)}** vessel calls year-to-date, **${pct(chgPct(cur, prev))}** versus the same point last year. `
+    + `IMF PortWatch daily calls are a near-real-time proxy for export throughput at the ${d?.country ?? "origin"} coffee gateway.`;
+};
+
+// ── Macro (fx / cross-commodity / CPI) ────────────────────────────────────────
+const fxTimeseries: Builder = async () => {
+  const d = await load<{ pairs?: Record<string, { name?: string; type?: string; history?: { close: number }[] }> }>("/data/fx_history.json");
+  const pairs = d?.pairs; if (!pairs) return null;
+  const mv = (sym: string, days = 90) => {
+    const h = pairs[sym]?.history; if (!h?.length) return null;
+    return chgPct(h[h.length - 1].close, h[Math.max(0, h.length - 1 - days)].close);
+  };
+  const brl = mv("BRL=X"), vnd = mv("VND=X"), cop = mv("COP=X");
+  const vals = [brl, vnd, cop].filter((x): x is number => x != null);
+  if (!vals.length) return null;
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length; // USD/local: negative = local stronger
+  return `Over ~3 months USD/BRL **${pct(brl)}**, USD/VND **${pct(vnd)}**, USD/COP **${pct(cop)}**. `
+    + `${avg < 0 ? "Producer currencies are strengthening vs USD — supportive of higher local prices and farmer retention." : "Producer currencies are weakening vs USD — incentivising origin selling and a headwind for USD-priced futures."}`;
+};
+
+const crossCommodity: Builder = async () => {
+  const m = await load<{ date: string; commodities?: { symbol: string; close_price?: number }[] }[]>("/data/macro_cot.json");
+  if (!Array.isArray(m) || m.length < 5) return null;
+  const price = (row: typeof m[number], sym: string) => row.commodities?.find((c) => c.symbol === sym)?.close_price;
+  const chg = (sym: string) => { const cur = price(m[m.length - 1], sym), old = price(m[m.length - 5], sym); return cur != null && old != null ? chgPct(cur, old) : null; };
+  const ar = chg("arabica"); if (ar == null) return null;
+  const su = chg("sugar11"), co = chg("cocoa_ny");
+  return `Over the past ~month arabica coffee is **${pct(ar)}**, versus sugar **${pct(su)}** and cocoa **${pct(co)}**. `
+    + `When coffee diverges from the softs complex the move is coffee-specific; when it tracks them it's macro / fund flow driving the tape.`;
+};
+
+const cpiLatest = (series: Record<string, { name?: string; monthly?: { period: string; yoy_pct?: number | null }[] }> | undefined, key: string) => {
+  const m = series?.[key]?.monthly; if (!m?.length) return null;
+  const last = [...m].reverse().find((r) => r.yoy_pct != null);
+  return last ? { period: last.period, yoy: last.yoy_pct as number } : null;
+};
+
+const usCpi: Builder = async () => {
+  const d = await load<{ series?: Record<string, { name?: string; monthly?: { period: string; yoy_pct?: number | null }[] }> }>("/data/us_cpi.json");
+  const all = cpiLatest(d?.series, "all_items"); const core = cpiLatest(d?.series, "core");
+  if (!all) return null;
+  return `US CPI ran **${pct(all.yoy)}** year-on-year in ${all.period}${core ? ` (core **${pct(core.yoy)}**)` : ""}. `
+    + `${Math.abs(all.yoy - 2) < 0.6 ? "Near the Fed's 2% goal" : all.yoy > 2 ? "Above the Fed's 2% goal" : "Below the Fed's 2% goal"} — the driver of the USD and real-rate backdrop that coffee is priced against.`;
+};
+
+const retailCpi: Builder = async () => {
+  const d = await load<{ series?: Record<string, { name?: string; monthly?: { period: string; yoy_pct?: number | null }[] }> }>("/data/retail_cpi.json");
+  const us = cpiLatest(d?.series, "us_coffee") ?? cpiLatest(d?.series, "us");
+  const eu = cpiLatest(d?.series, "eu"); const br = cpiLatest(d?.series, "brazil");
+  if (!us) return null;
+  const entries: [string, { period: string; yoy: number } | null][] = [["US", us], ["EU", eu], ["Brazil", br]];
+  const parts = entries.filter((p) => p[1]).map(([n, v]) => `${n} **${pct(v!.yoy)}**`);
+  return `Retail coffee inflation (latest): ${parts.join(", ")} year-on-year. `
+    + `Shelf prices lag futures by months, so elevated retail inflation can weigh on consumer demand even after futures cool.`;
+};
+
+// ── Signals (quant_report.json / open_direction_history.json) ─────────────────
+const priceDirection: Builder = async () => {
+  const d = await load<{ open_direction?: { available?: boolean; direction?: string; prob_up?: number; for_session?: string } }>("/data/quant_report.json");
+  const od = d?.open_direction; if (!od?.available || od.prob_up == null) return null;
+  return `The open-direction model calls **${od.direction}** for ${od.for_session ?? "the next session"} with **P(up) ${(od.prob_up * 100).toFixed(0)}%**. `
+    + `A pre-open, out-of-sample classifier on COT positioning, DXY and price momentum — logged before the open, not backfit.`;
+};
+
+const openDirectionCalendar: Builder = async () => {
+  const rows = await load<{ hit?: boolean | null; status?: string }[]>("/data/open_direction_history.json");
+  if (!Array.isArray(rows) || !rows.length) return null;
+  const graded = rows.filter((r) => typeof r.hit === "boolean");
+  if (!graded.length) return null;
+  const hits = graded.filter((r) => r.hit === true).length;
+  return `Across **${graded.length}** graded sessions the open-direction model has a **${(hits / graded.length * 100).toFixed(0)}%** hit rate. `
+    + `Each call is logged pre-open and graded after the open — a forward, out-of-sample track record rather than an in-sample fit.`;
+};
+
+const robustaForecast: Builder = async () => {
+  const d = await load<{ robusta_factors?: { available?: boolean; prediction?: { direction?: string; delta_p?: number }; model?: { r_squared?: number; n_obs?: number } } }>("/data/quant_report.json");
+  const rf = d?.robusta_factors; if (!rf?.available) return null;
+  const p = rf.prediction ?? {}; const m = rf.model ?? {};
+  return `The multi-factor OLS model projects robusta **${p.direction}** with ΔP **${p.delta_p ?? "—"} USD/MT** over the next four weeks `
+    + `(R² ${m.r_squared != null ? m.r_squared.toFixed(2) : "—"}, n=${m.n_obs ?? "—"}). Positioning, DXY and momentum scored into a single price path.`;
+};
+
 // ── id → builder map ──────────────────────────────────────────────────────────
 const INSIGHTS: Record<string, Builder> = {
   // Futures
@@ -441,12 +599,17 @@ const INSIGHTS: Record<string, Builder> = {
   // Freight
   freight_spot: freightSpot,
   freight_evolution: freightEvolution,
+  port_activity: portActivity,
+  origin_freight_costs: originFreightCosts,
   // Supply — Brazil
   brazil_daily_registration: brazilDaily,
   brazil_monthly_volume: brazilMonthly,
   brazil_annual_trend: brazilAnnual,
   brazil_cumulative_pace: brazilPace,
   brazil_destination: brazilDest,
+  brazil_type_share: brazilTypeShare,
+  brazil_yoy_type: brazilYoyType,
+  brazil_seasonality: brazilSeasonality,
   brazil_supply_demand: supplyDemand("brazil", "Brazil"),
   brazil_weather_analogs: weatherAnalogs("brazil", "Brazil"),
   brazil_weather_pack: weatherPack("brazil", "Brazil"),
@@ -463,6 +626,8 @@ const INSIGHTS: Record<string, Builder> = {
   uganda_weather_pack: weatherPack("uganda", "Uganda"),
   indonesia_weather_pack: weatherPack("indonesia", "Indonesia"),
   enso_oni: enso,
+  enso_plume: ensoPlume,
+  enso_risk_table: ensoRiskTable,
   // Demand
   certified_stocks_tiles: certifiedTiles,
   certified_stocks_activity: certifiedActivity,
@@ -479,8 +644,15 @@ const INSIGHTS: Record<string, Builder> = {
   coffee_currency_index: currency,
   origin_farmgate_prices: farmgate,
   fertilizer_inputs: fertilizer,
+  fx_timeseries: fxTimeseries,
+  cross_commodity: crossCommodity,
+  us_cpi: usCpi,
+  retail_cpi: retailCpi,
+  // Macro — Signals
   news_sentiment: newsSentiment,
-  // Vietnam exports (cecafe-style not available — handled generically)
+  price_direction: priceDirection,
+  open_direction_calendar: openDirectionCalendar,
+  robusta_forecast: robustaForecast,
 };
 
 /**
