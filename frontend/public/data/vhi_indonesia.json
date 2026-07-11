@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T23:53:01+00:00",
+  "generated_at": "2026-07-11T23:42:22+00:00",
   "country_iso3": "IDN",
   "year_window": [
     2023,
@@ -9,19 +9,15 @@
     "Lampung": {
       "province_id": 25,
       "noaa_name": "Lampung",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 44.17,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 43.89,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 44.86
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 43.41
@@ -44,46 +40,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 42.71
+          "vhi": 42.56
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 42.78
+          "vhi": 42.56
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 43.68
+          "vhi": 43.32
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 44.04
+          "vhi": 43.42
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 44.06
+          "vhi": 43.19
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 44.17
+          "vhi": 43.21
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 43.89
         }
       ]
     },
     "Gayo": {
       "province_id": 1,
       "noaa_name": "Aceh",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 54.57,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 52.23,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 44.47
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 43.86
@@ -106,46 +102,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 46.78
+          "vhi": 46.45
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 48.2
+          "vhi": 47.51
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 50.06
+          "vhi": 48.96
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 52.24
+          "vhi": 50.75
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 53.69
+          "vhi": 51.93
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 54.57
+          "vhi": 53.18
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 52.23
         }
       ]
     },
     "Java": {
       "province_id": 30,
       "noaa_name": "East Java",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 48.81,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 48.6,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 44.65
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 44.88
@@ -168,46 +164,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 44.59
+          "vhi": 44.56
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 45.7
+          "vhi": 45.41
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 47.39
+          "vhi": 46.77
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 48.61
+          "vhi": 47.6
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 49.56
+          "vhi": 47.99
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 48.81
+          "vhi": 47.84
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 48.6
         }
       ]
     },
     "Toraja": {
       "province_id": 22,
       "noaa_name": "South Sulawesi",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 55.9,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 53.46,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 50.92
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 51.0
@@ -230,46 +226,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 53.27
+          "vhi": 51.92
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 51.97
+          "vhi": 50.45
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 52.11
+          "vhi": 50.14
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 53.07
+          "vhi": 50.2
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 54.79
+          "vhi": 50.4
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 55.9
+          "vhi": 51.21
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 53.46
         }
       ]
     },
     "Flores": {
       "province_id": 19,
       "noaa_name": "East Nusa Tenggara",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 45.64,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 44.81,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 45.83
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 45.76
@@ -292,27 +288,31 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 44.92
+          "vhi": 44.78
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 44.96
+          "vhi": 44.75
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 45.26
+          "vhi": 44.94
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 45.6
+          "vhi": 45.15
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 45.44
+          "vhi": 44.76
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 45.64
+          "vhi": 44.75
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 44.81
         }
       ]
     }

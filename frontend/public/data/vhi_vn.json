@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T23:53:09+00:00",
+  "generated_at": "2026-07-11T23:42:33+00:00",
   "country_iso3": "VNM",
   "year_window": [
     2023,
@@ -9,19 +9,15 @@
     "Dak Lak": {
       "province_id": 40,
       "noaa_name": "Dak Lak",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 55.65,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 54.77,
         "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 51.85
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 47.82
@@ -44,46 +40,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 50.13
+          "vhi": 49.34
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 49.55
+          "vhi": 48.54
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 50.23
+          "vhi": 48.74
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 51.51
+          "vhi": 49.28
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 53.24
+          "vhi": 49.87
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 55.65
+          "vhi": 51.08
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 54.77
         }
       ]
     },
     "Lam Dong": {
       "province_id": 44,
       "noaa_name": "Lam Dong",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 37.71,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 38.07,
         "severity": "stress"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 23.65
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 25.33
@@ -106,46 +102,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 31.32
+          "vhi": 30.63
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 31.25
+          "vhi": 30.36
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 32.12
+          "vhi": 30.83
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 33.35
+          "vhi": 31.37
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 35.34
+          "vhi": 32.35
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 37.71
+          "vhi": 34.44
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 38.07
         }
       ]
     },
     "Dak Nong": {
       "province_id": 42,
       "noaa_name": "Dak Nong",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 60.11,
-        "severity": "healthy"
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 57.13,
+        "severity": "fair"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 57.86
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 54.99
@@ -168,46 +164,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 54.72
+          "vhi": 53.88
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 55.87
+          "vhi": 54.73
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 56.73
+          "vhi": 55.12
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 57.51
+          "vhi": 55.12
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 58.69
+          "vhi": 55.13
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 60.11
+          "vhi": 54.88
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 57.13
         }
       ]
     },
     "Gia Lai": {
       "province_id": 38,
       "noaa_name": "Gia Lai",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 66.17,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 63.54,
         "severity": "healthy"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 66.72
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 67.38
@@ -230,46 +226,46 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 66.08
+          "vhi": 65.12
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 63.75
+          "vhi": 62.42
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 62.86
+          "vhi": 60.89
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 62.99
+          "vhi": 60.04
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 63.69
+          "vhi": 59.24
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 66.17
+          "vhi": 60.7
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 63.54
         }
       ]
     },
     "Kon Tum": {
       "province_id": 36,
       "noaa_name": "Kon Tum",
-      "weeks_in_window": 181,
+      "weeks_in_window": 182,
       "vhi_latest": {
         "year": 2026,
-        "week": 26,
-        "iso_week": "2026-W26",
-        "vhi": 64.47,
+        "week": 27,
+        "iso_week": "2026-W27",
+        "vhi": 64.97,
         "severity": "healthy"
       },
       "vhi_recent": [
-        {
-          "iso_week": "2026-W15",
-          "vhi": 56.46
-        },
         {
           "iso_week": "2026-W16",
           "vhi": 55.21
@@ -292,27 +288,31 @@
         },
         {
           "iso_week": "2026-W21",
-          "vhi": 52.84
+          "vhi": 52.43
         },
         {
           "iso_week": "2026-W22",
-          "vhi": 53.49
+          "vhi": 52.85
         },
         {
           "iso_week": "2026-W23",
-          "vhi": 54.42
+          "vhi": 53.41
         },
         {
           "iso_week": "2026-W24",
-          "vhi": 56.85
+          "vhi": 55.32
         },
         {
           "iso_week": "2026-W25",
-          "vhi": 60.22
+          "vhi": 58.11
         },
         {
           "iso_week": "2026-W26",
-          "vhi": 64.47
+          "vhi": 61.13
+        },
+        {
+          "iso_week": "2026-W27",
+          "vhi": 64.97
         }
       ]
     }
