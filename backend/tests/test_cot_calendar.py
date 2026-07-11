@@ -52,6 +52,29 @@ def test_no_release_midweek():
     assert release_due_on(date(2026, 7, 8))[0] is False
 
 
+def test_slipped_friday_cron_caught_on_saturday():
+    # The silent-skip fix: the Friday 07-10 release, run late so date.today() is
+    # Saturday 07-11. The 1-day grace makes it still-due as a catch-up.
+    due, tue, reason = release_due_on(date(2026, 7, 11))
+    assert due is True
+    assert tue == date(2026, 7, 7)
+    assert "catch-up" in reason
+
+
+def test_no_grace_leak_to_sunday():
+    # Grace is exactly 1 day: two days after the Friday 07-10 release (Sunday
+    # 07-12) is no longer due, so grace can't drift into the next week.
+    assert release_due_on(date(2026, 7, 12))[0] is False
+
+
+def test_slipped_holiday_monday_caught_on_tuesday():
+    # Juneteenth-shifted Monday 06-22 release, run late into Tuesday 06-23.
+    due, tue, reason = release_due_on(date(2026, 6, 23))
+    assert due is True
+    assert tue == date(2026, 6, 16)
+    assert "catch-up" in reason and "holiday-delayed" in reason
+
+
 def test_thanksgiving_week_delays_release():
     # Thanksgiving 2026 = Thu 11-26. Report Tue 11-24 → Wed 25, [Thu 26 holiday],
     # Fri 27, Mon 30 → release Monday 2026-11-30.

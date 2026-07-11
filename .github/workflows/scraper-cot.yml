@@ -8,7 +8,10 @@ on:
     # US-federal-holiday calendar, so on a normal week only Friday runs, and a
     # holiday-delayed release (e.g. Juneteenth on a Friday → release shifts to
     # Monday) is picked up automatically on the day it lands instead of waiting
-    # a full week. Non-release weekdays are cheap no-op skips.
+    # a full week. The gate carries a 1-day grace window: GH fires crons hours
+    # late, so the Friday 21:00 run often lands after midnight (Saturday on the
+    # runner) — grace lets that slipped run still catch the release instead of
+    # skipping the whole week. Non-release weekdays are cheap no-op skips.
     - cron: '0 21 * * 1-5'
   workflow_dispatch:
 

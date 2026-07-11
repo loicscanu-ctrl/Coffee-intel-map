@@ -115,16 +115,26 @@ def recent_report_tuesdays(today: date, weeks: int = 3) -> list[date]:
     return [latest - timedelta(weeks=i) for i in range(weeks)]
 
 
-def release_due_on(today: date) -> tuple[bool, date | None, str]:
-    """Is `today` the expected CFTC COT release day for a recent report?
+def release_due_on(today: date, grace_days: int = 1) -> tuple[bool, date | None, str]:
+    """Is a CFTC COT release due on `today` (or in the last `grace_days`)?
 
-    Returns (due, report_tuesday, reason). True on the normal Friday release and
-    on a holiday-shifted release day (e.g. the Monday after a Juneteenth Friday),
-    so the workflow can run on whichever day the data actually lands.
+    Returns (due, report_tuesday, reason). True on the release day itself — the
+    normal Friday, or a holiday-shifted business day (e.g. the Monday after a
+    Juneteenth Friday) — and, crucially, for up to `grace_days` *after* it.
+
+    The grace window fixes a silent-skip: GitHub schedules the gate at 21:00 UTC
+    but routinely fires crons hours late, so the Friday 21:00 run often executes
+    after midnight, when `date.today()` on the runner is already Saturday. With a
+    strict `release == today` check that Saturday run saw no due release and the
+    entire week's COT was skipped until the next Friday. The pull is idempotent
+    (the scraper's staleness guard no-ops when there's nothing new), so treating
+    the day(s) right after a release as still-due is safe: a slipped/late cron
+    catches up instead of missing the week, and an on-time run is unaffected.
     """
     for tue in recent_report_tuesdays(today):
         release = cot_release_date(tue)
-        if release == today:
+        gap = (today - release).days
+        if 0 <= gap <= grace_days:
             normal_friday = tue + timedelta(days=3)
             if release != normal_friday:
                 blockers = ", ".join(
@@ -132,13 +142,19 @@ def release_due_on(today: date) -> tuple[bool, date | None, str]:
                     for d in (tue + timedelta(days=i) for i in (1, 2, 3))
                     if (name := holiday_name(d))
                 )
-                reason = (f"holiday-delayed CFTC release for Tue {tue}: normal "
-                          f"Friday {normal_friday} shifted to {release}"
-                          + (f" by {blockers}" if blockers else ""))
+                base = (f"holiday-delayed CFTC release for Tue {tue}: normal "
+                        f"Friday {normal_friday} shifted to {release}"
+                        + (f" by {blockers}" if blockers else ""))
             else:
-                reason = f"normal Friday CFTC release for Tue {tue}"
+                base = f"normal Friday CFTC release for Tue {tue}"
+            if gap == 0:
+                reason = base
+            else:
+                reason = (f"catch-up {gap} day(s) after {base} "
+                          f"— release {release} likely missed by a slipped/late cron")
             return True, tue, reason
-    return False, None, f"no CFTC COT release expected on {today}"
+    return False, None, (f"no CFTC COT release expected on {today} "
+                         f"(checked release day + {grace_days}-day grace)")
 
 
 def next_report_overdue(last_ingested_tuesday: date, today: date) -> bool:
