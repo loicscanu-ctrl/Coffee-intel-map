@@ -233,17 +233,29 @@ def send_telegram(text: str) -> bool:
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[morning_brief] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set")
         return False
-    url  = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    resp = requests.post(url, data={
-        "chat_id":    TELEGRAM_CHAT_ID,
-        "text":       text,
-        "parse_mode": "HTML",
-    }, timeout=15)
-    if resp.ok:
-        print("[morning_brief] Telegram message sent OK")
-        return True
-    print(f"[morning_brief] Telegram error: {resp.status_code} {resp.text[:200]}")
-    return False
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    # Telegram rejects any sendMessage body over 4096 chars with HTTP 400, which
+    # used to make an over-long brief fail silently. Split on paragraph/line
+    # boundaries (well under the limit) and send the parts in order; the send
+    # only counts as success if every chunk is delivered.
+    chunks = _split_message(text)
+    if len(chunks) > 1:
+        print(f"[morning_brief] brief is {len(text)} chars — splitting into {len(chunks)} messages")
+    ok = True
+    for i, chunk in enumerate(chunks, 1):
+        resp = requests.post(url, data={
+            "chat_id":    TELEGRAM_CHAT_ID,
+            "text":       chunk,
+            "parse_mode": "HTML",
+        }, timeout=15)
+        if resp.ok:
+            label = f"part {i}/{len(chunks)}" if len(chunks) > 1 else "message"
+            print(f"[morning_brief] Telegram {label} sent OK")
+        else:
+            print(f"[morning_brief] Telegram error on part {i}/{len(chunks)}: "
+                  f"{resp.status_code} {resp.text[:200]}")
+            ok = False
+    return ok
 
 
 def main():
