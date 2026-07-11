@@ -276,7 +276,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=104.3]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=134.6]"
     },
     {
       "id": "AGRO_honduras_Copán_blossom_drop",
@@ -288,7 +288,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "honduras/Copán: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=58.9]"
+      "text": "honduras/Copán: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=62.8]"
     },
     {
       "id": "AGRO_uganda_Masaka_severe_defoliation",
@@ -348,7 +348,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=50.6]"
+      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=52.6]"
     },
     {
       "id": "AGRO_ethiopia_Kaffa_severe_defoliation",
@@ -363,6 +363,18 @@
       "text": "ethiopia/Kaffa: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=20.51, spei_3=-1.85]"
     },
     {
+      "id": "AGRO_ethiopia_Kaffa_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=62.4]"
+    },
+    {
       "id": "AGRO_vn_Lam_Dong_blossom_drop",
       "name": "Flowering Disruption / Blossom Drop",
       "category": "AGRO",
@@ -372,7 +384,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=61.6]"
+      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=52.8]"
     },
     {
       "id": "AGRO_vn_Dak_Nong_blossom_drop",
@@ -384,7 +396,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=128.9]"
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=92.2]"
     },
     {
       "id": "AGRO_vn_Gia_Lai_blossom_drop",
@@ -396,7 +408,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.06, forecast_7d_rain=164.4]"
+      "text": "vn/Gia Lai: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.06, forecast_7d_rain=129.9]"
     },
     {
       "id": "AGRO_vn_Kon_Tum_blossom_drop",
@@ -408,7 +420,19 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=112.0]"
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=86.6]"
+    },
+    {
+      "id": "AGRO_brazil_Sul_de_Minas_brazil_frost_risk",
+      "name": "Watch Frost Threat",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "brazil/Sul de Minas: Marginal frost risk on 2026-07-15: 2.7 °C canopy. Monitor overnight lows.  [type=none, surface_c=2.7, air_min_c=6.7, hours_below_0=0, date=2026-07-15]"
     }
   ],
   "history": [
@@ -3001,5 +3025,5 @@
       "priceLDN": 3872
     }
   ],
-  "generatedAt": "2026-07-10T22:05:44.194Z"
+  "generatedAt": "2026-07-11T04:55:25.685Z"
 }

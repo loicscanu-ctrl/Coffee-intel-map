@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T05:52:43+00:00",
+  "generated_at": "2026-07-11T04:55:25+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 104.3
+            "forecast_7d_rain": 134.6
           }
         }
       ]
@@ -27,7 +27,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.55,
-            "forecast_7d_rain": 58.9
+            "forecast_7d_rain": 62.8
           }
         }
       ]
@@ -96,7 +96,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.29,
-            "forecast_7d_rain": 50.6
+            "forecast_7d_rain": 52.6
           }
         }
       ],
@@ -111,6 +111,17 @@
             "vhi": 20.51,
             "spei_3": -1.85
           }
+        },
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.85,
+            "forecast_7d_rain": 62.4
+          }
         }
       ]
     },
@@ -124,7 +135,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.14,
-            "forecast_7d_rain": 61.6
+            "forecast_7d_rain": 52.8
           }
         }
       ],
@@ -137,7 +148,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.42,
-            "forecast_7d_rain": 128.9
+            "forecast_7d_rain": 92.2
           }
         }
       ],
@@ -150,7 +161,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.06,
-            "forecast_7d_rain": 164.4
+            "forecast_7d_rain": 129.9
           }
         }
       ],
@@ -163,21 +174,40 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 112.0
+            "forecast_7d_rain": 86.6
+          }
+        }
+      ]
+    },
+    "brazil": {
+      "Sul de Minas": [
+        {
+          "threat_id": "brazil_frost_risk",
+          "name": "Watch Frost Threat",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Marginal frost risk on 2026-07-15: 2.7 °C canopy. Monitor overnight lows.",
+          "triggers": {
+            "type": "none",
+            "surface_c": 2.7,
+            "air_min_c": 6.7,
+            "hours_below_0": 0,
+            "date": "2026-07-15"
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 12,
+    "total_alerts": 14,
     "by_severity": {
-      "watch": 7,
+      "watch": 9,
       "critical": 5
     },
     "by_threat": {
-      "blossom_drop": 7,
-      "severe_defoliation": 5
+      "blossom_drop": 8,
+      "severe_defoliation": 5,
+      "brazil_frost_risk": 1
     }
   }
 }
