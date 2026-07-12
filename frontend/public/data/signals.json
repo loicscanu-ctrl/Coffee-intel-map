@@ -276,7 +276,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=134.6]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=85.6]"
     },
     {
       "id": "AGRO_honduras_Copán_blossom_drop",
@@ -288,7 +288,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "honduras/Copán: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=62.8]"
+      "text": "honduras/Copán: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.55, forecast_7d_rain=52.0]"
     },
     {
       "id": "AGRO_uganda_Masaka_severe_defoliation",
@@ -300,7 +300,7 @@
       "timeframe": "current",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Masaka: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=32.38, spei_3=-2.74]"
+      "text": "uganda/Masaka: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=34.3, spei_3=-2.74]"
     },
     {
       "id": "AGRO_uganda_Kasese_severe_defoliation",
@@ -312,7 +312,7 @@
       "timeframe": "current",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Kasese: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=27.06, spei_3=-1.51]"
+      "text": "uganda/Kasese: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=25.3, spei_3=-1.51]"
     },
     {
       "id": "AGRO_uganda_Mbale_severe_defoliation",
@@ -324,7 +324,7 @@
       "timeframe": "current",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Mbale: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=23.6, spei_3=-2.16]"
+      "text": "uganda/Mbale: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=24.22, spei_3=-2.16]"
     },
     {
       "id": "AGRO_uganda_Mt_Elgon_severe_defoliation",
@@ -336,7 +336,7 @@
       "timeframe": "current",
       "score": 0,
       "magnitude": "medium",
-      "text": "uganda/Mt Elgon: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=23.6, spei_3=-2.09]"
+      "text": "uganda/Mt Elgon: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=24.22, spei_3=-2.09]"
     },
     {
       "id": "AGRO_ethiopia_Limu_blossom_drop",
@@ -348,7 +348,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=52.6]"
+      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=54.0]"
     },
     {
       "id": "AGRO_ethiopia_Kaffa_severe_defoliation",
@@ -360,31 +360,7 @@
       "timeframe": "current",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Kaffa: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=20.51, spei_3=-1.85]"
-    },
-    {
-      "id": "AGRO_ethiopia_Kaffa_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=62.4]"
-    },
-    {
-      "id": "AGRO_vn_Lam_Dong_blossom_drop",
-      "name": "Flowering Disruption / Blossom Drop",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=52.8]"
+      "text": "ethiopia/Kaffa: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=20.55, spei_3=-1.85]"
     },
     {
       "id": "AGRO_vn_Dak_Nong_blossom_drop",
@@ -396,7 +372,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=92.2]"
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=98.3]"
     },
     {
       "id": "AGRO_vn_Gia_Lai_blossom_drop",
@@ -420,19 +396,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=86.6]"
-    },
-    {
-      "id": "AGRO_brazil_Sul_de_Minas_brazil_frost_risk",
-      "name": "Watch Frost Threat",
-      "category": "AGRO",
-      "categoryLabel": "Agronomic",
-      "market": "PHYS",
-      "severity": "watch",
-      "timeframe": "forecast",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "brazil/Sul de Minas: Marginal frost risk on 2026-07-15: 2.7 °C canopy. Monitor overnight lows.  [type=none, surface_c=2.7, air_min_c=6.7, hours_below_0=0, date=2026-07-15]"
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=71.9]"
     }
   ],
   "history": [
@@ -3025,5 +2989,5 @@
       "priceLDN": 3872
     }
   ],
-  "generatedAt": "2026-07-11T05:29:47.869Z"
+  "generatedAt": "2026-07-12T05:07:03.010Z"
 }

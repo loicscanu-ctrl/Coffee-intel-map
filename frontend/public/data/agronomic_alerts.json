@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T04:55:25+00:00",
+  "generated_at": "2026-07-12T05:07:03+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 134.6
+            "forecast_7d_rain": 85.6
           }
         }
       ]
@@ -27,7 +27,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.55,
-            "forecast_7d_rain": 62.8
+            "forecast_7d_rain": 52.0
           }
         }
       ]
@@ -41,7 +41,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 32.38,
+            "vhi": 34.3,
             "spei_3": -2.74
           }
         }
@@ -54,7 +54,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 27.06,
+            "vhi": 25.3,
             "spei_3": -1.51
           }
         }
@@ -67,7 +67,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 23.6,
+            "vhi": 24.22,
             "spei_3": -2.16
           }
         }
@@ -80,7 +80,7 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 23.6,
+            "vhi": 24.22,
             "spei_3": -2.09
           }
         }
@@ -96,7 +96,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.29,
-            "forecast_7d_rain": 52.6
+            "forecast_7d_rain": 54.0
           }
         }
       ],
@@ -108,37 +108,13 @@
           "timeframe": "current",
           "market_impact": "Irreversible yield reduction likely. Bean size shrinkage.",
           "triggers": {
-            "vhi": 20.51,
+            "vhi": 20.55,
             "spei_3": -1.85
-          }
-        },
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.85,
-            "forecast_7d_rain": 62.4
           }
         }
       ]
     },
     "vn": {
-      "Lam Dong": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.14,
-            "forecast_7d_rain": 52.8
-          }
-        }
-      ],
       "Dak Nong": [
         {
           "threat_id": "blossom_drop",
@@ -148,7 +124,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.42,
-            "forecast_7d_rain": 92.2
+            "forecast_7d_rain": 98.3
           }
         }
       ],
@@ -174,40 +150,21 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 86.6
-          }
-        }
-      ]
-    },
-    "brazil": {
-      "Sul de Minas": [
-        {
-          "threat_id": "brazil_frost_risk",
-          "name": "Watch Frost Threat",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Marginal frost risk on 2026-07-15: 2.7 °C canopy. Monitor overnight lows.",
-          "triggers": {
-            "type": "none",
-            "surface_c": 2.7,
-            "air_min_c": 6.7,
-            "hours_below_0": 0,
-            "date": "2026-07-15"
+            "forecast_7d_rain": 71.9
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 14,
+    "total_alerts": 11,
     "by_severity": {
-      "watch": 9,
+      "watch": 6,
       "critical": 5
     },
     "by_threat": {
-      "blossom_drop": 8,
-      "severe_defoliation": 5,
-      "brazil_frost_risk": 1
+      "blossom_drop": 6,
+      "severe_defoliation": 5
     }
   }
 }
