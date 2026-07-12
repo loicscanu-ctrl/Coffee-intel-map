@@ -1,7 +1,7 @@
 {
   "country": "brazil",
   "season": "2026/27",
-  "scraped_at": "2026-07-12T05:44:47.278779Z",
+  "scraped_at": "2026-07-12T06:08:45.263019Z",
   "cost": {
     "total_usd_per_bag": 222.7,
     "yoy_pct": 0.0,
@@ -2930,56 +2930,56 @@
     "items": [
       {
         "name": "Urea (N)",
-        "price_usd_mt": 558.0,
-        "mom_pct": -3.0,
+        "price_usd_mt": 578.0,
+        "mom_pct": 3.6,
         "sparkline": [
-          401.0,
           393.0,
           398.0,
           407.0,
           486.0,
           575.0,
-          558.0
+          558.0,
+          578.0
         ],
         "input_weight": 0.35,
         "base_usd_per_bag": 18.9
       },
       {
         "name": "MAP (P)",
-        "price_usd_mt": 699.0,
-        "mom_pct": 2.0,
+        "price_usd_mt": 759.0,
+        "mom_pct": 8.6,
         "sparkline": [
-          561.0,
           551.0,
           561.0,
           639.0,
           651.0,
           685.0,
-          699.0
+          699.0,
+          759.0
         ],
         "input_weight": 0.2,
         "base_usd_per_bag": 10.8
       },
       {
         "name": "KCl (K)",
-        "price_usd_mt": 343.0,
-        "mom_pct": 3.0,
+        "price_usd_mt": 351.0,
+        "mom_pct": 2.3,
         "sparkline": [
-          321.0,
           322.0,
           317.0,
           334.0,
           328.0,
           333.0,
-          343.0
+          343.0,
+          351.0
         ],
         "input_weight": 0.25,
         "base_usd_per_bag": 13.5
       }
     ],
-    "prices_as_of": "May-2026",
+    "prices_as_of": "Jun-2026",
     "imports": {
-      "last_updated": "2026-06-12",
+      "last_updated": "2026-07-12",
       "monthly": [
         {
           "month": "2024-01",
@@ -3391,8 +3391,8 @@
           "as_kt": 383.0,
           "superp_kt": 266.1,
           "map_dap_kt": 171.0,
-          "total_kt": 2336.5,
-          "total_fob_usd_m": 813.82,
+          "total_kt": 2336.7,
+          "total_fob_usd_m": 813.88,
           "urea_price_usd_mt": 407.0,
           "kcl_price_usd_mt": 334.0,
           "map_dap_price_usd_mt": 637.0
@@ -3408,7 +3408,7 @@
           "superp_kt": 606.7,
           "map_dap_kt": 355.6,
           "total_kt": 3424.3,
-          "total_fob_usd_m": 1310.58,
+          "total_fob_usd_m": 1310.59,
           "urea_price_usd_mt": 486.0,
           "kcl_price_usd_mt": 328.0,
           "map_dap_price_usd_mt": 652.0
@@ -3416,15 +3416,15 @@
         {
           "month": "2026-04",
           "urea_kt": 257.6,
-          "kcl_kt": 1280.7,
-          "map_kt": 253.5,
+          "kcl_kt": 1281.0,
+          "map_kt": 253.6,
           "dap_kt": 7.7,
           "an_kt": 62.0,
           "as_kt": 351.0,
-          "superp_kt": 505.2,
-          "map_dap_kt": 261.2,
-          "total_kt": 3216.3,
-          "total_fob_usd_m": 1264.18,
+          "superp_kt": 493.2,
+          "map_dap_kt": 261.3,
+          "total_kt": 3168.0,
+          "total_fob_usd_m": 1249.95,
           "urea_price_usd_mt": 575.0,
           "kcl_price_usd_mt": 333.0,
           "map_dap_price_usd_mt": 685.0
@@ -3432,18 +3432,34 @@
         {
           "month": "2026-05",
           "urea_kt": 121.8,
-          "kcl_kt": 1438.4,
-          "map_kt": 217.8,
+          "kcl_kt": 1440.8,
+          "map_kt": 218.5,
           "dap_kt": 0.0,
           "an_kt": 0.0,
-          "as_kt": 350.6,
-          "superp_kt": 542.3,
-          "map_dap_kt": 217.8,
-          "total_kt": 3208.8,
-          "total_fob_usd_m": 1274.78,
+          "as_kt": 350.7,
+          "superp_kt": 543.3,
+          "map_dap_kt": 218.6,
+          "total_kt": 3205.2,
+          "total_fob_usd_m": 1275.24,
           "urea_price_usd_mt": 558.0,
           "kcl_price_usd_mt": 343.0,
           "map_dap_price_usd_mt": 699.0
+        },
+        {
+          "month": "2026-06",
+          "urea_kt": 195.5,
+          "kcl_kt": 1411.8,
+          "map_kt": 489.0,
+          "dap_kt": 3.1,
+          "an_kt": 7.5,
+          "as_kt": 313.6,
+          "superp_kt": 560.3,
+          "map_dap_kt": 492.1,
+          "total_kt": 3313.0,
+          "total_fob_usd_m": 1462.36,
+          "urea_price_usd_mt": 578.0,
+          "kcl_price_usd_mt": 351.0,
+          "map_dap_price_usd_mt": 760.0
         }
       ]
     },
