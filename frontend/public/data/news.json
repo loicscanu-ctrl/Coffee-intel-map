@@ -1,5 +1,58 @@
 [
   {
+    "id": 8086,
+    "title": "CONAB Production Cost Conilon \u2013 2026/27",
+    "body": null,
+    "source": "CONAB Custos Conilon",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "conab",
+      "supply",
+      "brazil",
+      "cost",
+      "conilon"
+    ],
+    "meta": "{\"season\": \"2026/27\", \"total_brl_per_bag\": 649.57263, \"prev_total_brl_per_bag\": 649.57263, \"brl_usd\": 5.0, \"components_brl\": [{\"label\": \"Labor\", \"brl\": 216.58, \"color\": \"#22c55e\"}, {\"label\": \"Admin\", \"brl\": 13.63, \"color\": \"#475569\"}, {\"label\": \"Inputs\", \"brl\": 108.3, \"color\": \"#3b82f6\"}, {\"label\": \"Mechanization\", \"brl\": 1.76, \"color\": \"#f59e0b\"}, {\"label\": \"Land rent\", \"brl\": 4.94, \"color\": \"#8b5cf6\"}], \"inputs_detail_brl\": [], \"source_label\": \"CONAB Custos Conilon Jul 2026\"}",
+    "pub_date": "2026-07-12T05:27:57.766141"
+  },
+  {
+    "id": 8085,
+    "title": "CONAB Production Cost Arabica \u2013 2026/27",
+    "body": null,
+    "source": "CONAB Custos",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "conab",
+      "supply",
+      "brazil",
+      "cost",
+      "arabica"
+    ],
+    "meta": "{\"season\": \"2026/27\", \"total_brl_per_bag\": 1113.46796, \"prev_total_brl_per_bag\": 1113.46796, \"brl_usd\": 5.0, \"components_brl\": [{\"label\": \"Mechanization\", \"brl\": 49.05, \"color\": \"#f59e0b\"}, {\"label\": \"Labor\", \"brl\": 453.98, \"color\": \"#22c55e\"}, {\"label\": \"Admin\", \"brl\": 28.3, \"color\": \"#475569\"}, {\"label\": \"Inputs\", \"brl\": 217.03, \"color\": \"#3b82f6\"}, {\"label\": \"Land rent\", \"brl\": 59.97, \"color\": \"#8b5cf6\"}], \"inputs_detail_brl\": [], \"source_label\": \"CONAB Custos Arabica Jul 2026\"}",
+    "pub_date": "2026-07-12T05:27:53.563999"
+  },
+  {
+    "id": 8084,
+    "title": "CONAB Acreage Yield \u2013 2026/27",
+    "body": null,
+    "source": "CONAB Safra",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "conab",
+      "supply",
+      "brazil",
+      "acreage"
+    ],
+    "meta": "{\"season\": \"2026/27\", \"harvested_area_kha\": 1940.3, \"prev_area_kha\": 1940.3, \"yield_bags_ha\": 34.38, \"prev_yield_bags_ha\": 34.38, \"source_label\": \"CONAB Safra Jul 2026\"}",
+    "pub_date": "2026-07-12T05:27:45.964144"
+  },
+  {
     "id": 8083,
     "title": "Ethiopia Agronomic Status \u2013 2026-07-12",
     "body": "Agronomic Status Update: Ethiopia (Jimma, Limu, Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 114mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 33.4.",
@@ -3962,83 +4015,5 @@
     ],
     "meta": "https://sprudge.com/is-this-the-coolest-custom-la-marzocco-linea-ever-1138051.html",
     "pub_date": "2026-07-02T12:00:40"
-  },
-  {
-    "id": 7635,
-    "title": "Ethiopia Agronomic Status \u2013 2026-07-02",
-    "body": "Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 21.7.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 9.15,
-    "lng": 40.49,
-    "tags": [
-      "weather",
-      "ethiopia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 1, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 21.7.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-07-02T05:48:54.433416",
-    "commentary": {
-      "text": "Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 21.7.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Bullish",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Ethiopia: 1 growing region flagged at agronomic risk"
-  },
-  {
-    "id": 7634,
-    "title": "Uganda Agronomic Status \u2013 2026-07-02",
-    "body": "Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 58mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.5.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 1.37,
-    "lng": 32.29,
-    "tags": [
-      "weather",
-      "uganda",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"uganda\", \"evaluation\": {\"at_risk_count\": 2, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 58mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.5.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-07-02T05:48:53.972503",
-    "commentary": {
-      "text": "Agronomic Status Update: Uganda (Mbale, Mt Elgon) is currently flagged as at drought risk. Forecasted rainfall of 58mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 30.5.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Bullish",
-    "sentiment_confidence": 88.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Uganda: 2 growing regions flagged at agronomic risk"
-  },
-  {
-    "id": 7633,
-    "title": "Indonesia Agronomic Status \u2013 2026-07-02",
-    "body": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": -2.55,
-    "lng": 118.01,
-    "tags": [
-      "weather",
-      "indonesia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"indonesia\", \"evaluation\": {\"at_risk_count\": 0, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-07-02T05:48:53.512871",
-    "commentary": {
-      "text": "Agronomic Status Update: Indonesia (Lampung, Gayo, Java, Toraja, Flores) is currently flagged as normal.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Neutral",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Indonesia: no regions flagged at risk"
   }
 ]

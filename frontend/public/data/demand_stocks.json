@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T05:29:41.243900Z",
+  "generated_at": "2026-07-12T05:45:10.473836Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -7195,8 +7195,8 @@
       "name": "Brazil",
       "latest_year": "2025",
       "consumption_mt": 1336800,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 212812405,
+      "per_capita_kg": 6.28,
       "annual": [
         {
           "year": "1960",
@@ -8629,8 +8629,8 @@
       "name": "Vietnam",
       "latest_year": "2025",
       "consumption_mt": 294000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 101598527,
+      "per_capita_kg": 2.89,
       "annual": [
         {
           "year": "1960",
@@ -10063,8 +10063,8 @@
       "name": "Ethiopia",
       "latest_year": "2025",
       "consumption_mt": 222000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 135472051,
+      "per_capita_kg": 1.64,
       "annual": [
         {
           "year": "1960",
@@ -10667,8 +10667,8 @@
       "name": "South Korea",
       "latest_year": "2025",
       "consumption_mt": 204000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 51684564,
+      "per_capita_kg": 3.95,
       "annual": [
         {
           "year": "2002",
@@ -11723,8 +11723,8 @@
       "name": "India",
       "latest_year": "2025",
       "consumption_mt": 81600,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 1463865525,
+      "per_capita_kg": 0.06,
       "annual": [
         {
           "year": "1960",
@@ -12327,8 +12327,8 @@
       "name": "Egypt",
       "latest_year": "2025",
       "consumption_mt": 60000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 118365995,
+      "per_capita_kg": 0.51,
       "annual": [
         {
           "year": "2002",
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-07-11",
+    "last_updated": "2026-07-12",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12565,17 +12565,41 @@
         "latest_year": "2025",
         "latest_population": 123366734
       },
+      "usa": {
+        "name": "United States",
+        "iso3": "USA",
+        "latest_year": "2025",
+        "latest_population": 341784857
+      },
       "china": {
         "name": "China",
         "iso3": "CHN",
         "latest_year": "2025",
         "latest_population": 1406585000
       },
+      "india": {
+        "name": "India",
+        "iso3": "IND",
+        "latest_year": "2025",
+        "latest_population": 1463865525
+      },
+      "brazil": {
+        "name": "Brazil",
+        "iso3": "BRA",
+        "latest_year": "2025",
+        "latest_population": 212812405
+      },
       "indonesia": {
         "name": "Indonesia",
         "iso3": "IDN",
         "latest_year": "2025",
         "latest_population": 285721236
+      },
+      "vietnam": {
+        "name": "Vietnam",
+        "iso3": "VNM",
+        "latest_year": "2025",
+        "latest_population": 101598527
       },
       "russia": {
         "name": "Russia",
@@ -12600,6 +12624,24 @@
         "iso3": "PHL",
         "latest_year": "2025",
         "latest_population": 116786962
+      },
+      "egypt": {
+        "name": "Egypt",
+        "iso3": "EGY",
+        "latest_year": "2025",
+        "latest_population": 118365995
+      },
+      "korea": {
+        "name": "South Korea",
+        "iso3": "KOR",
+        "latest_year": "2025",
+        "latest_population": 51684564
+      },
+      "ethiopia": {
+        "name": "Ethiopia",
+        "iso3": "ETH",
+        "latest_year": "2025",
+        "latest_population": 135472051
       }
     }
   },
