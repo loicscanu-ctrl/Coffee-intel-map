@@ -91,6 +91,7 @@ def export_farmer_economics(db) -> None:
         if latest_by_region:
             regions_out           = []
             daily_frost_out       = []
+            frost_drivers_out     = []
             daily_drought_out     = []
             drought_detail_out    = []
             current_conditions_out= []
@@ -148,6 +149,35 @@ def export_farmer_economics(db) -> None:
                 drought_days = [d.get("drought_risk", "-") for d in daily]
                 if any(c != "-" for c in frost_days):
                     daily_frost_out.append({"region": region_name, "days": frost_days})
+
+                # Full per-day frost variable trend for EVERY region (even
+                # frost-free ones), so the UI can show how close each region
+                # runs to a freeze across the 14-day forecast. Each day carries
+                # the physics the model actually keyed on + the same severity
+                # tier the alert engine fires, computed here so the table and
+                # the Telegram alert can never disagree.
+                frost_drivers_out.append({
+                    "region": region_name,
+                    "days": [
+                        {
+                            "date":             d.get("date", ""),
+                            "risk":             d.get("frost_risk", "-"),
+                            "frost_type":       d.get("frost_type", "none"),
+                            "severity":         _fm.severity(
+                                d.get("frost_risk", "-"), d.get("frost_type", "none"),
+                                d.get("frost_surface_c"), d.get("frost_hours_below_0", 0),
+                            ),
+                            "canopy_c":         d.get("frost_surface_c"),
+                            "air_min_c":        d.get("frost_air_min_c"),
+                            "dew_c":            d.get("dew_point"),
+                            "cloud_pct":        d.get("cloud_cover"),
+                            "wind_kmh":         d.get("wind_speed"),
+                            "hours_below_0":    d.get("frost_hours_below_0", 0),
+                            "hours_below_hard": d.get("frost_hours_below_hard"),
+                        }
+                        for d in daily
+                    ],
+                })
                 if any(c != "-" for c in drought_days):
                     daily_drought_out.append({"region": region_name, "days": drought_days})
                     drought_detail_out.append({
@@ -178,6 +208,7 @@ def export_farmer_economics(db) -> None:
                     "scraped_at":         scraped_at_out or date.today().isoformat(),
                     "regions":            regions_out,
                     "daily_frost":        daily_frost_out,
+                    "frost_drivers":      frost_drivers_out,
                     "daily_drought":      daily_drought_out,
                     "drought_detail":     drought_detail_out,
                     "current_conditions": current_conditions_out,

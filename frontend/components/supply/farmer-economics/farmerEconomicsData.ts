@@ -55,6 +55,27 @@ export interface DroughtDayDetail {
   drought_risk: DayRisk;
 }
 
+// One forecast day's full frost physics for a region — the variables the model
+// keyed on, so the 14-day frost grid can expand into a per-variable trend.
+export interface FrostDayDetail {
+  date: string;
+  risk: DayRisk;
+  frost_type: "none" | "radiative" | "advective" | "black";
+  severity: "critical" | "alert" | "watch" | null;
+  canopy_c: number | null;         // estimated canopy/grass-minimum (°C)
+  air_min_c: number | null;        // 2 m air minimum (°C)
+  dew_c: number | null;            // mean dew point (°C)
+  cloud_pct: number | null;        // mean cloud cover (%)
+  wind_kmh: number | null;         // peak 10 m wind (km/h)
+  hours_below_0: number;           // hours canopy below freezing
+  hours_below_hard: number | null; // hours below the −2 °C hard-freeze line
+}
+
+export interface FrostDetailRow {
+  region: string;
+  days: FrostDayDetail[];  // length 14
+}
+
 export interface DroughtDetailRow {
   region: string;
   days: DroughtDayDetail[];
@@ -188,6 +209,7 @@ export interface FarmerEconomicsData {
     scraped_at: string;
     regions: WeatherRegion[];
     daily_frost: DailyRiskRow[];
+    frost_drivers?: FrostDetailRow[];
     daily_drought: DailyRiskRow[];
     drought_detail?: DroughtDetailRow[];
     current_conditions: CurrentCondition[];
