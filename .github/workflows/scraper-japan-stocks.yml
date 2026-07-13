@@ -7,7 +7,12 @@ name: "3.5 – AJCA (Japan)"
 
 on:
   schedule:
-    - cron: "0 5 6 * *"   # 6th of each month, 05:00 UTC
+    # Weekly (Sun 05:07 UTC, off the :00 mark per repo cron convention). AJCA
+    # posts a month's PDFs at an unpredictable point ~5–9 weeks after the
+    # period; the old monthly-on-the-6th cron could ingest a fresh PDF up to
+    # ~5 weeks late. Weekly caps that lag at 7 days — one HTML page + one PDF
+    # per run, so the extra runs are negligible.
+    - cron: "7 5 * * 0"
   workflow_dispatch:
     inputs:
       debug:
