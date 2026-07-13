@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T05:07:03+00:00",
+  "generated_at": "2026-07-13T05:25:37+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
     "colombia": {
@@ -12,7 +12,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.2,
-            "forecast_7d_rain": 85.6
+            "forecast_7d_rain": 78.1
           }
         }
       ]
@@ -87,19 +87,6 @@
       ]
     },
     "ethiopia": {
-      "Limu": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.29,
-            "forecast_7d_rain": 54.0
-          }
-        }
-      ],
       "Kaffa": [
         {
           "threat_id": "severe_defoliation",
@@ -124,7 +111,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.42,
-            "forecast_7d_rain": 98.3
+            "forecast_7d_rain": 68.9
           }
         }
       ],
@@ -137,7 +124,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.06,
-            "forecast_7d_rain": 129.9
+            "forecast_7d_rain": 90.5
           }
         }
       ],
@@ -150,20 +137,20 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.99,
-            "forecast_7d_rain": 71.9
+            "forecast_7d_rain": 54.2
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 11,
+    "total_alerts": 10,
     "by_severity": {
-      "watch": 6,
+      "watch": 5,
       "critical": 5
     },
     "by_threat": {
-      "blossom_drop": 6,
+      "blossom_drop": 5,
       "severe_defoliation": 5
     }
   }
