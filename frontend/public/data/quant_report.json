@@ -228,23 +228,41 @@
       }
     ]
   },
-  "scraped_at": "2026-07-13T22:28:19.799819+00:00",
+  "scraped_at": "2026-07-13T22:28:49.415231Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-10T22:32:38.147054Z",
+    "scraped_at": "2026-07-13T22:28:48.316108Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 89.0,
-    "net_index": 23.7,
+    "overall_confidence": 87.5,
+    "net_index": 17.5,
     "bull_count": 2,
     "bear_count": 0,
-    "neutral_count": 5,
-    "total": 7,
+    "neutral_count": 6,
+    "total": 8,
     "items": [
+      {
+        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The Dog Days Of Coffee Are Here",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 85.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
         "source": "Sprudge",
         "sentiment": "Bullish",
-        "confidence": 88.0,
+        "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
@@ -253,7 +271,7 @@
         "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +280,7 @@
         "headline": "The Afternoon Coffee Crash Is A Myth",
         "source": "Sprudge",
         "sentiment": "Bullish",
-        "confidence": 78.0,
+        "confidence": 65.0,
         "tags": [
           "sprudge"
         ]
@@ -271,7 +289,7 @@
         "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 92.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +298,7 @@
         "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 70.0,
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -290,15 +308,6 @@
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Life Is Like A Curated Selection Of Coffees, You Never Know What You\u2019re Going To Get",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 98.0,
         "tags": [
           "sprudge"
         ]
