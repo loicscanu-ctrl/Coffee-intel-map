@@ -1,5 +1,57 @@
 [
   {
+    "id": 8128,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-07-09",
+    "body": "ICE-EU RC Open Interest changed by +1,290 over the last session, with +23,476 on nearby two contracts and -22,186 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-07-09\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +1,290 over the last session, with +23,476 on nearby two contracts and -22,186 on forward contracts. Technical view: PRICE UP, LONG BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-13T04:54:54.315193",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +1,290 over the last session, with +23,476 on nearby two contracts and -22,186 on forward contracts. Technical view: PRICE UP, LONG BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 8127,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-07-09",
+    "body": "IFUS KC Open Interest changed by -1,028 over the last session, with -433 on nearby two contracts and -595 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-07-09\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -1,028 over the last session, with -433 on nearby two contracts and -595 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-13T04:54:52.209849",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -1,028 over the last session, with -433 on nearby two contracts and -595 on forward contracts. Technical view: PRICE UP, SHORT LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
     "id": 8126,
     "title": "World Bank Population \u2013 2026-07-13",
     "body": "Tracked 14 countries for demand-tab per-capita normalization.",
@@ -3959,35 +4011,5 @@
     ],
     "meta": null,
     "pub_date": "2026-07-03T04:54:24.266054"
-  },
-  {
-    "id": 7660,
-    "title": "USD/UGX FX Rate \u2013 2026-07-03",
-    "body": "USD/UGX FX Rate price: 3645",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "fx",
-      "uganda"
-    ],
-    "meta": null,
-    "pub_date": "2026-07-03T04:54:02.157097"
-  },
-  {
-    "id": 7659,
-    "title": "USD/HNL FX Rate \u2013 2026-07-03",
-    "body": "USD/HNL FX Rate price: 26.7167",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-07-03T04:54:01.261832"
   }
 ]
