@@ -346,7 +346,7 @@ def test_price_swing_guard_handles_brazilian_format():
     """Regression: CON T7 is Brazilian-formatted ('.' thousands, ',' decimal).
     A move from 980,00 to 1.050,00 BRL is +7%, not a spurious ~100% swing that
     would freeze latest_prices.json (see the June-2026 ticker freeze)."""
-    from scraper.validate_export import price_swing_guard, _first_number
+    from scraper.validate_export import _first_number, price_swing_guard
     assert _first_number("980,00 BRL ($3,158)") == 980.0
     assert _first_number("1.050,00 BRL ($3,383)") == 1050.0
     assert _first_number("100.000 VND ($1,234)") == 100000.0   # BR-style thousands
@@ -451,6 +451,7 @@ def test_safe_write_json_no_validator_writes_atomically(tmp_path):
 
 def test_safe_write_json_trailing_newline_and_format(tmp_path):
     import json
+
     from scraper.validate_export import safe_write_json
     p = tmp_path / "y.json"
     safe_write_json(p, {"k": "é"}, ensure_ascii=False, trailing_newline=True)

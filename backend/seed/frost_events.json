@@ -1,5 +1,5 @@
 {
-  "_note": "Catalogue of the major damaging frost events in the Brazilian arabica belt. Used by scraper.rules.frost_model's backtest/sanity harness to check the severity ladder classifies the historic disasters as 'critical', and by the frontend frost view for historical context. `observed_air_min_c` is a REPRESENTATIVE 2 m air minimum reported for the worst-hit region on the peak night (screen-height; the canopy/grass minimum ran several deg colder). `mechanism` is from the meteorological record of the event. These are well-established figures; precise per-station minima vary. The blind ERA5 backtest (recomputing the model from the raw hourly archive) has been run — scraper.backfill_frost_backtest --mode events, on GitHub Actions where archive-api.open-meteo.com is reachable. It confirmed the ladder fires 'critical' on every genuinely-cold ERA5 input; the remaining misses are ERA5's ~31 km grid reading several °C warmer than these station minima (grid-smoothed valley cold-pools), not threshold errors — so `expected_severity` is the disaster's real-world severity, which ERA5 under-resolves at some centroid points.",
+  "_note": "Catalogue of the major damaging frost events in the Brazilian arabica belt. Used by scraper.rules.frost_model's backtest/sanity harness to check the severity ladder classifies the historic disasters as 'critical', and by the frontend frost view for historical context. `observed_air_min_c` is a REPRESENTATIVE 2 m air minimum reported for the worst-hit region on the peak night (screen-height; the canopy/grass minimum ran several deg colder). `mechanism` is from the meteorological record of the event. `frost_areas` pins each event to the SPECIFIC municipalities the historical record reports as frost-hit (the 'appointed frost area'), with lat/lon, so the blind backtest samples where the damage actually occurred rather than a regional-mean centroid that averages the valley cold-pool away. The blind ERA5 backtest (scraper.backfill_frost_backtest --mode events, on GitHub Actions where archive-api.open-meteo.com is reachable) samples those points from ERA5-Land (~9 km — it resolves the cold-pooling that the ~31 km ERA5 grid smooths out) and checks the ladder fires 'critical'. Coordinates are the reported frost municipalities; where even ERA5-Land reads mild at a point, the reanalysis still under-resolves that specific hollow — not a threshold error, and never a reason to loosen the ladder.",
   "events": [
     {
       "id": "1975-black-frost",
@@ -9,8 +9,13 @@
       "observed_air_min_c": -4.0,
       "mechanism": "black",
       "expected_severity": "critical",
+      "frost_areas": [
+        {"region": "Paraná",       "site": "Londrina",                  "lat": -23.31, "lon": -50.62, "obs_air_min_c": -3.5, "note": "Epicentre; ~900 M trees killed. Recorded -3.5 C air."},
+        {"region": "São Paulo",    "site": "Ourinhos",                  "lat": -22.97, "lon": -49.87, "obs_air_min_c": -3.0, "note": "Southern SP near the PR border, hard-hit in 1975."},
+        {"region": "Sul de Minas", "site": "São Sebastião do Paraíso",  "lat": -20.92, "lon": -46.99, "note": "SW Sul de Minas — the northern reach of the 1975 air mass; Paraná was the epicentre."}
+      ],
       "crop_impact": "Catastrophic: on the order of 70% of Brazil's coffee trees killed; permanent collapse of Paraná as the leading producing state. Arabica prices roughly tripled through 1976-77. A dry hard freeze under a polar air mass — literally the 'black frost'.",
-      "source": "Widely documented; the benchmark Brazilian frost disaster."
+      "source": "Widely documented; the benchmark Brazilian frost disaster. Londrina -3.5 C; parts of SP -3 C."
     },
     {
       "id": "1994-double-frost",
@@ -20,8 +25,13 @@
       "observed_air_min_c": -3.0,
       "mechanism": "radiative",
       "expected_severity": "critical",
+      "frost_areas": [
+        {"region": "Paraná",       "site": "Londrina", "lat": -23.31, "lon": -50.62, "note": "First frost (26-27 Jun) hit PR/SP hardest."},
+        {"region": "São Paulo",    "site": "Franca",   "lat": -20.54, "lon": -47.40, "note": "Alta Mogiana; hit in both waves."},
+        {"region": "Sul de Minas", "site": "Guaxupé",  "lat": -21.30, "lon": -46.71, "note": "Cooxupé heartland; the second (July) frost pushed north into Sul de Minas / Cerrado."}
+      ],
       "crop_impact": "Two frosts ~two weeks apart devastated the 1995 crop; the worst since 1975. Arabica prices spiked well over 100%.",
-      "source": "Widely documented; drove the mid-1990s price spike."
+      "source": "Widely documented; drove the mid-1990s price spike. Marengo et al. (1997), Mon. Wea. Rev., analyse the 26 Jun 1994 cold surge."
     },
     {
       "id": "2021-july-frosts",
@@ -31,8 +41,14 @@
       "observed_air_min_c": -1.5,
       "mechanism": "radiative",
       "expected_severity": "critical",
-      "crop_impact": "Strong polar air mass; clear, calm radiative nights drove canopy minima well below the ~-1.5 °C screen minima. ~10-20% of the 2022/23 crop damaged; arabica futures roughly doubled over the following months.",
-      "source": "Well documented; the most damaging frost in decades."
+      "frost_areas": [
+        {"region": "Sul de Minas", "site": "Ibiraci",     "lat": -20.47, "lon": -47.12, "obs_air_min_c": -1.2, "note": "Among the hardest-hit 2021 municipalities; also Tres Pontas, Monte Santo de Minas, Tres Coracoes."},
+        {"region": "São Paulo",    "site": "Franca",      "lat": -20.54, "lon": -47.40, "note": "Alta Mogiana coffee hub."},
+        {"region": "Paraná",       "site": "Londrina",    "lat": -23.31, "lon": -50.62, "note": "Norte Pioneiro / northern PR belt frosted 29-30 Jul."},
+        {"region": "Cerrado",      "site": "Patrocínio",  "lat": -18.94, "lon": -46.99, "note": "Cerrado Mineiro sits at the northern edge — marginal; the 2021 damage concentrated further south."}
+      ],
+      "crop_impact": "Strong polar air mass; clear, calm radiative nights drove canopy minima well below the ~-1.5 C screen minima. ~10-20% of the 2022/23 crop damaged; arabica futures roughly doubled over the following months.",
+      "source": "Well documented; the most damaging frost in decades. Minas as low as -1.2 C; towns Ibiraci, Tres Pontas, Monte Santo de Minas, Tres Coracoes; SP Mogiana (Franca)."
     }
   ]
 }

@@ -18,7 +18,6 @@ Signal: % vs TBNN (Trung bình nhiều năm = multi-year historical average)
 from __future__ import annotations
 
 import io
-import json
 import logging
 import re
 from datetime import date, datetime, timedelta
