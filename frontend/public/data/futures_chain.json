@@ -80,15 +80,6 @@
     "pub_date": "2026-07-10",
     "contracts": [
       {
-        "contract": "Robusta Coffee 10-T (Jul '26)",
-        "expiry": "2026-07-27",
-        "last": 3872,
-        "chg": -191,
-        "oi": 158,
-        "volume": 0,
-        "symbol": "RMN26"
-      },
-      {
         "contract": "Robusta Coffee 10-T (Sep '26)",
         "expiry": "2026-09-24",
         "last": 3852,
