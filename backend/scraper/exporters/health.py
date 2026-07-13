@@ -98,9 +98,27 @@ def export_health(db, *, exporters_published_at: dict[str, str] | None = None) -
     item = db.query(NewsItem).filter(NewsItem.source == "Giacaphe").order_by(NewsItem.pub_date.desc()).first()
     scrapers["vietnam_price"] = _ts(item.pub_date) if item else None
 
-    # AJCA (Japan native source, from DB — cache file doesn't survive cross-job)
+    # AJCA (Japan). Freshness = when AJCA last UPLOADED a report, not the data
+    # period it covers: AJCA publishes month M's PDFs ~5-9 weeks after M ends,
+    # so period-dating makes a perfectly-healthy feed look 60-100+ days old and
+    # the stale alert cries wolf every cycle. The committed ajca.json carries
+    # each report's source_pdf URL with the wp upload path (/uploads/YYYY/MM/)
+    # — the max of those is the last time AJCA actually published anything.
+    # Falls back to the DB item's period-dated pub_date if the file is absent.
+    def _ajca_upload_ts() -> str | None:
+        try:
+            d = json.loads((OUT_DIR / "ajca.json").read_text(encoding="utf-8"))
+        except Exception:
+            return None
+        import re as _re
+        best = None
+        for m in _re.finditer(r"/uploads/(\d{4})/(\d{2})/", json.dumps(d)):
+            ym = f"{m.group(1)}-{m.group(2)}-01T00:00:00"
+            best = max(best, ym) if best else ym
+        return best
+
     item = db.query(NewsItem).filter(NewsItem.source == "AJCA").order_by(NewsItem.pub_date.desc()).first()
-    scrapers["ajca"] = _ts(item.pub_date) if item else None
+    scrapers["ajca"] = _ajca_upload_ts() or (_ts(item.pub_date) if item else None)
 
     # CONAB Costs (arabica production cost, monthly)
     item = db.query(NewsItem).filter(NewsItem.source == "CONAB Custos").order_by(NewsItem.pub_date.desc()).first()

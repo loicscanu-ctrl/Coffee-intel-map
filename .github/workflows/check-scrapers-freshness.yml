@@ -72,7 +72,13 @@ jobs:
               "fertilizer_comex": 45 * 24,   # MDIC Comex (monthly, mid-month)
               "brazil_exports":   45 * 24,   # Cecafe monthly green-coffee report
               "psd_coffee":       45 * 24,   # USDA PSD (monthly)
-              "ajca":             45 * 24,   # Japan AJCA (monthly)
+              # AJCA is UPLOAD-dated (health.py takes the newest /uploads/YYYY/MM/
+              # path from ajca.json = when AJCA last published anything, floored
+              # to the 1st). Healthy worst case ≈ 30d month-floor + ~31d between
+              # monthly uploads + ≤7d weekly scrape ≈ 68d. 70d alerts within
+              # ~2-4 weeks of a genuinely missed publish without crying wolf on
+              # AJCA's 5-9 week period lag (which the old period-dated 45d did).
+              "ajca":             70 * 24,   # Japan AJCA (monthly uploads)
               "conab_costs":      45 * 24,   # CONAB costs (monthly)
               "conab_safra":      45 * 24,   # CONAB safra (monthly)
               "ecf":              90 * 24,   # ECF port stocks (bi-monthly)
