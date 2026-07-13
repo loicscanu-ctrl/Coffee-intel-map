@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import type { FarmerEconomicsData, RiskLevel, DayRisk, CurrentCondition } from "./farmerEconomicsData";
+import type { FarmerEconomicsData, RiskLevel, DayRisk, CurrentCondition, FrostDayDetail } from "./farmerEconomicsData";
 import FrostWatchPanel from "./FrostWatchPanel";
 
 interface Props {
@@ -56,8 +56,69 @@ function soilCellClass(sm: number): string {
   return "bg-red-800 text-white";
 }
 
+// Frost-variable cell colouring. Canopy/air deepen blue toward freezing and go
+// red past the −2 °C hard-freeze line; hours-below-0 goes red at the ≥4 h
+// "critical duration" bar. Dew/cloud/wind are context → neutral.
+function canopyCellClass(c: number | null): string {
+  if (c == null) return "bg-slate-900 text-slate-600";
+  if (c <= -2)   return "bg-red-800 text-white";
+  if (c < 0)     return "bg-blue-700 text-white";
+  if (c < 3)     return "bg-blue-950 text-blue-300";
+  return "bg-slate-900 text-slate-500";
+}
+function airCellClass(a: number | null): string {
+  if (a == null) return "bg-slate-900 text-slate-600";
+  if (a <= 0)    return "bg-blue-700 text-white";
+  if (a < 3)     return "bg-blue-950 text-blue-300";
+  return "bg-slate-900 text-slate-500";
+}
+function hoursCellClass(h: number | null): string {
+  if (!h)       return "bg-slate-900 text-slate-600";
+  if (h >= 4)   return "bg-red-800 text-white";
+  return "bg-blue-950 text-blue-300";
+}
+const neutralCell = (): string => "bg-slate-900 text-slate-400";
+
+const fmt1 = (v: number | null): string => (v == null ? "" : v.toFixed(1));
+const fmt0 = (v: number | null): string => (v == null ? "" : String(Math.round(v)));
+
+// One driver row under an expanded frost region: a labelled variable across
+// all forecast days, coloured by its own scale.
+function FrostVarRow({ label, days, pick, cellClass, fmt, last }: {
+  label: string;
+  days: FrostDayDetail[];
+  pick: (d: FrostDayDetail) => number | null;
+  cellClass: (v: number | null) => string;
+  fmt: (v: number | null) => string;
+  last?: boolean;
+}) {
+  return (
+    <tr className={last ? "border-b border-slate-700" : ""}>
+      <td className="text-slate-600 pr-2 py-0.5 pl-2 italic whitespace-nowrap">{label}</td>
+      {days.map((d, i) => {
+        const v = pick(d);
+        return <td key={i} className={`text-center py-0.5 ${cellClass(v)}`}>{fmt(v)}</td>;
+      })}
+    </tr>
+  );
+}
+
 export default function WeatherRiskPanel({ weather }: Props) {
   const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
+  // Frost detail expands per region (multiple at once). Regions that fire any
+  // severity in the window open by default, so an at-risk trend is visible
+  // without a click.
+  const [expandedFrost, setExpandedFrost] = useState<Set<string>>(
+    () => new Set((weather.frost_drivers ?? [])
+      .filter((r) => r.days.some((d) => d.severity))
+      .map((r) => r.region)),
+  );
+  const toggleFrost = (region: string) =>
+    setExpandedFrost((prev) => {
+      const next = new Set(prev);
+      if (next.has(region)) next.delete(region); else next.add(region);
+      return next;
+    });
 
   const today = new Date();
   const dayLabels = Array.from({ length: 14 }, (_, i) => {
@@ -104,8 +165,79 @@ export default function WeatherRiskPanel({ weather }: Props) {
       {/* Frost Watch — per-region physics detail + historical anchor */}
       <FrostWatchPanel regions={weather.regions} />
 
-      {/* 14-day frost grid */}
-      {weather.daily_frost.length > 0 && (
+      {/* 14-day frost grid — risk letters, each region expandable into the
+          full per-variable trend (canopy/air/dew/cloud/wind/duration). */}
+      {(weather.frost_drivers?.length ?? 0) > 0 ? (
+        <div>
+          <div className="text-[9px] text-blue-400 mb-1">
+            14-Day Frost Risk
+            <span className="text-slate-600 ml-1 normal-case font-normal">— click a region to see every variable</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="text-[8px] border-collapse w-full">
+              <thead>
+                <tr>
+                  <th className="text-left text-slate-500 pr-2 font-normal w-20">Region</th>
+                  {dayLabels.map((d, i) => (
+                    <th key={i} className="text-center text-slate-600 w-5 font-normal">{d}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {weather.frost_drivers!.map((row) => {
+                  const isOpen = expandedFrost.has(row.region);
+                  return (
+                    <React.Fragment key={row.region}>
+                      {/* Risk-letter row (click to expand) */}
+                      <tr>
+                        <td
+                          className="text-slate-300 pr-2 py-0.5 truncate max-w-[80px] cursor-pointer select-none hover:text-blue-400 transition-colors"
+                          onClick={() => toggleFrost(row.region)}
+                        >
+                          <span className="mr-0.5">{isOpen ? "▼" : "▶"}</span>
+                          {row.region}
+                        </td>
+                        {row.days.map((d, i) => (
+                          <td key={i} className={`text-center py-0.5 ${FROST_CELL[d.risk]}`}>
+                            {d.risk === "-" ? "" : d.risk}
+                          </td>
+                        ))}
+                      </tr>
+
+                      {/* Expanded per-variable trend */}
+                      {isOpen && (
+                        <>
+                          <FrostVarRow label="Canopy °C" days={row.days} pick={(d) => d.canopy_c}  cellClass={canopyCellClass} fmt={fmt1} />
+                          <FrostVarRow label="Air °C"     days={row.days} pick={(d) => d.air_min_c} cellClass={airCellClass}    fmt={fmt1} />
+                          <FrostVarRow label="Dew °C"     days={row.days} pick={(d) => d.dew_c}     cellClass={neutralCell}     fmt={fmt1} />
+                          <FrostVarRow label="Cloud %"    days={row.days} pick={(d) => d.cloud_pct} cellClass={neutralCell}     fmt={fmt0} />
+                          <FrostVarRow label="Wind km/h"  days={row.days} pick={(d) => d.wind_kmh}  cellClass={neutralCell}     fmt={fmt0} />
+                          <FrostVarRow label="Hrs <0"     days={row.days} pick={(d) => d.hours_below_0} cellClass={hoursCellClass} fmt={fmt0} last />
+                        </>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {/* Legend */}
+          <div className="flex gap-3 mt-2 flex-wrap">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-red-800" />
+              <span className="text-[7px] text-slate-500">Canopy ≤ −2 °C (hard freeze) / ≥ 4 h critical</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-blue-700" />
+              <span className="text-[7px] text-slate-500">Below 0 °C</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-blue-950 border border-blue-900" />
+              <span className="text-[7px] text-slate-500">Marginal 0–3 °C</span>
+            </div>
+          </div>
+        </div>
+      ) : weather.daily_frost.length > 0 ? (
         <div>
           <div className="text-[9px] text-blue-400 mb-1">14-Day Frost Risk</div>
           <div className="overflow-x-auto">
@@ -133,7 +265,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
             </table>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* 14-day drought grid with expandable driver rows */}
       {weather.daily_drought.length > 0 && (

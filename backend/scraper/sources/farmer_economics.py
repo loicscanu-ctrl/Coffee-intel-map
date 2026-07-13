@@ -345,6 +345,7 @@ def _aggregate_hourly_to_daily(hourly: dict, region_name: str = "") -> list[dict
             "frost_surface_c":   frost.surface_min_c,
             "frost_air_min_c":   frost.air_min_c,
             "frost_hours_below_0": frost.hours_below_0,
+            "frost_hours_below_hard": frost.hours_below_hard,
             "drought_risk":      "-",            # filled by _apply_drought_modifiers
             "_drought_score_raw": raw_score,
         })
