@@ -1,7 +1,7 @@
 {
   "date": "2026-07-07",
   "scoreNY": 5,
-  "scoreLDN": -4,
+  "scoreLDN": -3,
   "signals": [
     {
       "id": "CP3",
@@ -252,8 +252,19 @@
       "market": "LDN",
       "severity": "info",
       "score": 1,
-      "magnitude": "small",
+      "magnitude": "large",
       "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+    },
+    {
+      "id": "CS5",
+      "name": "Deepening Inversion",
+      "category": "CS",
+      "categoryLabel": "Curve Structure",
+      "market": "LDN",
+      "severity": "alert",
+      "score": 2,
+      "magnitude": "large",
+      "text": "RC backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window."
     },
     {
       "id": "SP2",
@@ -265,6 +276,17 @@
       "score": 0,
       "magnitude": "medium",
       "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+    },
+    {
+      "id": "SP3",
+      "name": "Spreading vs Inversion",
+      "category": "SP",
+      "categoryLabel": "Spreading",
+      "market": "LDN",
+      "severity": "warn",
+      "score": 0,
+      "magnitude": "large",
+      "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
     },
     {
       "id": "AGRO_colombia_Caldas_blossom_drop",
@@ -2956,8 +2978,19 @@
           "market": "LDN",
           "severity": "info",
           "score": 1,
-          "magnitude": "small",
+          "magnitude": "large",
           "text": "RC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
+        },
+        {
+          "id": "CS5",
+          "name": "Deepening Inversion",
+          "category": "CS",
+          "categoryLabel": "Curve Structure",
+          "market": "LDN",
+          "severity": "alert",
+          "score": 2,
+          "magnitude": "large",
+          "text": "RC backwardation deepening while roasters are under-covered (<25th pct) — cost of forward coverage increasing week-on-week, amplifying squeeze risk. Cross-check against roll window."
         },
         {
           "id": "SP2",
@@ -2969,13 +3002,24 @@
           "score": 0,
           "magnitude": "medium",
           "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
+        },
+        {
+          "id": "SP3",
+          "name": "Spreading vs Inversion",
+          "category": "SP",
+          "categoryLabel": "Spreading",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 0,
+          "magnitude": "large",
+          "text": "Spreading OI increasing while backwardation deepens — funds likely harvesting backwardation premium. Not a directional signal but confirms curve structure is attracting capital."
         }
       ],
       "scoreNY": 5,
-      "scoreLDN": -4,
+      "scoreLDN": -3,
       "priceNY": 317.6,
       "priceLDN": 3872
     }
   ],
-  "generatedAt": "2026-07-13T05:25:37.934Z"
+  "generatedAt": "2026-07-13T05:55:56.224Z"
 }
