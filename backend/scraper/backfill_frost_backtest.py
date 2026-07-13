@@ -90,13 +90,32 @@ def _get_hourly(url: str, params: dict, tag: str) -> dict | None:
     return None
 
 
-def _fetch_hourly(lat: float, lon: float, start: str, end: str) -> dict | None:
-    """ERA5 hourly for [start, end] at (lat, lon). None on any failure."""
-    return _get_hourly(_archive_base(), {
+def _has_temps(hourly: dict | None) -> bool:
+    """True if the block carries at least one real 2 m temperature."""
+    if not hourly:
+        return False
+    return any(t is not None for t in (hourly.get("temperature_2m") or []))
+
+
+def _fetch_hourly(lat: float, lon: float, start: str, end: str) -> tuple[dict | None, str]:
+    """Archive hourly for [start, end] at (lat, lon), preferring ERA5-Land
+    (~9 km, which resolves the valley cold-pooling that the ~31 km ERA5 grid
+    smooths away) and falling back to ERA5 for any point/period ERA5-Land does
+    not cover. Returns (hourly, model_label); (None, "") on total failure."""
+    common = {
         "latitude": lat, "longitude": lon,
         "start_date": start, "end_date": end,
         "hourly": _HOURLY_VARS, "timezone": "America/Sao_Paulo",
-    }, tag=f"({lat},{lon}) {start}..{end}")
+    }
+    land = _get_hourly(_archive_base(), {**common, "models": "era5_land"},
+                       tag=f"era5_land ({lat},{lon}) {start}..{end}")
+    if _has_temps(land):
+        return land, "era5_land"
+    era5 = _get_hourly(_archive_base(), {**common, "models": "era5"},
+                       tag=f"era5 ({lat},{lon}) {start}..{end}")
+    if _has_temps(era5):
+        return era5, "era5"
+    return None, ""
 
 
 def _nights(hourly: dict) -> dict[str, tuple[list, list, list, list]]:
@@ -211,10 +230,11 @@ def run_events() -> int:
     fetch failed (archive unreachable — nothing proven)."""
     events = json.loads(CATALOG.read_text(encoding="utf-8"))["events"]
     print(f"[frost-backtest] events mode — archive base: {_archive_base()}", flush=True)
-    print("  ERA5 is a ~31 km reanalysis; it smooths the valley cold-pooling "
-          "that drives real frost minima, so a grid point often reads several "
-          "°C milder than the station observation. Read air_min/canopy_min to "
-          "tell 'model under-tiered' from 'ERA5 had no frost here'.")
+    print("  Sampling each event's documented frost municipality (the 'appointed "
+          "frost area') from ERA5-Land (~9 km, ERA5 fallback) — it resolves the "
+          "valley cold-pooling the ~31 km ERA5 grid smooths away. Even ERA5-Land "
+          "can read mild in a tight hollow, so read air_min/canopy_min to tell "
+          "'model under-tiered' from 'the reanalysis had no frost here'.")
     total = hits = ran = 0
     rank = {None: -1, "watch": 0, "alert": 1, "critical": 2}
     for ev in events:
@@ -224,13 +244,19 @@ def run_events() -> int:
         dates = sorted(ev["peak_dates"])
         # ±1 day brackets the pre-dawn minimum across the timezone boundary.
         start, end = _shift(dates[0], -1), _shift(dates[-1], 1)
-        for region in ev["regions"]:
-            latlon = REGION_LATLON.get(region)
-            if not latlon:
-                continue
-            hourly = _fetch_hourly(*latlon, start, end)
+        areas = ev.get("frost_areas") or [{"region": r} for r in ev.get("regions", [])]
+        for area in areas:
+            region = area.get("region", "?")
+            lat, lon = area.get("lat"), area.get("lon")
+            if lat is None or lon is None:
+                latlon = REGION_LATLON.get(region)
+                if not latlon:
+                    continue
+                lat, lon = latlon
+            site = area.get("site", region)
+            hourly, model = _fetch_hourly(lat, lon, start, end)
             if not hourly:
-                print(f"    · {region:15s} (fetch unavailable)")
+                print(f"    · {region:15s} · {site} (fetch unavailable)")
                 continue
             ran += 1
             # Track the night that drives the worst severity (coldest canopy
@@ -250,7 +276,8 @@ def run_events() -> int:
                         key, sev, a, night, day)
             mark = "✓" if worst_sev == ev["expected_severity"] else "✗"
             det = _night_detail(worst_night) if worst_night else None
-            print(f"    {mark} {region:15s} sev={str(worst_sev):8s}", end="")
+            loc = f"{region} · {site}"
+            print(f"    {mark} {loc:32s} [{model or '—':9s}] sev={str(worst_sev):8s}", end="")
             if det and worst_a is not None:
                 print(f" | air {det['air_min']:+5.1f}  canopy {det['canopy_min']:+5.1f}"
                       f"  dew {det['dew_at_min']:+5.1f}  cloud {det['cloud_at_min']:3.0f}%"
@@ -270,11 +297,10 @@ def run_events() -> int:
               "Nothing proven.", file=sys.stderr)
         return 2
     print(f"\n[frost-backtest] {hits}/{total} region-events matched expected "
-          f"severity on ERA5 grid data. Read each row's air_min before reading "
-          f"a miss as a model error: most are the ~31 km reanalysis sitting "
-          f"well above freezing where the station saw a hard freeze (smoothed "
-          f"valley cold-pools) — the ladder is right, the grid has no frost to "
-          f"detect there. Don't loosen thresholds to chase those.")
+          f"severity, sampling the documented frost municipalities from ERA5-Land. "
+          f"Read each row's air_min before reading a miss as a model error: a "
+          f"residual miss is the reanalysis still reading mild in that specific "
+          f"hollow, not the ladder under-tiering — don't loosen thresholds to chase it.")
     return 0
 
 
