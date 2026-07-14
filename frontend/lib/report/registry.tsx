@@ -14,7 +14,7 @@
 import type { ComponentType } from "react";
 import dynamic from "next/dynamic";
 
-export type ReportCategory = "Futures" | "Freight" | "Supply" | "Demand" | "Macro";
+export type ReportCategory = "Price" | "Freight" | "Supply" | "Demand" | "Macro";
 
 export interface ReportChartDef {
   id: string;
@@ -54,11 +54,11 @@ const NY_LDN_NOTES = [
 ];
 
 export const REPORT_REGISTRY: ReportChartDef[] = [
-  // ── Futures ────────────────────────────────────────────────────────────────
+  // ── Price ──────────────────────────────────────────────────────────────────
   {
     id: "daily_quotes",
     label: "Daily Quotes",
-    category: "Futures",
+    category: "Price",
     description: "ICE futures chain (Barchart) — NY Arabica & London Robusta, last/change/spread/OI/volume.",
     Component: dynamic(() => import("@/components/report/charts/DailyQuotesReport"), { ssr: false, loading }),
     notes: NY_LDN_NOTES,
@@ -67,7 +67,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_overview",
     label: "COT Positioning Overview",
-    category: "Futures",
+    category: "Price",
     description: "Weekly per-market summary — OI, price/structure, industry coverage and managed-money flow.",
     Component: dynamic(() => import("@/components/report/charts/CotOverviewReport"), { ssr: false, loading }),
     notes: NY_LDN_NOTES,
@@ -77,7 +77,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_heatmap",
     label: "13-Week Positioning Heatmap",
-    category: "Futures",
+    category: "Price",
     description: "Rolling 13-week signal heatmap across the positioning rule set, per market.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotHeatmapReport })), { ssr: false, loading }),
     width: "full",
@@ -86,7 +86,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_gauges",
     label: "52-Week Positioning Gauges",
-    category: "Futures",
+    category: "Price",
     description: "Where each cohort sits within its trailing 52-week positioning range.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotGaugesReport })), { ssr: false, loading }),
     width: "full",
@@ -95,7 +95,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_global_flow",
     label: "Global Money Flow",
-    category: "Futures",
+    category: "Price",
     description: "Cross-market managed-money flow from the macro-COT feed (gross/net).",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotGlobalFlowReport })), { ssr: false, loading }),
     width: "full",
@@ -104,7 +104,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_industry_pulse",
     label: "Industry Pulse (Metric Tons)",
-    category: "Futures",
+    category: "Price",
     description: "Producer & roaster coverage in metric tons, with week-over-week variation.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotIndustryPulseReport })), { ssr: false, loading }),
     width: "full",
@@ -113,7 +113,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_dry_powder",
     label: "Dry Powder Indicator",
-    category: "Futures",
+    category: "Price",
     description: "Managed-money room-to-add vs historical extremes — fuel for a squeeze or flush.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotDryPowderReport })), { ssr: false, loading }),
     width: "full",
@@ -122,7 +122,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_cycle_location",
     label: "Cycle Location (OB/OS Matrix)",
-    category: "Futures",
+    category: "Price",
     description: "Overbought/oversold matrix locating each market in the positioning cycle.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotCycleLocationReport })), { ssr: false, loading }),
     width: "full",
@@ -131,7 +131,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_signals",
     label: "Rule-Based Signal Analysis",
-    category: "Futures",
+    category: "Price",
     description: "Composite rule-engine score with the firing alert/warn/info signals per market.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotSignalsReport })), { ssr: false, loading }),
     width: "full",
@@ -140,7 +140,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "cot_report",
     label: "COT Report — Positioning Analysis",
-    category: "Futures",
+    category: "Price",
     description: "Automated positioning read — positioning, WoW flow, price divergence, crowd risk and overall bias per market.",
     Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotReportAnalysis })), { ssr: false, loading }),
     width: "full",
@@ -149,10 +149,18 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   {
     id: "oi_fnd",
     label: "OI Evolution to FND — NY & London",
-    category: "Futures",
+    category: "Price",
     description: "Open-interest run-down into First Notice Day — NY Arabica (left) & London Robusta (right).",
     Component: dynamic(() => import("@/components/report/charts/FuturesReports"), { ssr: false, loading }),
     notes: NY_LDN_NOTES,
+    width: "full",
+  },
+  {
+    id: "origin_farmgate_prices",
+    label: "Origin Farmgate Prices",
+    category: "Price",
+    description: "Reindexed farmgate price trends across Vietnam, Brazil arabica/conilon and Uganda.",
+    Component: dynamic(() => import("@/components/macro/OriginPricesPanel"), { ssr: false, loading }),
     width: "full",
   },
 
@@ -606,14 +614,6 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     width: "full",
   },
   {
-    id: "origin_farmgate_prices",
-    label: "Origin Farmgate Prices",
-    category: "Macro",
-    description: "Reindexed farmgate price trends across Vietnam, Brazil arabica/conilon and Uganda.",
-    Component: dynamic(() => import("@/components/macro/OriginPricesPanel"), { ssr: false, loading }),
-    width: "full",
-  },
-  {
     id: "fertilizer_inputs",
     label: "Fertilizer Inputs (N-P-K)",
     category: "Macro",
@@ -691,7 +691,7 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
   },
 ];
 
-export const REPORT_CATEGORIES: ReportCategory[] = ["Futures", "Freight", "Supply", "Demand", "Macro"];
+export const REPORT_CATEGORIES: ReportCategory[] = ["Price", "Freight", "Supply", "Demand", "Macro"];
 
 export const REPORT_BY_ID: Record<string, ReportChartDef> = Object.fromEntries(
   REPORT_REGISTRY.map((d) => [d.id, d]),
