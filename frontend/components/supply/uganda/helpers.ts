@@ -9,7 +9,8 @@ export interface UgandaMonthlyRow {
   total_bags?:     number | null;
   value_usd?:      number | null;
   by_grade?:       { grade: string; bags: number }[];
-  by_destination?: { country: string; bags: number }[];
+  by_destination?: { country: string; bags: number;
+                     robusta_bags?: number; arabica_bags?: number }[];
   parser_version?: string;
   source_pdf?:     string;
   parse_warnings?: string[];

@@ -1,191 +1,341 @@
 "use client";
+// Uganda — Export by Destination. Aligned to the shared Export-by-Destination
+// template (Brazil / Indonesia / Vietnam): window selector, current-vs-prior-
+// year bars in kt, By Country / By Hub views, Top-N, YoY table with hub share
+// deltas — plus the Robusta/Arabica type split stacked inside the current bar
+// (UCDA publishes the R/A split per destination from the enriched schema on;
+// older rows only carry totals, which land in the 'Unsplit' segment).
 import { useMemo, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend,
   ResponsiveContainer,
 } from "recharts";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import { COUNTRY_HUB, HUB_COLORS, HUB_ORDER } from "../IndonesiaExports/constants";
 import { TT_STYLE, bagsToKT, type UgandaMonthlyRow } from "./helpers";
 
-type Window = "L12M" | "L24M" | "CTD" | "ALL";
-type Mode   = "total" | "stack";
+type ViewMode = "country" | "hub";
+const WINDOWS = ["1M", "3M", "6M", "12M", "CYTD"] as const;
+type DestWindow = (typeof WINDOWS)[number];
 
-const WINDOW_LABELS: Record<Window, string> = {
-  L12M: "Last 12 months",
-  L24M: "Last 24 months",
-  CTD:  "Crop-to-date",
-  ALL:  "All time",
-};
+const GREEN = "#22c55e";
+const SLATE = "#64748b";
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const COLORS = [
-  "#f59e0b", "#fb923c", "#fbbf24", "#84cc16", "#22c55e",
-  "#10b981", "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899",
-  "#f43f5e", "#ef4444", "#f97316", "#eab308", "#65a30d",
+const SPLIT_SERIES = [
+  { key: "t_robusta", label: "Robusta", color: "#f59e0b" },
+  { key: "t_arabica", label: "Arabica", color: GREEN },
+  { key: "t_unsplit", label: "Unsplit", color: SLATE },
 ];
 
-interface AggRow {
-  country: string;
-  robusta_bags: number;
-  arabica_bags: number;
-  total_bags: number;
-  robusta_kt: number;
-  arabica_kt: number;
-  total_kt:   number;
+function getHub(country: string): string {
+  return COUNTRY_HUB[country.toUpperCase()] ?? "Other";
 }
 
+function monthLabel(ym: string): string {
+  return MONTH_LABELS[parseInt(ym.split("-")[1], 10) - 1] ?? ym;
+}
+
+function offsetYM(ym: string, months: number): string {
+  const [y, m] = ym.split("-").map(Number);
+  const d = new Date(y, m - 1 - months);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+interface DestAcc { bags: number; rob: number; ara: number }
+
 export default function UgandaDestinationChart({ monthly }: { monthly: UgandaMonthlyRow[] }) {
-  const [window, setWindow] = useState<Window>("L12M");
-  const [topN, setTopN]     = useState(10);
-  const [mode, setMode]     = useState<Mode>("stack");
+  const [mode, setMode]             = useState<ViewMode>("country");
+  const [topN, setTopN]             = useState(15);
+  const [destWindow, setDestWindow] = useState<DestWindow>("CYTD");
+  const [splitTypes, setSplitTypes] = useState(true);
 
-  // Filter `monthly` to the active window, then aggregate by_destination
-  // with Robusta + Arabica + Total. The R/A split lands on each row once
-  // the UCDA scraper writes the enriched schema (PR #296 onwards). Rows
-  // from older runs only carry `bags`; we treat their R/A as 0 so the
-  // stacked view still renders a meaningful column.
-  const { data, hasSplit, warned } = useMemo<{ data: AggRow[]; hasSplit: boolean; warned: string[] }>(() => {
-    if (!monthly.length) return { data: [], hasSplit: false, warned: [] };
-    const sorted = monthly.slice().sort((a, b) => a.month.localeCompare(b.month));
-    const latestYm = sorted[sorted.length - 1].month;
-    const [latestY, latestM] = latestYm.split("-").map(Number);
-
-    const inWindow = (ym: string) => {
-      if (window === "ALL") return true;
-      const [y, m] = ym.split("-").map(Number);
-      if (window === "L12M") {
-        const monthsBack = (latestY - y) * 12 + (latestM - m);
-        return monthsBack < 12;
+  // country → ym → accumulated bags (+ R/A split where published).
+  const { byCountry, allMonths, warned } = useMemo(() => {
+    const out: Record<string, Record<string, DestAcc>> = {};
+    const months = new Set<string>();
+    const warnedMonths: string[] = [];
+    for (const r of monthly) {
+      if (!r.by_destination) continue;
+      months.add(r.month);
+      if (r.parse_warnings?.some(w => /cross-check failed|no published total/i.test(w))) {
+        warnedMonths.push(r.month);
       }
-      if (window === "L24M") {
-        const monthsBack = (latestY - y) * 12 + (latestM - m);
-        return monthsBack < 24;
-      }
-      // CTD: same crop year (Oct-Sep) as latest month.
-      const cropStartY = latestM >= 10 ? latestY : latestY - 1;
-      const cropEndY   = cropStartY + 1;
-      const cropStart  = cropStartY * 12 + 10;
-      const cropEnd    = cropEndY * 12 + 9;
-      const idx        = y * 12 + m;
-      return idx >= cropStart && idx <= cropEnd;
-    };
-
-    interface Acc { robusta_bags: number; arabica_bags: number; total_bags: number }
-    const agg: Record<string, Acc> = {};
-    let anySplit = false;
-    for (const r of sorted) {
-      if (!inWindow(r.month) || !r.by_destination) continue;
       for (const d of r.by_destination) {
-        const dRec = d as { country: string; bags?: number;
-          robusta_bags?: number; arabica_bags?: number };
-        if (!agg[dRec.country]) agg[dRec.country] = { robusta_bags: 0, arabica_bags: 0, total_bags: 0 };
-        const rob = dRec.robusta_bags ?? 0;
-        const ara = dRec.arabica_bags ?? 0;
-        if (rob || ara) anySplit = true;
-        agg[dRec.country].robusta_bags += rob;
-        agg[dRec.country].arabica_bags += ara;
-        agg[dRec.country].total_bags   += dRec.bags ?? 0;
+        const c = out[d.country] ?? (out[d.country] = {});
+        const acc = c[r.month] ?? (c[r.month] = { bags: 0, rob: 0, ara: 0 });
+        acc.bags += d.bags ?? 0;
+        acc.rob  += d.robusta_bags ?? 0;
+        acc.ara  += d.arabica_bags ?? 0;
       }
     }
-    const rows = Object.entries(agg)
-      .map(([country, a]) => ({
-        country,
-        robusta_bags: a.robusta_bags,
-        arabica_bags: a.arabica_bags,
-        total_bags:   a.total_bags,
-        robusta_kt:   bagsToKT(a.robusta_bags),
-        arabica_kt:   bagsToKT(a.arabica_bags),
-        total_kt:     bagsToKT(a.total_bags),
-      }))
-      .sort((a, b) => b.total_bags - a.total_bags)
-      .slice(0, topN);
-    // Months in this window where the scraper's published-total cross-check
-    // failed — their destination volumes are likely incomplete in the
-    // aggregation above, so the operator gets an explicit flag.
-    const warnedMonths = sorted
-      .filter(r => inWindow(r.month) &&
-        r.parse_warnings?.some(w => /cross-check failed|no published total/i.test(w)))
-      .map(r => r.month);
-    return { data: rows, hasSplit: anySplit, warned: warnedMonths };
-  }, [monthly, window, topN]);
+    return { byCountry: out, allMonths: Array.from(months).sort(), warned: warnedMonths.sort() };
+  }, [monthly]);
 
-  if (data.length === 0) return null;
-  const totalKt = data.reduce((s, r) => s + r.total_kt, 0);
-  const effectiveMode: Mode = hasSplit ? mode : "total";
+  const latestMonth = allMonths[allMonths.length - 1] ?? "";
+
+  // Window months. CYTD = Uganda crop year (Oct → Sep) to date.
+  const windowMonths = useMemo(() => {
+    if (!latestMonth) return [];
+    if (destWindow === "CYTD") {
+      const [y, m] = latestMonth.split("-").map(Number);
+      const cropStart = m >= 10 ? `${y}-10` : `${y - 1}-10`;
+      return allMonths.filter(mm => mm >= cropStart && mm <= latestMonth);
+    }
+    const n = { "1M": 1, "3M": 3, "6M": 6, "12M": 12 }[destWindow]!;
+    return allMonths.slice(-n);
+  }, [destWindow, allMonths, latestMonth]);
+
+  const prevWindowMonths = useMemo(
+    () => windowMonths.map(m => offsetYM(m, 12)),
+    [windowMonths],
+  );
+
+  const fmtPeriod = (months: string[]) => {
+    const first = months[0], last = months[months.length - 1];
+    if (!first || !last) return "";
+    return first === last
+      ? `${monthLabel(first)} ${first.split("-")[0]}`
+      : `${monthLabel(first)} ${first.split("-")[0]}–${monthLabel(last)} ${last.split("-")[0]}`;
+  };
+  const periodLabel     = fmtPeriod(windowMonths);
+  const prevPeriodLabel = fmtPeriod(prevWindowMonths);
+
+  const countryTotals = useMemo(() => {
+    const out: Record<string, { current: number; prev: number; rob: number; ara: number }> = {};
+    Object.entries(byCountry).forEach(([c, mv]) => {
+      const sum = (months: string[], pick: (a: DestAcc) => number) =>
+        months.reduce((s, m) => s + (mv[m] ? pick(mv[m]) : 0), 0);
+      const current = sum(windowMonths, a => a.bags);
+      const prev    = sum(prevWindowMonths, a => a.bags);
+      if (current > 0 || prev > 0) {
+        out[c] = {
+          current, prev,
+          rob: sum(windowMonths, a => a.rob),
+          ara: sum(windowMonths, a => a.ara),
+        };
+      }
+    });
+    return out;
+  }, [byCountry, windowMonths, prevWindowMonths]);
+
+  const hubTotals = useMemo(() => {
+    const out: Record<string, { current: number; prev: number }> = {};
+    Object.entries(countryTotals).forEach(([c, v]) => {
+      const hub = getHub(c);
+      if (!out[hub]) out[hub] = { current: 0, prev: 0 };
+      out[hub].current += v.current;
+      out[hub].prev    += v.prev;
+    });
+    return out;
+  }, [countryTotals]);
+
+  const countryRows = useMemo(() =>
+    Object.entries(countryTotals)
+      .sort((a, b) => b[1].current - a[1].current)
+      .slice(0, topN)
+      .map(([c, v]) => {
+        const current   = bagsToKT(v.current);
+        const t_robusta = bagsToKT(v.rob);
+        const t_arabica = bagsToKT(v.ara);
+        const t_unsplit = Math.max(0,
+          Math.round((current - t_robusta - t_arabica) * 10) / 10);
+        return {
+          label:      c.length > 22 ? c.slice(0, 21) + "…" : c,
+          current,
+          prev:       bagsToKT(v.prev),
+          pct:        v.prev > 0 ? Math.round((v.current - v.prev) / v.prev * 100) : null,
+          shareDelta: null as number | null,
+          t_robusta, t_arabica, t_unsplit,
+        };
+      })
+  , [countryTotals, topN]);
+
+  const hubRows = useMemo(() => {
+    const totalCurrent = Object.values(hubTotals).reduce((s, v) => s + v.current, 0);
+    const totalPrev    = Object.values(hubTotals).reduce((s, v) => s + v.prev,    0);
+    return [...HUB_ORDER, "Other"]
+      .map(hub => {
+        const v = hubTotals[hub] ?? { current: 0, prev: 0 };
+        const shareCurrent = totalCurrent > 0 ? v.current / totalCurrent * 100 : 0;
+        const sharePrev    = totalPrev    > 0 ? v.prev    / totalPrev    * 100 : 0;
+        return {
+          label:      hub,
+          current:    bagsToKT(v.current),
+          prev:       bagsToKT(v.prev),
+          pct:        v.prev > 0 ? Math.round((v.current - v.prev) / v.prev * 100) : null,
+          shareDelta: totalPrev > 0
+            ? Math.round((shareCurrent - sharePrev) * 10) / 10 : null,
+        };
+      })
+      .filter(r => r.current > 0 || r.prev > 0)
+      .sort((a, b) => b.current - a.current);
+  }, [hubTotals]);
+
+  if (allMonths.length === 0) return null;
+
+  const rows = mode === "hub" ? hubRows : countryRows;
+  const barH = mode === "hub" ? rows.length * 30 + 40 : Math.min(topN, rows.length) * 26 + 40;
+
+  // One source of truth for the current-window colour — used by both the bar
+  // cells and the tooltip, so hovering always echoes the bar's own colour.
+  const barFill = (r: { label: string; pct: number | null }) =>
+    mode === "hub"
+      ? (HUB_COLORS[r.label] ?? "#475569")
+      : r.pct !== null && r.pct < 0 ? "#ef4444" : GREEN;
+
+  const canSplit  = mode === "country";
+  const showSplit = canSplit && splitTypes;
+  const warnedInWindow = warned.filter(m => windowMonths.includes(m));
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
         <div>
-          <div className="text-sm font-semibold text-slate-200">Top Export Destinations</div>
+          <div className="text-sm font-semibold text-slate-200">Export by Destination</div>
           <div className="text-[10px] text-slate-500">
-            {WINDOW_LABELS[window]} · Top {topN} · kt
-            <span className="ml-2 text-slate-600">· Total {Math.round(totalKt).toLocaleString()} kt</span>
+            {periodLabel} (current) vs {prevPeriodLabel} (grey) · Thousand metric tons · UCDA
           </div>
         </div>
-        <div className="flex gap-1 flex-wrap">
-          {(["L12M", "L24M", "CTD", "ALL"] as Window[]).map(w => (
-            <button key={w} onClick={() => setWindow(w)}
-              className={`text-[10px] px-2 py-0.5 rounded ${window === w ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              {w}
-            </button>
-          ))}
-          <span className="text-slate-700 mx-1">·</span>
-          {[5, 10, 15].map(n => (
-            <button key={n} onClick={() => setTopN(n)}
-              className={`text-[10px] px-2 py-0.5 rounded ${topN === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
-              top {n}
-            </button>
-          ))}
-          {hasSplit && (
-            <>
-              <span className="text-slate-700 mx-1">·</span>
-              {(["total", "stack"] as Mode[]).map(m => (
-                <button key={m} onClick={() => setMode(m)}
-                  className={`text-[10px] px-2 py-0.5 rounded ${mode === m ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}
-                  title={m === "stack" ? "Stack Robusta + Arabica per country" : "Show Total only"}>
-                  {m === "stack" ? "R/A split" : "Total"}
+        <div className="flex flex-wrap gap-1">
+          {/* Window selector */}
+          <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+            {WINDOWS.map(w => (
+              <button key={w} onClick={() => setDestWindow(w)}
+                className={`text-[10px] px-2 py-0.5 rounded ${destWindow === w ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                {w}
+              </button>
+            ))}
+          </div>
+          {/* View toggle */}
+          <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+            {(["country", "hub"] as ViewMode[]).map(m => (
+              <button key={m} onClick={() => setMode(m)}
+                className={`text-[10px] px-2 py-0.5 rounded capitalize ${mode === m ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                {m === "hub" ? "By Hub" : "By Country"}
+              </button>
+            ))}
+          </div>
+          {/* Top N (country only) */}
+          {mode === "country" && (
+            <div className="flex gap-1">
+              {[10, 15, 25].map(n => (
+                <button key={n} onClick={() => setTopN(n)}
+                  className={`text-[10px] px-2 py-0.5 rounded ${topN === n ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:bg-slate-600"}`}>
+                  Top {n}
                 </button>
               ))}
-            </>
+            </div>
+          )}
+          {/* Type-split toggle (country view only) */}
+          {canSplit && (
+            <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+              {([true, false] as const).map(s => (
+                <button key={String(s)} onClick={() => setSplitTypes(s)}
+                  title={s ? "Stack Robusta + Arabica inside each bar" : "Single bar coloured by YoY direction"}
+                  className={`text-[10px] px-2 py-0.5 rounded ${splitTypes === s ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                  {s ? "Split" : "Solid"}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>
-      {warned.length > 0 && (
+
+      {warnedInWindow.length > 0 && (
         <div className="text-[10px] text-amber-500/90 mb-1">
-          ⚠ Source-PDF totals cross-check failed for {warned.join(", ")} —
-          destination volumes for {warned.length === 1 ? "this month" : "these months"} may be incomplete.
+          ⚠ Source-PDF totals cross-check failed for {warnedInWindow.join(", ")} —
+          destination volumes for {warnedInWindow.length === 1 ? "this month" : "these months"} may be incomplete.
         </div>
       )}
-      <ResponsiveContainer width="100%" height={Math.max(180, data.length * 26)}>
-        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, bottom: 4, left: 60 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis type="number" tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 10 }} />
-          <YAxis dataKey="country" type="category" tick={{ fill: "#cbd5e1", fontSize: 10 }} width={90} />
-          <Tooltip contentStyle={TT_STYLE}
-            formatter={((v, name, p) => {
-              const row = p?.payload as AggRow | undefined;
-              if (name === "robusta_kt") return [`${v} kt`, "Robusta" as NameType];
-              if (name === "arabica_kt") return [`${v} kt`, "Arabica" as NameType];
-              return [`${v} kt (${row?.total_bags.toLocaleString() ?? "—"} bags)`, row?.country as NameType];
+
+      {/* Bar chart */}
+      <ResponsiveContainer width="100%" height={barH}>
+        <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 64, bottom: 4, left: mode === "hub" ? 130 : 140 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
+          <XAxis type="number" tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 9 }} />
+          <YAxis type="category" dataKey="label" tick={{ fill: "#cbd5e1", fontSize: 9 }}
+            width={mode === "hub" ? 125 : 135} />
+          <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: "#94a3b8" }}
+            formatter={((v, name, item) => {
+              const split = SPLIT_SERIES.find(s => s.key === name);
+              if (split) {
+                return [
+                  <span key="v" style={{ color: split.color }}>{`${v} kt`}</span>,
+                  split.label as NameType,
+                ];
+              }
+              const row = (item?.payload ?? {}) as { label: string; pct: number | null };
+              const color = name === "current" ? barFill(row) : "#94a3b8";
+              return [
+                <span key="v" style={{ color }}>{`${v} kt`}</span>,
+                (name === "current" ? periodLabel : prevPeriodLabel) as NameType,
+              ];
             }) satisfies Formatter<ValueType, NameType>} />
-          {effectiveMode === "stack" ? (
-            <>
-              <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
-                formatter={v => (
-                  <span style={{ color: "#cbd5e1" }}>
-                    {v === "robusta_kt" ? "Robusta" : v === "arabica_kt" ? "Arabica" : v}
-                  </span>
-                )} />
-              <Bar dataKey="robusta_kt" name="robusta_kt" stackId="a" fill="#f59e0b" />
-              <Bar dataKey="arabica_kt" name="arabica_kt" stackId="a" fill="#22c55e" />
-            </>
+          <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
+            formatter={(v) => {
+              const split = SPLIT_SERIES.find(s => s.key === v);
+              return (
+                <span style={{ color: "#cbd5e1" }}>
+                  {split ? split.label : v === "current" ? periodLabel : prevPeriodLabel}
+                </span>
+              );
+            }} />
+          <Bar dataKey="prev" name="prev" fill="#94a3b8" opacity={0.55} />
+          {showSplit ? (
+            SPLIT_SERIES.map((s, i) => (
+              <Bar key={s.key} dataKey={s.key} name={s.key} stackId="cur" fill={s.color}
+                radius={i === SPLIT_SERIES.length - 1 ? [0, 3, 3, 0] : undefined} />
+            ))
           ) : (
-            <Bar dataKey="total_kt">
-              {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+            <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
+              {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
             </Bar>
           )}
         </BarChart>
       </ResponsiveContainer>
+
+      {/* YoY change table */}
+      <div className="mt-4 text-[10px]">
+        <div className="grid pb-1 border-b border-slate-700 text-slate-500 font-medium gap-x-6"
+          style={{ gridTemplateColumns: mode === "hub" ? "1fr auto auto" : "1fr auto" }}>
+          <span>Destination</span>
+          <span className="text-right">YoY vol. (same period)</span>
+          {mode === "hub" && <span className="text-right">Share Δpp</span>}
+        </div>
+        {rows.map(r => (
+          <div key={r.label}
+            className="grid gap-x-6 py-0.5 border-b border-slate-800"
+            style={{ gridTemplateColumns: mode === "hub" ? "1fr auto auto" : "1fr auto" }}>
+            <span className="text-slate-300 truncate">{r.label}</span>
+            <span className={`text-right ${
+              r.pct === null ? "text-slate-500" : r.pct >= 0 ? "text-green-400" : "text-red-400"
+            }`}>
+              {r.pct === null ? "n/a" : `${r.pct > 0 ? "+" : ""}${r.pct}%`}
+            </span>
+            {mode === "hub" && (
+              <span className={`text-right ${
+                r.shareDelta === null ? "text-slate-500"
+                : r.shareDelta > 0    ? "text-green-400"
+                : r.shareDelta < 0    ? "text-red-400"
+                : "text-slate-500"
+              }`}>
+                {r.shareDelta === null ? "n/a"
+                  : `${r.shareDelta > 0 ? "+" : ""}${r.shareDelta}pp`}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Source note */}
+      <div className="mt-3 text-[8px] text-slate-600 leading-relaxed">
+        Source: UCDA monthly reports (60-kg bags → kt). The Robusta/Arabica split
+        per destination is published from the enriched schema onward; earlier
+        months appear in the Unsplit segment.
+      </div>
     </div>
   );
 }

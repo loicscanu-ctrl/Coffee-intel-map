@@ -4,12 +4,22 @@ import {
   BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
 import {
-  DEST_WINDOWS, EMPTY_CY, GREEN, HUB_COLORS, HUB_ORDER, ISLAND_COLORS, ISLAND_ORDER,
+  AMBER, DEST_WINDOWS, EMPTY_CY, GREEN, HUB_COLORS, HUB_ORDER, ISLAND_COLORS, ISLAND_ORDER,
   SLATE, TT_STYLE, TYPE_LABELS,
 } from "./constants";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { cropYearKey, getHub, getIsland, kgToKT, monthLabel, offsetYM } from "./helpers";
 import type { CountryYear, DestWindow, SeriesKey, ViewMode } from "./types";
+
+// Stacked species split for the Total view (destination × country mode).
+// BPS gives species-level HS codes only, so the stack is arabica / robusta
+// plus an 'Other / unsplit' remainder (decaf, roasted, husks, and the
+// pre-Apr-2022 lumped code) that keeps the stack summing to the total.
+const SPLIT_SERIES = [
+  { key: "t_arabica", label: "Arabica",          color: GREEN },
+  { key: "t_robusta", label: "Robusta",          color: AMBER },
+  { key: "t_other",   label: "Other / unsplit",  color: "#64748b" },
+];
 
 /** Mode-axis options:
  *    DEST_MODE: which side of the trade lane to view — destination
@@ -42,6 +52,7 @@ export default function DestinationChart({
   const [topN, setTopN]         = useState(15);
   const [coffeeType, setCoffeeType] = useState<DestType>("total");
   const [destWindow, setDestWindow] = useState<DestWindow>("CTD");
+  const [splitTypes, setSplitTypes] = useState(true);
 
   // Per-mode source tables. The "port" side has only totals (BPS doesn't
   // ship per-type port breakdowns), so the type selector disables itself.
@@ -165,18 +176,33 @@ export default function DestinationChart({
   }, [leafTotals, destMode]);
 
   // ── Chart rows ─────────────────────────────────────────────────────────────
-  const leafRows = useMemo(() =>
-    Object.entries(leafTotals)
+  const leafRows = useMemo(() => {
+    // Per-species window sum for one country: current-crop-year data first,
+    // the prior crop year covers window months across the boundary.
+    const typedKt = (name: string, cy?: CountryYear, cyPrev?: CountryYear) =>
+      kgToKT(windowMonths.reduce((s, m) =>
+        s + (cy?.countries?.[name]?.[m] ?? cyPrev?.countries?.[name]?.[m] ?? 0), 0));
+
+    return Object.entries(leafTotals)
       .sort((a, b) => b[1].current - a[1].current)
       .slice(0, topN)
-      .map(([name, v]) => ({
-        label:      name.length > 22 ? name.slice(0, 21) + "…" : name,
-        current:    kgToKT(v.current),
-        prev:       kgToKT(v.prev),
-        pct:        v.prev > 0 ? Math.round((v.current - v.prev) / v.prev * 100) : null,
-        shareDelta: null as number | null,
-      }))
-  , [leafTotals, topN]);
+      .map(([name, v]) => {
+        const current   = kgToKT(v.current);
+        const t_arabica = typedKt(name, byCountryArabica, byCountryArabicaPrev);
+        const t_robusta = typedKt(name, byCountryRobusta, byCountryRobustaPrev);
+        const t_other   = Math.max(0,
+          Math.round((current - t_arabica - t_robusta) * 10) / 10);
+        return {
+          label:      name.length > 22 ? name.slice(0, 21) + "…" : name,
+          current,
+          prev:       kgToKT(v.prev),
+          pct:        v.prev > 0 ? Math.round((v.current - v.prev) / v.prev * 100) : null,
+          shareDelta: null as number | null,
+          t_arabica, t_robusta, t_other,
+        };
+      });
+  }, [leafTotals, topN, windowMonths, byCountryArabica, byCountryArabicaPrev,
+      byCountryRobusta, byCountryRobustaPrev]);
 
   const hubRows = useMemo(() => {
     const totalCurrent = Object.values(hubTotals).reduce((s, v) => s + v.current, 0);
@@ -209,6 +235,12 @@ export default function DestinationChart({
     view === "hub"
       ? (groupColors[r.label] ?? "#475569")
       : r.pct !== null && r.pct < 0 ? "#ef4444" : GREEN;
+
+  // Stacked species split: Total view, destination × country mode only
+  // (ports carry no per-type data).
+  const canSplit  = destMode === "destination" && view === "country"
+    && coffeeType === "total" && !!(byCountryArabica || byCountryRobusta);
+  const showSplit = canSplit && splitTypes;
 
   // Hide the type selector when port mode is active (no per-type port data).
   const showTypeSelector = destMode === "destination";
@@ -297,6 +329,18 @@ export default function DestinationChart({
               ))}
             </div>
           )}
+          {/* Type-split toggle (Total × country view only) */}
+          {canSplit && (
+            <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+              {([true, false] as const).map(sp => (
+                <button key={String(sp)} onClick={() => setSplitTypes(sp)}
+                  title={sp ? "Stack the species inside each bar" : "Single bar coloured by YoY direction"}
+                  className={`text-[10px] px-2 py-0.5 rounded ${splitTypes === sp ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                  {sp ? "Split" : "Solid"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -310,6 +354,13 @@ export default function DestinationChart({
             width={view === "hub" ? 125 : 145} />
           <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: "#94a3b8" }}
             formatter={((v, name, item) => {
+              const split = SPLIT_SERIES.find(sp => sp.key === name);
+              if (split) {
+                return [
+                  <span key="v" style={{ color: split.color }}>{`${v} kt`}</span>,
+                  split.label as NameType,
+                ];
+              }
               const row = (item?.payload ?? {}) as { label: string; pct: number | null };
               const color = name === "current" ? barFill(row) : "#94a3b8";
               return [
@@ -318,15 +369,25 @@ export default function DestinationChart({
               ];
             }) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
-            formatter={(v) => (
-              <span style={{ color: "#cbd5e1" }}>
-                {v === "current" ? periodLabel : prevPeriodLabel}
-              </span>
-            )} />
-          <Bar dataKey="prev"    name="prev"    fill={SLATE} opacity={0.55} />
-          <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
-            {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
-          </Bar>
+            formatter={(v) => {
+              const split = SPLIT_SERIES.find(sp => sp.key === v);
+              return (
+                <span style={{ color: "#cbd5e1" }}>
+                  {split ? split.label : v === "current" ? periodLabel : prevPeriodLabel}
+                </span>
+              );
+            }} />
+          <Bar dataKey="prev" name="prev" fill={SLATE} opacity={0.55} />
+          {showSplit ? (
+            SPLIT_SERIES.map((sp, i) => (
+              <Bar key={sp.key} dataKey={sp.key} name={sp.key} stackId="cur" fill={sp.color}
+                radius={i === SPLIT_SERIES.length - 1 ? [0, 3, 3, 0] : undefined} />
+            ))
+          ) : (
+            <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
+              {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
+            </Bar>
+          )}
         </BarChart>
       </ResponsiveContainer>
 
