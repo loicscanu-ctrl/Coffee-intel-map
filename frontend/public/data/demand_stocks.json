@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T03:46:55.060489Z",
+  "generated_at": "2026-07-14T05:17:28.024513Z",
   "eu": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -10063,8 +10063,8 @@
       "name": "Ethiopia",
       "latest_year": "2025",
       "consumption_mt": 222000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 135472051,
+      "per_capita_kg": 1.64,
       "annual": [
         {
           "year": "1960",
@@ -10667,8 +10667,8 @@
       "name": "South Korea",
       "latest_year": "2025",
       "consumption_mt": 204000,
-      "population": null,
-      "per_capita_kg": null,
+      "population": 51684564,
+      "per_capita_kg": 3.95,
       "annual": [
         {
           "year": "2002",
@@ -12551,7 +12551,7 @@
   ],
   "populations": {
     "source": "World Bank API (SP.POP.TOTL)",
-    "last_updated": "2026-07-13",
+    "last_updated": "2026-07-14",
     "countries": {
       "eu": {
         "name": "European Union",
@@ -12630,6 +12630,18 @@
         "iso3": "EGY",
         "latest_year": "2025",
         "latest_population": 118365995
+      },
+      "korea": {
+        "name": "South Korea",
+        "iso3": "KOR",
+        "latest_year": "2025",
+        "latest_population": 51684564
+      },
+      "ethiopia": {
+        "name": "Ethiopia",
+        "iso3": "ETH",
+        "latest_year": "2025",
+        "latest_population": 135472051
       }
     }
   },
