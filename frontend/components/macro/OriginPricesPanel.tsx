@@ -72,6 +72,11 @@ interface OiContract { symbol: string; oi: number; last_price: number }
 interface OiSnapshot { date: string; contracts: OiContract[] }
 interface OiHistory  { arabica?: OiSnapshot[]; robusta?: OiSnapshot[] }
 
+// Long-lived front-month price history (from the 5-year contract archive, not
+// the 14-day OI window). arabica price is US¢/lb, robusta USD/MT.
+interface FrontPricePoint { date: string; price: number }
+interface FuturesPriceHistory { arabica?: FrontPricePoint[]; robusta?: FrontPricePoint[] }
+
 // Rate on a given date: the last close on or before it (forward-fill across
 // weekends/holidays / dates past the last FX point). Falls back to the earliest
 // close for dates before the series starts.
@@ -123,6 +128,7 @@ export default function OriginPricesPanel() {
   const [commodity, setCommodity] = useState<Commodity>("robusta");
   const [fx,        setFx]        = useState<FxSeries>({});
   const [oiHist,    setOiHist]    = useState<OiHistory | null>(null);
+  const [priceHist, setPriceHist] = useState<FuturesPriceHistory | null>(null);
 
   useEffect(() => {
     fetch("/data/origin_prices_history.json")
@@ -145,7 +151,14 @@ export default function OriginPricesPanel() {
         setFx(series);
       })
       .catch(() => { /* native-only */ });
-    // Daily futures price history (per-contract last_price) for the KC/RC overlay.
+    // Long front-month price history (5-year contract archive) for the KC/RC
+    // overlay — spans the whole selected window, not just 14 days.
+    fetch("/data/futures_price_history.json")
+      .then(r => r.ok ? r.json() : null)
+      .then((ph: FuturesPriceHistory | null) => { if (ph) setPriceHist(ph); })
+      .catch(() => { /* fall back to oi_history */ });
+    // Fallback: the 14-day OI window (used only if the price-history file is
+    // missing, e.g. before its first export run).
     fetch("/data/oi_history.json")
       .then(r => r.ok ? r.json() : null)
       .then((oi: OiHistory | null) => { if (oi) setOiHist(oi); })
@@ -161,9 +174,22 @@ export default function OriginPricesPanel() {
     [data, commodity]
   );
 
-  // Front-month futures price (USD/MT) per day, for the active commodity. Front
-  // = highest open interest. KC is ¢/lb → USD/MT; RC is already $/MT.
+  // Front-month futures price (USD/MT) per day, for the active commodity. KC is
+  // ¢/lb → USD/MT; RC is already $/MT. Prefer the long price-history file (5-year
+  // archive) so the overlay spans the window; fall back to the 14-day oi_history
+  // (front = highest open interest) only if the long file isn't available.
   const futuresSeries = useMemo(() => {
+    const toUsdMt = (price: number) =>
+      commodity === "arabica" ? price * KC_CENTS_TO_USD_MT : price;
+
+    const long = commodity === "arabica" ? priceHist?.arabica : priceHist?.robusta;
+    if (long?.length) {
+      return long
+        .filter(p => p.price != null)
+        .map(p => ({ date: p.date, value: toUsdMt(p.price) }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+    }
+
     const snaps = commodity === "arabica" ? oiHist?.arabica : oiHist?.robusta;
     if (!snaps?.length) return [] as { date: string; value: number }[];
     return snaps
@@ -172,12 +198,11 @@ export default function OriginPricesPanel() {
         if (!cs.length) return null;
         const front = cs.reduce((b, c) => (c.oi ?? 0) > (b.oi ?? 0) ? c : b, cs[0]);
         if (front?.last_price == null) return null;
-        const usdMt = commodity === "arabica" ? front.last_price * KC_CENTS_TO_USD_MT : front.last_price;
-        return { date: s.date, value: usdMt };
+        return { date: s.date, value: toUsdMt(front.last_price) };
       })
       .filter((x): x is { date: string; value: number } => x != null)
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, [oiHist, commodity]);
+  }, [oiHist, priceHist, commodity]);
 
   const futuresName = commodity === "arabica" ? "ICE NY Arabica (KC)" : "ICE London Robusta (RC)";
   // The futures price is a USD/MT figure, so only overlay it where the origins

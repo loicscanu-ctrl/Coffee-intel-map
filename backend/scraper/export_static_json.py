@@ -31,7 +31,11 @@ from database import SessionLocal
 from scraper.exporters.base import OUT_DIR
 from scraper.exporters.cot import export_cot, export_macro_cot
 from scraper.exporters.demand import export_demand_stocks, export_factory_mix_step
-from scraper.exporters.futures import export_futures_chain, export_oi_fnd_chart
+from scraper.exporters.futures import (
+    export_futures_chain,
+    export_futures_price_history,
+    export_oi_fnd_chart,
+)
 from scraper.exporters.health import export_health
 from scraper.exporters.macro import export_freight, export_retail_cpi, export_us_cpi
 from scraper.exporters.news import export_news
@@ -81,6 +85,7 @@ def _exporters(db):
     return [
         ("futures_chain",         lambda: export_futures_chain(db)),
         ("oi_fnd_chart",          lambda: export_oi_fnd_chart(db)),
+        ("futures_price_history", lambda: export_futures_price_history(db)),
         ("cot",                   lambda: export_cot(db)),
         ("macro_cot",             lambda: export_macro_cot(db)),
         ("freight",               lambda: export_freight(db)),

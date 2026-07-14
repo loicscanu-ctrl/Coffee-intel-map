@@ -354,3 +354,66 @@ def export_oi_fnd_chart(db) -> None:
     path = OUT_DIR / "oi_fnd_chart.json"
     written = safe_write_json(path, result, validate_oi_fnd_chart)
     print(f"  oi_fnd_chart.json → written:{written} arabica:{len(result['arabica'])} robusta:{len(result['robusta'])} series")
+
+
+# Emit at most this many trailing days — comfortably covers the panel's 2Y max
+# window while keeping the file lean. The archive itself keeps ~5Y.
+_PRICE_HISTORY_MAX_DAYS = 820
+
+
+def _front_price_series(market_archive: dict) -> list[dict]:
+    """Front-month daily settlement price series from the per-contract archive.
+
+    `market_archive` is {YYYY-MM-DD: {SYMBOL: {oi, price}}}. For each date the
+    front month is the highest-OI contract; when OI is missing (ICE publishes it
+    a day behind the price, so the most recent date has price-but-no-OI) we carry
+    forward the last OI-determined front, else fall back to the nearest-expiry
+    (first-listed) priced contract. Prices are passed through in their native
+    unit — arabica in US¢/lb, robusta in USD/MT — matching oi_history so the
+    frontend converts them the same way.
+    """
+    rows: list[dict] = []
+    last_front: str | None = None
+    for d in sorted(market_archive):
+        day = market_archive[d] or {}
+        priced = {s: v for s, v in day.items()
+                  if isinstance(v, dict) and v.get("price") is not None}
+        if not priced:
+            continue
+        with_oi = {s: v for s, v in priced.items() if v.get("oi")}
+        if with_oi:
+            front = max(with_oi, key=lambda s: with_oi[s]["oi"] or 0)
+            last_front = front
+        elif last_front in priced:
+            front = last_front
+        else:
+            front = next(iter(priced))          # dicts preserve insertion (expiry) order
+        rows.append({"date": d, "price": priced[front]["price"]})
+    return rows[-_PRICE_HISTORY_MAX_DAYS:]
+
+
+def export_futures_price_history(db) -> None:
+    """Write futures_price_history.json — the front-month KC/RC daily price
+    history for the Origin Farmgate overlay.
+
+    The overlay used to read oi_history.json, whose 14-day rolling window (a
+    deliberate cap for the OI *visual* tables) truncated the futures line to two
+    weeks. This sources the full ~5-year per-contract archive instead, so the
+    overlay spans the whole selected window. The 14-day cap stays on the OI
+    tables; only this price line is uncapped.
+    """
+    archive = _load_contract_archive()
+    result = {
+        "arabica": _front_price_series(archive.get("arabica") or {}),
+        "robusta": _front_price_series(archive.get("robusta") or {}),
+    }
+    path = OUT_DIR / "futures_price_history.json"
+    # Shape/liveness gate: both markets present and non-trivially populated.
+    def _valid(d: dict) -> tuple[bool, str]:
+        for m in ("arabica", "robusta"):
+            if not isinstance(d.get(m), list) or len(d[m]) < 2:
+                return False, f"{m} series too short"
+        return True, "ok"
+    written = safe_write_json(path, result, _valid)
+    print(f"  futures_price_history.json → written:{written} "
+          f"arabica:{len(result['arabica'])} robusta:{len(result['robusta'])} days")
