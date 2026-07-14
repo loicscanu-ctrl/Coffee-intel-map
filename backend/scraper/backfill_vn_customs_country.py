@@ -138,19 +138,25 @@ def _candidate_urls(data_y: int, data_m: int, table: str) -> list[str]:
     return [u for u in urls if not (u in seen or seen.add(u))]
 
 
-def _download(url: str) -> bytes | None:
+# Shared session: candidate sweeps hit the same host hundreds of times, and a
+# fresh TLS handshake per request (~2 s against this host) is what blew the
+# first 48-month run past the job timeout. Keep-alive makes 404s cheap.
+_SESSION = requests.Session()
+_SESSION.headers.update(_HEADERS)
+
+
+def _download(url: str, timeout: int = 12) -> bytes | None:
     """GET url; PDF bytes on success else None. verify=False matches the
     misconfigured TLS chain on files.customs.gov.vn (see vn_coffee_export)."""
     try:
-        r = requests.get(url, headers=_HEADERS, timeout=30, verify=False,
-                         allow_redirects=True)
+        r = _SESSION.get(url, timeout=timeout, verify=False, allow_redirects=True)
         if r.status_code == 200 and b"%PDF" in r.content[:10]:
             return r.content
         if r.status_code == 403:
-            print(f"    403 (blocked, not missing): {url}", file=sys.stderr)
+            print(f"    403 (blocked, not missing): {url}", file=sys.stderr, flush=True)
         return None
     except requests.RequestException as e:
-        print(f"    {type(e).__name__} on {url}: {str(e)[:120]}", file=sys.stderr)
+        print(f"    {type(e).__name__} on {url}: {str(e)[:120]}", file=sys.stderr, flush=True)
         return None
 
 
@@ -221,8 +227,13 @@ def _find_month(data_y: int, data_m: int,
         if got:
             continue
 
-        # 3) full prediction sweep
-        for cand in _candidate_urls(data_y, data_m, table):
+        # 3) prediction sweep. 5x and 5n publish together, so if the month's
+        # 5x is already missing after a FULL sweep, cap the 5n sweep to the
+        # most plausible candidates instead of doubling the miss cost.
+        candidates = _candidate_urls(data_y, data_m, table)
+        if table == "5n" and "5x" not in out:
+            candidates = candidates[:32]
+        for cand in candidates:
             body = _download(cand)
             if body:
                 out[table] = (cand, body)
@@ -361,23 +372,51 @@ def run_probe() -> int:
     return 2
 
 
+def _write_seed(series: dict[str, dict], ok: int) -> None:
+    SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SEED_PATH.write_text(json.dumps({
+        "_note": ("Vietnam Customs coffee by country/territory, harvested from "
+                  "the English preliminary bulletins (5X exports / 5N imports, "
+                  "'(ta-sb)') on files.customs.gov.vn by "
+                  "scraper.backfill_vn_customs_country. volume_ton/value_usd "
+                  "are the reporting month; ytd_* the year-to-date cumulative. "
+                  "5N carries no coffee commodity line (VN coffee imports are "
+                  "folded into 'Other products'), so imports_by_country is "
+                  "empty by source, kept for future-proofing."),
+        "harvested_months": ok,
+        "months": dict(sorted(series.items())),
+    }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
 def run_backfill(months: int) -> int:
-    index_hits = _index_scrape()
+    # Merge into any existing seed so the backfill is resumable — a partial
+    # (timeout-salvaged) run plus a re-run converge on the full series, and
+    # already-harvested months are skipped instead of re-downloaded.
     series: dict[str, dict] = {}
-    ok = 0
+    if SEED_PATH.exists():
+        try:
+            series = json.loads(SEED_PATH.read_text(encoding="utf-8")).get("months", {})
+            print(f"[backfill] resuming over existing seed ({len(series)} months)", flush=True)
+        except (json.JSONDecodeError, OSError):
+            pass
+    index_hits = _index_scrape()
+    ok = len(series)
     consecutive_misses = 0
     for (y, m) in _months_back(months):
         key = f"{y}-{m:02d}"
+        if key in series:
+            consecutive_misses = 0
+            continue
         found = _find_month(y, m, index_hits)
         if not found:
             consecutive_misses += 1
             print(f"[backfill] {key}: not found "
-                  f"({consecutive_misses} consecutive miss(es))")
+                  f"({consecutive_misses} consecutive miss(es))", flush=True)
             # Three consecutive missing months going backward = the English
             # preliminary archive ends here; stop instead of sweeping ~700
             # more 404s per month into the past.
             if consecutive_misses >= 3:
-                print("[backfill] archive appears to end here — stopping.")
+                print("[backfill] archive appears to end here — stopping.", flush=True)
                 break
             continue
         consecutive_misses = 0
@@ -396,31 +435,22 @@ def run_backfill(months: int) -> int:
                 for r in rows
             ]
             entry[f"source_url_{table}"] = url
-            print(f"[backfill] {key} {table}: {len(rows)} coffee rows ({url.rsplit('/', 1)[-1]})")
+            print(f"[backfill] {key} {table}: {len(rows)} coffee rows "
+                  f"({url.rsplit('/', 1)[-1]})", flush=True)
             unattributed = [r for r in rows if not r["country"]]
             if unattributed:
                 print(f"[backfill] {key} {table}: WARNING {len(unattributed)} "
-                      f"rows without a resolved country", file=sys.stderr)
+                      f"rows without a resolved country", file=sys.stderr, flush=True)
         series[key] = entry
         ok += 1
+        # Write after every month so a job timeout salvages everything so far.
+        _write_seed(series, ok)
         time.sleep(0.5)   # be polite to the host
     if not series:
-        print("[backfill] FATAL: nothing harvested.", file=sys.stderr)
+        print("[backfill] FATAL: nothing harvested.", file=sys.stderr, flush=True)
         return 2
-    SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
-    SEED_PATH.write_text(json.dumps({
-        "_note": ("Vietnam Customs coffee by country/territory, harvested from "
-                  "the English preliminary bulletins (5X exports / 5N imports, "
-                  "'(ta-sb)') on files.customs.gov.vn by "
-                  "scraper.backfill_vn_customs_country. volume_ton/value_usd "
-                  "are the reporting month; ytd_* the year-to-date cumulative. "
-                  "5N carries no coffee commodity line (VN coffee imports are "
-                  "folded into 'Other products'), so imports_by_country is "
-                  "empty by source, kept for future-proofing."),
-        "harvested_months": ok,
-        "months": dict(sorted(series.items())),
-    }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"[backfill] wrote {ok} months → {SEED_PATH}")
+    _write_seed(series, ok)
+    print(f"[backfill] wrote {ok} months → {SEED_PATH}", flush=True)
     return 0
 
 
