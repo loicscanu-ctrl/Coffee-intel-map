@@ -228,56 +228,29 @@
       }
     ]
   },
-  "scraped_at": "2026-07-14T22:30:44.361112+00:00",
+  "scraped_at": "2026-07-14T22:31:08.923937Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-13T22:28:48.316108Z",
-    "overall_sentiment": "Neutral",
-    "overall_confidence": 87.5,
-    "net_index": 17.5,
-    "bull_count": 2,
-    "bear_count": 0,
-    "neutral_count": 6,
+    "scraped_at": "2026-07-14T22:31:07.381396Z",
+    "overall_sentiment": "Bullish",
+    "overall_confidence": 67.0,
+    "net_index": 25.0,
+    "bull_count": 5,
+    "bear_count": 2,
+    "neutral_count": 1,
     "total": 8,
     "items": [
       {
-        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Dog Days Of Coffee Are Here",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 85.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
+        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
         "source": "Sprudge",
         "sentiment": "Bullish",
-        "confidence": 75.0,
+        "confidence": 50.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Afternoon Coffee Crash Is A Myth",
+        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
         "source": "Sprudge",
         "sentiment": "Bullish",
         "confidence": 65.0,
@@ -286,10 +259,46 @@
         ]
       },
       {
-        "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
+        "headline": "The Dog Days Of Coffee Are Here",
+        "source": "Sprudge",
+        "sentiment": "Bearish",
+        "confidence": 60.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 85.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The Afternoon Coffee Crash Is A Myth",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 70.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 65.0,
         "tags": [
           "sprudge"
         ]
@@ -297,17 +306,8 @@
       {
         "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "New Study Finds That Your Espresso Shots May Be Caving To Pressure",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bearish",
+        "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
