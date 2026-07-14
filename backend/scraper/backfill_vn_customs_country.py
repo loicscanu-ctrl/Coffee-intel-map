@@ -466,38 +466,15 @@ def run_probe_past() -> int:
     """
     hits = 0
 
-    # ── A: map the Vietnamese-edition coverage ────────────────────────────
-    # v1 answered the naming question: no 'ct' (official) files exist at this
-    # CMS path in any language, but the Vietnamese preliminary (vn-sb) DOES
-    # reach back to at least 2023-01 — published at a +6-month lag. Map the
-    # months v1 missed with a wider window (+1..+12), full day order and
-    # padded-month variants.
-    probe_months = [(2023, 12), (2023, 6), (2022, 6), (2022, 1)]
-    for (y, m) in probe_months:
-        found = None
-        for stem in _stems(y, m, "5x", suffixes=("(vn-sb)", "(VN-SB)")):
-            for off in range(1, 13):
-                pub_y, pub_m = _shift(y, m, off)
-                for d in _DAY_ORDER:
-                    url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
-                    body = _download(url)
-                    if body:
-                        found = (url, body)
-                        break
-                if found:
-                    break
-            if found:
-                break
-        if not found:
-            print(f"[probe-past] {y}-{m:02d}: no vn-sb 5x (pub +1..+12, all days)",
-                  flush=True)
-            continue
-        hits += 1
-        url, body = found
-        rows = parse_coffee_by_country(body)
-        print(f"[probe-past] {y}-{m:02d}: FOUND {url}", flush=True)
-        print(f"[probe-past] {y}-{m:02d}: {len(rows)} coffee rows; sample: "
-              f"{[(r['country'], r['rm_volume']) for r in rows[:5]]}", flush=True)
+    # ── A: pre-2024 archaeology — CONCLUDED ───────────────────────────────
+    # v1: no 'ct' (official) files exist at this CMS path in any language for
+    # any probed month (pub +1..+8). One Vietnamese hit: 2023-t1-5x(vn-sb)
+    # at a +6-month lag. v2: exhaustive sweeps (+1..+12, all days, padded and
+    # case variants) found NO vn-sb 5x for 2023-12, 2023-06 or 2022-06 — the
+    # 2023-01 file is an isolated re-upload, not a retrievable monthly
+    # series. URL prediction cannot reach pre-2024 by-country history; the
+    # remaining lever is portal-bridge enumeration (Playwright, see
+    # vn_fertilizer), which lists real publication URLs instead of guessing.
 
     # ── B: structure dump of the known Vietnamese 5x (2023-01) ────────────
     # Found by probe v1 at a +6-month publication lag. Dump its header/layout
