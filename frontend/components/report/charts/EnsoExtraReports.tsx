@@ -7,6 +7,8 @@
 import { useEffect, useState } from "react";
 import EnsoForecastPlume from "@/components/enso/EnsoForecastPlume";
 import EnsoRiskTable from "@/components/enso/EnsoRiskTable";
+import EnsoDivergenceChart from "@/components/enso/EnsoDivergenceChart";
+import EnsoSubsurfaceCard from "@/components/enso/EnsoSubsurfaceCard";
 import type { EnsoData } from "@/lib/enso";
 
 function useEnso() {
@@ -34,4 +36,14 @@ export function EnsoPlumeReport() {
 export function EnsoRiskTableReport() {
   const { data, error } = useEnso();
   return fallback(error, data) ?? <EnsoRiskTable pins={data!.risk.pins} />;
+}
+
+// These two self-fetch their own indices (enso_indices.json / enso_subsurface.json)
+// and default their time range, so the wrapper is a passthrough.
+export function EnsoDivergenceReport() {
+  return <EnsoDivergenceChart />;
+}
+
+export function EnsoSubsurfaceReport() {
+  return <EnsoSubsurfaceCard />;
 }

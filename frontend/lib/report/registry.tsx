@@ -138,6 +138,15 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     group: "COT",
   },
   {
+    id: "cot_report",
+    label: "COT Report — Positioning Analysis",
+    category: "Futures",
+    description: "Automated positioning read — positioning, WoW flow, price divergence, crowd risk and overall bias per market.",
+    Component: dynamic(() => import("@/components/report/charts/CotReports").then((m) => ({ default: m.CotReportAnalysis })), { ssr: false, loading }),
+    width: "full",
+    group: "COT",
+  },
+  {
     id: "oi_fnd",
     label: "OI Evolution to FND — NY & London",
     category: "Futures",
@@ -429,6 +438,24 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     Component: dynamic(() => import("@/components/report/charts/EnsoExtraReports").then((m) => ({ default: m.EnsoRiskTableReport })), { ssr: false, loading }),
     width: "full",
   },
+  {
+    id: "enso_divergence",
+    label: "ENSO — Ocean/Atmosphere Coupling",
+    group: "Cross-origin",
+    category: "Supply",
+    description: "Niño 3.4 SST anomaly and the SOI atmospheric response — how coupled the current ENSO phase is.",
+    Component: dynamic(() => import("@/components/report/charts/EnsoExtraReports").then((m) => ({ default: m.EnsoDivergenceReport })), { ssr: false, loading }),
+    width: "half",
+  },
+  {
+    id: "enso_subsurface",
+    label: "ENSO — Subsurface Warm Water Volume",
+    group: "Cross-origin",
+    category: "Supply",
+    description: "Warm Water Volume anomaly — a 4–6 month leading indicator for the next ENSO phase.",
+    Component: dynamic(() => import("@/components/report/charts/EnsoExtraReports").then((m) => ({ default: m.EnsoSubsurfaceReport })), { ssr: false, loading }),
+    width: "half",
+  },
 
   // ── Demand ─────────────────────────────────────────────────────────────────
   {
@@ -531,6 +558,42 @@ export const REPORT_REGISTRY: ReportChartDef[] = [
     description: "Monthly Kaffeesteuer revenue with 12-mo average — a proxy for German consumption.",
     Component: dynamic(() => import("@/components/demand/KaffeesteuerChart"), { ssr: false, loading }),
     width: "half",
+  },
+  {
+    id: "world_consumption",
+    label: "World Consumption",
+    category: "Demand",
+    group: "Consumption",
+    description: "Tracked global coffee consumption vs the ICO reference total.",
+    Component: dynamic(() => import("@/components/demand/WorldConsumptionWidget"), { ssr: false, loading }),
+    width: "full",
+  },
+  {
+    id: "age_cohort",
+    label: "Coffee-Drinking-Age Population (18+)",
+    category: "Demand",
+    group: "Consumption",
+    description: "18+ population trajectory across tracked markets — the structural demand base.",
+    Component: dynamic(() => import("@/components/demand/AgeCohortPanel"), { ssr: false, loading }),
+    width: "full",
+  },
+  {
+    id: "us_imports_origin",
+    label: "US Coffee Imports by Origin",
+    category: "Demand",
+    group: "Imports",
+    description: "Where the US sources its green coffee (USITC, HTS 0901) — origin ranking and trend.",
+    Component: dynamic(() => import("@/components/report/charts/DemandReports").then((m) => ({ default: m.UsImportsByOrigin })), { ssr: false, loading }),
+    width: "full",
+  },
+  {
+    id: "eu_imports_origin",
+    label: "EU Coffee Imports by Origin",
+    category: "Demand",
+    group: "Imports",
+    description: "Extra-EU coffee sourcing (Eurostat Comext, HS 0901) — origin ranking and trend.",
+    Component: dynamic(() => import("@/components/report/charts/DemandReports").then((m) => ({ default: m.EuImportsByOrigin })), { ssr: false, loading }),
+    width: "full",
   },
 
   // ── Macro ──────────────────────────────────────────────────────────────────

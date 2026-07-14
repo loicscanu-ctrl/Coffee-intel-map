@@ -22,6 +22,7 @@ import Step1GlobalFlow from "@/components/futures/CotDashboard/Step1GlobalFlow";
 import Step4IndustryPulse from "@/components/futures/CotDashboard/Step4IndustryPulse";
 import Step5DryPowder from "@/components/futures/CotDashboard/Step5DryPowder";
 import Step6CycleLocation from "@/components/futures/CotDashboard/Step6CycleLocation";
+import Step7Report from "@/components/futures/CotDashboard/Step7Report";
 import Step8Analysis from "@/components/futures/CotDashboard/Step8Analysis";
 
 const Unavailable = () => <div className="p-4 text-xs text-slate-500">COT data unavailable.</div>;
@@ -59,6 +60,7 @@ export const CotGaugesReport        = cotVisual((data) => <CotGauges data={data}
 export const CotIndustryPulseReport = cotVisual((data) => <Step4IndustryPulse data={data} />);
 export const CotDryPowderReport     = cotVisual((data) => <Step5DryPowder data={data} />);
 export const CotCycleLocationReport = cotVisual((data) => <Step6CycleLocation recent52={data.slice(-52)} />);
+export const CotReportAnalysis      = cotVisual((data) => <Step7Report data={data} recent52={data.slice(-52)} />);
 export const CotSignalsReport       = cotVisual((data) => (
   <Step8Analysis signals={evaluateSignals(data)} historicalSignals={evaluateHistoricalSignals(data)} />
 ));
