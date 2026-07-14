@@ -152,10 +152,15 @@ def export_farmer_economics(db) -> None:
 
                 # Full per-day frost variable trend for EVERY region (even
                 # frost-free ones), so the UI can show how close each region
-                # runs to a freeze across the 14-day forecast. Each day carries
-                # the physics the model actually keyed on + the same severity
-                # tier the alert engine fires, computed here so the table and
-                # the Telegram alert can never disagree.
+                # runs to a freeze across the FORECAST. daily_data trails ~2
+                # months of history for the drought baseline, so slice to the
+                # days from today forward (capped at the 14-day grid width) —
+                # the trend table is about what's coming, not the past. Each
+                # day carries the physics the model keyed on + the same severity
+                # the alert engine fires, so table and Telegram can't disagree.
+                frost_forecast = [
+                    d for d in daily if str(d.get("date", "")) >= _today_iso
+                ][:14] or daily[-14:]
                 frost_drivers_out.append({
                     "region": region_name,
                     "days": [
@@ -175,7 +180,7 @@ def export_farmer_economics(db) -> None:
                             "hours_below_0":    d.get("frost_hours_below_0", 0),
                             "hours_below_hard": d.get("frost_hours_below_hard"),
                         }
-                        for d in daily
+                        for d in frost_forecast
                     ],
                 })
                 if any(c != "-" for c in drought_days):

@@ -126,6 +126,12 @@ export default function WeatherRiskPanel({ weather }: Props) {
     d.setDate(today.getDate() + i);
     return String(d.getDate());
   });
+  // Frost header comes from the actual forecast dates the export shipped, so
+  // the day columns always line up with the data (which is sliced to the
+  // forecast window, not the browser's calendar).
+  const frostDayLabels = (weather.frost_drivers?.[0]?.days ?? []).map((d) =>
+    d.date ? String(parseInt(d.date.slice(8, 10), 10)) : "",
+  );
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 space-y-4">
@@ -178,7 +184,7 @@ export default function WeatherRiskPanel({ weather }: Props) {
               <thead>
                 <tr>
                   <th className="text-left text-slate-500 pr-2 font-normal w-20">Region</th>
-                  {dayLabels.map((d, i) => (
+                  {frostDayLabels.map((d, i) => (
                     <th key={i} className="text-center text-slate-600 w-5 font-normal">{d}</th>
                   ))}
                 </tr>
