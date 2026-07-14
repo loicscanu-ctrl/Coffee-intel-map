@@ -17,11 +17,11 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "probe (dump newest PDFs' table structure) or backfill (harvest N months → seed JSON)"
+        description: "probe (newest PDFs) · backfill (harvest N months → seed) · probe-past (hunt official 'ct'/Vietnamese bulletins before 2024-02 + check 1N for a coffee import line)"
         required: false
         default: "probe"
         type: choice
-        options: ["probe", "backfill"]
+        options: ["probe", "backfill", "probe-past"]
       months:
         description: "Backfill lookback in months."
         required: false

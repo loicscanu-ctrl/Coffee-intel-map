@@ -109,12 +109,17 @@ def _shift(year: int, month: int, by: int) -> tuple[int, int]:
     return y, m
 
 
-def _stems(data_y: int, data_m: int, table: str) -> list[str]:
-    """Filename variants for one data month + direction ('5x' | '5n')."""
+def _stems(data_y: int, data_m: int, table: str,
+           suffixes: tuple[str, ...] = ("(ta-sb)", "(TA-SB)")) -> list[str]:
+    """Filename variants for one data month + table ('5x' | '5n' | '1n').
+
+    Suffix legend (per the customs CMS naming): ta = English, vn = Vietnamese,
+    sb = so bo (preliminary), ct = chinh thuc (official/definitive).
+    """
     out = []
     for tprefix in ("t", "T"):
         for mfmt in (str(data_m), f"{data_m:02d}"):
-            for suffix in ("(ta-sb)", "(TA-SB)"):
+            for suffix in suffixes:
                 out.append(f"{data_y}-{tprefix}{mfmt}-{table}{suffix}.pdf")
     return out
 
@@ -444,6 +449,94 @@ def _write_seed(series: dict[str, dict], ok: int) -> None:
     }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
+def run_probe_past() -> int:
+    """Two archaeology probes, both reporting to logs:
+
+    A) Do OFFICIAL ('ct' = chinh thuc) or Vietnamese-language bulletins exist
+       for months BEFORE the English preliminary series starts (2024-02)?
+       Officials publish with a longer lag, so the publication window sweeps
+       data_month+1 .. +8; stems try (ta-ct)/(ct)/(vn-ct)/(vn-sb) in modern
+       lowercase (older case variants only widen the sweep — first find the
+       naming, then widen if needed).
+
+    B) Does the 1N bulletin (imports BY COMMODITY — the import twin of the
+       2x that vn_coffee_export harvests) carry a coffee line? The 5N
+       by-country table doesn't; if 1N does, a national import series is
+       harvestable. Scans the newest reachable month's 1n for coffee rows.
+    """
+    hits = 0
+
+    # ── A: pre-2024 archaeology ───────────────────────────────────────────
+    past_suffixes = ("(ta-ct)", "(ct)", "(vn-ct)", "(vn-sb)")
+    probe_months = [(2024, 1), (2023, 12), (2023, 11), (2023, 10),
+                    (2023, 6), (2023, 1)]
+    days = _DAY_ORDER[:16]
+    for (y, m) in probe_months:
+        found = None
+        for suffix in past_suffixes:
+            stem = f"{y}-t{m}-5x{suffix}.pdf"
+            for off in range(1, 9):
+                pub_y, pub_m = _shift(y, m, off)
+                for d in days:
+                    url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
+                    body = _download(url)
+                    if body:
+                        found = (url, body)
+                        break
+                if found:
+                    break
+            if found:
+                break
+        if not found:
+            print(f"[probe-past] {y}-{m:02d}: no 5x under "
+                  f"{'/'.join(past_suffixes)} (pub +1..+8)", flush=True)
+            continue
+        hits += 1
+        url, body = found
+        rows = parse_coffee_by_country(body)
+        print(f"[probe-past] {y}-{m:02d}: FOUND {url}", flush=True)
+        print(f"[probe-past] {y}-{m:02d}: {len(rows)} coffee rows; sample: "
+              f"{[(r['country'], r['rm_volume']) for r in rows[:5]]}", flush=True)
+
+    # ── B: 1N coffee-import check ─────────────────────────────────────────
+    import pdfplumber
+    for (y, m) in _months_back(3):
+        got = None
+        for suffix in ("(ta-sb)", "(vn-sb)"):
+            stem = f"{y}-t{m}-1n{suffix}.pdf"
+            for off in (1, 2):
+                pub_y, pub_m = _shift(y, m, off)
+                for d in _DAY_ORDER[:16]:
+                    url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
+                    body = _download(url)
+                    if body:
+                        got = (url, body)
+                        break
+                if got:
+                    break
+            if got:
+                break
+        if not got:
+            print(f"[probe-past] 1n {y}-{m:02d}: not found", flush=True)
+            continue
+        url, body = got
+        print(f"[probe-past] 1n FOUND: {url}", flush=True)
+        with pdfplumber.open(io.BytesIO(body)) as pdf:
+            printed = 0
+            for pno, pg in enumerate(pdf.pages, 1):
+                for ln in (pg.extract_text() or "").splitlines():
+                    if _COFFEE_RX.search(_strip_accents(ln)):
+                        print(f"[probe-past] 1n p{pno}: {ln[:120]}", flush=True)
+                        printed += 1
+            if not printed:
+                print("[probe-past] 1n: NO coffee line — imports not broken "
+                      "out in this bulletin either", flush=True)
+        break   # one month is enough to answer the question
+
+    print(f"[probe-past] done — {hits} pre-2024 5x hit(s).", flush=True)
+    return 0
+
+
 def run_backfill(months: int) -> int:
     # Merge into any existing seed so the backfill is resumable — a partial
     # (timeout-salvaged) run plus a re-run converge on the full series, and
@@ -517,10 +610,13 @@ def run_backfill(months: int) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--mode", choices=("probe", "backfill"), default="probe")
+    ap.add_argument("--mode", choices=("probe", "backfill", "probe-past"),
+                    default="probe")
     ap.add_argument("--months", type=int, default=24,
                     help="Backfill lookback in months (default 24).")
     args = ap.parse_args(argv)
+    if args.mode == "probe-past":
+        return run_probe_past()
     return run_probe() if args.mode == "probe" else run_backfill(args.months)
 
 
