@@ -877,11 +877,14 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
             <tr><td style="color:#94a3b8">Export↔import match</td><td style="text-align:right">${f.corr != null ? `r=${f.corr.toFixed(2)} @ lag ${f.lagMonths}mo` : "no import series"}</td></tr>
             <tr><td style="color:#94a3b8">Dest captures</td><td style="text-align:right">${f.matchRatio != null ? `${Math.round(f.matchRatio * 100)}% of exports` : "—"}</td></tr>
           </table>
-          <div style="color:#64748b;font-size:9px;margin-top:6px">in-transit ≈ export rate × voyage days · sources: ${f.origin === "Brazil" ? "Cecafe" : "VN customs"} ↔ ${f.dest === "EU" ? "Eurostat" : f.dest === "US" ? "USITC" : "n/a"}</div>
+          <div style="color:#64748b;font-size:9px;margin-top:6px">in-transit ≈ export rate × voyage days · sources: ${{Brazil: "Cecafe", Vietnam: "VN customs", Indonesia: "BPS", Uganda: "UCDA"}[f.origin]} ↔ ${f.dest === "EU" ? "Eurostat" : f.dest === "US" ? "USITC" : "n/a"}</div>
         </div>`;
+        // Small lanes (< half a boat-unit) show a dinghy rather than a full
+        // ship, so 1-boat-minimum lanes don't read as 25 kt when they carry 2.
+        const glyph = f.inTransitMt < (KT_PER_BOAT * 1000) / 2 ? "⛵" : "🚢";
         for (let k = 0; k < n; k++) {
           const icon = Leaflet.divIcon({
-            className: "", html: `<div style="font-size:15px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.9))">🚢</div>`,
+            className: "", html: `<div style="font-size:15px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.9))">${glyph}</div>`,
             iconSize: [16, 16], iconAnchor: [8, 8],
           });
           const m = Leaflet.marker(interp(k / n), { icon })

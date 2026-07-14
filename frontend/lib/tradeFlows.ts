@@ -12,7 +12,7 @@
 // for tonnage. All computation is client-side over already-published JSONs.
 
 export interface TradeFlow {
-  origin: "Brazil" | "Vietnam";
+  origin: "Brazil" | "Vietnam" | "Indonesia" | "Uganda";
   dest: "EU" | "US" | "Japan";
   exportRateMt: number;        // avg of the last 2 reported export months
   lastExportMonth: string;
@@ -56,12 +56,37 @@ const PATHS: Record<string, [number, number][]> = {
   "Vietnam-Japan": [
     [10.76, 106.78], [8, 110], [15, 116], [22, 123], [30, 128], [33, 134], [35.61, 139.78],
   ],
+  "Indonesia-EU": [
+    [-6.1, 106.88], [-3, 106], [1.26, 103.8], [3, 100.5], [5.5, 98], [5.8, 95.5],
+    [5.8, 80.4], [10, 65], [14, 55], [12.5, 45], [12.6, 43.3], [18, 40], [22, 38],
+    [27, 34.5], [29.5, 32.55], [31.2, 32.3], [32.5, 31], [34, 25], [36, 15], [37.5, 10],
+    [37.5, 3], [37, 0], [36, -5.3], [37, -10], [43, -11], [48, -7], [49.5, -3.5],
+    [50, -1], [50.5, 0], [51.2, 1.8], [52, 3], [51.8, 3.5], [51.26, 4.35],
+  ],
+  "Indonesia-US": [
+    [-6.1, 106.88], [-3, 106], [1.26, 103.8], [8, 112], [15, 125], [22, 138], [30, 150],
+    [38, 158], [30, 175], [22, 195], [26, 212], [30, 227], [33.7, 241.8],
+  ],
+  "Indonesia-Japan": [
+    [-6.1, 106.88], [-3, 106], [1.26, 103.8], [8, 110], [15, 116], [22, 123],
+    [30, 128], [33, 134], [35.61, 139.78],
+  ],
+  // Kampala → rail/road → Mombasa → Red Sea → Suez → Antwerp.
+  "Uganda-EU": [
+    [0.31, 32.58], [-1.29, 36.82], [-4.04, 39.66], [-4, 42], [0, 48], [5, 55],
+    [12, 52], [12.5, 45], [12.6, 43.3], [18, 40], [22, 38], [27, 34.5],
+    [29.5, 32.55], [31.2, 32.3], [32.5, 31], [34, 25], [36, 15], [37.5, 10],
+    [37.5, 3], [37, 0], [36, -5.3], [37, -10], [43, -11], [48, -7], [49.5, -3.5],
+    [50, -1], [50.5, 0], [51.2, 1.8], [52, 3], [51.8, 3.5], [51.26, 4.35],
+  ],
 };
 
 // Physical voyage estimates (days) per lane — freight-route table.
 const TRANSIT_DAYS: Record<string, number> = {
   "Brazil-EU": 19, "Brazil-US": 15, "Brazil-Japan": 35,
   "Vietnam-EU": 27, "Vietnam-US": 30, "Vietnam-Japan": 12,
+  "Indonesia-EU": 30, "Indonesia-US": 24, "Indonesia-Japan": 9,
+  "Uganda-EU": 26,   // incl. the Kampala→Mombasa inland leg
 };
 
 // ── destination country groupings in each export source's own naming ─────────
@@ -74,6 +99,9 @@ const EU_EN = ["Germany", "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus",
   "Czech Republic", "Czechia", "Denmark", "Slovakia", "Slovenia", "Spain", "Estonia",
   "Finland", "France", "Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania",
   "Luxembourg", "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Sweden"];
+
+// Indonesia's BPS file uses UPPERCASE English country names.
+const EU_UPPER = EU_EN.map(n => n.toUpperCase());
 
 type Series = Record<string, number>;   // {"YYYY-MM": MT}
 
@@ -131,12 +159,17 @@ async function j(url: string): Promise<unknown | null> {
   try { const r = await fetch(url); return r.ok ? r.json() : null; } catch { return null; }
 }
 
+interface IdRow { month: string; by_destination?: { country: string; kg?: number }[] }
+interface UgRow { month: string; by_destination?: { country: string; bags?: number }[] }
+
 export async function fetchTradeFlows(): Promise<TradeFlow[]> {
-  const [cecafe, vn, eu, us] = await Promise.all([
+  const [cecafe, vn, eu, us, id, ug] = await Promise.all([
     j("/data/cecafe.json") as Promise<{ by_country?: CecafeCY; by_country_prev?: CecafeCY } | null>,
     j("/data/vn_export_by_destination.json") as Promise<{ countries?: Record<string, Series> } | null>,
     j("/data/eu_coffee_imports.json") as Promise<{ origins?: { name: string; monthly?: Series }[] } | null>,
     j("/data/us_coffee_imports.json") as Promise<{ monthly_origins?: Record<string, Series> } | null>,
+    j("/data/indonesia_exports.json") as Promise<{ series?: IdRow[] } | null>,
+    j("/data/uganda_monthly.json") as Promise<{ series?: UgRow[] } | null>,
   ]);
 
   const cecafeSeries = (names: string[]): Series => {
@@ -163,6 +196,27 @@ export async function fetchTradeFlows(): Promise<TradeFlow[]> {
     eu?.origins?.find(o => o.name === origin)?.monthly ?? {};
   const usImports = (origin: string): Series => us?.monthly_origins?.[origin] ?? {};
 
+  const idSeries = (names: string[]): Series => {
+    const out: Series = {};
+    const set = new Set(names);
+    for (const row of id?.series ?? []) {
+      for (const e of row.by_destination ?? []) {
+        if (set.has(e.country) && e.kg) out[row.month] = (out[row.month] ?? 0) + e.kg / 1000;
+      }
+    }
+    return out;
+  };
+  const ugSeries = (names: string[]): Series => {
+    const out: Series = {};
+    const set = new Set(names);
+    for (const row of ug?.series ?? []) {
+      for (const e of row.by_destination ?? []) {
+        if (set.has(e.country) && e.bags) out[row.month] = (out[row.month] ?? 0) + e.bags * 60 / 1000;
+      }
+    }
+    return out;
+  };
+
   const flows = [
     analysePair("Brazil", "EU", cecafeSeries(EU_PT), euImports("Brazil")),
     analysePair("Brazil", "US", cecafeSeries(["E.U.A."]), usImports("Brazil")),
@@ -170,6 +224,10 @@ export async function fetchTradeFlows(): Promise<TradeFlow[]> {
     analysePair("Vietnam", "EU", vnSeries(EU_EN), euImports("Vietnam")),
     analysePair("Vietnam", "US", vnSeries(["United States of America"]), usImports("Vietnam")),
     analysePair("Vietnam", "Japan", vnSeries(["Japan"]), {}),
+    analysePair("Indonesia", "EU", idSeries(EU_UPPER), euImports("Indonesia")),
+    analysePair("Indonesia", "US", idSeries(["UNITED STATES"]), usImports("Indonesia")),
+    analysePair("Indonesia", "Japan", idSeries(["JAPAN"]), {}),
+    analysePair("Uganda", "EU", ugSeries(EU_EN), euImports("Uganda")),
   ];
   return flows.filter((f): f is TradeFlow => f != null);
 }
