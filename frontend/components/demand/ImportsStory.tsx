@@ -4,11 +4,10 @@ import MonthlyTrendCombined from "@/components/demand/MonthlyTrendCombined";
 import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import OriginExplorer, { ImportKpiStrip } from "@/components/demand/imports-lab/OriginExplorer";
 
-// Imports tab redesign — Option A "funnel" storyline, prototyped in the Test
-// tab before replacing the live layout. Same components, re-ordered into a
-// narrative: world state → who buys → what's changing → from where → fine
-// print (collapsed). Chapter headers carry the one-line question each section
-// answers, so the reader always knows why they're looking at a chart.
+// The live Imports tab — "funnel" storyline: world state → who buys → what's
+// changing → from where → fine print (collapsed). Chapter headers carry the
+// one-line question each section answers, so the reader always knows why
+// they're looking at a chart. Promoted from the Test-tab prototype.
 function Chapter({ n, title, question, children }: {
   n: number; title: string; question: string; children: React.ReactNode;
 }) {
@@ -26,19 +25,9 @@ function Chapter({ n, title, question, children }: {
   );
 }
 
-export default function ImportsStoryPrototype() {
+export default function ImportsStory() {
   return (
     <div className="p-4 space-y-8">
-      <div className="space-y-1">
-        <h2 className="text-lg font-bold text-white">Imports — redesigned layout (prototype) ✦</h2>
-        <p className="text-xs text-slate-400 max-w-3xl">
-          Funnel storyline: world state → who buys → what&rsquo;s changing → from where → fine print.
-          Same data and charts as the live Imports tab, reorganized. The standalone US/EU origin cards are
-          retired here — their content lives in the origin explorer (chapter 4). Approve and this replaces
-          the live tab layout.
-        </p>
-      </div>
-
       <Chapter n={1} title="World import demand" question="How much coffee is the world buying, and is it growing?">
         <ImportKpiStrip />
       </Chapter>
