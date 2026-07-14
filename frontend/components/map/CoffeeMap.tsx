@@ -6,6 +6,7 @@ import { cachedFetchStatic } from "@/lib/api";
 import type { CountryPin, FactoryPin, NewsItem } from "@/lib/api";
 import { computeOriginPrices, type OriginPrice } from "@/lib/originPrices";
 import { centroidFor, DEST } from "@/components/demand/imports-lab/centroids";
+import { fetchTradeFlows, pathInterpolator, boatsFor, KT_PER_BOAT } from "@/lib/tradeFlows";
 import {
   HUB_LL,
   ORIGIN_LL,
@@ -259,6 +260,12 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
   const [showBasemapPanel, setShowBasemapPanel] = useState(false);
   // Import-sourcing flow overlay: arcs from origin countries to the US/EU bloc.
   const flowLayerRef = useRef<LeafletLayerGroup | null>(null);
+  // In-transit boats: coffee currently on the water per origin→dest lane,
+  // estimated by the trade-flow matching engine (lib/tradeFlows).
+  const boatsLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const boatsTimerRef = useRef<number | null>(null);
+  const [ships, setShips] = useUrlState<string>("ships", "on", (raw) =>
+    ["on", "off"].includes(raw) ? raw : "on");
   const [flowDest, setFlowDest] = useUrlState<string>("flows", "off", (raw) =>
     ["off", "US", "EU"].includes(raw) ? raw : "off");
   // Export-flow overlay: arcs from a producing-origin centroid to its
@@ -839,6 +846,66 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
     return () => { cancelled = true; };
   }, [freightFlow, freightData]);
 
+  // ── In-transit boats (trade-flow engine) ──────────────────────────────────
+  // One 🚢 ≈ 25 kt estimated on the water for a lane; boats glide along the
+  // real sea-lane waypoints, one full crossing ≈ transit-days at 1 s/day.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    let cancelled = false;
+    if (boatsTimerRef.current !== null) { clearInterval(boatsTimerRef.current); boatsTimerRef.current = null; }
+    if (boatsLayerRef.current) { boatsLayerRef.current.remove(); boatsLayerRef.current = null; }
+    if (ships !== "on") return;
+
+    Promise.all([import("leaflet"), fetchTradeFlows()]).then(([L, flows]) => {
+      if (cancelled || !mapInstanceRef.current) return;
+      const Leaflet = (L as unknown as { default?: typeof L }).default ?? L;
+      const lg = Leaflet.layerGroup();
+      const anim: { marker: LeafletMarker; interp: (t: number) => [number, number]; periodMs: number; phase: number }[] = [];
+
+      for (const f of flows) {
+        if (!f.path || f.inTransitMt <= 0) continue;
+        const interp = pathInterpolator(f.path);
+        const n = boatsFor(f);
+        const periodMs = f.transitDays * 1000;          // 1 s per voyage-day
+        const popup = `<div style="font-family:monospace;font-size:11px;background:#0f172a;color:#e2e8f0;padding:10px 12px;border-radius:6px;min-width:230px;border:1px solid #334155">
+          <b style="color:#f59e0b">${f.origin} → ${f.dest}</b>
+          <table style="width:100%;margin-top:6px;border-collapse:collapse;font-size:10px">
+            <tr><td style="color:#94a3b8">On the water (est.)</td><td style="text-align:right;color:#fff;font-weight:700">${Math.round(f.inTransitMt / 1000)} kt</td></tr>
+            <tr><td style="color:#94a3b8">Export rate</td><td style="text-align:right">${Math.round(f.exportRateMt / 1000)} kt/mo (${f.lastExportMonth})</td></tr>
+            <tr><td style="color:#94a3b8">Voyage</td><td style="text-align:right">~${f.transitDays} days</td></tr>
+            <tr><td style="color:#94a3b8">Export↔import match</td><td style="text-align:right">${f.corr != null ? `r=${f.corr.toFixed(2)} @ lag ${f.lagMonths}mo` : "no import series"}</td></tr>
+            <tr><td style="color:#94a3b8">Dest captures</td><td style="text-align:right">${f.matchRatio != null ? `${Math.round(f.matchRatio * 100)}% of exports` : "—"}</td></tr>
+          </table>
+          <div style="color:#64748b;font-size:9px;margin-top:6px">in-transit ≈ export rate × voyage days · sources: ${f.origin === "Brazil" ? "Cecafe" : "VN customs"} ↔ ${f.dest === "EU" ? "Eurostat" : f.dest === "US" ? "USITC" : "n/a"}</div>
+        </div>`;
+        for (let k = 0; k < n; k++) {
+          const icon = Leaflet.divIcon({
+            className: "", html: `<div style="font-size:15px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.9))">🚢</div>`,
+            iconSize: [16, 16], iconAnchor: [8, 8],
+          });
+          const m = Leaflet.marker(interp(k / n), { icon })
+            .bindTooltip(`${f.origin} → ${f.dest} · ~${Math.round(f.inTransitMt / 1000)} kt in transit`,
+              { direction: "top", className: "leaflet-tooltip-dark" })
+            .bindPopup(popup, { maxWidth: 300, className: "cecafe-popup" });
+          m.addTo(lg);
+          anim.push({ marker: m as LeafletMarker, interp, periodMs, phase: k / n });
+        }
+      }
+      lg.addTo(map);
+      boatsLayerRef.current = lg;
+      const t0 = Date.now();
+      boatsTimerRef.current = window.setInterval(() => {
+        const dt = Date.now() - t0;
+        for (const a of anim) a.marker.setLatLng(a.interp(((dt / a.periodMs) + a.phase) % 1));
+      }, 250);
+    });
+    return () => {
+      cancelled = true;
+      if (boatsTimerRef.current !== null) { clearInterval(boatsTimerRef.current); boatsTimerRef.current = null; }
+    };
+  }, [ships]);
+
   // Origin-price permanent labels: standalone markers at hardcoded
   // producer-region coordinates. Independent of the CountryIntel pins,
   // so labels appear even if that DB table is empty or uses unexpected
@@ -940,6 +1007,21 @@ export default function CoffeeMap({ onPinClick, countries, factories, news, hidd
           always-visible Map Style + toggle bars visually stay put at the
           bottom edge when the dropdown opens/closes. */}
       <div style={{ position: "absolute", bottom: 8, left: 8, zIndex: 1000 }}>
+        {/* In-transit boats toggle */}
+        <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 4, background: "#1e293b", border: "1px solid #475569", borderRadius: 4, padding: "3px 6px", fontFamily: "monospace" }}>
+          <span style={{ fontSize: 9, color: "#64748b" }}>In transit 🚢</span>
+          {(["on", "off"] as const).map((v) => (
+            <button key={v} onClick={() => setShips(v)}
+              style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "monospace",
+                border: "1px solid " + (ships === v ? "#f59e0b" : "transparent"),
+                background: ships === v ? "#0f172a" : "transparent",
+                color: ships === v ? "#f59e0b" : "#94a3b8" }}>
+              {v === "on" ? "On" : "Off"}
+            </button>
+          ))}
+          <span style={{ fontSize: 8, color: "#475569" }}>1🚢≈{KT_PER_BOAT}kt</span>
+        </div>
+
         {showBasemapPanel && (
           <div
             style={{
