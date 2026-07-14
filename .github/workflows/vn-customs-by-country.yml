@@ -36,6 +36,11 @@ jobs:
   vn-customs:
     runs-on: ubuntu-22.04
     timeout-minutes: 45
+    # Required for the backfill's seed commit — the repo's default
+    # GITHUB_TOKEN is read-only (run 2 harvested 6.4k lines then hit
+    # 'Permission denied to github-actions[bot]' on push).
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
