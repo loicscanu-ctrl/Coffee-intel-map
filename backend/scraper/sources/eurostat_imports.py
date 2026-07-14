@@ -32,6 +32,12 @@ log = logging.getLogger(__name__)
 
 BASE = "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/ds-045409"
 PRODUCT = "0901"
+# Soluble coffee HS6 codes (extracts/essences/concentrates of coffee and
+# preparations thereof). 2101 also covers tea/maté extracts — never fetch the
+# 4-digit heading, only these coffee lines. ICO green-bean-equivalent factor
+# for soluble is ×2.6 (applied in the frontend netting, not here — the JSON
+# stores product weight).
+SOLUBLE_CODES = ["210111", "210112"]
 N_YEARS = 6
 REPORTER = "EU27_2020"          # confirmed valid EU-bloc reporter code
 INDICATOR = "QUANTITY_IN_100KG"  # the only quantity indicator (units = 100 kg)
@@ -80,11 +86,14 @@ OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coff
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(years: list[str], reporter: str = REPORTER, flow: str = "1") -> dict:
-    """One reporter's HS-0901 trade by partner, annual, quantity (100-kg units).
-    flow: "1" = imports, "2" = exports."""
+def _fetch(years: list[str], reporter: str = REPORTER, flow: str = "1",
+           products: list[str] | None = None) -> dict:
+    """One reporter's trade by partner, annual, quantity (100-kg units).
+    flow: "1" = imports, "2" = exports. `products` defaults to HS 0901; a list
+    yields one cube whose product dim the stride decoder sums over."""
     params = [("format", "JSON"), ("freq", "A"), ("reporter", reporter),
-              ("product", PRODUCT), ("flow", flow), ("indicators", INDICATOR)]
+              ("flow", flow), ("indicators", INDICATOR)]
+    params += [("product", pr) for pr in (products or [PRODUCT])]
     params += [("time", y) for y in years]
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
@@ -560,6 +569,32 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     log.info("Eurostat bloc exports: %d years, %d monthly pts",
              len(exports_total_by_year), len(monthly_exports))
 
+    # SOLUBLE exports (HS 2101.11/.12, product weight MT). The EU exports a lot
+    # of instant coffee; netting only HS 0901 understates re-exports. The GBE
+    # conversion (×2.6) happens in the frontend so the stored series stays raw.
+    sol_parsed = parse_jsonstat(_fetch(years, REPORTER, flow="2", products=SOLUBLE_CODES))
+    exports_soluble_by_year = sol_parsed["total_by_year"]
+    monthly_exports_soluble: dict = {}
+    for last_n in (40, 36, 30, 24, 18, 12):
+        monthly_exports_soluble = parse_monthly_total(
+            _fetch_monthly_products(REPORTER, SOLUBLE_CODES, "2", last_n))
+        log.info("Eurostat bloc SOLUBLE exports lastN=%d → %d months",
+                 last_n, len(monthly_exports_soluble))
+        if monthly_exports_soluble:
+            break
+    monthly_exports_soluble = {k: v for k, v in sorted(monthly_exports_soluble.items()) if v > 0}
+    if OUT_PATH.exists():
+        try:
+            prev_all2 = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            prev_all2 = {}
+        exports_soluble_by_year = {**(prev_all2.get("exports_soluble_by_year") or {}),
+                                   **exports_soluble_by_year}
+        monthly_exports_soluble = merge_monthly(prev_all2.get("monthly_exports_soluble"),
+                                                monthly_exports_soluble)
+    log.info("Eurostat bloc soluble exports: %d years, %d monthly pts",
+             len(exports_soluble_by_year), len(monthly_exports_soluble))
+
     comtrade_by_year = _comtrade_eu_total_by_year()
 
     out = {
@@ -576,6 +611,9 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         # Extra-EU exports (flow=2) — net imports = total_by_year − exports_total_by_year.
         "exports_total_by_year": exports_total_by_year,
         "monthly_exports": monthly_exports,
+        # Soluble exports (HS 2101.11/.12, PRODUCT weight — apply ×2.6 GBE downstream).
+        "exports_soluble_by_year": exports_soluble_by_year,
+        "monthly_exports_soluble": monthly_exports_soluble,
         "comtrade_total_by_year": comtrade_by_year,   # EU-bloc extra-EU, for reconciliation
         # Per-reporter breakdown: bloc + individual member states.
         "reporters":     reporters,

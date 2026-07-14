@@ -17,13 +17,14 @@ export default function MonthlyTrendCombined() {
   // NET import line: at bloc level intra-EU flows cancel, so
   // net = extra-EU imports − extra-EU exports.
   const [euEx, setEuEx] = useState<Record<string, number>>({});
+  const [euSol, setEuSol] = useState<Record<string, number>>({});   // soluble HS2101.11/.12, product MT
   const [err, setErr] = useState(false);
 
   useEffect(() => {
     fetch("/data/us_coffee_imports.json").then(r => r.json())
       .then(d => setUs(d?.monthly_total ?? {})).catch(() => setErr(true));
     fetch("/data/eu_coffee_imports.json").then(r => r.json())
-      .then(d => { setEu(d?.monthly_total ?? {}); setEuEx(d?.monthly_exports ?? {}); })
+      .then(d => { setEu(d?.monthly_total ?? {}); setEuEx(d?.monthly_exports ?? {}); setEuSol(d?.monthly_exports_soluble ?? {}); })
       .catch(() => setErr(true));
   }, []);
 
@@ -42,7 +43,8 @@ export default function MonthlyTrendCombined() {
       }
       return out;
     };
-    const usMat = mat(us), euMat = mat(eu), exMat = mat(euEx);
+    const usMat = mat(us), euMat = mat(eu), exMat = mat(euEx), solMat = mat(euSol);
+    const GBE_SOLUBLE = 2.6;   // ICO: 1 kg soluble ≈ 2.6 kg green-bean equivalent
     const months = Array.from(new Set([...Object.keys(us), ...Object.keys(eu)]))
       .filter(k => (us[k] ?? 0) > 0 || (eu[k] ?? 0) > 0).sort();
     return months.map(k => ({
@@ -51,9 +53,10 @@ export default function MonthlyTrendCombined() {
       eu: eu[k] ? +(eu[k] / 1000).toFixed(1) : null,
       usMat: usMat[k] ? +(usMat[k] / 1000).toFixed(0) : null,
       euMat: euMat[k] ? +(euMat[k] / 1000).toFixed(0) : null,
-      euNetMat: euMat[k] && exMat[k] ? +((euMat[k] - exMat[k]) / 1000).toFixed(0) : null,
+      euNetMat: euMat[k] && exMat[k]
+        ? +((euMat[k] - exMat[k] - GBE_SOLUBLE * (solMat[k] ?? 0)) / 1000).toFixed(0) : null,
     }));
-  }, [us, eu, euEx]);
+  }, [us, eu, euEx, euSol]);
 
   if (err) return null;
   if (!us || !eu) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading monthly series…</div>;
@@ -62,7 +65,7 @@ export default function MonthlyTrendCombined() {
   const last = [...rows].reverse().find(r => r.usMat != null || r.euMat != null);
   const NAMES: Record<string, string> = {
     us: "US monthly", eu: "EU monthly", usMat: "US MAT (12m, right)", euMat: "EU MAT (12m, right)",
-    euNetMat: "EU NET MAT (− re-exports, right)",
+    euNetMat: "EU NET MAT (− re-exports incl. soluble GBE, right)",
   };
   return (
     <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
@@ -100,8 +103,8 @@ export default function MonthlyTrendCombined() {
       <div className="text-[9px] text-slate-500 italic mt-1">
         Solid = monthly HS-0901 imports (left, kt); dashed = MAT, the trailing-12-month total (right, kt/yr) —
         the level trend with seasonality removed. Green dotted = EU NET MAT: extra-EU imports minus extra-EU
-        exports (re-exports/value-added out of the bloc; intra-EU flows cancel at bloc level). US: USITC ·
-        EU: Eurostat. MAT starts once 12 consecutive months are available.
+        exports of HS 0901 AND soluble (HS 2101.11/.12 × 2.6 green-bean equivalent); intra-EU flows cancel
+        at bloc level. US: USITC · EU: Eurostat. MAT starts once 12 consecutive months are available.
       </div>
     </div>
   );
