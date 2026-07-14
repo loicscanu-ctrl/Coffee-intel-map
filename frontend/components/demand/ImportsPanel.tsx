@@ -67,8 +67,17 @@ export default function ImportsPanel() {
         for (const [code, r] of Object.entries(eu?.reporters ?? {})) {
           if (code === "EU27_2020") continue;                       // bloc ≠ a country
           const iso = code.toLowerCase();
-          const exists = Object.values(d.countries).some(c => c.name === r.name);
-          if (exists) continue;
+          const existing = Object.values(d.countries).find(c => c.name === r.name);
+          if (existing) {
+            // Comtrade-native EU member (Italy, NL, BE, PL, DK, AT…): Comtrade
+            // deliberately skips EU members in its monthly loop, but Eurostat
+            // has ~29 months for every member reporter — attach it so the
+            // Monthly toggle works for these markets too.
+            if (!existing.monthly_total && r.monthly_total && Object.keys(r.monthly_total).length) {
+              existing.monthly_total = r.monthly_total;
+            }
+            continue;
+          }
           const annual = Object.entries(r.total_by_year)
             .map(([y, mt]) => ({ year: +y, total_mt: mt, green_mt: null, roasted_mt: null,
                                  decaf_mt: null, husks_mt: null, value_usd: null }))
@@ -264,7 +273,8 @@ export default function ImportsPanel() {
         </div>
         {mode === "monthly" && (
           <div className="text-[9px] text-slate-500 italic">
-            Monthly total HS-0901 imports (kt), recent ~12 months, UN Comtrade. ● marks markets with a monthly series.
+            Monthly total HS-0901 imports (kt). ● marks markets with a monthly series — UN Comtrade for
+            rest-of-world markets, Eurostat for EU members (incl. Comtrade-native ones like Italy/NL).
             Gaps = months not yet reported. US &amp; EU monthly live in their own panels below (USITC / Eurostat).
           </div>
         )}
