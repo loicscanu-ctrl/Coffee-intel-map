@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DataHealthBar } from "@/components/DataHealthBar";
 import VietnamExportPanel from "@/components/supply/VietnamExportPanel";
+import DestinationChart from "@/components/supply/VietnamTab/DestinationChart";
 import VietnamFarmerEconomics from "@/components/supply/VietnamFarmerEconomics";
 import VnWeatherCharts from "@/components/supply/VnWeatherCharts";
 import VnWaterLevels   from "@/components/supply/VnWaterLevels";
@@ -203,6 +204,14 @@ export default function VietnamTab() {
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Export by destination — Vietnam Customs 5X by-country series */}
+          <div>
+            <h2 className="text-xs text-slate-500 uppercase font-bold tracking-widest mb-3">
+              Export by Destination
+            </h2>
+            <DestinationChart />
           </div>
 
         </div>
