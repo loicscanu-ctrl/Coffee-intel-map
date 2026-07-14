@@ -17,6 +17,8 @@ interface DestData {
   source: string;
   unit: string;
   coverage_note?: string;
+  source_boundary?: string | null;  // first 5X month; earlier months are the XLSX series
+  months_from_xlsx?: string[];
   months: string[];                                   // sorted "YYYY-MM"
   countries: Record<string, Record<string, number>>;  // country → ym → tonnes
 }
@@ -292,8 +294,8 @@ export default function DestinationChart() {
       {/* Source / coverage note */}
       <div className="mt-3 text-[8px] text-slate-600 leading-relaxed">
         Source: {data.source}. {data.coverage_note ?? ""} Preliminary figures;
-        months missing from the customs archive (e.g. 2024-06/08, 2026-05) are
-        omitted rather than interpolated.
+        months absent from both sources are omitted rather than interpolated.
+        {data.source_boundary && ` Months before ${data.source_boundary} are the green-bean XLSX series.`}
       </div>
     </div>
   );
