@@ -1,0 +1,57 @@
+name: "probe – Comtrade EU members data availability"
+
+# One-off diagnostic: does UN Comtrade actually have recent coffee-import data
+# for Germany/France/Spain, on (a) the keyless public preview endpoint our
+# scraper uses and (b) the authenticated endpoint? Prints distinct periods.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe endpoints
+        env:
+          COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
+        run: |
+          pip -q install requests
+          python - <<'PY'
+          import json, os, time
+          import requests
+
+          REPORTERS = {"Germany": "276", "France": "251", "Spain": "724"}
+          PERIODS = ",".join(str(y) for y in range(2014, 2026))
+          KEY = os.environ.get("COMTRADE_API_KEY", "")
+
+          def probe(name, url, headers):
+              try:
+                  r = requests.get(url, headers=headers, timeout=30)
+                  if r.status_code != 200:
+                      print(f"    {name}: HTTP {r.status_code} {r.text[:120]}")
+                      return
+                  rows = r.json().get("data", []) or []
+                  periods = sorted({str(d.get("period")) for d in rows})
+                  wgt = {p: sum(d.get("netWgt") or 0 for d in rows if str(d.get("period")) == p)
+                         for p in periods}
+                  print(f"    {name}: {len(rows)} rows, periods={periods}")
+                  print(f"      netWgt by period (t): " +
+                        ", ".join(f"{p}:{round(w/1000):,}" for p, w in wgt.items()))
+              except Exception as e:
+                  print(f"    {name}: ERROR {e}")
+
+          for cname, code in REPORTERS.items():
+              print(f"\n=== {cname} (reporter {code}) ===")
+              q = f"reporterCode={code}&cmdCode=0901&flowCode=M&period={PERIODS}&partnerCode=0&includeDesc=true"
+              probe("preview (keyless)",
+                    f"https://comtradeapi.un.org/public/v1/preview/C/A/HS?{q}", {})
+              time.sleep(2)
+              if KEY:
+                  probe("authenticated",
+                        f"https://comtradeapi.un.org/data/v1/get/C/A/HS?{q}",
+                        {"Ocp-Apim-Subscription-Key": KEY})
+              else:
+                  print("    authenticated: COMTRADE_API_KEY not set")
+              time.sleep(2)
+          PY
