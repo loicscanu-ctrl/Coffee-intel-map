@@ -24,7 +24,7 @@ interface DestData {
 }
 
 type ViewMode = "country" | "hub";
-const WINDOWS = ["3M", "6M", "12M", "CYTD"] as const;
+const WINDOWS = ["1M", "3M", "6M", "12M", "CYTD"] as const;
 type DestWindow = (typeof WINDOWS)[number];
 
 const GREEN = "#22c55e";
@@ -93,7 +93,7 @@ export default function DestinationChart() {
       const cropStart = m >= 10 ? `${y}-10` : `${y - 1}-10`;
       return allMonths.filter(mm => mm >= cropStart && mm <= latestMonth);
     }
-    const n = { "3M": 3, "6M": 6, "12M": 12 }[destWindow]!;
+    const n = { "1M": 1, "3M": 3, "6M": 6, "12M": 12 }[destWindow]!;
     return allMonths.slice(-n);
   }, [destWindow, allMonths, latestMonth]);
 
@@ -185,6 +185,13 @@ export default function DestinationChart() {
   const rows = mode === "hub" ? hubRows : countryRows;
   const barH = mode === "hub" ? rows.length * 30 + 40 : Math.min(topN, rows.length) * 26 + 40;
 
+  // One source of truth for the current-window colour — used by both the bar
+  // cells and the tooltip, so hovering always echoes the bar's own colour.
+  const barFill = (r: { label: string; pct: number | null }) =>
+    mode === "hub"
+      ? (HUB_COLORS[r.label] ?? "#475569")
+      : r.pct !== null && r.pct < 0 ? "#ef4444" : GREEN;
+
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
       {/* Header */}
@@ -235,11 +242,15 @@ export default function DestinationChart() {
           <XAxis type="number" tickFormatter={v => `${v}kt`} tick={{ fill: "#94a3b8", fontSize: 9 }} />
           <YAxis type="category" dataKey="label" tick={{ fill: "#cbd5e1", fontSize: 9 }}
             width={mode === "hub" ? 125 : 135} />
-          <Tooltip contentStyle={TT_STYLE}
-            formatter={((v, name) => [
-              `${v} kt`,
-              (name === "current" ? periodLabel : prevPeriodLabel) as NameType,
-            ]) satisfies Formatter<ValueType, NameType>} />
+          <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: "#94a3b8" }}
+            formatter={((v, name, item) => {
+              const row = (item?.payload ?? {}) as { label: string; pct: number | null };
+              const color = name === "current" ? barFill(row) : "#94a3b8";
+              return [
+                <span key="v" style={{ color }}>{`${v} kt`}</span>,
+                (name === "current" ? periodLabel : prevPeriodLabel) as NameType,
+              ];
+            }) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
             formatter={(v) => (
               <span style={{ color: "#cbd5e1" }}>
@@ -248,12 +259,7 @@ export default function DestinationChart() {
             )} />
           <Bar dataKey="prev"    name="prev"    fill={SLATE} opacity={0.55} />
           <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
-            {rows.map((r, i) => {
-              const fill = mode === "hub"
-                ? (HUB_COLORS[r.label] ?? "#475569")
-                : (r.pct !== null && r.pct < 0 ? "#ef4444" : GREEN);
-              return <Cell key={i} fill={fill} />;
-            })}
+            {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
