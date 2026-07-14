@@ -721,11 +721,28 @@ def export_vietnam_supply() -> None:
         print(f"  vietnam_supply.json → FAILED: {e}")
 
 
+# XLSX labels → the 5X bulletins' country naming, so YoY comparisons stay
+# continuous across the source boundary in the stitched series below.
+_VN_XLSX_ALIAS = {
+    "US":      "United States of America",
+    "UK":      "United Kingdom",
+    "Russia":  "Russian Federation",
+    "Korea":   "Korea (Republic)",
+    "Myanmar": "Myanmar (Burma)",
+}
+
+
 def export_vn_export_by_destination() -> None:
-    """Transform the VN Customs 5X by-country seed (harvested from the
-    English preliminary bulletins by scraper.backfill_vn_customs_country)
-    into the chart-friendly series behind the Vietnam Export-by-Destination
-    panel: months + {country: {ym: tonnes}}."""
+    """Chart series behind the Vietnam Export-by-Destination panel:
+    months + {country: {ym: tonnes}}, stitched from two Customs sources.
+
+    Primary: the 5X '(ta-sb)' preliminary bulletins (all coffee, harvested by
+    scraper.backfill_vn_customs_country) — archive starts 2024-02 (probed
+    exhaustively; see the harvester's probe-past notes). Pre-2024 history and
+    any 5X gap months are filled from the older Export_Destination_Port.xlsx
+    series (green bean, 2014-10 → 2024-08, vn_export_destination_port.json)
+    whose overlap months agree with the 5X within ~0-12%. XLSX labels are
+    harmonized to the 5X naming so YoY windows read across the boundary."""
     try:
         seed_path = ROOT / "seed" / "vn_customs_by_country.json"
         seed = json.loads(seed_path.read_text(encoding="utf-8"))
@@ -737,14 +754,40 @@ def export_vn_export_by_destination() -> None:
                 if not row.get("country") or vol is None:
                     continue
                 countries.setdefault(row["country"], {})[ym] = vol
+        five_x_months = {ym for ym in month_keys
+                         if (seed["months"][ym].get("exports_by_country") or [])}
+
+        # Stitch: any month the 5X series doesn't carry comes from the XLSX.
+        months_from_xlsx: list[str] = []
+        xlsx_path = OUT_DIR / "vn_export_destination_port.json"
+        if xlsx_path.exists():
+            mbc = json.loads(xlsx_path.read_text(encoding="utf-8")) \
+                .get("monthly_by_country") or {}
+            for ym in sorted(mbc):
+                if ym in five_x_months:
+                    continue
+                months_from_xlsx.append(ym)
+                for name, vol in mbc[ym].items():
+                    if name == "na" or vol is None:
+                        continue
+                    canon = _VN_XLSX_ALIAS.get(name, name)
+                    countries.setdefault(canon, {})[ym] = round(float(vol), 1)
+
+        all_months = sorted(set(month_keys) | set(months_from_xlsx))
         data = {
-            "source": ("Vietnam Customs — 5X '(ta-sb)' preliminary bulletins, "
-                       "coffee by destination country"),
+            "source": ("Vietnam Customs — 5X '(ta-sb)' preliminary bulletins "
+                       "(2024-02 onward, all coffee) stitched with the "
+                       "Export_Destination_Port.xlsx series (2014-10 → 2024-08, "
+                       "green bean) for earlier / gap months"),
             "unit": "tonnes",
             "coverage_note": ("The 5X bulletin lists coffee only for countries "
-                              "where it is a 'main export' line; the listed sum "
-                              "runs ~85-94% of the 2x national total."),
-            "months": month_keys,
+                              "where it is a 'main export' line (~85-94% of the "
+                              "2x national total); pre-2024 months are the "
+                              "green-bean XLSX series, which agrees with the 5X "
+                              "within ~0-12% on overlap months."),
+            "source_boundary": min(five_x_months) if five_x_months else None,
+            "months_from_xlsx": months_from_xlsx,
+            "months": all_months,
             "countries": countries,
         }
         path = OUT_DIR / "vn_export_by_destination.json"
@@ -753,7 +796,7 @@ def export_vn_export_by_destination() -> None:
             lambda d: (True, "ok") if d.get("countries") else (False, "no countries"),
         )
         print(f"  vn_export_by_destination.json → {len(countries)} countries × "
-              f"{len(month_keys)} months")
+              f"{len(all_months)} months ({len(months_from_xlsx)} from the XLSX series)")
     except Exception as e:
         print(f"  vn_export_by_destination.json → FAILED: {e}")
 
