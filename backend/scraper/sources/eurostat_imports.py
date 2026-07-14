@@ -80,10 +80,11 @@ OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "eu_coff
 _HEADERS = {"User-Agent": "Mozilla/5.0 (CoffeeIntelBot/1.0)", "Accept": "application/json"}
 
 
-def _fetch(years: list[str], reporter: str = REPORTER) -> dict:
-    """One reporter's imports of HS 0901 by partner, annual, quantity (100-kg units)."""
+def _fetch(years: list[str], reporter: str = REPORTER, flow: str = "1") -> dict:
+    """One reporter's HS-0901 trade by partner, annual, quantity (100-kg units).
+    flow: "1" = imports, "2" = exports."""
     params = [("format", "JSON"), ("freq", "A"), ("reporter", reporter),
-              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR)]
+              ("product", PRODUCT), ("flow", flow), ("indicators", INDICATOR)]
     params += [("time", y) for y in years]
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
@@ -210,12 +211,13 @@ def _month_code(t: str) -> str | None:
     return None
 
 
-def _fetch_monthly(last_n: int, reporter: str = REPORTER) -> dict:
-    """Recent `last_n` months of one reporter's monthly HS-0901 imports by partner.
-    Uses lastTimePeriod (annual time= doesn't expand to months); large windows
-    trip Comext's async 413, so the caller steps the window down."""
+def _fetch_monthly(last_n: int, reporter: str = REPORTER, flow: str = "1") -> dict:
+    """Recent `last_n` months of one reporter's monthly HS-0901 trade by partner
+    (flow "1"=imports, "2"=exports). Uses lastTimePeriod (annual time= doesn't
+    expand to months); large windows trip Comext's async 413, so the caller
+    steps the window down."""
     params = [("format", "JSON"), ("freq", "M"), ("reporter", reporter),
-              ("product", PRODUCT), ("flow", "1"), ("indicators", INDICATOR),
+              ("product", PRODUCT), ("flow", flow), ("indicators", INDICATOR),
               ("lastTimePeriod", str(last_n))]
     try:
         r = requests.get(BASE, params=params, headers=_HEADERS, timeout=60)
@@ -536,6 +538,28 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
             rep["monthly_total"] = merge_monthly(prev.get("monthly_total"), rep.get("monthly_total"))
             merge_origin_monthly(prev.get("origins"), rep["origins"])
 
+    # Extra-EU EXPORTS of the bloc (flow=2) — the EU's re-exports/value-added
+    # shipments to the rest of the world. Needed for NET imports: at bloc level
+    # intra-EU flows cancel, so net = extra-EU imports − extra-EU exports.
+    exp_parsed = parse_jsonstat(_fetch(years, REPORTER, flow="2"))
+    exports_total_by_year = exp_parsed["total_by_year"]
+    monthly_exports: dict = {}
+    for last_n in (40, 36, 30, 24, 18, 12):
+        monthly_exports = parse_monthly_total(_fetch_monthly(last_n, REPORTER, flow="2"))
+        log.info("Eurostat bloc EXPORTS lastN=%d → %d months", last_n, len(monthly_exports))
+        if monthly_exports:
+            break
+    monthly_exports = {k: v for k, v in sorted(monthly_exports.items()) if v > 0}
+    if OUT_PATH.exists():
+        try:
+            prev_all = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            prev_all = {}
+        exports_total_by_year = {**(prev_all.get("exports_total_by_year") or {}), **exports_total_by_year}
+        monthly_exports = merge_monthly(prev_all.get("monthly_exports"), monthly_exports)
+    log.info("Eurostat bloc exports: %d years, %d monthly pts",
+             len(exports_total_by_year), len(monthly_exports))
+
     comtrade_by_year = _comtrade_eu_total_by_year()
 
     out = {
@@ -549,6 +573,9 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         "origins":       bloc["origins"],
         "total_by_year": bloc["total_by_year"],
         "monthly_total": bloc["monthly_total"],
+        # Extra-EU exports (flow=2) — net imports = total_by_year − exports_total_by_year.
+        "exports_total_by_year": exports_total_by_year,
+        "monthly_exports": monthly_exports,
         "comtrade_total_by_year": comtrade_by_year,   # EU-bloc extra-EU, for reconciliation
         # Per-reporter breakdown: bloc + individual member states.
         "reporters":     reporters,

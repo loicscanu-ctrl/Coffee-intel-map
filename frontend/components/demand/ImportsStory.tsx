@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ImportsPanel from "@/components/demand/ImportsPanel";
 import MonthlyTrendCombined from "@/components/demand/MonthlyTrendCombined";
 import SourceReconciliation from "@/components/demand/SourceReconciliation";
@@ -72,6 +72,19 @@ function matYoy(m: Record<string, number> | undefined): { end: string; val: numb
 
 function useImportInsights() {
   const { us, eu, ct } = useImportData();
+  // EU net-import context: extra-EU exports (re-exports out of the bloc) and
+  // USDA-PSD EU consumption for the imports-vs-consumption comparison.
+  const [euAux, setEuAux] = useState<{ exports?: Record<string, number>; consumptionMt?: number } | null>(null);
+  useEffect(() => {
+    Promise.all([
+      fetch("/data/eu_coffee_imports.json").then(r => r.json()).catch(() => null),
+      fetch("/data/demand_stocks.json").then(r => (r.ok ? r.json() : null)).catch(() => null),
+    ]).then(([e, ds]) => {
+      const annual = ds?.eu?.annual as { year: string; consumption_mt?: number }[] | undefined;
+      const lastCons = annual?.filter(a => a.consumption_mt).at(-1)?.consumption_mt;
+      setEuAux({ exports: e?.monthly_exports ?? undefined, consumptionMt: lastCons });
+    });
+  }, []);
   return useMemo(() => {
     if (!us || !eu || !ct) return { world: null, who: null, changing: null, origins: null, trust: null };
 
@@ -80,9 +93,21 @@ function useImportInsights() {
     for (const c of Object.values(ct.countries)) for (const a of c.annual)
       if (a.total_mt != null) worldByYear[String(a.year)] = (worldByYear[String(a.year)] ?? 0) + a.total_mt;
     const w = yoyOf(worldByYear), usA = yoyOf(us.total_by_year), euA = yoyOf(eu.total_by_year);
-    const world = w ? `Tracked world imports reached ${ktOf(w.val)} in ${w.yr}` +
+    let world = w ? `Tracked world imports reached ${ktOf(w.val)} in ${w.yr}` +
       (w.yoy != null ? ` (${p1(w.yoy)} YoY)` : "") +
       (usA?.yoy != null && euA?.yoy != null ? ` — US ${p1(usA.yoy)}, EU ${p1(euA.yoy)}.` : ".") : null;
+    // Net-of-re-exports view: EU gross MAT − extra-EU export MAT, vs PSD consumption.
+    const impMat = matYoy(eu.monthly_total), exMat = matYoy(euAux?.exports);
+    if (world && impMat && exMat) {
+      const net = impMat.val - exMat.val;
+      let tail = ` EU re-exports run ~${ktOf(exMat.val)}/yr → NET imports ~${ktOf(net)}/yr`;
+      const cons = euAux?.consumptionMt;
+      if (cons) {
+        const gap = net - cons;
+        tail += ` vs PSD consumption ~${ktOf(cons)}/yr (${gap >= 0 ? "pipeline building" : "pipeline drawing"} ~${ktOf(Math.abs(gap))}/yr).`;
+      } else tail += ".";
+      world += tail;
+    }
 
     // 2 — who buys: largest single markets vs the EU bloc
     const latestOf = (c: { annual: { year: number; total_mt: number | null }[]; latest_year: number }) =>
@@ -134,7 +159,7 @@ function useImportInsights() {
       : `For the US, USITC is primary; for the EU, Eurostat is authoritative (no usable Comtrade EU-bloc series).`;
 
     return { world, who, changing, origins, trust };
-  }, [us, eu, ct]);
+  }, [us, eu, ct, euAux]);
 }
 
 export default function ImportsStory() {
