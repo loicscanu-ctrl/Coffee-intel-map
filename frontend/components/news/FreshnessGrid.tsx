@@ -62,7 +62,7 @@ const SCRAPER_META: Record<string, { label: string; category: Category; threshol
   fertilizer_comex:     { label: "Comex fert.",           category: "Fertilizer",       thresholdDays: 35  }, // monthly
   ecf:                  { label: "ECF stocks",            category: "Demand & stocks",  thresholdDays: 70  }, // bi-monthly
   psd_coffee:           { label: "USDA PSD",              category: "Demand & stocks",  thresholdDays: 210 }, // biannual (USDA coffee PSD: June + December)
-  ajca:                 { label: "AJCA Japan stocks",     category: "Demand & stocks",  thresholdDays: 35  }, // monthly
+  ajca:                 { label: "AJCA Japan stocks",     category: "Demand & stocks",  thresholdDays: 70  }, // upload-dated; AJCA posts ~5-9wk after period
   conab_costs:          { label: "CONAB costs",           category: "Supply (origins)", thresholdDays: 35  }, // monthly
   conab_safra:          { label: "CONAB safra",           category: "Supply (origins)", thresholdDays: 35  }, // monthly safra release
   cecafe_daily:         { label: "Cecafé daily",          category: "Supply (origins)", thresholdDays:  4  }, // daily M-F + Brazilian holidays
