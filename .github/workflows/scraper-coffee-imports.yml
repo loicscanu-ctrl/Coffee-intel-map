@@ -12,74 +12,50 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  scrape:
+  probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
-
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Connectivity probe (Comtrade releases endpoint)
-        run: |
-          curl -sS -m 25 -o /dev/null \
-            -w "PROBE → HTTP %{http_code} | time=%{time_total}s\n" \
-            "https://comtradeapi.un.org/public/v1/getComtradeReleases" || echo "PROBE → curl exit $?"
-
-      - name: Run coffee-imports scraper (3 attempts)
+      - name: Probe endpoints
         env:
-          # Optional — only needed for the paid tier / higher limits. The public
-          # preview endpoint works without it.
           COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
-          PYTHONPATH: backend
         run: |
-          for attempt in 1 2 3; do
-            python -m scraper.sources.coffee_imports && break
-            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 3m..." && sleep 180 || exit 1
-          done
+          pip -q install requests
+          python - <<'PY'
+          import json, os, time
+          import requests
 
-      - name: Validate output (≥10 countries, not a seed)
-        run: |
-          python -c "
-          import json, subprocess
-          d = json.load(open('frontend/public/data/coffee_imports.json'))
-          n = len(d.get('countries', {}))
-          if d.get('is_seed') or n < 10:
-              print(f'[validate] FAILED: is_seed={d.get(\"is_seed\")} countries={n} — restoring HEAD version')
-              subprocess.run(['git', 'checkout', '--', 'frontend/public/data/coffee_imports.json'])
-          else:
-              print(f'[validate] OK: {n} countries')
-          "
+          REPORTERS = {"Germany": "276", "France": "251", "Spain": "724"}
+          PERIODS = ",".join(str(y) for y in range(2014, 2026))
+          KEY = os.environ.get("COMTRADE_API_KEY", "")
 
-      - name: Commit updated JSON if changed
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frontend/public/data/coffee_imports.json
-          if git diff --cached --quiet; then
-            echo "No changes — JSON already up to date."
-          else
-            git commit -m "data: update coffee_imports.json [skip ci]"
-            # Push to the branch this run is on (main for the scheduled job; the
-            # dispatch ref otherwise) so manual branch dispatches don't false-fail.
-            git pull --rebase --autostash --strategy-option=theirs origin "${GITHUB_REF_NAME}" || true
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
+          def probe(name, url, headers):
+              try:
+                  r = requests.get(url, headers=headers, timeout=30)
+                  if r.status_code != 200:
+                      print(f"    {name}: HTTP {r.status_code} {r.text[:120]}")
+                      return
+                  rows = r.json().get("data", []) or []
+                  periods = sorted({str(d.get("period")) for d in rows})
+                  wgt = {p: sum(d.get("netWgt") or 0 for d in rows if str(d.get("period")) == p)
+                         for p in periods}
+                  print(f"    {name}: {len(rows)} rows, periods={periods}")
+                  print(f"      netWgt by period (t): " +
+                        ", ".join(f"{p}:{round(w/1000):,}" for p, w in wgt.items()))
+              except Exception as e:
+                  print(f"    {name}: ERROR {e}")
 
-      - name: Notify on failure
-        if: failure()
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=🚨 ${{ github.workflow }} failed — $(date -u +'%Y-%m-%d %H:%M UTC') — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
+          for cname, code in REPORTERS.items():
+              print(f"\n=== {cname} (reporter {code}) ===")
+              q = f"reporterCode={code}&cmdCode=0901&flowCode=M&period={PERIODS}&partnerCode=0&includeDesc=true"
+              probe("preview (keyless)",
+                    f"https://comtradeapi.un.org/public/v1/preview/C/A/HS?{q}", {})
+              time.sleep(2)
+              if KEY:
+                  probe("authenticated",
+                        f"https://comtradeapi.un.org/data/v1/get/C/A/HS?{q}",
+                        {"Ocp-Apim-Subscription-Key": KEY})
+              else:
+                  print("    authenticated: COMTRADE_API_KEY not set")
+              time.sleep(2)
+          PY
