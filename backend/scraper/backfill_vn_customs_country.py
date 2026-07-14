@@ -466,18 +466,19 @@ def run_probe_past() -> int:
     """
     hits = 0
 
-    # ── A: pre-2024 archaeology ───────────────────────────────────────────
-    past_suffixes = ("(ta-ct)", "(ct)", "(vn-ct)", "(vn-sb)")
-    probe_months = [(2024, 1), (2023, 12), (2023, 11), (2023, 10),
-                    (2023, 6), (2023, 1)]
-    days = _DAY_ORDER[:16]
+    # ── A: map the Vietnamese-edition coverage ────────────────────────────
+    # v1 answered the naming question: no 'ct' (official) files exist at this
+    # CMS path in any language, but the Vietnamese preliminary (vn-sb) DOES
+    # reach back to at least 2023-01 — published at a +6-month lag. Map the
+    # months v1 missed with a wider window (+1..+12), full day order and
+    # padded-month variants.
+    probe_months = [(2023, 12), (2023, 6), (2022, 6), (2022, 1)]
     for (y, m) in probe_months:
         found = None
-        for suffix in past_suffixes:
-            stem = f"{y}-t{m}-5x{suffix}.pdf"
-            for off in range(1, 9):
+        for stem in _stems(y, m, "5x", suffixes=("(vn-sb)", "(VN-SB)")):
+            for off in range(1, 13):
                 pub_y, pub_m = _shift(y, m, off)
-                for d in days:
+                for d in _DAY_ORDER:
                     url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
                     body = _download(url)
                     if body:
@@ -488,8 +489,8 @@ def run_probe_past() -> int:
             if found:
                 break
         if not found:
-            print(f"[probe-past] {y}-{m:02d}: no 5x under "
-                  f"{'/'.join(past_suffixes)} (pub +1..+8)", flush=True)
+            print(f"[probe-past] {y}-{m:02d}: no vn-sb 5x (pub +1..+12, all days)",
+                  flush=True)
             continue
         hits += 1
         url, body = found
@@ -498,26 +499,55 @@ def run_probe_past() -> int:
         print(f"[probe-past] {y}-{m:02d}: {len(rows)} coffee rows; sample: "
               f"{[(r['country'], r['rm_volume']) for r in rows[:5]]}", flush=True)
 
-    # ── B: 1N coffee-import check ─────────────────────────────────────────
+    # ── B: structure dump of the known Vietnamese 5x (2023-01) ────────────
+    # Found by probe v1 at a +6-month publication lag. Dump its header/layout
+    # so the parser can be adapted to the Vietnamese template (headers,
+    # country x0, number format).
     import pdfplumber
-    for (y, m) in _months_back(3):
+    vn_url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/2023/7/6/2023-t1-5x(vn-sb).pdf"
+    body = _download(vn_url)
+    if body:
+        with pdfplumber.open(io.BytesIO(body)) as pdf:
+            print(f"[probe-past] vn-5x structure ({len(pdf.pages)} pages):", flush=True)
+            pg = pdf.pages[0]
+            for ln in (pg.extract_text() or "").splitlines()[:10]:
+                print(f"[probe-past] vn-5x head: {ln[:110]}", flush=True)
+            words = pg.extract_words()
+            lines: dict[int, list] = {}
+            for w in words:
+                lines.setdefault(round(w["top"] / 2.5), []).append(w)
+            shown = 0
+            for _, ws in sorted(lines.items()):
+                ws = sorted(ws, key=lambda w: w["x0"])
+                print("[probe-past] vn-5x line: " +
+                      " | ".join(f"{w['text']}@{w['x0']:.0f}-{w['x1']:.0f}" for w in ws[:8]),
+                      flush=True)
+                shown += 1
+                if shown >= 12:
+                    break
+
+    # ── C: 1N with half-month 'k' markers (vn_fertilizer's naming) ────────
+    for (y, m) in _months_back(3)[:2]:
         got = None
-        for suffix in ("(ta-sb)", "(vn-sb)"):
-            stem = f"{y}-t{m}-1n{suffix}.pdf"
-            for off in (1, 2):
-                pub_y, pub_m = _shift(y, m, off)
-                for d in _DAY_ORDER[:16]:
-                    url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
-                    body = _download(url)
-                    if body:
-                        got = (url, body)
+        for kmark in ("-k2", "-k1", ""):
+            for suffix in ("(vn-sb)", "(ta-sb)"):
+                stem = f"{y}-t{m}{kmark}-1n{suffix}.pdf"
+                for off in (0, 1, 2):
+                    pub_y, pub_m = _shift(y, m, off)
+                    for d in _DAY_ORDER[:16]:
+                        url = f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}"
+                        body = _download(url)
+                        if body:
+                            got = (url, body)
+                            break
+                    if got:
                         break
                 if got:
                     break
             if got:
                 break
         if not got:
-            print(f"[probe-past] 1n {y}-{m:02d}: not found", flush=True)
+            print(f"[probe-past] 1n {y}-{m:02d}: not found (k2/k1/plain × vn/ta)", flush=True)
             continue
         url, body = got
         print(f"[probe-past] 1n FOUND: {url}", flush=True)
@@ -529,9 +559,8 @@ def run_probe_past() -> int:
                         print(f"[probe-past] 1n p{pno}: {ln[:120]}", flush=True)
                         printed += 1
             if not printed:
-                print("[probe-past] 1n: NO coffee line — imports not broken "
-                      "out in this bulletin either", flush=True)
-        break   # one month is enough to answer the question
+                print("[probe-past] 1n: NO coffee line in this bulletin", flush=True)
+        break
 
     print(f"[probe-past] done — {hits} pre-2024 5x hit(s).", flush=True)
     return 0
