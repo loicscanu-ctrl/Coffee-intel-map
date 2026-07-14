@@ -38,7 +38,8 @@ const TT_STYLE = {
 // that actually have a price history.
 const ORIGIN_ORDER = [
   "vietnam", "brazil_conilon", "uganda",          // robusta
-  "brazil_arabica", "uganda_drugar", "uganda_wugar", // arabica
+  "brazil_arabica", "guatemala_estrictamente_duro", // arabica
+  "uganda_drugar", "uganda_wugar",
 ] as const;
 type OriginKey = string;
 type Commodity = "robusta" | "arabica";
