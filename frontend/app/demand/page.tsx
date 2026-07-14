@@ -17,6 +17,7 @@ const CertifiedStocksPanel = dynamic(
 import EarningsTable from "@/components/demand/EarningsTable";
 import GrowthMarketsPanel from "@/components/demand/GrowthMarketsPanel";
 import ImportsPanel from "@/components/demand/ImportsPanel";
+import ImportsStoryPrototype from "@/components/demand/ImportsStoryPrototype";
 import ImportsByOrigin from "@/components/demand/ImportsByOrigin";
 import OriginExplorer from "@/components/demand/imports-lab/OriginExplorer";
 import MonthlyTrend from "@/components/demand/MonthlyTrend";
@@ -30,7 +31,7 @@ import WorldConsumptionWidget from "@/components/demand/WorldConsumptionWidget";
 import PageHeader from "@/components/PageHeader";
 import { useUrlState } from "@/lib/useUrlState";
 
-type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed";
+type SubTab = "certified" | "destination" | "spot" | "demand" | "imports" | "listed" | "test";
 
 const TABS: { id: SubTab; label: string }[] = [
   { id: "certified",   label: "Certified stocks" },
@@ -39,6 +40,7 @@ const TABS: { id: SubTab; label: string }[] = [
   { id: "demand",      label: "Consumption" },
   { id: "imports",     label: "Imports" },
   { id: "listed",      label: "Listed stocks" },
+  { id: "test",        label: "Test ✦" },
 ];
 const SUB_TABS = TABS.map((t) => t.id) as SubTab[];
 
@@ -174,6 +176,12 @@ function DemandPageInner() {
       {tab === "listed" && (
         <Section>
           <EarningsTable />
+        </Section>
+      )}
+
+      {tab === "test" && (
+        <Section>
+          <ImportsStoryPrototype />
         </Section>
       )}
 
