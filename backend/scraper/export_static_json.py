@@ -46,6 +46,7 @@ from scraper.exporters.supply import (
     export_uganda,
     export_vietnam_last,
     export_vietnam_supply,
+    export_vn_coffee_imports,
     export_vn_export_by_destination,
 )
 
@@ -88,6 +89,7 @@ def _exporters(db):
         ("vietnam_last",          lambda: export_vietnam_last()),
         ("vietnam_supply",        lambda: export_vietnam_supply()),
         ("vn_export_by_destination", lambda: export_vn_export_by_destination()),
+        ("vn_coffee_imports",     lambda: export_vn_coffee_imports()),
         ("colombia",              lambda: export_colombia(db)),
         ("honduras",              lambda: export_honduras(db)),
         ("indonesia",             lambda: export_indonesia(db)),
