@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-14T08:53:32.877029Z",
-  "count": 72,
+  "generated_at": "2026-07-14T20:53:34.494476Z",
+  "count": 73,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -428,6 +428,17 @@
     {
       "file": "probe-anacafe.yml",
       "name": "Z \u2013 Probe: ANACAFE Guatemala prices (test)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
+    {
+      "file": "probe-cepea.yml",
+      "name": "Z \u2013 Probe: CEPEA coffee scrape (test)",
       "triggers": [
         "workflow_dispatch"
       ],
