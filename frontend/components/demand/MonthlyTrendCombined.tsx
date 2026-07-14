@@ -13,13 +13,18 @@ const US_C = "#0ea5e9", EU_C = "#f59e0b";
 export default function MonthlyTrendCombined() {
   const [us, setUs] = useState<Record<string, number> | null>(null);
   const [eu, setEu] = useState<Record<string, number> | null>(null);
+  // Extra-EU EXPORTS (re-exports/value-added out of the bloc) — used for the
+  // NET import line: at bloc level intra-EU flows cancel, so
+  // net = extra-EU imports − extra-EU exports.
+  const [euEx, setEuEx] = useState<Record<string, number>>({});
   const [err, setErr] = useState(false);
 
   useEffect(() => {
     fetch("/data/us_coffee_imports.json").then(r => r.json())
       .then(d => setUs(d?.monthly_total ?? {})).catch(() => setErr(true));
     fetch("/data/eu_coffee_imports.json").then(r => r.json())
-      .then(d => setEu(d?.monthly_total ?? {})).catch(() => setErr(true));
+      .then(d => { setEu(d?.monthly_total ?? {}); setEuEx(d?.monthly_exports ?? {}); })
+      .catch(() => setErr(true));
   }, []);
 
   const rows = useMemo(() => {
@@ -37,7 +42,7 @@ export default function MonthlyTrendCombined() {
       }
       return out;
     };
-    const usMat = mat(us), euMat = mat(eu);
+    const usMat = mat(us), euMat = mat(eu), exMat = mat(euEx);
     const months = Array.from(new Set([...Object.keys(us), ...Object.keys(eu)]))
       .filter(k => (us[k] ?? 0) > 0 || (eu[k] ?? 0) > 0).sort();
     return months.map(k => ({
@@ -46,8 +51,9 @@ export default function MonthlyTrendCombined() {
       eu: eu[k] ? +(eu[k] / 1000).toFixed(1) : null,
       usMat: usMat[k] ? +(usMat[k] / 1000).toFixed(0) : null,
       euMat: euMat[k] ? +(euMat[k] / 1000).toFixed(0) : null,
+      euNetMat: euMat[k] && exMat[k] ? +((euMat[k] - exMat[k]) / 1000).toFixed(0) : null,
     }));
-  }, [us, eu]);
+  }, [us, eu, euEx]);
 
   if (err) return null;
   if (!us || !eu) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading monthly series…</div>;
@@ -56,6 +62,7 @@ export default function MonthlyTrendCombined() {
   const last = [...rows].reverse().find(r => r.usMat != null || r.euMat != null);
   const NAMES: Record<string, string> = {
     us: "US monthly", eu: "EU monthly", usMat: "US MAT (12m, right)", euMat: "EU MAT (12m, right)",
+    euNetMat: "EU NET MAT (− re-exports, right)",
   };
   return (
     <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
@@ -86,13 +93,15 @@ export default function MonthlyTrendCombined() {
             <Line yAxisId="mo" dataKey="eu" stroke={EU_C} strokeWidth={1.3} dot={false} connectNulls />
             <Line yAxisId="mat" dataKey="usMat" stroke={US_C} strokeWidth={2.2} strokeDasharray="6 3" dot={false} connectNulls />
             <Line yAxisId="mat" dataKey="euMat" stroke={EU_C} strokeWidth={2.2} strokeDasharray="6 3" dot={false} connectNulls />
+            <Line yAxisId="mat" dataKey="euNetMat" stroke="#34d399" strokeWidth={2} strokeDasharray="2 3" dot={false} connectNulls />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
       <div className="text-[9px] text-slate-500 italic mt-1">
         Solid = monthly HS-0901 imports (left, kt); dashed = MAT, the trailing-12-month total (right, kt/yr) —
-        the level trend with seasonality removed. US: USITC · EU: Eurostat extra-EU. MAT starts once 12
-        consecutive months are available.
+        the level trend with seasonality removed. Green dotted = EU NET MAT: extra-EU imports minus extra-EU
+        exports (re-exports/value-added out of the bloc; intra-EU flows cancel at bloc level). US: USITC ·
+        EU: Eurostat. MAT starts once 12 consecutive months are available.
       </div>
     </div>
   );
