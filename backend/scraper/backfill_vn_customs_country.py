@@ -56,7 +56,7 @@ from pathlib import Path
 import requests
 import urllib3
 
-from scraper.sources.vn_coffee_export import _parse_vn_number, _strip_accents
+from scraper.sources.vn_coffee_export import _strip_accents
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -231,52 +231,116 @@ def _find_month(data_y: int, data_m: int,
     return out
 
 
-# ── PDF structure dump (probe) / raw coffee-row capture (backfill) ──────────
+# ── PDF parsing ──────────────────────────────────────────────────────────────
+#
+# Layout verified against the June-2026 bulletins (fixtures in
+# scraper/tests/fixtures/vn_customs_2026-t6-5[xn]_ta-sb.pdf):
+#
+#   Country/Territory-Main exports   Units   Reporting month     Year to date
+#                                            Volume  Value(USD)  Volume  Value(USD)
+#   Algeria                                          21,504,938          305,273,444
+#     Fishery products               USD              364,500             1,544,675
+#     Coffee                         Ton     3,667   15,501,977  60,070  257,173,005
+#
+# pdfplumber's extract_tables() mangles this layout (multi-line cells lose the
+# volume↔commodity alignment), so we parse WORDS by position instead:
+#   • lines grouped by y (top / 2.5)
+#   • country rows start at x0≈45 and carry NO unit token; commodity rows are
+#     indented to x0≈49 with a unit ('Ton'/'USD') in the 265–310 x-band
+#   • numbers are right-aligned; the right edge (x1) assigns the column:
+#       ≤365 RM volume · ≤436 RM value · ≤494 YTD volume · >494 YTD value
+#   • country blocks span page breaks — current country carries across pages
+#
+# NOTE these 'ta' (English) bulletins use comma-thousands ('15,501,977'), NOT
+# the Vietnamese format of the 2x bulletins — vn_coffee_export's
+# _parse_vn_number would zero them, hence the dedicated parser below.
+
+_NUM_RX = re.compile(r"^-?[\d,]+(?:\.\d+)?$")
+_SKIP_PREFIXES = ("Country/Territory", "Volume", "Value", "MINISTRY", "GENERAL",
+                  "Preliminary", "STATISTICS", "Reporting", "TOTAL", "Table:",
+                  "Customs IT")
+
+# Column right-edge boundaries (pt) for number→column assignment.
+_COL_BOUNDS = ((365.0, "rm_vol"), (436.0, "rm_val"), (494.0, "ytd_vol"),
+               (9e9, "ytd_val"))
+_NAME_X_MAX = 265.0      # words left of this are the name
+_UNIT_X = (265.0, 310.0)  # the Units column band
+_COUNTRY_X0 = 47.5        # country rows start left of this; commodities right
+
+
+def _parse_en_number(s: str) -> float:
+    """'15,501,977' → 15501977.0 (English comma-thousands)."""
+    try:
+        return float(s.replace(",", ""))
+    except ValueError:
+        return 0.0
+
+
+def _page_lines(pg) -> list[list[dict]]:
+    """Page words grouped into visual lines (sorted top-to-bottom, l-to-r)."""
+    lines: dict[int, list[dict]] = {}
+    for w in pg.extract_words():
+        lines.setdefault(round(w["top"] / 2.5), []).append(w)
+    return [sorted(ws, key=lambda w: w["x0"]) for _, ws in sorted(lines.items())]
+
+
+def parse_coffee_by_country(pdf_bytes: bytes) -> list[dict]:
+    """Extract every coffee commodity row from a 5X/5N bulletin.
+
+    Returns [{country, commodity, unit, rm_volume, rm_value_usd, ytd_volume,
+    ytd_value_usd}] — rm_* is the reporting month, ytd_* the year-to-date
+    cumulative; volumes in tonnes (unit column says 'Ton' for coffee). A row
+    with no reporting-month trade carries only the ytd_* fields (rm_* None).
+    """
+    import pdfplumber
+    out: list[dict] = []
+    country: str | None = None    # carries across page breaks
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        for pg in pdf.pages:
+            for ws in _page_lines(pg):
+                name = " ".join(w["text"] for w in ws
+                                if w["x0"] < _NAME_X_MAX and not _NUM_RX.match(w["text"]))
+                if not name or name.startswith(_SKIP_PREFIXES):
+                    continue
+                unit = " ".join(w["text"] for w in ws
+                                if _UNIT_X[0] <= w["x0"] <= _UNIT_X[1]
+                                and not _NUM_RX.match(w["text"]))
+                if ws[0]["x0"] < _COUNTRY_X0 and not unit:
+                    country = name
+                    continue
+                if not _COFFEE_RX.search(_strip_accents(name)):
+                    continue
+                cols: dict[str, float] = {}
+                for w in ws:
+                    if _NUM_RX.match(w["text"]) and w["x1"] > _UNIT_X[1]:
+                        for bound, col in _COL_BOUNDS:
+                            if w["x1"] <= bound:
+                                cols[col] = _parse_en_number(w["text"])
+                                break
+                out.append({
+                    "country":       country,
+                    "commodity":     name,
+                    "unit":          unit,
+                    "rm_volume":     cols.get("rm_vol"),
+                    "rm_value_usd":  cols.get("rm_val"),
+                    "ytd_volume":    cols.get("ytd_vol"),
+                    "ytd_value_usd": cols.get("ytd_val"),
+                })
+    return out
+
 
 def _dump_structure(tag: str, pdf_bytes: bytes) -> None:
-    """Print the table skeleton of a bulletin so the parser can be designed
-    against the real layout: page/table dims, first rows, coffee candidates."""
+    """Probe output: bulletin size + the parsed coffee rows."""
     import pdfplumber
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        print(f"\n[{tag}] {len(pdf.pages)} pages")
-        for pno, pg in enumerate(pdf.pages, 1):
-            tables = pg.extract_tables() or []
-            if not tables:
-                text = (pg.extract_text() or "")[:200].replace("\n", " ¶ ")
-                print(f"  p{pno}: no tables; text: {text!r}")
-                continue
-            for tno, tb in enumerate(tables):
-                rows = [r for r in tb if r]
-                print(f"  p{pno} t{tno}: {len(rows)} rows × {max(len(r) for r in rows)} cols")
-                for r in rows[:3]:
-                    print(f"    head: {[str(c)[:28] if c else '' for c in r]}")
-                for r in rows:
-                    joined = " ".join(str(c) for c in r if c)
-                    if _COFFEE_RX.search(_strip_accents(joined)):
-                        print(f"    ☕ p{pno}t{tno}: {[str(c)[:28] if c else '' for c in r]}")
-
-
-def _coffee_rows_raw(pdf_bytes: bytes) -> list[dict]:
-    """Every table row mentioning coffee, with coordinates + parsed numbers.
-    Stored raw until the probe confirms the column layout."""
-    import pdfplumber
-    out = []
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        for pno, pg in enumerate(pdf.pages, 1):
-            for tno, tb in enumerate(pg.extract_tables() or []):
-                for rno, row in enumerate(tb):
-                    if not row:
-                        continue
-                    joined = " ".join(str(c) for c in row if c)
-                    if not _COFFEE_RX.search(_strip_accents(joined)):
-                        continue
-                    cells = [str(c).strip() if c else "" for c in row]
-                    out.append({
-                        "page": pno, "table": tno, "row": rno,
-                        "raw_row": cells,
-                        "numbers": [_parse_vn_number(c) for c in cells],
-                    })
-    return out
+        n_pages = len(pdf.pages)
+        title = (pdf.pages[0].extract_text() or "").splitlines()[:5]
+    rows = parse_coffee_by_country(pdf_bytes)
+    print(f"\n[{tag}] {n_pages} pages; title: {' / '.join(title)}")
+    print(f"[{tag}] {len(rows)} coffee rows:")
+    for r in rows:
+        print(f"   {str(r['country']):22s} rm {r['rm_volume']} t / {r['rm_value_usd']} USD"
+              f"  · ytd {r['ytd_volume']} t / {r['ytd_value_usd']} USD")
 
 
 # ── modes ────────────────────────────────────────────────────────────────────
@@ -301,35 +365,61 @@ def run_backfill(months: int) -> int:
     index_hits = _index_scrape()
     series: dict[str, dict] = {}
     ok = 0
+    consecutive_misses = 0
     for (y, m) in _months_back(months):
         key = f"{y}-{m:02d}"
         found = _find_month(y, m, index_hits)
         if not found:
-            print(f"[backfill] {key}: not found")
+            consecutive_misses += 1
+            print(f"[backfill] {key}: not found "
+                  f"({consecutive_misses} consecutive miss(es))")
+            # Three consecutive missing months going backward = the English
+            # preliminary archive ends here; stop instead of sweeping ~700
+            # more 404s per month into the past.
+            if consecutive_misses >= 3:
+                print("[backfill] archive appears to end here — stopping.")
+                break
             continue
+        consecutive_misses = 0
         entry: dict = {}
         for table, (url, body) in found.items():
-            rows = _coffee_rows_raw(body)
-            entry[table] = {"source_url": url, "coffee_rows": rows}
+            rows = parse_coffee_by_country(body)
+            side = "exports_by_country" if table == "5x" else "imports_by_country"
+            entry[side] = [
+                {
+                    "country":        r["country"],
+                    "volume_ton":     r["rm_volume"],
+                    "value_usd":      r["rm_value_usd"],
+                    "ytd_volume_ton": r["ytd_volume"],
+                    "ytd_value_usd":  r["ytd_value_usd"],
+                }
+                for r in rows
+            ]
+            entry[f"source_url_{table}"] = url
             print(f"[backfill] {key} {table}: {len(rows)} coffee rows ({url.rsplit('/', 1)[-1]})")
-        if entry:
-            series[key] = entry
-            ok += 1
+            unattributed = [r for r in rows if not r["country"]]
+            if unattributed:
+                print(f"[backfill] {key} {table}: WARNING {len(unattributed)} "
+                      f"rows without a resolved country", file=sys.stderr)
+        series[key] = entry
+        ok += 1
         time.sleep(0.5)   # be polite to the host
     if not series:
         print("[backfill] FATAL: nothing harvested.", file=sys.stderr)
         return 2
     SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
     SEED_PATH.write_text(json.dumps({
-        "_note": ("Vietnam Customs 5X (exports) / 5N (imports) coffee rows by "
-                  "country, harvested from the English preliminary bulletins on "
-                  "files.customs.gov.vn by scraper.backfill_vn_customs_country. "
-                  "Rows are stored raw (cells + parsed numbers + page/table "
-                  "coordinates) pending column-layout confirmation from the "
-                  "probe run."),
+        "_note": ("Vietnam Customs coffee by country/territory, harvested from "
+                  "the English preliminary bulletins (5X exports / 5N imports, "
+                  "'(ta-sb)') on files.customs.gov.vn by "
+                  "scraper.backfill_vn_customs_country. volume_ton/value_usd "
+                  "are the reporting month; ytd_* the year-to-date cumulative. "
+                  "5N carries no coffee commodity line (VN coffee imports are "
+                  "folded into 'Other products'), so imports_by_country is "
+                  "empty by source, kept for future-proofing."),
         "harvested_months": ok,
         "months": dict(sorted(series.items())),
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"[backfill] wrote {ok} months → {SEED_PATH}")
     return 0
 
