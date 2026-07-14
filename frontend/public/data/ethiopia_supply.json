@@ -1,6 +1,6 @@
 {
   "country": "ethiopia",
-  "scraped_at": "2026-07-13T05:55:49.776765Z",
+  "scraped_at": "2026-07-14T03:34:58.466202Z",
   "exports": {
     "source": "USDA FAS PSD",
     "last_updated": "2026-06-16",
@@ -346,7 +346,7 @@
     "grade": "All grades avg"
   },
   "weather": {
-    "scraped_at": "2026-07-13T04:51:57.696512Z",
+    "scraped_at": "2026-07-13T21:13:07.346020Z",
     "regions": [
       {
         "name": "Sidama/Yirgacheffe",
@@ -355,9 +355,9 @@
         "csi_60d": 0.046,
         "csi_30d_level": "OK",
         "csi_60d_level": "LOW",
-        "rain_mtd_mm": 78.7,
-        "rain_hist_min": 20.3,
-        "rain_hist_max": 101.2
+        "rain_mtd_mm": 77.6,
+        "rain_hist_min": 22.2,
+        "rain_hist_max": 103.5
       },
       {
         "name": "Harrar",
@@ -425,7 +425,6 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
@@ -458,11 +457,12 @@
           "-",
           "-",
           "-",
-          "-",
           "L",
           "L",
           "L",
-          "M"
+          "L",
+          "L",
+          "L"
         ]
       },
       {
@@ -478,7 +478,6 @@
           "-",
           "-",
           "-",
-          "-",
           "M",
           "M",
           "M",
@@ -529,7 +528,8 @@
           "-",
           "-",
           "L",
-          "L",
+          "M",
+          "M",
           "M",
           "M",
           "M",
@@ -644,9 +644,9 @@
           "-",
           "-",
           "-",
+          "L",
+          "L",
           "-",
-          "L",
-          "L",
           "-",
           "-",
           "-",

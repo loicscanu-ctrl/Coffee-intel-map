@@ -356,7 +356,10 @@
       "sprudge"
     ],
     "meta": "https://sprudge.com/build-outs-of-coffee-coffee-equipment-pros-in-spicewood-tx-1077197.html",
-    "pub_date": "2026-07-13T16:32:46"
+    "pub_date": "2026-07-13T16:32:46",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 90.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 8138,
@@ -1167,7 +1170,10 @@
       "sprudge"
     ],
     "meta": "https://sprudge.com/the-dog-days-of-coffee-are-here-1161962.html",
-    "pub_date": "2026-07-11T12:00:49"
+    "pub_date": "2026-07-11T12:00:49",
+    "sentiment": "Neutral",
+    "sentiment_confidence": 85.0,
+    "sentiment_method": "gemini"
   },
   {
     "id": 8038,
@@ -1570,7 +1576,7 @@
     "meta": "https://sprudge.com/new-study-finds-drinking-coffee-protects-against-liver-disease-cancer-and-death-1138799.html",
     "pub_date": "2026-07-10T12:00:06",
     "sentiment": "Bullish",
-    "sentiment_confidence": 88.0,
+    "sentiment_confidence": 75.0,
     "sentiment_method": "gemini"
   },
   {
@@ -1834,7 +1840,7 @@
     "meta": "https://sprudge.com/the-san-franciscan-roaster-company-enters-new-chapter-under-new-ownership-and-leadership-1161928.html",
     "pub_date": "2026-07-09T22:40:30",
     "sentiment": "Neutral",
-    "sentiment_confidence": 95.0,
+    "sentiment_confidence": 90.0,
     "sentiment_method": "gemini"
   },
   {
@@ -1996,7 +2002,7 @@
     "meta": "https://sprudge.com/the-afternoon-coffee-crash-is-a-myth-1138325.html",
     "pub_date": "2026-07-09T12:00:26",
     "sentiment": "Bullish",
-    "sentiment_confidence": 78.0,
+    "sentiment_confidence": 65.0,
     "sentiment_method": "gemini"
   },
   {
@@ -2444,7 +2450,7 @@
     "meta": "https://sprudge.com/build-outs-of-coffee-same-time-tomorrow-in-harlem-ny-1061314.html",
     "pub_date": "2026-07-08T14:00:06",
     "sentiment": "Neutral",
-    "sentiment_confidence": 92.0,
+    "sentiment_confidence": 90.0,
     "sentiment_method": "gemini"
   },
   {
@@ -2462,7 +2468,7 @@
     "meta": "https://sprudge.com/update-the-kauai-coffee-company-has-secured-their-land-lease-1138488.html",
     "pub_date": "2026-07-08T12:00:56",
     "sentiment": "Neutral",
-    "sentiment_confidence": 70.0,
+    "sentiment_confidence": 80.0,
     "sentiment_method": "gemini"
   },
   {
@@ -3691,10 +3697,7 @@
       "sprudge"
     ],
     "meta": "https://sprudge.com/life-is-like-a-curated-selection-of-coffees-you-never-know-what-youre-going-to-get-1141522.html",
-    "pub_date": "2026-07-05T12:00:24",
-    "sentiment": "Neutral",
-    "sentiment_confidence": 98.0,
-    "sentiment_method": "gemini"
+    "pub_date": "2026-07-05T12:00:24"
   },
   {
     "id": 7771,
