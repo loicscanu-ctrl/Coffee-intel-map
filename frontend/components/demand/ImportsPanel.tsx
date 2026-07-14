@@ -21,6 +21,12 @@ interface ImpCountry {
   annual: ImpYear[];
   latest_year: number;
   monthly_total?: Record<string, number>;
+  src?: "comtrade" | "eurostat";   // synthetic Eurostat entries are tagged
+}
+interface EuReporter {
+  name: string; years: number[];
+  total_by_year: Record<string, number>;
+  monthly_total?: Record<string, number>;
 }
 interface CoffeeImports {
   updated: string;
@@ -48,10 +54,34 @@ export default function ImportsPanel() {
   const [trendMode, setTrendMode] = useState<"annual" | "monthly">("annual");
 
   useEffect(() => {
-    fetch("/data/coffee_imports.json")
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: CoffeeImports) => {
-        setData(d);
+    Promise.all([
+      fetch("/data/coffee_imports.json").then(r => { if (!r.ok) throw new Error(); return r.json(); }),
+      fetch("/data/eu_coffee_imports.json").then(r => (r.ok ? r.json() : null)).catch(() => null),
+    ])
+      .then(([d, eu]: [CoffeeImports, { reporters?: Record<string, EuReporter> } | null]) => {
+        // UN Comtrade's keyless endpoint serves stale/no data for most EU
+        // members (Germany's latest there is 2014), so the big EU importers
+        // come from Eurostat instead: synthesize a country entry per member
+        // reporter that Comtrade doesn't cover (total volumes only — Eurostat
+        // per-member has no green/roasted split).
+        for (const [code, r] of Object.entries(eu?.reporters ?? {})) {
+          if (code === "EU27_2020") continue;                       // bloc ≠ a country
+          const iso = code.toLowerCase();
+          const exists = Object.values(d.countries).some(c => c.name === r.name);
+          if (exists) continue;
+          const annual = Object.entries(r.total_by_year)
+            .map(([y, mt]) => ({ year: +y, total_mt: mt, green_mt: null, roasted_mt: null,
+                                 decaf_mt: null, husks_mt: null, value_usd: null }))
+            .filter(a => a.total_mt > 0).sort((a, b) => a.year - b.year);
+          if (!annual.length) continue;
+          d.countries[`eu_${iso}`] = {
+            // "ᴱ" marks the Eurostat-sourced rows everywhere the name renders.
+            name: `${r.name} ᴱ`, iso3: code, reporter_code: code, annual,
+            latest_year: annual[annual.length - 1].year,
+            monthly_total: r.monthly_total, src: "eurostat",
+          };
+        }
+        setData({ ...d });
         // default selection: largest importer in the latest year
         const top = Object.entries(d.countries)
           .map(([k, c]) => [k, latest(c)?.total_mt ?? 0] as const)
@@ -106,7 +136,9 @@ export default function ImportsPanel() {
   }
 
   const worldTotal = ranking.reduce((s, r) => s + r.total, 0);
-  const topComposition = ranking.slice(0, 14);
+  // Form-of-import chart: only markets with a green/roasted split (the
+  // synthetic Eurostat entries carry totals only).
+  const topComposition = ranking.filter(r => r.green > 0 || r.roasted > 0).slice(0, 14);
 
   return (
     <div className="p-4 space-y-4">
@@ -114,7 +146,7 @@ export default function ImportsPanel() {
         <div>
           <h2 className="text-lg font-bold text-white">Coffee Imports by Country</h2>
           <p className="text-xs text-slate-400">
-            HS 0901 imports from World · {ranking.length} markets · {data.source}
+            HS 0901 imports from World · {ranking.length} markets · UN Comtrade + Eurostat (EU members)
           </p>
         </div>
         <div className="text-[10px] font-mono text-slate-400">
@@ -282,9 +314,11 @@ export default function ImportsPanel() {
       </div>
 
       <div className="text-[9px] text-slate-500 italic">
-        Imports of HS 0901 (coffee) from World, UN Comtrade. Green = not-roasted (0901.11/.12); roasted = 0901.21/.22;
-        decaf (0901.12 + .22) is a cross-cut shown as a share of total. Weights net kg → MT → kt. Netherlands/Belgium
-        figures include substantial re-export hubs. Value is CIF import value where reported.
+        Imports of HS 0901 (coffee) from World. UN Comtrade for non-EU markets; EU members (marked ᴱ) come from
+        Eurostat Comext, since Comtrade&rsquo;s keyless endpoint serves stale data for them — totals only, no
+        green/roasted split. Green = not-roasted (0901.11/.12); roasted = 0901.21/.22; decaf (0901.12 + .22) is a
+        cross-cut shown as a share of total. Weights net kg → MT → kt. Netherlands/Belgium figures include
+        substantial re-export hubs. Value is CIF import value where reported.
       </div>
     </div>
   );

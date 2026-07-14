@@ -308,7 +308,10 @@ function MonthlyHeatmap({ view }: { view: View }) {
 }
 
 // ── the three promoted concepts ─────────────────────────────────────────────────
-export default function OriginExplorer() {
+export type ExplorerSection = "combo" | "sankey" | "heat";
+
+export default function OriginExplorer({ sections }: { sections?: ExplorerSection[] } = {}) {
+  const show = (k: ExplorerSection) => !sections || sections.includes(k);
   const { us, eu, views } = useImportData();
 
   const [comboKey, setComboKey] = useState("US");
@@ -343,7 +346,7 @@ export default function OriginExplorer() {
   return (
     <div className="space-y-4">
       {/* Origin rank & concentration (bump + treemap) */}
-      <Card title="Origin rank & concentration"
+      {show("combo") && <Card title="Origin rank & concentration"
         note="Left: how each top origin's rank shifts over time. Right: origin shares as a treemap for the selected period. Pick a destination (US, EU bloc, or an EU member), granularity (annual or monthly) and period."
         control={
           <div className="flex items-center gap-2 flex-wrap">
@@ -364,10 +367,10 @@ export default function OriginExplorer() {
               valueOf={(o) => valueAt(combo, o, comboGran, cPeriod)} />
           </div>
         </div>
-      </Card>
+      </Card>}
 
       {/* Origins → blocs Sankey */}
-      <Card title="Origins → blocs (Sankey)"
+      {show("sankey") && <Card title="Origins → blocs (Sankey)"
         note="Top origins flowing into the US and EU for the selected period (kt) — annual or monthly."
         control={
           <div className="flex items-center gap-2 flex-wrap">
@@ -383,10 +386,10 @@ export default function OriginExplorer() {
             </Sankey>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </Card>}
 
       {/* Change heatmap */}
-      <Card title="Change heatmap"
+      {show("heat") && <Card title="Change heatmap"
         note="Per-origin change — spot surges and collapses. Switch destination (US, EU bloc, or a member state) and granularity (annual YoY or monthly month-over-month)."
         control={
           <div className="flex items-center gap-2 flex-wrap">
@@ -395,7 +398,7 @@ export default function OriginExplorer() {
           </div>
         }>
         {heatGran === "annual" ? <YoyHeatmap years={heat.years} origins={heat.origins} /> : <MonthlyHeatmap view={heat} />}
-      </Card>
+      </Card>}
     </div>
   );
 }
