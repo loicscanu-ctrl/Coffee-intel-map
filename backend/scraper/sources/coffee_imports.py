@@ -244,7 +244,10 @@ def parse_country_rows(rows: list[dict]) -> list[dict]:
 
 _OUTLIER_LOW = 0.2     # drop years below 20% of the typical level …
 _OUTLIER_HIGH = 8.0    # … or above 8× (double-counted / spurious revisions)
-_ABS_FLOOR_MT = 500.0  # …and any year under 0.5 kt (clearly incomplete reporting)
+_ABS_FLOOR_MT = 5_000.0  # unconditional row floor: every market in COUNTRIES
+#   imports ≥ ~15 kt in a real year, so a sub-5 kt "annual total" is always a
+#   token/incomplete preview slice (observed: Germany 2025 @ 0.4 kt, Spain
+#   2023 @ 0.8 kt, UK 2023 @ 3.1 kt), never a real figure.
 
 
 def drop_implausible_years(rows: list[dict], iso3: str = "") -> list[dict]:
@@ -252,10 +255,19 @@ def drop_implausible_years(rows: list[dict], iso3: str = "") -> list[dict]:
     country — partial/incomplete Comtrade reporting (e.g. Italy 2016 at ~8 kt vs
     a ~570 kt norm, or near-zero 0/2/58 MT years), not real collapses.
 
-    The reference level is the median of the *upper half* of non-zero totals, so
-    it stays robust even when most years are garbage-low (which would wreck a
-    plain median). A year is dropped if it's below 0.5 kt, below 20% of that
-    level, or above 8×. Needs ≥4 non-zero years. Pure — unit-tested."""
+    The absolute floor applies UNCONDITIONALLY: every market in COUNTRIES
+    imports thousands of MT in a real year, so a sub-0.5 kt row is always a
+    token/incomplete slice (e.g. Germany 2025 at ~0.4 kt under the 1-period
+    preview) — kept, it would rank as a bogus near-zero bar AND block the
+    frontend's Eurostat fallback entry for that country.
+
+    The relative gates need history: the reference level is the median of the
+    *upper half* of non-zero totals, so it stays robust even when most years
+    are garbage-low (which would wreck a plain median). A year is dropped if
+    it's below 20% of that level or above 8×; those apply only with ≥4
+    non-zero years. Pure — unit-tested."""
+    rows = [r for r in rows
+            if r.get("total_mt") is None or r["total_mt"] >= _ABS_FLOOR_MT]
     nz = sorted(t for t in (r.get("total_mt") for r in rows) if t)
     if len(nz) < 4:
         return rows

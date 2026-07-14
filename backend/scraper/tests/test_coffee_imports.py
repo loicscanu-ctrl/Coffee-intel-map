@@ -93,9 +93,11 @@ def test_drop_implausible_years_keeps_real_dips_and_short_series():
     rows = [{"year": y, "total_mt": v} for y, v in
             [(2014, 100_000), (2015, 95_000), (2016, 70_000), (2017, 98_000), (2018, 102_000)]]
     assert len(drop_implausible_years(rows, "x")) == 5
-    # <4 non-zero years → no reference level, untouched.
-    short = [{"year": 2017, "total_mt": 5}, {"year": 2018, "total_mt": 500}]
-    assert drop_implausible_years(short, "x") == short
+    # <4 non-zero years → no relative gates, but the ABSOLUTE floor still
+    # applies: a 5 MT "year" is a token slice (e.g. Germany 2025 under the
+    # 1-period preview), never a real annual import for these markets.
+    short = [{"year": 2017, "total_mt": 3_116}, {"year": 2018, "total_mt": 8_000}]
+    assert drop_implausible_years(short, "x") == [{"year": 2018, "total_mt": 8_000}]
 
 
 def test_drop_implausible_years_robust_when_most_years_garbage():

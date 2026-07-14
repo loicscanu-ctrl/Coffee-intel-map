@@ -127,41 +127,6 @@
       ],
       "latest_year": 2025
     },
-    "deu": {
-      "name": "Germany",
-      "iso3": "DEU",
-      "reporter_code": "276",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 0.0,
-          "green_mt": 0.0,
-          "roasted_mt": 0.2,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 1
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.0,
-          "green_mt": 0.2,
-          "roasted_mt": 1.8,
-          "decaf_mt": 0.1,
-          "husks_mt": 0.0,
-          "value_usd": 575
-        },
-        {
-          "year": 2025,
-          "total_mt": 0.2,
-          "green_mt": 0.0,
-          "roasted_mt": 0.3,
-          "decaf_mt": 0.1,
-          "husks_mt": 10.1,
-          "value_usd": 8731
-        }
-      ],
-      "latest_year": 2025
-    },
     "ita": {
       "name": "Italy",
       "iso3": "ITA",
@@ -265,41 +230,6 @@
           "decaf_mt": 5567.4,
           "husks_mt": 132.3,
           "value_usd": 4559392565
-        }
-      ],
-      "latest_year": 2025
-    },
-    "esp": {
-      "name": "Spain",
-      "iso3": "ESP",
-      "reporter_code": "724",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 842.0,
-          "green_mt": 18541.0,
-          "roasted_mt": 2067.1,
-          "decaf_mt": 20596.5,
-          "husks_mt": 0.0,
-          "value_usd": 4518647
-        },
-        {
-          "year": 2024,
-          "total_mt": 1.9,
-          "green_mt": 5475.1,
-          "roasted_mt": 13.7,
-          "decaf_mt": 13.7,
-          "husks_mt": 0.0,
-          "value_usd": 9025
-        },
-        {
-          "year": 2025,
-          "total_mt": 0.0,
-          "green_mt": 1117.7,
-          "roasted_mt": 15.4,
-          "decaf_mt": 274.3,
-          "husks_mt": 0.0,
-          "value_usd": 355
         }
       ],
       "latest_year": 2025
@@ -536,76 +466,6 @@
       ],
       "latest_year": 2025
     },
-    "gbr": {
-      "name": "United Kingdom",
-      "iso3": "GBR",
-      "reporter_code": "826",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 3116.2,
-          "green_mt": 3.8,
-          "roasted_mt": 1802.0,
-          "decaf_mt": 16.1,
-          "husks_mt": 0.3,
-          "value_usd": 111194734
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.5,
-          "green_mt": 2367.1,
-          "roasted_mt": 5.4,
-          "decaf_mt": 1696.7,
-          "husks_mt": 0.1,
-          "value_usd": 7142
-        },
-        {
-          "year": 2025,
-          "total_mt": 29.2,
-          "green_mt": 29.1,
-          "roasted_mt": 10342.1,
-          "decaf_mt": 730.3,
-          "husks_mt": 4.4,
-          "value_usd": 918733
-        }
-      ],
-      "latest_year": 2025
-    },
-    "swe": {
-      "name": "Sweden",
-      "iso3": "SWE",
-      "reporter_code": "752",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 0.0,
-          "green_mt": 423.0,
-          "roasted_mt": 16.1,
-          "decaf_mt": 16.0,
-          "husks_mt": 10.0,
-          "value_usd": 94
-        },
-        {
-          "year": 2024,
-          "total_mt": 346.0,
-          "green_mt": 34.4,
-          "roasted_mt": 0.1,
-          "decaf_mt": 0.1,
-          "husks_mt": 0.0,
-          "value_usd": 1585596
-        },
-        {
-          "year": 2025,
-          "total_mt": 129.0,
-          "green_mt": 129.0,
-          "roasted_mt": 0.8,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 1117126
-        }
-      ],
-      "latest_year": 2025
-    },
     "pol": {
       "name": "Poland",
       "iso3": "POL",
@@ -838,76 +698,6 @@
       ],
       "latest_year": 2025
     },
-    "prt": {
-      "name": "Portugal",
-      "iso3": "PRT",
-      "reporter_code": "620",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 3.6,
-          "green_mt": 284.1,
-          "roasted_mt": 161.3,
-          "decaf_mt": 166.9,
-          "husks_mt": 47.9,
-          "value_usd": 45061
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.0,
-          "green_mt": 3.0,
-          "roasted_mt": 0.5,
-          "decaf_mt": 3.4,
-          "husks_mt": 0.0,
-          "value_usd": 485
-        },
-        {
-          "year": 2025,
-          "total_mt": 0.0,
-          "green_mt": 0.0,
-          "roasted_mt": 0.1,
-          "decaf_mt": 0.1,
-          "husks_mt": 0.0,
-          "value_usd": 1014
-        }
-      ],
-      "latest_year": 2025
-    },
-    "fin": {
-      "name": "Finland",
-      "iso3": "FIN",
-      "reporter_code": "246",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 43.2,
-          "green_mt": 43.2,
-          "roasted_mt": 0.0,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 223632
-        },
-        {
-          "year": 2024,
-          "total_mt": 134.5,
-          "green_mt": 134.5,
-          "roasted_mt": 0.2,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 709538
-        },
-        {
-          "year": 2025,
-          "total_mt": 137.2,
-          "green_mt": 137.2,
-          "roasted_mt": 0.2,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 1071446
-        }
-      ],
-      "latest_year": 2025
-    },
     "dnk": {
       "name": "Denmark",
       "iso3": "DNK",
@@ -1020,76 +810,6 @@
           "decaf_mt": 190.0,
           "husks_mt": 47.3,
           "value_usd": 483069971
-        }
-      ],
-      "latest_year": 2025
-    },
-    "cze": {
-      "name": "Czechia",
-      "iso3": "CZE",
-      "reporter_code": "203",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 14.4,
-          "green_mt": 1168.0,
-          "roasted_mt": 13.5,
-          "decaf_mt": 0.7,
-          "husks_mt": 0.0,
-          "value_usd": 121841
-        },
-        {
-          "year": 2024,
-          "total_mt": 12.1,
-          "green_mt": 12.0,
-          "roasted_mt": 0.0,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.2,
-          "value_usd": 102889
-        },
-        {
-          "year": 2025,
-          "total_mt": 0.0,
-          "green_mt": 11.2,
-          "roasted_mt": 0.0,
-          "decaf_mt": 11.2,
-          "husks_mt": 0.3,
-          "value_usd": 68
-        }
-      ],
-      "latest_year": 2025
-    },
-    "rou": {
-      "name": "Romania",
-      "iso3": "ROU",
-      "reporter_code": "642",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 0.1,
-          "green_mt": 1.3,
-          "roasted_mt": 14.0,
-          "decaf_mt": 15.0,
-          "husks_mt": 0.6,
-          "value_usd": 4059
-        },
-        {
-          "year": 2024,
-          "total_mt": 3.1,
-          "green_mt": 4.9,
-          "roasted_mt": 0.0,
-          "decaf_mt": 1.8,
-          "husks_mt": 0.1,
-          "value_usd": 22587
-        },
-        {
-          "year": 2025,
-          "total_mt": 19.3,
-          "green_mt": 15.5,
-          "roasted_mt": 0.1,
-          "decaf_mt": 2.7,
-          "husks_mt": 2.1,
-          "value_usd": 147082
         }
       ],
       "latest_year": 2025
@@ -1276,27 +996,9 @@
           "decaf_mt": 0.2,
           "husks_mt": 2.1,
           "value_usd": 16142340
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.0,
-          "green_mt": 0.0,
-          "roasted_mt": 38342.2,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 7
-        },
-        {
-          "year": 2025,
-          "total_mt": 48.8,
-          "green_mt": 54.7,
-          "roasted_mt": 0.4,
-          "decaf_mt": 35.7,
-          "husks_mt": 0.0,
-          "value_usd": 955070
         }
       ],
-      "latest_year": 2025
+      "latest_year": 2023
     },
     "jpn": {
       "name": "Japan",
@@ -1665,41 +1367,6 @@
         "2026-05": 8552.0
       }
     },
-    "tur": {
-      "name": "Turkey",
-      "iso3": "TUR",
-      "reporter_code": "792",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 54.9,
-          "green_mt": 66405.0,
-          "roasted_mt": 206.2,
-          "decaf_mt": 0.6,
-          "husks_mt": 0.0,
-          "value_usd": 199804
-        },
-        {
-          "year": 2024,
-          "total_mt": 246.8,
-          "green_mt": 19.0,
-          "roasted_mt": 0.0,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 721356
-        },
-        {
-          "year": 2025,
-          "total_mt": 16.5,
-          "green_mt": 29.1,
-          "roasted_mt": 0.0,
-          "decaf_mt": 12.6,
-          "husks_mt": 0.0,
-          "value_usd": 183433
-        }
-      ],
-      "latest_year": 2025
-    },
     "chn": {
       "name": "China",
       "iso3": "CHN",
@@ -2003,15 +1670,6 @@
           "value_usd": 147902260
         },
         {
-          "year": 2024,
-          "total_mt": 520.1,
-          "green_mt": 142.6,
-          "roasted_mt": 378.6,
-          "decaf_mt": 1.2,
-          "husks_mt": 2.4,
-          "value_usd": 3086881
-        },
-        {
           "year": 2025,
           "total_mt": 57213.8,
           "green_mt": 53753.0,
@@ -2155,42 +1813,6 @@
       "iso3": "MEX",
       "reporter_code": "484",
       "annual": [
-        {
-          "year": 2015,
-          "total_mt": 3361.5,
-          "green_mt": 1230.0,
-          "roasted_mt": 2131.5,
-          "decaf_mt": null,
-          "husks_mt": null,
-          "value_usd": 23909225
-        },
-        {
-          "year": 2016,
-          "total_mt": 3904.3,
-          "green_mt": 1525.1,
-          "roasted_mt": 2379.2,
-          "decaf_mt": 103.7,
-          "husks_mt": null,
-          "value_usd": 25354485
-        },
-        {
-          "year": 2017,
-          "total_mt": 5655.0,
-          "green_mt": 2730.5,
-          "roasted_mt": 2924.5,
-          "decaf_mt": 161.9,
-          "husks_mt": null,
-          "value_usd": 24803157
-        },
-        {
-          "year": 2019,
-          "total_mt": 3228.9,
-          "green_mt": 173.3,
-          "roasted_mt": 3055.6,
-          "decaf_mt": 144.1,
-          "husks_mt": null,
-          "value_usd": 27121352
-        },
         {
           "year": 2021,
           "total_mt": 15043.3,
@@ -2378,102 +2000,6 @@
         "2026-03": 3712.2
       }
     },
-    "idn": {
-      "name": "Indonesia",
-      "iso3": "IDN",
-      "reporter_code": "360",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 57.5,
-          "green_mt": 57.5,
-          "roasted_mt": 911.3,
-          "decaf_mt": 13.1,
-          "husks_mt": 1.8,
-          "value_usd": 148392
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.1,
-          "green_mt": 21.2,
-          "roasted_mt": 0.0,
-          "decaf_mt": 21.2,
-          "husks_mt": 0.0,
-          "value_usd": 3140
-        },
-        {
-          "year": 2025,
-          "total_mt": 0.0,
-          "green_mt": 25711.0,
-          "roasted_mt": 765.4,
-          "decaf_mt": 8.2,
-          "husks_mt": 0.2,
-          "value_usd": 106
-        }
-      ],
-      "latest_year": 2025
-    },
-    "mys": {
-      "name": "Malaysia",
-      "iso3": "MYS",
-      "reporter_code": "458",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 1088.0,
-          "green_mt": 368.8,
-          "roasted_mt": 670.7,
-          "decaf_mt": 21.7,
-          "husks_mt": 48.4,
-          "value_usd": 11592215
-        },
-        {
-          "year": 2024,
-          "total_mt": 934.2,
-          "green_mt": 389.8,
-          "roasted_mt": 494.1,
-          "decaf_mt": 20.0,
-          "husks_mt": 50.3,
-          "value_usd": 10002375
-        },
-        {
-          "year": 2025,
-          "total_mt": 780.6,
-          "green_mt": 276.1,
-          "roasted_mt": 453.2,
-          "decaf_mt": 26.4,
-          "husks_mt": 51.3,
-          "value_usd": 9855108
-        }
-      ],
-      "latest_year": 2025
-    },
-    "tha": {
-      "name": "Thailand",
-      "iso3": "THA",
-      "reporter_code": "764",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 934.9,
-          "green_mt": 0.0,
-          "roasted_mt": 15.8,
-          "decaf_mt": 0.0,
-          "husks_mt": 0.0,
-          "value_usd": 11754331
-        },
-        {
-          "year": 2024,
-          "total_mt": 0.0,
-          "green_mt": 0.0,
-          "roasted_mt": 1.5,
-          "decaf_mt": 1.6,
-          "husks_mt": 0.0,
-          "value_usd": 74
-        }
-      ],
-      "latest_year": 2024
-    },
     "ukr": {
       "name": "Ukraine",
       "iso3": "UKR",
@@ -2499,41 +2025,6 @@
         }
       ],
       "latest_year": 2024
-    },
-    "zaf": {
-      "name": "South Africa",
-      "iso3": "ZAF",
-      "reporter_code": "710",
-      "annual": [
-        {
-          "year": 2023,
-          "total_mt": 9.0,
-          "green_mt": 10.0,
-          "roasted_mt": 1.4,
-          "decaf_mt": 2.3,
-          "husks_mt": 19.2,
-          "value_usd": 54093
-        },
-        {
-          "year": 2024,
-          "total_mt": 47.9,
-          "green_mt": 42.3,
-          "roasted_mt": 10.0,
-          "decaf_mt": 4.4,
-          "husks_mt": 0.0,
-          "value_usd": 265688
-        },
-        {
-          "year": 2025,
-          "total_mt": 38.0,
-          "green_mt": 204.8,
-          "roasted_mt": 38.0,
-          "decaf_mt": 29.1,
-          "husks_mt": 0.1,
-          "value_usd": 354880
-        }
-      ],
-      "latest_year": 2025
     },
     "isr": {
       "name": "Israel",
