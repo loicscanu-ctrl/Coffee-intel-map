@@ -264,7 +264,7 @@ async def _fetch_publication_list(page) -> list[dict]:
         return []
 
 
-def _download_pdf(url: str) -> bytes | None:
+def _download_pdf(url: str, session=None, timeout: int = 60) -> bytes | None:
     """Download PDF from files.customs.gov.vn (no auth required)."""
     import requests
     try:
@@ -272,14 +272,95 @@ def _download_pdf(url: str) -> bytes | None:
         # cert is sometimes missing on the edge). verify=False is intentional;
         # the host is non-auth and we validate the response body (PDF magic)
         # before trusting it.
-        resp = requests.get(url, timeout=60, verify=False)
-        resp.raise_for_status()
-        if b"%PDF" not in resp.content[:10]:
+        getter = session or requests
+        resp = getter.get(url, timeout=timeout, verify=False)
+        if resp.status_code != 200 or b"%PDF" not in resp.content[:10]:
             return None
         return resp.content
     except Exception as e:
         logger.warning(f"[vn_fertilizer] PDF download failed {url}: {e}")
         return None
+
+
+# ── path A: URL prediction (primary — no browser, no bridge) ────────────────────
+#
+# The portal bridge (path B below) has never returned publications in CI, but
+# the k2/1n bulletins are URL-predictable on files.customs.gov.vn (verified:
+# /CustomsCMS/TONG_CUC/2026/7/6/2026-t6k2-1n(vn-sb).pdf). Publication lands in
+# data-month+1 (occasionally +2), day clusters near the 6th-10th. Same
+# discovery machinery as vn_coffee_export / the 5X harvester.
+
+_FILES_HOST = "https://files.customs.gov.vn"
+# Plausibility-ordered days; 6 first — the verified Jul-2026 publication day.
+_DAY_ORDER = [6, 7, 8, 9, 10, 11, 5, 12, 13, 14, 15, 4, 16, 17, 3, 18, 19, 2,
+              20, 21, 1, 22, 23, 24, 25, 26, 27, 28]
+
+
+def _shift_month(year: int, month: int, by: int) -> tuple[int, int]:
+    m = month + by
+    y = year
+    while m > 12:
+        m -= 12
+        y += 1
+    return y, m
+
+
+def _candidate_1n_urls(data_y: int, data_m: int) -> list[str]:
+    """Predicted URLs for one data month's k2 (full-month cumulative) 1n
+    bulletin, most plausible first. Stem-major order so a present month
+    resolves in a handful of requests; the Vietnamese edition only — the
+    parser matches Vietnamese commodity names."""
+    urls: list[str] = []
+    for off in (1, 2):
+        pub_y, pub_m = _shift_month(data_y, data_m, off)
+        for tprefix in ("t", "T"):
+            for mfmt in (str(data_m), f"{data_m:02d}"):
+                for suffix in ("(vn-sb)", "(VN-SB)"):
+                    stem = f"{data_y}-{tprefix}{mfmt}k2-1n{suffix}.pdf"
+                    for d in _DAY_ORDER:
+                        urls.append(
+                            f"{_FILES_HOST}/CustomsCMS/TONG_CUC/{pub_y}/{pub_m}/{d}/{stem}")
+    seen: set[str] = set()
+    return [u for u in urls if not (u in seen or seen.add(u))]
+
+
+def _harvest_pdfs_via_urls(months_back: int = 18) -> dict[str, bytes]:
+    """Path A: fetch the last `months_back` k2/1n bulletins by URL prediction.
+    Returns {YYYY-MM: pdf_bytes}. Keep-alive session (a fresh TLS handshake
+    per candidate is what makes miss-sweeps expensive); stops after three
+    consecutive missing months going backward (archive end)."""
+    from datetime import date
+
+    import requests
+    session = requests.Session()
+
+    y, m = date.today().year, date.today().month - 1
+    if m == 0:
+        y, m = y - 1, 12
+    out: dict[str, bytes] = {}
+    misses = 0
+    for _ in range(months_back):
+        key = f"{y}-{m:02d}"
+        body = None
+        for url in _candidate_1n_urls(y, m):
+            body = _download_pdf(url, session=session, timeout=12)
+            if body:
+                print(f"[vn_fertilizer] [pathA] {key}: {url.rsplit('/', 1)[-1]}")
+                break
+        if body:
+            out[key] = body
+            misses = 0
+        else:
+            misses += 1
+            print(f"[vn_fertilizer] [pathA] {key}: not found "
+                  f"({misses} consecutive miss(es))")
+            if misses >= 3:
+                print("[vn_fertilizer] [pathA] archive appears to end here — stopping.")
+                break
+        m -= 1
+        if m == 0:
+            y, m = y - 1, 12
+    return out
 
 
 # ── monthly derivation ──────────────────────────────────────────────────────────
@@ -333,56 +414,68 @@ async def run(page, db) -> None:  # noqa: ARG001
     warnings.filterwarnings("ignore", message="Unverified HTTPS request")
 
     try:
-        print("[vn_fertilizer] Navigating to Vietnam Customs portal...")
-        await page.goto(_PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
-        await page.wait_for_timeout(2_000)
+        # Path A first: URL prediction against files.customs.gov.vn — no
+        # browser session needed, and unlike the bridge it actually delivers.
+        pdf_by_month = _harvest_pdfs_via_urls()
+        if pdf_by_month:
+            print(f"[vn_fertilizer] [pathA] {len(pdf_by_month)} k2/1n bulletins "
+                  f"via URL prediction")
+        else:
+            # Path B fallback: the portal bridge (requires the browser session).
+            print("[vn_fertilizer] [pathA] nothing found — falling back to the "
+                  "portal bridge")
+            print("[vn_fertilizer] Navigating to Vietnam Customs portal...")
+            await page.goto(_PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
+            await page.wait_for_timeout(2_000)
 
-        publications = await _fetch_publication_list(page)
-        print(f"[vn_fertilizer] Got {len(publications)} publications")
+            publications = await _fetch_publication_list(page)
+            print(f"[vn_fertilizer] Got {len(publications)} publications")
 
-        if not publications:
-            print("[vn_fertilizer] No publications returned — retaining cache")
-            return
+            if not publications:
+                print("[vn_fertilizer] No publications returned — retaining cache")
+                return
 
-        # Filter: 1n (all-trader) + k2 (second-half = full-month cumulative)
-        k2_pubs: list[dict] = []
-        for pub in publications:
-            # Candidates: check fileSoBo URL or any text/type field
-            file_url  = pub.get("fileSoBo") or pub.get("filePath") or pub.get("url") or ""
-            type_code = pub.get("loaiBaoCao") or pub.get("type") or pub.get("reportType") or ""
-            name      = pub.get("tenBaoCao") or pub.get("name") or pub.get("title") or ""
-            combined  = f"{file_url} {type_code} {name}"
+            # Filter: 1n (all-trader) + k2 (second-half = full-month cumulative)
+            k2_pubs: list[dict] = []
+            for pub in publications:
+                # Candidates: check fileSoBo URL or any text/type field
+                file_url  = pub.get("fileSoBo") or pub.get("filePath") or pub.get("url") or ""
+                type_code = pub.get("loaiBaoCao") or pub.get("type") or pub.get("reportType") or ""
+                name      = pub.get("tenBaoCao") or pub.get("name") or pub.get("title") or ""
+                combined  = f"{file_url} {type_code} {name}"
 
-            if not _is_k2(combined):
-                continue
-            if not _is_1n(combined):
-                continue
+                if not _is_k2(combined):
+                    continue
+                if not _is_1n(combined):
+                    continue
 
-            month = _period_to_month(combined)
-            if month:
-                k2_pubs.append({"month": month, "url": file_url, "raw": combined})
+                month = _period_to_month(combined)
+                if month:
+                    k2_pubs.append({"month": month, "url": file_url, "raw": combined})
 
-        print(f"[vn_fertilizer] {len(k2_pubs)} k2/1n reports identified")
+            print(f"[vn_fertilizer] {len(k2_pubs)} k2/1n reports identified")
 
-        if not k2_pubs:
-            print("[vn_fertilizer] No k2/1n publications found — retaining cache")
-            return
+            if not k2_pubs:
+                print("[vn_fertilizer] No k2/1n publications found — retaining cache")
+                return
 
-        # Deduplicate by month (keep latest URL per month)
-        by_month: dict[str, str] = {}
-        for pub in k2_pubs:
-            by_month[pub["month"]] = pub["url"]
+            # Deduplicate by month (keep latest URL per month), then download.
+            by_month: dict[str, str] = {}
+            for pub in k2_pubs:
+                by_month[pub["month"]] = pub["url"]
+            for month, url in sorted(by_month.items()):
+                body = _download_pdf(url)
+                if body:
+                    pdf_by_month[month] = body
+                else:
+                    print(f"[vn_fertilizer] {month}: PDF download failed — skipping")
 
-        # Download and parse each PDF. The same bytes feed two extractions:
-        # fertilizer sub-types (this scraper's job) and the national coffee
-        # import row (piggyback — no extra fetching).
+        # Parse each PDF. The same bytes feed two extractions: fertilizer
+        # sub-types (this scraper's job) and the national coffee import row
+        # (dormant piggyback — see the note at _COFFEE_CACHE_PATH).
         cumulative: dict[str, dict[str, float]] = {}
         coffee_cum: dict[str, dict[str, float]] = {}
-        for month, url in sorted(by_month.items()):
-            pdf_bytes = _download_pdf(url)
-            if not pdf_bytes:
-                print(f"[vn_fertilizer] {month}: PDF download failed — skipping")
-                continue
+        for month, pdf_bytes in sorted(pdf_by_month.items()):
             fert = _extract_fert_cumulative(pdf_bytes)
             if not fert:
                 print(f"[vn_fertilizer] {month}: no fertilizer data extracted")
