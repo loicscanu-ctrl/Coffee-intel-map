@@ -1,6 +1,6 @@
 "use client";
 import ImportsPanel from "@/components/demand/ImportsPanel";
-import MonthlyTrend from "@/components/demand/MonthlyTrend";
+import MonthlyTrendCombined from "@/components/demand/MonthlyTrendCombined";
 import SourceReconciliation from "@/components/demand/SourceReconciliation";
 import OriginExplorer, { ImportKpiStrip } from "@/components/demand/imports-lab/OriginExplorer";
 
@@ -50,12 +50,7 @@ export default function ImportsStoryPrototype() {
       </Chapter>
 
       <Chapter n={3} title="What's changing" question="Where is import momentum building or fading right now?">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <MonthlyTrend src="/data/us_coffee_imports.json"
-            heading="US imports — monthly (USITC)" color="#0ea5e9" />
-          <MonthlyTrend src="/data/eu_coffee_imports.json"
-            heading="EU extra-EU imports — monthly (Eurostat)" color="#f59e0b" />
-        </div>
+        <MonthlyTrendCombined />
         <OriginExplorer sections={["heat"]} />
       </Chapter>
 

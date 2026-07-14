@@ -136,9 +136,18 @@ export default function ImportsPanel() {
   }
 
   const worldTotal = ranking.reduce((s, r) => s + r.total, 0);
-  // Form-of-import chart: only markets with a green/roasted split (the
-  // synthetic Eurostat entries carry totals only).
-  const topComposition = ranking.filter(r => r.green > 0 || r.roasted > 0).slice(0, 14);
+  // One merged ranking: stacked green/roasted (+ grey remainder) where the
+  // split is reported; a single amber "totalOnly" bar where it isn't.
+  const rankingStacked = ranking.map(r => {
+    const hasSplit = r.green > 0 || r.roasted > 0;
+    return {
+      name: r.name,
+      green: hasSplit ? +r.green.toFixed(1) : 0,
+      roasted: hasSplit ? +r.roasted.toFixed(1) : 0,
+      other: hasSplit ? +Math.max(0, r.total - r.green - r.roasted).toFixed(1) : 0,
+      totalOnly: hasSplit ? 0 : +r.total.toFixed(1),
+    };
+  });
 
   return (
     <div className="p-4 space-y-4">
@@ -163,42 +172,32 @@ export default function ImportsPanel() {
         </div>
       )}
 
-      {/* Ranking + composition */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
-            Total coffee imports — latest year (kt/yr)
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ranking} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 8, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={84} interval={0} />
-                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown) => [`${Number(v).toLocaleString()} kt`, "Imports"]} />
-                <Bar dataKey="total" fill="#f59e0b" radius={[0, 2, 2, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Ranking — one chart: stacked green/roasted where the split is known,
+          a single amber total bar where it isn't (Eurostat ᴱ members). */}
+      <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
+        <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
+          Total coffee imports — latest year (kt/yr) · green/roasted split where reported
         </div>
-
-        <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
-            Form of import — green vs roasted (top 14, kt/yr)
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topComposition} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 8, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={84} interval={0} />
-                <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => [`${Number(v).toLocaleString()} kt`, n === "green" ? "Green" : "Roasted"]} />
-                <Legend wrapperStyle={{ fontSize: 9 }} />
-                <Bar dataKey="green" stackId="a" fill={GREEN} radius={[0, 0, 0, 0]} />
-                <Bar dataKey="roasted" stackId="a" fill={ROASTED} radius={[0, 2, 2, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="h-[520px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={rankingStacked} layout="vertical" margin={{ top: 0, right: 14, left: 4, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}kt`} />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: "#cbd5e1" }} axisLine={false} tickLine={false} width={94} interval={0} />
+              <Tooltip contentStyle={TT_STYLE} formatter={(v: unknown, n: unknown) => {
+                const lbl = n === "green" ? "Green" : n === "roasted" ? "Roasted"
+                  : n === "other" ? "Other/unspec." : "Total (no split)";
+                return [`${Number(v).toLocaleString()} kt`, lbl];
+              }} />
+              <Legend wrapperStyle={{ fontSize: 9 }} formatter={(v: string) =>
+                v === "green" ? "Green" : v === "roasted" ? "Roasted"
+                  : v === "other" ? "Other/unspec." : "Total (no split)"} />
+              <Bar dataKey="green" stackId="a" fill={GREEN} />
+              <Bar dataKey="roasted" stackId="a" fill={ROASTED} />
+              <Bar dataKey="other" stackId="a" fill="#475569" />
+              <Bar dataKey="totalOnly" stackId="a" fill="#f59e0b" radius={[0, 2, 2, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
