@@ -721,6 +721,43 @@ def export_vietnam_supply() -> None:
         print(f"  vietnam_supply.json → FAILED: {e}")
 
 
+def export_vn_export_by_destination() -> None:
+    """Transform the VN Customs 5X by-country seed (harvested from the
+    English preliminary bulletins by scraper.backfill_vn_customs_country)
+    into the chart-friendly series behind the Vietnam Export-by-Destination
+    panel: months + {country: {ym: tonnes}}."""
+    try:
+        seed_path = ROOT / "seed" / "vn_customs_by_country.json"
+        seed = json.loads(seed_path.read_text(encoding="utf-8"))
+        month_keys = sorted(seed.get("months", {}))
+        countries: dict[str, dict[str, float]] = {}
+        for ym in month_keys:
+            for row in seed["months"][ym].get("exports_by_country") or []:
+                vol = row.get("volume_ton")
+                if not row.get("country") or vol is None:
+                    continue
+                countries.setdefault(row["country"], {})[ym] = vol
+        data = {
+            "source": ("Vietnam Customs — 5X '(ta-sb)' preliminary bulletins, "
+                       "coffee by destination country"),
+            "unit": "tonnes",
+            "coverage_note": ("The 5X bulletin lists coffee only for countries "
+                              "where it is a 'main export' line; the listed sum "
+                              "runs ~85-94% of the 2x national total."),
+            "months": month_keys,
+            "countries": countries,
+        }
+        path = OUT_DIR / "vn_export_by_destination.json"
+        safe_write_json(
+            path, data,
+            lambda d: (True, "ok") if d.get("countries") else (False, "no countries"),
+        )
+        print(f"  vn_export_by_destination.json → {len(countries)} countries × "
+              f"{len(month_keys)} months")
+    except Exception as e:
+        print(f"  vn_export_by_destination.json → FAILED: {e}")
+
+
 def export_colombia(db) -> None:
     try:
         from scraper.export_colombia import export_colombia as _export_colombia
