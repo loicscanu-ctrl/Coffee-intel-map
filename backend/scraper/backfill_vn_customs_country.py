@@ -271,12 +271,17 @@ _SKIP_PREFIXES = ("Country/Territory", "Volume", "Value", "MINISTRY", "GENERAL",
                   "Preliminary", "STATISTICS", "Reporting", "TOTAL", "Table:",
                   "Customs IT")
 
-# Column right-edge boundaries (pt) for number→column assignment.
+# Fallback column right-edge boundaries (pt) for number→column assignment,
+# measured from the June-2026 bulletins. Pages that carry the standard header
+# row (Volume / Value (USD) / Volume / Value (USD)) get boundaries derived
+# from the actual header positions instead — early-2024 bulletins shift the
+# columns enough that fixed constants parse 0 rows (see 2024-03).
 _COL_BOUNDS = ((365.0, "rm_vol"), (436.0, "rm_val"), (494.0, "ytd_vol"),
                (9e9, "ytd_val"))
 _NAME_X_MAX = 265.0      # words left of this are the name
 _UNIT_X = (265.0, 310.0)  # the Units column band
 _COUNTRY_X0 = 47.5        # country rows start left of this; commodities right
+_COUNTRY_INDENT = 2.5     # commodity rows are indented ≥ this past the country x0
 
 
 def _parse_en_number(s: str) -> float:
@@ -295,6 +300,43 @@ def _page_lines(pg) -> list[list[dict]]:
     return [sorted(ws, key=lambda w: w["x0"]) for _, ws in sorted(lines.items())]
 
 
+def _page_geometry(lines: list[list[dict]]):
+    """Derive (name_x_max, unit_band, col_bounds) from the page's own header
+    row. Column boundaries are the midpoints between adjacent header blocks
+    (Volume | Value (USD) | Volume | Value (USD)) — on the June-2026 fixtures
+    this reproduces the measured constants; on older bulletins whose columns
+    sit elsewhere it adapts instead of parsing 0 rows (the 2024-03 failure).
+    Falls back to the fixture-measured constants when the header is absent
+    (continuation pages keep the header, so this is rare)."""
+    name_x_max, unit_band, bounds = _NAME_X_MAX, _UNIT_X, _COL_BOUNDS
+    for ws in lines[:8]:
+        vols = [w for w in ws if w["text"] == "Volume"]
+        vals = [w for w in ws if w["text"] == "Value"]
+        usds = [w for w in ws if w["text"].startswith("(USD")]
+        if len(vols) == 2 and len(vals) == 2:
+            v1, v2 = sorted(vols, key=lambda w: w["x0"])
+            a1, a2 = sorted(vals, key=lambda w: w["x0"])
+            u1 = next((u for u in sorted(usds, key=lambda w: w["x0"])
+                       if u["x0"] > a1["x0"]), None)
+            rm_val_right = (u1["x1"] if u1 is not None and u1["x0"] < v2["x0"]
+                            else a1["x1"])
+            bounds = (
+                ((v1["x1"] + a1["x0"]) / 2, "rm_vol"),
+                ((rm_val_right + v2["x0"]) / 2, "rm_val"),
+                ((v2["x1"] + a2["x0"]) / 2, "ytd_vol"),
+                (9e9, "ytd_val"),
+            )
+            break
+    for ws in lines[:8]:
+        units = [w for w in ws if w["text"] == "Units"]
+        if units:
+            u = units[0]
+            name_x_max = u["x0"] - 8
+            unit_band = (u["x0"] - 12, u["x1"] + 12)
+            break
+    return name_x_max, unit_band, bounds
+
+
 def parse_coffee_by_country(pdf_bytes: bytes) -> list[dict]:
     """Extract every coffee commodity row from a 5X/5N bulletin.
 
@@ -308,26 +350,40 @@ def parse_coffee_by_country(pdf_bytes: bytes) -> list[dict]:
     country: str | None = None    # carries across page breaks
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         for pg in pdf.pages:
-            for ws in _page_lines(pg):
+            lines = _page_lines(pg)
+            name_x_max, unit_band, col_bounds = _page_geometry(lines)
+
+            # First pass: the page's left margin. Country rows start at the
+            # margin; commodity rows are indented a few points past it.
+            data_x0 = [ws[0]["x0"] for ws in lines
+                       if ws and not _NUM_RX.match(ws[0]["text"])]
+            left_margin = min(data_x0) if data_x0 else _COUNTRY_X0 - _COUNTRY_INDENT
+
+            for ws in lines:
                 name = " ".join(w["text"] for w in ws
-                                if w["x0"] < _NAME_X_MAX and not _NUM_RX.match(w["text"]))
+                                if w["x0"] < name_x_max and not _NUM_RX.match(w["text"]))
                 if not name or name.startswith(_SKIP_PREFIXES):
                     continue
                 unit = " ".join(w["text"] for w in ws
-                                if _UNIT_X[0] <= w["x0"] <= _UNIT_X[1]
+                                if unit_band[0] <= w["x0"] <= unit_band[1]
                                 and not _NUM_RX.match(w["text"]))
-                if ws[0]["x0"] < _COUNTRY_X0 and not unit:
+                cols: dict[str, float] = {}
+                for w in ws:
+                    if _NUM_RX.match(w["text"]) and w["x1"] > unit_band[1]:
+                        for bound, col in col_bounds:
+                            if w["x1"] <= bound:
+                                cols[col] = _parse_en_number(w["text"])
+                                break
+                # Country row: at the left margin, no unit token, and carrying
+                # value numbers (wrapped commodity-name fragments have none —
+                # without this a continuation line like 'components thereof'
+                # on a country-less page would hijack the current country).
+                if (ws[0]["x0"] < left_margin + _COUNTRY_INDENT and not unit
+                        and cols):
                     country = name
                     continue
                 if not _COFFEE_RX.search(_strip_accents(name)):
                     continue
-                cols: dict[str, float] = {}
-                for w in ws:
-                    if _NUM_RX.match(w["text"]) and w["x1"] > _UNIT_X[1]:
-                        for bound, col in _COL_BOUNDS:
-                            if w["x1"] <= bound:
-                                cols[col] = _parse_en_number(w["text"])
-                                break
                 out.append({
                     "country":       country,
                     "commodity":     name,
@@ -404,7 +460,10 @@ def run_backfill(months: int) -> int:
     consecutive_misses = 0
     for (y, m) in _months_back(months):
         key = f"{y}-{m:02d}"
-        if key in series:
+        # Skip only months that already carry export rows; empty months are
+        # re-tried (a layout the parser missed, or a 5x that wasn't found on
+        # the earlier dispatch).
+        if series.get(key, {}).get("exports_by_country"):
             consecutive_misses = 0
             continue
         found = _find_month(y, m, index_hits)
@@ -420,7 +479,9 @@ def run_backfill(months: int) -> int:
                 break
             continue
         consecutive_misses = 0
-        entry: dict = {}
+        # Merge over any earlier partial entry (e.g. keep a previously-found
+        # 5n when only the 5x resolved this time).
+        entry: dict = dict(series.get(key, {}))
         for table, (url, body) in found.items():
             rows = parse_coffee_by_country(body)
             side = "exports_by_country" if table == "5x" else "imports_by_country"
