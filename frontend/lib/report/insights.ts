@@ -19,6 +19,8 @@ import { transformApiData } from "@/lib/cot/transformApiData";
 import type { CotRawRow } from "@/lib/cot/types";
 import { buildMarketMetrics } from "@/lib/pdf/dataHelpers";
 import { evaluateSignals } from "@/lib/cot/signalEngine";
+import { buildIndonesiaData, type RawIndonesiaExports } from "@/components/supply/IndonesiaExports/data";
+import type { IndonesiaExportsData } from "@/components/supply/IndonesiaExports/types";
 
 type Insight = string | Record<string, string> | null;
 type Builder = () => Promise<Insight>;
@@ -644,6 +646,147 @@ const importsByOrigin = (src: string, label: string): Builder => async () => {
     + `${top?.name ? `Top origin **${top.name}**${share != null ? ` at **${share.toFixed(0)}%**` : ""} of the total. ` : ""}Origin concentration is a supply-security and differential signal for the importing bloc.`;
 };
 
+// ── Uganda exports (uganda_monthly.json) ──────────────────────────────────────
+interface UgRow { month: string; total_bags?: number; robusta_bags?: number; arabica_bags?: number; by_destination?: { country?: string; bags?: number }[]; }
+async function ugSeries(): Promise<UgRow[] | null> {
+  const d = await load<{ series?: UgRow[] }>("/data/uganda_monthly.json");
+  return Array.isArray(d?.series) && d!.series!.length ? d!.series! : null;
+}
+const ugKt = (bags: number) => bags * 6e-5; // raw 60-kg bags → kt
+
+const ugandaMonthly: Builder = async () => {
+  const s = await ugSeries(); if (!s) return null;
+  const last = s[s.length - 1]; const ya = s[s.length - 13];
+  const yoy = ya ? chgPct(last.total_bags ?? 0, ya.total_bags ?? 0) : null;
+  const rob = last.robusta_bags ?? 0, ara = last.arabica_bags ?? 0; const tot = last.total_bags || (rob + ara) || 1;
+  return `Uganda exported **${n1(ugKt(last.total_bags ?? 0))} kt** in ${monthLabel(last.month)}${yoy != null ? ` (**${pct(yoy)}** YoY)` : ""}, `
+    + `**${(rob / tot * 100).toFixed(0)}% robusta / ${(ara / tot * 100).toFixed(0)}% arabica**. Africa's top robusta exporter — a key London-market supply read.`;
+};
+const ugandaPace: Builder = async () => {
+  const s = await ugSeries(); if (!s) return null;
+  const last = s[s.length - 1]; const ck = vnCrop(last.month);
+  const ctd = s.filter((r) => vnCrop(r.month) === ck); const months = new Set(ctd.map((r) => r.month.slice(5)));
+  const prevCk = `${+ck.slice(0, 4) - 1}/${String((+ck.slice(0, 4)) % 100).padStart(2, "0")}`;
+  const prevCtd = s.filter((r) => vnCrop(r.month) === prevCk && months.has(r.month.slice(5)));
+  const ctdT = ctd.reduce((a, r) => a + (r.total_bags ?? 0), 0), prevT = prevCtd.reduce((a, r) => a + (r.total_bags ?? 0), 0);
+  return `Through ${MONTHS[+last.month.slice(5) - 1]}, ${ck} crop-year (Oct–Sep) exports total **${n1(ugKt(ctdT))} kt**, **${pct(chgPct(ctdT, prevT))}** versus ${prevCk} at the same stage. `
+    + `Pace ${ctdT >= prevT ? "ahead of" : "behind"} last year gauges robusta availability into the marketing year.`;
+};
+const ugandaAnnual: Builder = async () => {
+  const s = await ugSeries(); if (!s) return null;
+  const ck = vnCrop(s[s.length - 1].month); const ctd = s.filter((r) => vnCrop(r.month) === ck);
+  const rob = ctd.reduce((a, r) => a + (r.robusta_bags ?? 0), 0), ara = ctd.reduce((a, r) => a + (r.arabica_bags ?? 0), 0);
+  const tot = rob + ara || 1;
+  return `In ${ck} crop-year-to-date, Uganda's exports are **${(rob / tot * 100).toFixed(0)}% robusta** (${n1(ugKt(rob))} kt) and **${(ara / tot * 100).toFixed(0)}% arabica** (${n1(ugKt(ara))} kt). `
+    + `The robusta/arabica split decides which futures market the origin feeds.`;
+};
+const ugandaTypeShare: Builder = async () => {
+  const s = await ugSeries(); if (!s) return null;
+  const last = s[s.length - 1]; const rob = last.robusta_bags ?? 0, ara = last.arabica_bags ?? 0; const tot = rob + ara || 1;
+  const ya = s[s.length - 13];
+  const yaRob = ya ? (ya.robusta_bags ?? 0) / ((ya.robusta_bags ?? 0) + (ya.arabica_bags ?? 0) || 1) * 100 : null;
+  return `Robusta is **${(rob / tot * 100).toFixed(0)}%** of Uganda's export mix in ${monthLabel(last.month)}${yaRob != null ? `, versus ${yaRob.toFixed(0)}% a year earlier` : ""}. `
+    + `The robusta share tracks how much London-deliverable supply Uganda is contributing.`;
+};
+const ugandaDest: Builder = async () => {
+  const s = await ugSeries(); if (!s) return null;
+  const last = [...s].reverse().find((r) => Array.isArray(r.by_destination) && r.by_destination!.length);
+  const bd = last?.by_destination; if (!bd?.length) return null;
+  const tot = bd.reduce((a, r) => a + (r.bags ?? 0), 0) || 1;
+  const top = [...bd].sort((a, b) => (b.bags ?? 0) - (a.bags ?? 0)).slice(0, 3);
+  return `Top destination **${top[0].country}** at **${((top[0].bags ?? 0) / tot * 100).toFixed(0)}%** of ${monthLabel(last!.month)} exports; `
+    + `next: ${top.slice(1).map((t) => `${t.country} (${((t.bags ?? 0) / tot * 100).toFixed(0)}%)`).join(", ")}. Destination concentration maps Uganda's key buyer relationships.`;
+};
+
+// ── Indonesia exports (indonesia_exports.json → buildIndonesiaData) ────────────
+async function indoData(): Promise<IndonesiaExportsData | null> {
+  const raw = await load<RawIndonesiaExports>("/data/indonesia_exports.json");
+  if (!raw) return null;
+  try { return buildIndonesiaData(raw); } catch { return null; }
+}
+const idKt = (kg: number) => kg / 1e6; // kg → kt
+type IdRow = { date: string; total: number; arabica: number; robusta: number; other: number };
+
+const indoMonthly: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const last = s[s.length - 1]; const ya = s[s.length - 13];
+  const yoy = ya ? chgPct(last.total, ya.total) : null;
+  return `Indonesia exported **${n1(idKt(last.total))} kt** in ${monthLabel(last.date)}${yoy != null ? ` (**${pct(yoy)}** YoY)` : ""}. `
+    + `A dual arabica/robusta origin whose monsoon-driven crop feeds both the KC and RC markets.`;
+};
+const indoPace: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const last = s[s.length - 1]; const ck = cropKey(last.date);
+  const ctd = s.filter((r) => cropKey(r.date) === ck); const months = new Set(ctd.map((r) => r.date.slice(5)));
+  const prevCk = `${+ck.slice(0, 4) - 1}/${String((+ck.slice(0, 4)) % 100).padStart(2, "0")}`;
+  const prevCtd = s.filter((r) => cropKey(r.date) === prevCk && months.has(r.date.slice(5)));
+  const ctdT = ctd.reduce((a, r) => a + r.total, 0), prevT = prevCtd.reduce((a, r) => a + r.total, 0);
+  return `Through ${MONTHS[+last.date.slice(5) - 1]}, ${ck} crop-year exports total **${n1(idKt(ctdT))} kt**, **${pct(chgPct(ctdT, prevT))}** versus ${prevCk} at the same stage.`;
+};
+const indoAnnual: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const r = s[s.length - 1]; const tot = r.arabica + r.robusta + r.other || r.total || 1;
+  return `In ${monthLabel(r.date)} Indonesia's export mix was **${(r.arabica / tot * 100).toFixed(0)}% arabica**, `
+    + `**${(r.robusta / tot * 100).toFixed(0)}% robusta** and **${(r.other / tot * 100).toFixed(0)}% other**, on **${n1(idKt(r.total))} kt**. Robusta dominance ties Indonesia to the London market.`;
+};
+const indoTypeShare: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const r = s[s.length - 1]; const ya = s[s.length - 13]; const tot = r.arabica + r.robusta + r.other || 1;
+  const yaRob = ya ? ya.robusta / (ya.arabica + ya.robusta + ya.other || 1) * 100 : null;
+  return `Robusta is **${(r.robusta / tot * 100).toFixed(0)}%** of Indonesia's export mix in ${monthLabel(r.date)}${yaRob != null ? `, versus ${yaRob.toFixed(0)}% a year earlier` : ""}. `
+    + `The arabica/robusta balance shows which market Indonesian supply lands in.`;
+};
+const indoYoy: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const r = s[s.length - 1]; const ya = s[s.length - 13]; if (!ya) return null;
+  return `Year-on-year in ${monthLabel(r.date)}: arabica **${pct(chgPct(r.arabica, ya.arabica))}**, robusta **${pct(chgPct(r.robusta, ya.robusta))}**. `
+    + `Diverging growth by type shifts the arabica/robusta balance Indonesia supplies.`;
+};
+const indoSeasonality: Builder = async () => {
+  const d = await indoData(); const s = d?.series as IdRow[] | undefined; if (!s?.length) return null;
+  const byMonth: Record<number, number[]> = {};
+  for (const r of s) { const m = +r.date.slice(5, 7); (byMonth[m] ||= []).push(r.total); }
+  const avg = (m: number) => (byMonth[m]?.reduce((x, y) => x + y, 0) ?? 0) / (byMonth[m]?.length || 1);
+  const peak = Object.keys(byMonth).map(Number).sort((x, y) => avg(y) - avg(x))[0];
+  const last = s[s.length - 1]; const lm = +last.date.slice(5, 7);
+  return `Indonesia's shipments seasonally peak around **${MONTHS[peak - 1]}**. ${MONTHS[lm - 1]} printed **${n1(idKt(last.total))} kt**, **${pct(chgPct(last.total, avg(lm)))}** versus its seasonal norm.`;
+};
+const indoDest: Builder = async () => {
+  const d = await indoData();
+  const cc = d?.by_country?.countries; if (!cc) return null; // CountryYear.countries: ctr → ym → kg
+  const totals = Object.entries(cc)
+    .map(([c, months]) => [c, Object.values(months || {}).reduce((a, b) => a + (b || 0), 0)] as [string, number])
+    .filter(([, v]) => v > 0);
+  if (!totals.length) return null;
+  const grand = totals.reduce((a, [, v]) => a + v, 0) || 1;
+  const top = totals.sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return `Top destination is **${top[0][0]}** at **${(top[0][1] / grand * 100).toFixed(0)}%** of shipments; `
+    + `next ${top.slice(1).map(([c, v]) => `${c} (${(v / grand * 100).toFixed(0)}%)`).join(", ")}. Where Indonesian coffee lands shapes its regional differential.`;
+};
+
+// ── Vietnam destination (vn_export_by_destination.json) ───────────────────────
+const vietnamDest: Builder = async () => {
+  const d = await load<{ countries?: Record<string, Record<string, number>> }>("/data/vn_export_by_destination.json");
+  const c = d?.countries; if (!c) return null;
+  const totals = Object.entries(c).map(([country, months]) => [country, Object.values(months).reduce((a, b) => a + (b || 0), 0)] as [string, number]);
+  const grand = totals.reduce((a, [, v]) => a + v, 0) || 1;
+  const top = totals.sort((a, b) => b[1] - a[1]).slice(0, 3);
+  if (!top.length) return null;
+  return `Top destination for Vietnamese coffee: **${top[0][0]}** at **${(top[0][1] / grand * 100).toFixed(0)}%** of tracked volume; `
+    + `next ${top.slice(1).map(([n, v]) => `${n} (${(v / grand * 100).toFixed(0)}%)`).join(", ")}. Buyer concentration for the world's top robusta exporter.`;
+};
+
+// ── Brazil frost & drought risk (farmer_economics.json → weather) ─────────────
+const brazilWeatherRisk: Builder = async () => {
+  const d = await load<{ weather?: { regions?: { name?: string; frost?: string; drought?: string }[] } }>("/data/farmer_economics.json");
+  const rg = d?.weather?.regions; if (!Array.isArray(rg) || !rg.length) return null;
+  const frostAt = rg.filter((r) => r.frost && r.frost.toUpperCase() !== "NONE");
+  const droughtHi = rg.filter((r) => ["HIGH", "MED", "H", "M"].includes((r.drought ?? "").toUpperCase()));
+  const worst = frostAt[0];
+  return `Across ${rg.length} Brazil growing regions, **${frostAt.length}** show frost risk and **${droughtHi.length}** elevated drought (CSI) risk in the forecast window`
+    + `${worst?.name ? `; ${worst.name} flags frost **${worst.frost}**` : ""}. Frost and drought are the two dominant weather threats to the arabica crop.`;
+};
+
 // ── id → builder map ──────────────────────────────────────────────────────────
 const INSIGHTS: Record<string, Builder> = {
   // Futures
@@ -675,17 +818,31 @@ const INSIGHTS: Record<string, Builder> = {
   brazil_supply_demand: supplyDemand("brazil", "Brazil"),
   brazil_weather_analogs: weatherAnalogs("brazil", "Brazil"),
   brazil_weather_pack: weatherPack("brazil", "Brazil"),
+  brazil_weather_risk: brazilWeatherRisk,
   // Supply — Vietnam & others
   vietnam_monthly_volume: vietnamMonthly,
   vietnam_cumulative_pace: vietnamPace,
   vietnam_annual_volume: vietnamAnnual,
+  vietnam_destination: vietnamDest,
   vietnam_supply_demand: supplyDemand("vietnam", "Vietnam"),
   vietnam_weather_analogs: weatherAnalogs("vietnam", "Vietnam"),
   vietnam_weather_pack: weatherPack("vn", "Vietnam"),
   colombia_weather_pack: weatherPack("colombia", "Colombia"),
   honduras_weather_pack: weatherPack("honduras", "Honduras"),
   ethiopia_weather_pack: weatherPack("ethiopia", "Ethiopia"),
+  uganda_monthly_volume: ugandaMonthly,
+  uganda_cumulative_pace: ugandaPace,
+  uganda_annual_trend: ugandaAnnual,
+  uganda_type_share: ugandaTypeShare,
+  uganda_destination: ugandaDest,
   uganda_weather_pack: weatherPack("uganda", "Uganda"),
+  indonesia_monthly_volume: indoMonthly,
+  indonesia_cumulative_pace: indoPace,
+  indonesia_annual_trend: indoAnnual,
+  indonesia_type_share: indoTypeShare,
+  indonesia_yoy_type: indoYoy,
+  indonesia_seasonality: indoSeasonality,
+  indonesia_destination: indoDest,
   indonesia_weather_pack: weatherPack("indonesia", "Indonesia"),
   enso_oni: enso,
   enso_plume: ensoPlume,
