@@ -55,3 +55,12 @@ def test_revision_downward_clamps_to_zero():
     })
     assert rows[1]["tonnes"] == 0.0
     assert rows[1]["value_usd"] == 0.0
+
+
+def test_1n_url_prediction_leads_with_the_verified_url():
+    # Path A candidate ordering: the empirically-verified July-2026 bulletin
+    # URL must be the very first candidate, so present months cost ~1 request.
+    from scraper.sources.vn_fertilizer import _candidate_1n_urls
+    urls = _candidate_1n_urls(2026, 6)
+    assert urls[0] == ("https://files.customs.gov.vn/CustomsCMS/TONG_CUC"
+                       "/2026/7/6/2026-t6k2-1n(vn-sb).pdf")
