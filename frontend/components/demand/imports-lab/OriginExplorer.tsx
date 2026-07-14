@@ -138,19 +138,34 @@ function Kpi({ label, value, sub, delta, tone }: { label: string; value: string;
     </div>
   );
 }
+const latestYearOf = (tby: Record<string, number>): string => {
+  const ys = Object.keys(tby).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  return ys.length ? String(ys[ys.length - 1]) : "—";
+};
+
 export function ImportKpiStrip() {
   const { us, eu, ct } = useImportData();
   if (!us || !eu || !ct) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading import KPIs…</div>;
   const worldByYear: Record<string, number> = {};
   for (const c of Object.values(ct.countries)) for (const a of c.annual) if (a.total_mt != null) worldByYear[String(a.year)] = (worldByYear[String(a.year)] ?? 0) + a.total_mt;
+  // Every headline value is explicitly timed: the KPI sub carries the data
+  // year it refers to, and the caption row carries each file's refresh date.
+  const wY = latestYearOf(worldByYear), usY = latestYearOf(us.total_by_year), euY = latestYearOf(eu.total_by_year);
+  const fdate = (u?: string) => (u ? u.slice(0, 10) : "—");
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-      <Kpi label="World (Comtrade)" value={fmtKt(latestVal(worldByYear))} delta={yoyPct(worldByYear)} sub={`${Object.keys(ct.countries).length} mkts`} tone="text-amber-300" />
-      <Kpi label="US imports" value={fmtKt(latestVal(us.total_by_year))} delta={yoyPct(us.total_by_year)} sub={`top: ${us.origins[0]?.name ?? "—"}`} />
-      <Kpi label="EU imports" value={fmtKt(latestVal(eu.total_by_year))} delta={yoyPct(eu.total_by_year)} sub={`top: ${eu.origins[0]?.name ?? "—"}`} />
-      <Kpi label="US origins" value={`${us.origins.length}`} sub={`HHI ${hhi(us.origins)}`} />
-      <Kpi label="EU origins" value={`${eu.origins.length}`} sub={`HHI ${hhi(eu.origins)}`} />
-      <Kpi label="US top-3 share" value={`${Math.round(us.origins.slice(0, 3).reduce((s, o) => s + (o.latest_mt ?? 0), 0) / (us.origins.reduce((s, o) => s + (o.latest_mt ?? 0), 0) || 1) * 100)}%`} sub="of US imports" />
+    <div className="space-y-1.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        <Kpi label="World (Comtrade)" value={fmtKt(latestVal(worldByYear))} delta={yoyPct(worldByYear)} sub={`${wY} · ${Object.keys(ct.countries).length} mkts`} tone="text-amber-300" />
+        <Kpi label="US imports" value={fmtKt(latestVal(us.total_by_year))} delta={yoyPct(us.total_by_year)} sub={`${usY} · top: ${us.origins[0]?.name ?? "—"}`} />
+        <Kpi label="EU imports" value={fmtKt(latestVal(eu.total_by_year))} delta={yoyPct(eu.total_by_year)} sub={`${euY} · top: ${eu.origins[0]?.name ?? "—"}`} />
+        <Kpi label="US origins" value={`${us.origins.length}`} sub={`${usY} · HHI ${hhi(us.origins)}`} />
+        <Kpi label="EU origins" value={`${eu.origins.length}`} sub={`${euY} · HHI ${hhi(eu.origins)}`} />
+        <Kpi label="US top-3 share" value={`${Math.round(us.origins.slice(0, 3).reduce((s, o) => s + (o.latest_mt ?? 0), 0) / (us.origins.reduce((s, o) => s + (o.latest_mt ?? 0), 0) || 1) * 100)}%`} sub={`${usY} · of US imports`} />
+      </div>
+      <div className="text-[9px] text-slate-500 font-mono">
+        Totals = latest full year shown on each tile · YoY vs the year before ·
+        files updated: Comtrade {fdate((ct as { updated?: string }).updated)} · USITC {fdate(us.updated)} · Eurostat {fdate(eu.updated)}
+      </div>
     </div>
   );
 }
