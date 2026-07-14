@@ -504,9 +504,11 @@ def run_probe_past() -> int:
                     break
 
     # ── C: 1N with half-month 'k' markers (vn_fertilizer's naming) ────────
+    # Period format per vn_fertilizer's regex is 't{m}k2' with NO hyphen
+    # ('2026-t6k2'); the earlier probe wrongly hyphenated it.
     for (y, m) in _months_back(3)[:2]:
         got = None
-        for kmark in ("-k2", "-k1", ""):
+        for kmark in ("k2", "k1", ""):
             for suffix in ("(vn-sb)", "(ta-sb)"):
                 stem = f"{y}-t{m}{kmark}-1n{suffix}.pdf"
                 for off in (0, 1, 2):

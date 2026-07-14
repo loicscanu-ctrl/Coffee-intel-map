@@ -40,10 +40,13 @@ _BRIDGE_URL = (
     "&site=https://tongcuc.customs.gov.vn/"
 )
 _CACHE_PATH = Path(__file__).resolve().parents[2] / "scraper" / "cache" / "vn_fertilizer.json"
-# Coffee IMPORTS piggyback: the same 1n bulletins carry a national 'Cà phê'
-# row (Vietnam imports coffee — Laos/Brazil/Indonesia — for processing and
-# re-export; the customs 5N by-country table does NOT break coffee out, so
-# this national series is the only import figure the bulletins publish).
+# Coffee IMPORTS piggyback. VERIFIED (probe, Jul-2026): the current 1n
+# bulletins do NOT carry a 'Cà phê' row — the 1n uses the same 'main imports'
+# commodity nomenclature as the 5N (also coffee-free), so coffee imports fold
+# into 'Other' throughout the customs monthly bulletins. The extraction below
+# is kept as a dormant hook: it costs nothing per run, and if customs ever
+# adds coffee to the import nomenclature the series starts automatically.
+# (Real VN coffee-import data would need ITC/Comtrade or GDVC data services.)
 _COFFEE_CACHE_PATH = _CACHE_PATH.parent / "vn_coffee_imports.json"
 
 # Vietnamese sub-type name → output field (cumulative tons → kt)
