@@ -1,22 +1,21 @@
 """
-Diagnostic probe: why does the CEPEA/ESALQ coffee scrape return nothing?
+Diagnostic probe #2: find a Cloudflare-free source for the Brazil Arabica
+(CEPEA/ESALQ) physical price.
 
-news.json carries 0 "CEPEA/ESALQ" items, so brazil_arabica (whose only source is
-this scrape) never populates. This probe reproduces the scraper's fetch in CI and
-reports exactly where it breaks — anti-bot block vs. page-structure change:
+Probe #1 established CEPEA is hard-walled by Cloudflare in CI (403 on every URL,
+challenge page on render). This probe looks for an alternative that CI can reach:
 
-  1. Playwright stealth render of the indicator page (the scraper's path):
-     HTTP status, <title>, #tables, price-like matches, visible-text sample,
-     and what _parse_price_table() extracts.
-  2. Plain HTTP GET with browser headers (is it a hard 403/Cloudflare wall?).
-  3. The CEPEA JSON "consulta" series endpoints (a structured fallback that
-     bypasses the rendered table entirely, if reachable).
+  A) BCB SGS API (api.bcb.gov.br) — the same clean gov JSON that feeds
+     brazil_conilon. Sweep the coffee cluster (4330-4340) plus 1/7/8, print each
+     series' latest row so we can see which arabica/conilon series are still
+     live (4332 arabica is believed dead since May 2026).
+  B) A couple of Brazilian mirrors that republish the CEPEA arábica indicator,
+     to see whether any is fetchable without a bot challenge.
 
 Pure diagnostic — no DB, no commits. Run via the "Probe: CEPEA" workflow.
 """
 from __future__ import annotations
 
-import asyncio
 import json
 import re
 import sys
@@ -25,117 +24,72 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # → backend/
 
-DEBUG = Path("debug/cepea_probe")
-DEBUG.mkdir(parents=True, exist_ok=True)
-
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
-URL = "https://www.cepea.org.br/en/indicator/coffee.aspx"
-URL_BR = "https://www.cepea.org.br/br/indicador/cafe.aspx"
 PRICE_RE = re.compile(r"\d{1,3}(?:\.\d{3})*,\d{2}")
 
-# CEPEA's site AJAX endpoint that feeds the indicator chart/table with a JSON
-# series — product IDs: 23 = Arábica (ESALQ/BM&F), 24 = Robusta/Conilon.
-CONSULTA = ("https://www.cepea.org.br/br/aynzul/consultarserie.js.php"
-            "?id_indicador[]={pid}")
+
+def _get(url: str, headers: dict | None = None, timeout: int = 30):
+    req = urllib.request.Request(url, headers=headers or {"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.status, r.read().decode("utf-8", "replace")
 
 
-def plain_get(url: str) -> None:
-    print(f"\n[http] GET {url}")
+def bcb_series(code: int) -> None:
+    """Print the latest row of a BCB SGS series (and whether it has 2026 data)."""
+    last_url = (f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{code}"
+                f"/dados/ultimos/3?formato=json")
     try:
-        req = urllib.request.Request(url, headers={
+        st, body = _get(last_url)
+        rows = json.loads(body) if body.strip().startswith("[") else []
+        latest = rows[-1] if rows else None
+        has2026 = any(str(r.get("data", "")).endswith("2026") for r in rows)
+        print(f"  SGS {code}: HTTP {st}  rows={len(rows)}  latest={latest}  2026={has2026}")
+    except Exception as e:  # noqa: BLE001
+        msg = str(e)[:120]
+        print(f"  SGS {code}: FAILED {type(e).__name__}: {msg}")
+
+
+def mirror(url: str) -> None:
+    print(f"\n[mirror] {url}")
+    try:
+        st, body = _get(url, headers={
             "User-Agent": UA,
             "Accept": "text/html,application/xhtml+xml",
-            "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+            "Accept-Language": "pt-BR,pt;q=0.9",
         })
-        with urllib.request.urlopen(req, timeout=30) as r:
-            body = r.read().decode("utf-8", "replace")
-        print(f"   HTTP {r.status}  {len(body)} bytes")
         prices = PRICE_RE.findall(body)
-        print(f"   price-like matches: {len(prices)} (first: {prices[:5]})")
+        low = body.lower()
+        cf = any(s in low for s in ("just a moment", "cloudflare", "verificação de segurança",
+                                    "attention required", "captcha"))
+        # show a little context around "arábica"/"arabica" if present
+        idx = low.find("arábica")
+        if idx < 0:
+            idx = low.find("arabica")
+        ctx = body[max(0, idx - 40):idx + 120].replace("\n", " ") if idx >= 0 else ""
+        print(f"   HTTP {st}  {len(body)} bytes  cf_challenge={cf}  prices={len(prices)} (first {prices[:6]})")
+        if ctx:
+            print(f"   arabica ctx: {ctx!r}")
     except Exception as e:  # noqa: BLE001
-        print(f"   failed: {type(e).__name__}: {e}")
+        print(f"   FAILED {type(e).__name__}: {str(e)[:140]}")
 
 
-def consulta(pid: int, name: str) -> None:
-    url = CONSULTA.format(pid=pid)
-    print(f"\n[consulta] {name} (id={pid}) {url}")
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": UA,
-                                                   "Referer": URL_BR})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            body = r.read().decode("utf-8", "replace")
-        print(f"   HTTP {r.status}  {len(body)} bytes")
-        print(f"   head: {body[:400]!r}")
-    except Exception as e:  # noqa: BLE001
-        print(f"   failed: {type(e).__name__}: {e}")
+def main() -> None:
+    print("=== (A) BCB SGS coffee-cluster sweep ===")
+    for code in [1, 7, 8, 4330, 4331, 4332, 4333, 4334, 4335, 4336, 4337, 4338, 4339, 4340,
+                 27574, 27575, 24369, 24370]:
+        bcb_series(code)
 
-
-async def render() -> None:
-    try:
-        from playwright_stealth import Stealth
-    except ImportError:
-        Stealth = None
-        print("[render] playwright_stealth NOT importable")
-    from playwright.async_api import async_playwright
-
-    from scraper.sources.cepea import _parse_price_table  # reuse the real parser
-
-    async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
-        for url in (URL, URL_BR):
-            ctx = await browser.new_context(user_agent=UA, locale="pt-BR")
-            pg = await ctx.new_page()
-            if Stealth:
-                try:
-                    await Stealth().apply_stealth_async(pg)
-                except Exception as e:  # noqa: BLE001
-                    print(f"[render] stealth apply failed: {e}")
-            print(f"\n{'='*60}\n[render] {url}")
-            try:
-                resp = await pg.goto(url, wait_until="networkidle", timeout=45000)
-                print(f"   goto HTTP {resp.status if resp else '?'}")
-            except Exception as e:  # noqa: BLE001
-                print(f"   goto error: {type(e).__name__}: {e}")
-            await pg.wait_for_timeout(6000)
-            try:
-                html = await pg.content()
-            except Exception as e:  # noqa: BLE001
-                print(f"   content error: {e}")
-                await ctx.close()
-                continue
-            fn = "en" if "/en/" in url else "br"
-            (DEBUG / f"cepea_{fn}.html").write_text(html, encoding="utf-8")
-            title = await pg.title()
-            ntables = len(await pg.query_selector_all("table"))
-            nselects = len(await pg.query_selector_all("select"))
-            from bs4 import BeautifulSoup
-            text = BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
-            prices = PRICE_RE.findall(text)
-            price, dstr = _parse_price_table(html)
-            print(f"   title={title!r}")
-            print(f"   tables={ntables} selects={nselects} bytes={len(html)}")
-            print(f"   price-like in text: {len(prices)} (first {prices[:6]})")
-            print(f"   _parse_price_table → price={price} date={dstr}")
-            # cloudflare/challenge signatures
-            low = text.lower()
-            for sig in ("just a moment", "verify you are human", "cloudflare",
-                        "access denied", "captcha", "attention required"):
-                if sig in low:
-                    print(f"   ⚠ challenge signature: {sig!r}")
-            print(f"   text[:400]: {text[:400]!r}")
-            await ctx.close()
-        await browser.close()
-
-
-async def main() -> None:
-    plain_get(URL)
-    plain_get(URL_BR)
-    consulta(23, "Arabica")
-    consulta(24, "Conilon")
-    await render()
+    print("\n=== (B) Brazilian CEPEA-arabica mirrors ===")
+    for url in [
+        "https://www.noticiasagricolas.com.br/cotacoes/cafe",
+        "https://www.melhorcambio.com/cafe-hoje",
+        "https://www.canalrural.com.br/precos-agropecuarios/cafe/",
+        "https://www.notasagricolas.com.br/cafe",
+    ]:
+        mirror(url)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
