@@ -105,8 +105,6 @@ COMTRADE_API_KEY = os.environ.get("COMTRADE_API_KEY", "")  # passed as a header 
 
 OUT_PATH = Path(__file__).parents[3] / "frontend" / "public" / "data" / "coffee_imports.json"
 
-_N_YEARS = 12        # annual history depth
-_N_MONTHS = 12       # monthly window (preview monthly endpoint caps at ~12 periods)
 _MONTHLY_TOP_N = 12  # cap monthly fetches to the largest RoW importers (rate limits)
 
 
@@ -151,14 +149,28 @@ def _comtrade_fetch(url: str, reporter_code: str, periods_csv: str, *, kind: str
 
 
 def _comtrade_annual(reporter_code: str, periods_csv: str) -> list[dict]:
-    """One call: all HS-0901 subcodes × all periods, imports from World."""
+    """One call: all HS-0901 subcodes × ONE period, imports from World.
+
+    As of July 2026 the keyless preview endpoint enforces "Maximum number of
+    periods for preview is 1" — multi-period CSVs now return HTTP 400. Use
+    _fetch_periods() to cover a window."""
     return _comtrade_fetch(COMTRADE_PREVIEW, reporter_code, periods_csv, kind="annual")
 
 
 def _comtrade_monthly(reporter_code: str, periods_csv: str) -> list[dict]:
-    """Monthly variant (C/M endpoint). Caller must keep the period list short
-    (≤12) — the preview monthly endpoint returns HTTP 400 on long lists."""
+    """Monthly variant (C/M endpoint) — same 1-period-per-call limit."""
     return _comtrade_fetch(COMTRADE_MONTHLY, reporter_code, periods_csv, kind="monthly")
+
+
+def _fetch_periods(fetch, reporter_code: str, periods: list[str], *, pause: float = 0.6) -> list[dict]:
+    """Fetch each period with its own call (preview limit = 1 period/call) and
+    concatenate the rows. Combined with the archive merge in the build, each
+    run only needs the recent few periods — history persists in the JSON."""
+    rows: list[dict] = []
+    for p in periods:
+        rows.extend(fetch(reporter_code, p))
+        time.sleep(pause)
+    return rows
 
 
 def parse_country_monthly(rows: list[dict]) -> dict:
@@ -266,28 +278,45 @@ def drop_implausible_years(rows: list[dict], iso3: str = "") -> list[dict]:
 
 # ── Build ────────────────────────────────────────────────────────────────────
 
+_RECENT_ANNUAL_YEARS = 3   # per-run annual refresh window (1 call per year)
+_RECENT_MONTHS = 3         # per-run monthly refresh window (1 call per month)
+
+
 def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
     now = datetime.utcnow()
-    years = [str(now.year - 1 - i) for i in range(_N_YEARS)]   # last N complete years
-    periods_csv = ",".join(reversed(years))
+    # Preview limit is 1 period/call (July 2026), so each run refreshes only a
+    # recent window and merges into the archived history in the committed JSON
+    # — full 12-year series persist there from the pre-limit era.
+    recent_years = [str(now.year - 1 - i) for i in range(_RECENT_ANNUAL_YEARS)]
     fresh_cutoff = now.year - 3   # drop reporters whose newest real datum is older
+
+    prev_countries: dict = {}
+    if OUT_PATH.exists():
+        try:
+            prev_countries = json.loads(OUT_PATH.read_text(encoding="utf-8")).get("countries", {})
+        except Exception:
+            prev_countries = {}
 
     countries: dict[str, dict] = {}
     stale: list[str] = []
     for iso3, (name, code) in COUNTRIES.items():
-        annual = drop_implausible_years(parse_country_rows(_comtrade_annual(code, periods_csv)), iso3)
-        # latest year that actually carries a total volume
+        fetched = parse_country_rows(_fetch_periods(_comtrade_annual, code, recent_years))
+        # Merge the fresh window into the archived per-year history (new years
+        # override same-year revisions; old years persist), THEN sanity-filter.
+        by_year = {r["year"]: r for r in (prev_countries.get(iso3) or {}).get("annual", [])}
+        for r in fetched:
+            if r.get("total_mt") is not None:
+                by_year[r["year"]] = r
+        annual = drop_implausible_years(sorted(by_year.values(), key=lambda r: r["year"]), iso3)
         real_years = [r["year"] for r in annual if r.get("total_mt") is not None]
         if not real_years:
             log.info("coffee_imports: no usable data for %s", iso3)
-            time.sleep(0.4)
             continue
         latest = max(real_years)
         if latest < fresh_cutoff:
             # Stale slice (the preview endpoint does this for some reporters) —
             # exclude rather than surface a misleading old/zero value.
             stale.append(f"{iso3}:{latest}")
-            time.sleep(0.4)
             continue
         countries[iso3] = {
             "name":         name,
@@ -296,28 +325,27 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
             "annual":       [r for r in annual if r.get("total_mt") is not None],
             "latest_year":  latest,
         }
-        time.sleep(0.4)   # be gentle on the endpoint
 
     if stale:
         log.warning("coffee_imports: dropped %d stale reporters (latest < %d): %s",
                     len(stale), fresh_cutoff, ", ".join(stale))
     log.info("coffee_imports: kept %d fresh countries", len(countries))
 
-    # Monthly momentum for the rest-of-world importers (recent 12 months — the
-    # preview monthly endpoint returns HTTP 400 on longer period lists). Skip
-    # the US + EU members (served better by USITC / Eurostat) and limit to the
-    # largest remaining importers so the rate-limited endpoint isn't hammered.
+    # Monthly momentum for the rest-of-world importers — recent months only
+    # (1 period/call preview limit); history persists via the archive merge
+    # below. Skip the US + EU members (served better by USITC / Eurostat) and
+    # limit to the largest remaining importers (rate limits).
     eu_members = {"deu", "ita", "fra", "esp", "nld", "bel", "swe", "pol", "aut",
                   "prt", "fin", "dnk", "grc", "cze", "rou", "hun", "irl"}
     skip_monthly = eu_members | {"usa"}
     m_periods = []
     y, m = now.year, now.month
-    for _ in range(_N_MONTHS):
+    for _ in range(_RECENT_MONTHS):
         m -= 1
         if m == 0:
             m, y = 12, y - 1
         m_periods.append(f"{y}{m:02d}")
-    m_periods_csv = ",".join(reversed(m_periods))
+    m_periods = list(reversed(m_periods))
 
     def _latest_total(c: dict) -> float:
         ly = c.get("latest_year")
@@ -329,22 +357,18 @@ def build_coffee_imports(db=None) -> dict:  # noqa: ARG001
     )[:_MONTHLY_TOP_N]
     n_monthly = 0
     for _iso3, c in row_targets:
-        mt = parse_country_monthly(_comtrade_monthly(c["reporter_code"], m_periods_csv))
+        mt = parse_country_monthly(_fetch_periods(_comtrade_monthly, c["reporter_code"],
+                                                  m_periods, pause=1.5))
         if mt:
             c["monthly_total"] = mt
             n_monthly += 1
-        time.sleep(1.5)   # space calls out — the preview endpoint 429s easily
     log.info("coffee_imports: monthly added for %d of %d top rest-of-world importers",
              n_monthly, len(row_targets))
 
-    # Archive: the monthly fetch only covers the recent ~12 months, so merge it
+    # Archive: the monthly fetch only covers the recent few months, so merge it
     # into the previously-committed history — old months are kept, new/revised
     # ones are added. Without this the RoW monthly series would never grow.
-    if OUT_PATH.exists():
-        try:
-            prev_countries = json.loads(OUT_PATH.read_text(encoding="utf-8")).get("countries", {})
-        except Exception:
-            prev_countries = {}
+    if prev_countries:
         for iso3, c in countries.items():
             merged = merge_monthly((prev_countries.get(iso3) or {}).get("monthly_total"),
                                    c.get("monthly_total"))
