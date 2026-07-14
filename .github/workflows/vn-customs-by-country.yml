@@ -1,0 +1,78 @@
+name: "0.9 – VN Customs by-country (5X/5N) probe / backfill"
+
+# Harvests the Vietnam Customs English preliminary bulletins 5X (exports by
+# country) / 5N (imports by country) from files.customs.gov.vn — the richer
+# by-destination companion to the 2x national totals that the existing
+# vn_coffee_export monthly job already pulls from the same host.
+#
+# PROBE mode finds the newest month's PDFs and dumps their table structure to
+# the run logs, so the coffee-by-country parser can be designed against the
+# real layout (the customs hosts are blocked from the dev sandbox — this is
+# the only place we can see inside these PDFs).
+#
+# BACKFILL mode harvests the last N months and commits the raw coffee rows to
+# backend/seed/vn_customs_by_country.json.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "probe (dump newest PDFs' table structure) or backfill (harvest N months → seed JSON)"
+        required: false
+        default: "probe"
+        type: choice
+        options: ["probe", "backfill"]
+      months:
+        description: "Backfill lookback in months."
+        required: false
+        default: "24"
+        type: string
+
+concurrency:
+  group: vn-customs-by-country
+  cancel-in-progress: false
+
+jobs:
+  vn-customs:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests pdfplumber
+
+      - name: Run harvester
+        run: |
+          cd backend
+          MODE="${{ inputs.mode || 'probe' }}"
+          MONTHS="${{ inputs.months || '24' }}"
+          echo "::group::vn customs ($MODE)"
+          set +e
+          PYTHONPATH=. python -m scraper.backfill_vn_customs_country --mode "$MODE" --months "$MONTHS"
+          rc=$?
+          set -e
+          echo "::endgroup::"
+          if [ "$rc" = "2" ]; then
+            echo "::notice::customs.gov.vn unreachable or no PDFs found — nothing proven. Not red-lighting the run."
+            exit 0
+          fi
+          exit "$rc"
+
+      - name: Commit seed (backfill only)
+        if: ${{ inputs.mode == 'backfill' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git status --porcelain backend/seed/vn_customs_by_country.json | grep -q .; then
+            git add backend/seed/vn_customs_by_country.json
+            git commit -m "data: VN customs 5X/5N coffee-by-country backfill [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          else
+            echo "No seed changes to commit."
+          fi
