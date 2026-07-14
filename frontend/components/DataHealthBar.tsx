@@ -43,7 +43,7 @@ const SCRAPER_CONFIGS: ScraperConfig[] = [
   // Demand stocks
   { key: "ecf",               label: "ECF",        thresholdHours: 1440 }, // bi-monthly
   { key: "psd_coffee",        label: "USDA PSD",   thresholdHours: 2160 }, // ~quarterly (Jan, May, Jun, Dec)
-  { key: "ajca",              label: "AJCA",       thresholdHours: 720 }, // monthly
+  { key: "ajca",              label: "AJCA",       thresholdHours: 1680 }, // upload-dated; AJCA posts ~5-9wk after period (see check-scrapers-freshness.yml)
   { key: "ice_certified_daily",       label: "ICE Cert. Daily",   thresholdHours: 144 }, // Mon-Fri T-1
   { key: "ice_arabica_ageing",        label: "ICE Arabica Age.",  thresholdHours: 912 }, // monthly, 38d buffer for missed-window
   { key: "ice_robusta_age_allowance", label: "ICE Robusta Age.",  thresholdHours: 912 },
