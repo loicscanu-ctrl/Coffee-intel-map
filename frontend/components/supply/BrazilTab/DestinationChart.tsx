@@ -6,11 +6,20 @@ import {
 } from "recharts";
 import {
   DEST_WINDOWS, EMPTY_CY, GREEN, HUB_COLORS, HUB_ORDER, SLATE,
-  TT_STYLE, TYPE_LABELS,
+  TT_STYLE, TYPE_LABELS, TYPE_SERIES,
 } from "./constants";
 import type { Formatter, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { bagsToKT, cropYearKey, getHub, monthLabel, offsetYM, toEn } from "./helpers";
 import type { CoffeeType, CountryYear, DestWindow, ViewMode } from "./types";
+
+// Stacked type-split series for the Total view (country mode): the four
+// coffee types plus an 'Unsplit' remainder so the stack always sums to the
+// total (typed data only covers the current + prior crop years; window
+// months beyond that land in Unsplit rather than silently vanishing).
+const SPLIT_SERIES = [
+  ...TYPE_SERIES.map(t => ({ key: `t_${t.key}`, label: t.label, color: t.color })),
+  { key: "t_unsplit", label: "Unsplit", color: "#64748b" },
+];
 
 export default function DestinationChart({
   byCountry, byCountryPrev,
@@ -33,6 +42,7 @@ export default function DestinationChart({
   const [topN, setTopN]           = useState(15);
   const [coffeeType, setCoffeeType] = useState<CoffeeType>("total");
   const [destWindow, setDestWindow] = useState<DestWindow>("CTD");
+  const [splitTypes, setSplitTypes] = useState(true);
 
   // Build a merged flat map: country → ym → vol, across all available data
   const mergedCountries = useMemo(() => {
@@ -158,21 +168,36 @@ export default function DestinationChart({
   }, [countryTotals]);
 
   // ── Build chart data ────────────────────────────────────────────────────────
-  const countryRows = useMemo(() =>
-    Object.entries(countryTotals)
+  const countryRows = useMemo(() => {
+    // Per-type window sum for one country: current-crop-year data first, the
+    // prior crop year covers window months reaching back across the boundary.
+    const typedKt = (pt: string, cy?: CountryYear, cyPrev?: CountryYear) =>
+      bagsToKT(windowMonths.reduce((s, m) =>
+        s + (cy?.countries?.[pt]?.[m] ?? cyPrev?.countries?.[pt]?.[m] ?? 0), 0));
+
+    return Object.entries(countryTotals)
       .sort((a, b) => b[1].current - a[1].current)
       .slice(0, topN)
       .map(([pt, v]) => {
         const en = toEn(pt);
+        const current = bagsToKT(v.current);
+        const t_arabica  = typedKt(pt, byArabica,  byArabicaPrev);
+        const t_conillon = typedKt(pt, byConillon, byConillonPrev);
+        const t_soluvel  = typedKt(pt, bySoluvel,  bySoluvelPrev);
+        const t_torrado  = typedKt(pt, byTorrado,  byTorradoPrev);
+        const t_unsplit  = Math.max(0, Math.round(
+          (current - t_arabica - t_conillon - t_soluvel - t_torrado) * 10) / 10);
         return {
           label:      en.length > 20 ? en.slice(0, 19) + "…" : en,
-          current:    bagsToKT(v.current),
+          current,
           prev:       bagsToKT(v.prev),
           pct:        v.prev > 0 ? Math.round((v.current - v.prev) / v.prev * 100) : null,
           shareDelta: null as number | null,
+          t_arabica, t_conillon, t_soluvel, t_torrado, t_unsplit,
         };
-      })
-  , [countryTotals, topN]);
+      });
+  }, [countryTotals, topN, windowMonths, byArabica, byArabicaPrev, byConillon,
+      byConillonPrev, bySoluvel, bySoluvelPrev, byTorrado, byTorradoPrev]);
 
   const hubRows = useMemo(() => {
     const totalCurrent = Object.values(hubTotals).reduce((s, v) => s + v.current, 0);
@@ -205,6 +230,11 @@ export default function DestinationChart({
     mode === "hub"
       ? (HUB_COLORS[r.label] ?? "#475569")
       : r.pct !== null && r.pct < 0 ? "#ef4444" : GREEN;
+
+  // Stacked type split: Total view, country mode, typed data present.
+  const canSplit  = coffeeType === "total" && mode === "country"
+    && !!(byArabica || byConillon || bySoluvel || byTorrado);
+  const showSplit = canSplit && splitTypes;
 
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -255,6 +285,18 @@ export default function DestinationChart({
               ))}
             </div>
           )}
+          {/* Type-split toggle (Total × country view only) */}
+          {canSplit && (
+            <div className="flex gap-1 border border-slate-600 rounded p-0.5">
+              {([true, false] as const).map(s => (
+                <button key={String(s)} onClick={() => setSplitTypes(s)}
+                  title={s ? "Stack the coffee types inside each bar" : "Single bar coloured by YoY direction"}
+                  className={`text-[10px] px-2 py-0.5 rounded ${splitTypes === s ? "bg-slate-600 text-slate-100" : "text-slate-400 hover:text-slate-200"}`}>
+                  {s ? "Split" : "Solid"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -267,6 +309,13 @@ export default function DestinationChart({
             width={mode === "hub" ? 125 : 135} />
           <Tooltip contentStyle={TT_STYLE} itemStyle={{ color: "#94a3b8" }}
             formatter={((v, name, item) => {
+              const split = SPLIT_SERIES.find(s => s.key === name);
+              if (split) {
+                return [
+                  <span key="v" style={{ color: split.color }}>{`${v} kt`}</span>,
+                  split.label as NameType,
+                ];
+              }
               const row = (item?.payload ?? {}) as { label: string; pct: number | null };
               const color = name === "current" ? barFill(row) : "#94a3b8";
               return [
@@ -275,15 +324,25 @@ export default function DestinationChart({
               ];
             }) satisfies Formatter<ValueType, NameType>} />
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }}
-            formatter={(v) => (
-              <span style={{ color: "#cbd5e1" }}>
-                {v === "current" ? periodLabel : prevPeriodLabel}
-              </span>
-            )} />
-          <Bar dataKey="prev"    name="prev"    fill={SLATE} opacity={0.55} />
-          <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
-            {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
-          </Bar>
+            formatter={(v) => {
+              const split = SPLIT_SERIES.find(s => s.key === v);
+              return (
+                <span style={{ color: "#cbd5e1" }}>
+                  {split ? split.label : v === "current" ? periodLabel : prevPeriodLabel}
+                </span>
+              );
+            }} />
+          <Bar dataKey="prev" name="prev" fill={SLATE} opacity={0.55} />
+          {showSplit ? (
+            SPLIT_SERIES.map((s, i) => (
+              <Bar key={s.key} dataKey={s.key} name={s.key} stackId="cur" fill={s.color}
+                radius={i === SPLIT_SERIES.length - 1 ? [0, 3, 3, 0] : undefined} />
+            ))
+          ) : (
+            <Bar dataKey="current" name="current" radius={[0, 3, 3, 0]}>
+              {rows.map((r, i) => <Cell key={i} fill={barFill(r)} />)}
+            </Bar>
+          )}
         </BarChart>
       </ResponsiveContainer>
 
