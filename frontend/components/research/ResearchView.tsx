@@ -8,6 +8,7 @@ import CotBacktestReport from "@/components/futures/CotBacktestReport";
 import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
+import CertifiedStocksParity from "./CertifiedStocksParity";
 import SignalsMethodology from "./methodology/SignalsMethodology";
 import OpenDirectionRecord from "./methodology/OpenDirectionRecord";
 import NewsSentimentMethodology from "./methodology/NewsSentimentMethodology";
@@ -19,7 +20,7 @@ import FreightMethodology from "./methodology/FreightMethodology";
 import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
 
-type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "demand";
+type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "parity" | "demand";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",         label: "COT & positioning" },
   { id: "signals",     label: "Signals & forecasts" },
@@ -36,6 +37,7 @@ const CATS: { id: Cat; label: string }[] = [
   { id: "destination", label: "Destination In-store" },
   { id: "freight",     label: "Freight & ports" },
   { id: "certstocks",  label: "Certified stocks" },
+  { id: "parity",      label: "Tender parity" },
   { id: "demand",      label: "Demand modelling" },
 ];
 
@@ -1639,6 +1641,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "destination" && <DestinationInstore />}
       {cat === "freight" && <FreightMethodology />}
       {cat === "certstocks" && <CertifiedStocksMethodology />}
+      {cat === "parity" && <CertifiedStocksParity />}
       {cat === "demand" && (
         <div className="space-y-4">
           <DemandArticles />
