@@ -74,7 +74,8 @@ function useImportInsights() {
   const { us, eu, ct } = useImportData();
   // EU net-import context: extra-EU exports (re-exports out of the bloc) and
   // USDA-PSD EU consumption for the imports-vs-consumption comparison.
-  const [euAux, setEuAux] = useState<{ exports?: Record<string, number>; soluble?: Record<string, number>; consumptionMt?: number } | null>(null);
+  const [euAux, setEuAux] = useState<{ exports?: Record<string, number>; soluble?: Record<string, number>;
+    solubleImports?: Record<string, number>; consumptionMt?: number } | null>(null);
   useEffect(() => {
     Promise.all([
       fetch("/data/eu_coffee_imports.json").then(r => r.json()).catch(() => null),
@@ -83,7 +84,8 @@ function useImportInsights() {
       const annual = ds?.eu?.annual as { year: string; consumption_mt?: number }[] | undefined;
       const lastCons = annual?.filter(a => a.consumption_mt).at(-1)?.consumption_mt;
       setEuAux({ exports: e?.monthly_exports ?? undefined,
-                 soluble: e?.monthly_exports_soluble ?? undefined, consumptionMt: lastCons });
+                 soluble: e?.monthly_exports_soluble ?? undefined,
+                 solubleImports: e?.monthly_imports_soluble ?? undefined, consumptionMt: lastCons });
     });
   }, []);
   return useMemo(() => {
@@ -99,13 +101,14 @@ function useImportInsights() {
       (usA?.yoy != null && euA?.yoy != null ? ` — US ${p1(usA.yoy)}, EU ${p1(euA.yoy)}.` : ".") : null;
     // Net-of-re-exports view: EU gross MAT − extra-EU export MAT, vs PSD consumption.
     const impMat = matYoy(eu.monthly_total), exMat = matYoy(euAux?.exports);
-    const solMat = matYoy(euAux?.soluble);
+    const solMat = matYoy(euAux?.soluble), solImpMat = matYoy(euAux?.solubleImports);
     if (world && impMat && exMat) {
-      const solGbe = solMat ? solMat.val * 2.6 : 0;   // ICO ×2.6 green-bean equivalent
-      const net = impMat.val - exMat.val - solGbe;
-      let tail = ` EU re-exports run ~${ktOf(exMat.val + solGbe)}/yr` +
+      const solGbe = solMat ? solMat.val * 2.6 : 0;          // ICO ×2.6 GBE, export side
+      const solImpGbe = solImpMat ? solImpMat.val * 2.6 : 0; // …and the symmetric import side
+      const net = impMat.val + solImpGbe - exMat.val - solGbe;
+      let tail = ` EU exports run ~${ktOf(exMat.val + solGbe)}/yr` +
         (solGbe ? ` (incl. soluble ~${ktOf(solGbe)} GBE)` : "") +
-        ` → NET imports ~${ktOf(net)}/yr`;
+        ` → NET imports ~${ktOf(net)}/yr (GBE, soluble both ways)`;
       const cons = euAux?.consumptionMt;
       if (cons) {
         const gap = net - cons;

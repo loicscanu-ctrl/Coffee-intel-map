@@ -17,14 +17,16 @@ export default function MonthlyTrendCombined() {
   // NET import line: at bloc level intra-EU flows cancel, so
   // net = extra-EU imports − extra-EU exports.
   const [euEx, setEuEx] = useState<Record<string, number>>({});
-  const [euSol, setEuSol] = useState<Record<string, number>>({});   // soluble HS2101.11/.12, product MT
+  const [euSol, setEuSol] = useState<Record<string, number>>({});   // soluble exports HS2101.11/.12, product MT
+  const [euSolImp, setEuSolImp] = useState<Record<string, number>>({});   // soluble imports (symmetric term)
   const [err, setErr] = useState(false);
 
   useEffect(() => {
     fetch("/data/us_coffee_imports.json").then(r => r.json())
       .then(d => setUs(d?.monthly_total ?? {})).catch(() => setErr(true));
     fetch("/data/eu_coffee_imports.json").then(r => r.json())
-      .then(d => { setEu(d?.monthly_total ?? {}); setEuEx(d?.monthly_exports ?? {}); setEuSol(d?.monthly_exports_soluble ?? {}); })
+      .then(d => { setEu(d?.monthly_total ?? {}); setEuEx(d?.monthly_exports ?? {});
+                   setEuSol(d?.monthly_exports_soluble ?? {}); setEuSolImp(d?.monthly_imports_soluble ?? {}); })
       .catch(() => setErr(true));
   }, []);
 
@@ -43,7 +45,7 @@ export default function MonthlyTrendCombined() {
       }
       return out;
     };
-    const usMat = mat(us), euMat = mat(eu), exMat = mat(euEx), solMat = mat(euSol);
+    const usMat = mat(us), euMat = mat(eu), exMat = mat(euEx), solMat = mat(euSol), solImpMat = mat(euSolImp);
     const GBE_SOLUBLE = 2.6;   // ICO: 1 kg soluble ≈ 2.6 kg green-bean equivalent
     const months = Array.from(new Set([...Object.keys(us), ...Object.keys(eu)]))
       .filter(k => (us[k] ?? 0) > 0 || (eu[k] ?? 0) > 0).sort();
@@ -53,10 +55,13 @@ export default function MonthlyTrendCombined() {
       eu: eu[k] ? +(eu[k] / 1000).toFixed(1) : null,
       usMat: usMat[k] ? +(usMat[k] / 1000).toFixed(0) : null,
       euMat: euMat[k] ? +(euMat[k] / 1000).toFixed(0) : null,
+      // Symmetric GBE net: soluble enters BOTH sides (the EU imports instant
+      // from Brazil/Vietnam/India as well as exporting it).
       euNetMat: euMat[k] && exMat[k]
-        ? +((euMat[k] - exMat[k] - GBE_SOLUBLE * (solMat[k] ?? 0)) / 1000).toFixed(0) : null,
+        ? +((euMat[k] + GBE_SOLUBLE * (solImpMat[k] ?? 0)
+             - exMat[k] - GBE_SOLUBLE * (solMat[k] ?? 0)) / 1000).toFixed(0) : null,
     }));
-  }, [us, eu, euEx, euSol]);
+  }, [us, eu, euEx, euSol, euSolImp]);
 
   if (err) return null;
   if (!us || !eu) return <div className="p-4 text-xs text-slate-500 animate-pulse">Loading monthly series…</div>;
@@ -102,9 +107,9 @@ export default function MonthlyTrendCombined() {
       </div>
       <div className="text-[9px] text-slate-500 italic mt-1">
         Solid = monthly HS-0901 imports (left, kt); dashed = MAT, the trailing-12-month total (right, kt/yr) —
-        the level trend with seasonality removed. Green dotted = EU NET MAT: extra-EU imports minus extra-EU
-        exports of HS 0901 AND soluble (HS 2101.11/.12 × 2.6 green-bean equivalent); intra-EU flows cancel
-        at bloc level. US: USITC · EU: Eurostat. MAT starts once 12 consecutive months are available.
+        the level trend with seasonality removed. Green dotted = EU NET MAT, the symmetric green-bean-equivalent
+        balance: (HS-0901 imports + soluble imports ×2.6) − (HS-0901 exports + soluble exports ×2.6),
+        soluble = HS 2101.11/.12; intra-EU flows cancel at bloc level. US: USITC · EU: Eurostat. MAT starts once 12 consecutive months are available.
       </div>
     </div>
   );

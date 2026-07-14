@@ -595,6 +595,30 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
     log.info("Eurostat bloc soluble exports: %d years, %d monthly pts",
              len(exports_soluble_by_year), len(monthly_exports_soluble))
 
+    # SOLUBLE imports (flow=1) — the symmetric term: the EU also imports
+    # instant coffee (Brazil/Vietnam/India). A GBE-honest net needs it on the
+    # import side just as soluble exports are netted off.
+    soli_parsed = parse_jsonstat(_fetch(years, REPORTER, flow="1", products=SOLUBLE_CODES))
+    imports_soluble_by_year = soli_parsed["total_by_year"]
+    monthly_imports_soluble: dict = {}
+    for last_n in (40, 36, 30, 24, 18, 12):
+        monthly_imports_soluble = parse_monthly_total(
+            _fetch_monthly_products(REPORTER, SOLUBLE_CODES, "1", last_n))
+        log.info("Eurostat bloc SOLUBLE imports lastN=%d → %d months",
+                 last_n, len(monthly_imports_soluble))
+        if monthly_imports_soluble:
+            break
+    monthly_imports_soluble = {k: v for k, v in sorted(monthly_imports_soluble.items()) if v > 0}
+    if OUT_PATH.exists():
+        try:
+            prev_all3 = json.loads(OUT_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            prev_all3 = {}
+        imports_soluble_by_year = {**(prev_all3.get("imports_soluble_by_year") or {}),
+                                   **imports_soluble_by_year}
+        monthly_imports_soluble = merge_monthly(prev_all3.get("monthly_imports_soluble"),
+                                                monthly_imports_soluble)
+
     comtrade_by_year = _comtrade_eu_total_by_year()
 
     out = {
@@ -611,9 +635,11 @@ def build_eu_coffee_imports(db=None) -> dict:  # noqa: ARG001
         # Extra-EU exports (flow=2) — net imports = total_by_year − exports_total_by_year.
         "exports_total_by_year": exports_total_by_year,
         "monthly_exports": monthly_exports,
-        # Soluble exports (HS 2101.11/.12, PRODUCT weight — apply ×2.6 GBE downstream).
+        # Soluble trade (HS 2101.11/.12, PRODUCT weight — apply ×2.6 GBE downstream).
         "exports_soluble_by_year": exports_soluble_by_year,
         "monthly_exports_soluble": monthly_exports_soluble,
+        "imports_soluble_by_year": imports_soluble_by_year,
+        "monthly_imports_soluble": monthly_imports_soluble,
         "comtrade_total_by_year": comtrade_by_year,   # EU-bloc extra-EU, for reconciliation
         # Per-reporter breakdown: bloc + individual member states.
         "reporters":     reporters,
