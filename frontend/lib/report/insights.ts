@@ -583,6 +583,67 @@ const robustaForecast: Builder = async () => {
     + `(R² ${m.r_squared != null ? m.r_squared.toFixed(2) : "—"}, n=${m.n_obs ?? "—"}). Positioning, DXY and momentum scored into a single price path.`;
 };
 
+// ── COT report (cot.json, reuse metric engine) ────────────────────────────────
+const cotReport: Builder = async () => {
+  const data = await cotRows(); if (!data) return null;
+  const ny = buildMarketMetrics(data.slice(-52), data, "ny");
+  const ldn = buildMarketMetrics(data.slice(-52), data, "ldn");
+  if (!ny || !ldn) return null;
+  return `Automated positioning analysis — latest COT week: NY managed-money net change **${klots(ny.mmLongChangeLots - ny.mmShortChangeLots)}**, `
+    + `London **${klots(ldn.mmLongChangeLots - ldn.mmShortChangeLots)}**. The report grades positioning, week-over-week flow, price divergence and crowd risk into an overall directional bias per market.`;
+};
+
+// ── ENSO indices (enso_indices.json / enso_subsurface.json) ───────────────────
+const ensoDivergence: Builder = async () => {
+  const d = await load<{ nino34?: { latest?: { sst_anomaly?: number; phase?: string } }; soi?: { latest?: { soi?: number } } }>("/data/enso_indices.json");
+  const n = d?.nino34?.latest; const s = d?.soi?.latest;
+  if (!n || n.sst_anomaly == null) return null;
+  const phase = (n.phase ?? "").replace(/-/g, " ");
+  return `Niño 3.4 SST anomaly at **${n.sst_anomaly >= 0 ? "+" : ""}${n.sst_anomaly}°C**${phase ? ` (${phase})` : ""}${s?.soi != null ? `, with SOI at **${s.soi}**` : ""}. `
+    + `The ocean-temperature signal and the SOI atmospheric response together gauge how coupled — and therefore how entrenched — the current ENSO phase is.`;
+};
+
+const ensoSubsurface: Builder = async () => {
+  const d = await load<{ wwv?: { latest?: { wwv_anomaly?: number; lead_signal?: string }; lead_months?: string } }>("/data/enso_subsurface.json");
+  const w = d?.wwv?.latest; if (!w || w.wwv_anomaly == null) return null;
+  const lm = d?.wwv?.lead_months ?? "4–6";
+  return `Subsurface Warm Water Volume anomaly at **${w.wwv_anomaly >= 0 ? "+" : ""}${w.wwv_anomaly}** (10¹⁴ m³)${w.lead_signal ? `, signalling **${w.lead_signal.replace(/-/g, " ")}**` : ""}. `
+    + `WWV leads surface ENSO by ~${lm} months, so a positive anomaly points to El Niño building (negative → La Niña) — an early read on next season's crop-weather odds.`;
+};
+
+// ── Demand — consumption & imports (demand_stocks.json / *_coffee_imports.json)
+const worldConsumption: Builder = async () => {
+  const d = await load<{ world_consumption?: { tracked_consumption_mt?: number; tracked_countries?: number; tracked_latest_year?: number | string; tracked_vs_ico_pct?: number } }>("/data/demand_stocks.json");
+  const w = d?.world_consumption; if (!w?.tracked_consumption_mt) return null;
+  return `Tracked world coffee consumption is **${n1(w.tracked_consumption_mt / 1e6)} M tonnes** across ${w.tracked_countries ?? "the tracked"} countries (${w.tracked_latest_year ?? "latest year"})`
+    + `${w.tracked_vs_ico_pct != null ? `, **${w.tracked_vs_ico_pct.toFixed(0)}%** of the ICO reference total` : ""}. The demand base the global balance is measured against.`;
+};
+
+const ageCohort: Builder = async () => {
+  const d = await load<{ age_cohort_18plus?: { countries?: Record<string, { annual?: { year: number; pop_18plus?: number }[] }> } }>("/data/demand_stocks.json");
+  const c = d?.age_cohort_18plus?.countries; if (!c) return null;
+  const names = Object.keys(c); if (!names.length) return null;
+  const sumAt = (fromEnd: number) => names.reduce((a, k) => { const arr = c[k].annual ?? []; return a + (arr[arr.length - fromEnd]?.pop_18plus ?? 0); }, 0);
+  const last = sumAt(1); const decadeAgo = sumAt(11);
+  if (!last || !decadeAgo) return null;
+  const yr = (c[names[0]].annual ?? []).at(-1)?.year;
+  return `Across **${names.length}** tracked markets the coffee-drinking-age (18+) population has grown **${pct(chgPct(last, decadeAgo))}** over the past decade${yr ? ` (to ${yr})` : ""}. `
+    + `A structural tailwind for consumption that is largely independent of the price cycle.`;
+};
+
+interface ImportsJson { total_by_year?: Record<string, number>; origins?: { name?: string; latest_mt?: number }[]; }
+const importsByOrigin = (src: string, label: string): Builder => async () => {
+  const d = await load<ImportsJson>(src); const tby = d?.total_by_year; const origins = d?.origins;
+  if (!tby || !Array.isArray(origins) || !origins.length) return null;
+  const years = Object.keys(tby).sort(); const ly = years[years.length - 1]; const py = years[years.length - 2];
+  const total = tby[ly]; if (total == null) return null;
+  const top = [...origins].sort((a, b) => (b.latest_mt ?? 0) - (a.latest_mt ?? 0))[0];
+  const share = top?.latest_mt != null ? top.latest_mt / total * 100 : null;
+  const yoy = py != null ? chgPct(total, tby[py]) : null;
+  return `${label} imported **${n1(total / 1000)} kt** of green coffee in ${ly}${yoy != null ? ` (**${pct(yoy)}** YoY)` : ""}. `
+    + `${top?.name ? `Top origin **${top.name}**${share != null ? ` at **${share.toFixed(0)}%**` : ""} of the total. ` : ""}Origin concentration is a supply-security and differential signal for the importing bloc.`;
+};
+
 // ── id → builder map ──────────────────────────────────────────────────────────
 const INSIGHTS: Record<string, Builder> = {
   // Futures
@@ -596,6 +657,7 @@ const INSIGHTS: Record<string, Builder> = {
   cot_dry_powder: cotGeneric("Dry-powder positioning (room to add vs extremes)"),
   cot_cycle_location: cotGeneric("Overbought/oversold cycle-location matrix"),
   cot_signals: cotSignals,
+  cot_report: cotReport,
   // Freight
   freight_spot: freightSpot,
   freight_evolution: freightEvolution,
@@ -628,6 +690,8 @@ const INSIGHTS: Record<string, Builder> = {
   enso_oni: enso,
   enso_plume: ensoPlume,
   enso_risk_table: ensoRiskTable,
+  enso_divergence: ensoDivergence,
+  enso_subsurface: ensoSubsurface,
   // Demand
   certified_stocks_tiles: certifiedTiles,
   certified_stocks_activity: certifiedActivity,
@@ -640,6 +704,10 @@ const INSIGHTS: Record<string, Builder> = {
   spot_square_map: spotGeneric("Each square is roughly one lot, coloured by origin and crop-year freshness."),
   ecf_port_stocks: ecf,
   kaffeesteuer: kaffee,
+  world_consumption: worldConsumption,
+  age_cohort: ageCohort,
+  us_imports_origin: importsByOrigin("/data/us_coffee_imports.json", "The US"),
+  eu_imports_origin: importsByOrigin("/data/eu_coffee_imports.json", "The EU"),
   // Macro
   coffee_currency_index: currency,
   origin_farmgate_prices: farmgate,
