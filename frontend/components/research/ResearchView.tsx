@@ -19,8 +19,9 @@ import FarmerMethodology from "./methodology/FarmerMethodology";
 import FreightMethodology from "./methodology/FreightMethodology";
 import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
+import DeliveryProcessMethodology from "./methodology/DeliveryProcessMethodology";
 
-type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "parity" | "demand";
+type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "delivery" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "parity" | "demand";
 const CATS: { id: Cat; label: string }[] = [
   { id: "cot",         label: "COT & positioning" },
   { id: "signals",     label: "Signals & forecasts" },
@@ -32,6 +33,7 @@ const CATS: { id: Cat; label: string }[] = [
   { id: "farmer",      label: "Farmer economics" },
   { id: "fertilizer",  label: "Fertilizer" },
   { id: "contracts",   label: "Contract rules" },
+  { id: "delivery",    label: "RC delivery process" },
   { id: "agronomy",    label: "Agronomy" },
   { id: "logistics",   label: "Origin Logistics" },
   { id: "destination", label: "Destination In-store" },
@@ -1636,6 +1638,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "farmer" && <FarmerMethodology />}
       {cat === "fertilizer" && <FertilizerMethodology />}
       {cat === "contracts" && <ContractRules />}
+      {cat === "delivery" && <DeliveryProcessMethodology />}
       {cat === "agronomy"  && <AgronomyArticles />}
       {cat === "logistics" && <OriginLogistics />}
       {cat === "destination" && <DestinationInstore />}
