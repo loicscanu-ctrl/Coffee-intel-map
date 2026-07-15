@@ -25,7 +25,7 @@ import urllib.request
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / "frontend" / "public" / "data" / "brazil_arabica_fisico.json"
 BASE = ("https://www.noticiasagricolas.com.br/cotacoes/cafe/"
         "cafe-arabica-mercado-fisico-tipo-6-7")
