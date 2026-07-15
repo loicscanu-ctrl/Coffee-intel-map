@@ -109,9 +109,25 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/oi_history.json frontend/public/data/oi_history.json data/contract_prices_archive.json
-          git diff --cached --quiet \
-            && echo "No changes." \
-            || (git commit -m "chore: daily OI snapshot $(date -u +%Y-%m-%d) [skip ci]" && git pull --rebase --autostash --strategy-option=theirs origin main && git push)
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          git commit -m "chore: daily OI snapshot $(date -u +%Y-%m-%d) [skip ci]"
+          # main is a busy branch (daily exporters, PR merges and other bots push
+          # concurrently). A single pull-then-push races and gets rejected with
+          # "cannot lock ref 'refs/heads/main'", which failed the whole job and
+          # fired a false-alarm Telegram alert. Retry rebase-onto-latest + push.
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase --autostash --strategy-option=theirs origin main && git push; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push attempt $attempt rejected (main moved); retrying…"
+            sleep $((RANDOM % 6 + 3))
+          done
+          echo "::error::OI snapshot push failed after 5 attempts"
+          exit 1
 
       - name: Notify on failure
         if: failure()
