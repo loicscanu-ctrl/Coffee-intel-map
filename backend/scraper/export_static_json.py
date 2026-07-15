@@ -73,6 +73,7 @@ def _exporters(db):
     exported here (avoids clobbering 1.3's fresher copy with a stale one).
     """
     from scraper.sources.origin_prices_history import export_origin_prices_history
+    from scraper.exporters.tender_parity import export_tender_parity
 
     def _country_pins():
         from scraper.build_country_pins import export_country_pins
@@ -107,6 +108,7 @@ def _exporters(db):
         ("latest_prices",         lambda: export_latest_prices(db)),
         ("vn_physical_prices",    lambda: export_vn_physical_prices(db)),
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
+        ("tender_parity",         lambda: export_tender_parity()),
         ("news",                  lambda: export_news(db)),
         ("country_pins",          _country_pins),
         ("enso",                  _enso_intel),

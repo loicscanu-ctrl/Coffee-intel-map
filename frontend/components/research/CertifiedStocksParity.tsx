@@ -6,8 +6,9 @@ import {
 } from "recharts";
 import { cachedFetchStatic } from "@/lib/api";
 import {
-  buildCostStack, buildLevelSeries, buildOriginInflow, eventStudy,
-  PARITY_ORIGINS, CONTAINER_MT, PARITY_ADDERS_USD, type DatedPrice, type Snapshot, type GradingDay,
+  buildCostStack, buildLevelSeries, buildOriginInflow, eventStudy, parityInflowStudy,
+  PARITY_ORIGINS, CONTAINER_MT, PARITY_ADDERS_USD,
+  type DatedPrice, type Snapshot, type GradingDay, type ParityRow,
 } from "@/lib/research/certStocksParity";
 
 // ── colours (fixed categorical order — never cycled) ────────────────────────
@@ -38,6 +39,7 @@ interface Loaded {
   deep: Snapshot[][];
   gradings: GradingDay[];
   freightUsdMt: number;
+  parity: Record<string, ParityRow[]>;
 }
 
 export default function CertifiedStocksParity() {
@@ -49,7 +51,7 @@ export default function CertifiedStocksParity() {
     let alive = true;
     (async () => {
       try {
-        const [fph, oph, fx, cs, d25, d20, freight] = await Promise.all([
+        const [fph, oph, fx, cs, d25, d20, freight, tp] = await Promise.all([
           cachedFetchStatic<{ robusta: DatedPrice[] }>("/data/futures_price_history.json"),
           cachedFetchStatic<{ origins: Record<string, { currency: string; history: DatedPrice[] }> }>("/data/origin_prices_history.json"),
           cachedFetchStatic<{ pairs: Record<string, { history: { date: string; close: number }[] }> }>("/data/fx_history.json"),
@@ -57,12 +59,15 @@ export default function CertifiedStocksParity() {
           cachedFetchStatic<{ snapshots: Snapshot[] }>("/data/certified_stocks_robusta_deep_2025-2029.json").catch(() => ({ snapshots: [] })),
           cachedFetchStatic<{ snapshots: Snapshot[] }>("/data/certified_stocks_robusta_deep_2020-2024.json").catch(() => ({ snapshots: [] })),
           cachedFetchStatic<{ routes?: { id: string; rate: number }[] }>("/data/freight.json").catch(() => ({ routes: [] })),
+          cachedFetchStatic<{ origins?: Record<string, { history: ParityRow[] }> }>("/data/tender_parity_history.json").catch(() => ({ origins: {} as Record<string, { history: ParityRow[] }> })),
         ]);
         const farmgate: Record<string, DatedPrice[]> = {};
         for (const o of PARITY_ORIGINS) farmgate[o.key] = (oph.origins?.[o.farmgateKey]?.history ?? []).map(d => ({ date: d.date, price: d.price }));
         const fxOut: Record<string, DatedPrice[]> = {};
         for (const o of PARITY_ORIGINS) if (o.fxTicker) fxOut[o.fxTicker] = (fx.pairs?.[o.fxTicker]?.history ?? []).map(d => ({ date: d.date, price: d.close }));
         const vnEu = (freight.routes ?? []).find(r => r.id === "vn-eu");
+        const parity: Record<string, ParityRow[]> = {};
+        for (const o of PARITY_ORIGINS) parity[o.key] = tp.origins?.[o.farmgateKey]?.history ?? [];
         if (alive) setData({
           rc: fph.robusta ?? [],
           farmgate, fx: fxOut,
@@ -70,6 +75,7 @@ export default function CertifiedStocksParity() {
           deep: [d20.snapshots ?? [], d25.snapshots ?? []],
           gradings: cs.recent_activity?.gradings ?? [],
           freightUsdMt: (vnEu ? vnEu.rate : 4741) / CONTAINER_MT,
+          parity,
         });
       } catch { if (alive) setErr(true); }
     })();
@@ -92,6 +98,7 @@ export default function CertifiedStocksParity() {
     return Array.from(m.entries()).map(([o, lots]) => ({ origin: o.replace("Brazilian ", "Brazil "), lots })).sort((a, b) => b.lots - a.lots).slice(0, 7);
   }, [data]);
   const es = useMemo(() => (level.length ? eventStudy(data!.rc, level, 6, 10) : null), [level, data]);
+  const pStudy = useMemo(() => (data ? parityInflowStudy(data.parity[origin.key] ?? [], data.gradings, origin.gradingOrigin) : null), [data, origin]);
 
   // fill months with 0 so a barely-tendering origin reads honestly as ~empty
   const inflowFilled = useMemo(() => {
@@ -261,11 +268,43 @@ export default function CertifiedStocksParity() {
         </div>
       )}
 
+      <H>4 · The rigorous per-origin test (building toward it)</H>
+      <P>
+        The exact test you want — <em>when {origin.label}&rsquo;s differential compresses to tenderable parity, how much
+        grades onto the exchange and how long after</em> — needs a persisted daily differential series. That pipeline
+        now exists (<Code>tender_parity_history.json</Code>, appended every day), and this panel activates automatically
+        once it has enough parity crossings and span.
+      </P>
+      {pStudy && (
+        <div className={`rounded-lg p-3 border ${pStudy.ready ? "bg-emerald-950/20 border-emerald-800/50" : "bg-slate-950/40 border-slate-700/60"}`}>
+          {pStudy.ready ? (
+            <div className="text-xs text-slate-200 space-y-1">
+              <div className="text-[10px] uppercase tracking-wider text-emerald-400">Fitted · {pStudy.nEvents} crossings · {pStudy.spanLabel}</div>
+              <div>After a parity crossing, <strong>{origin.label}</strong> grades a mean of{" "}
+                <strong className="text-emerald-400">{Math.round(pStudy.meanForwardLots).toLocaleString()} lots</strong> onto the exchange within {pStudy.horizonWeeks} weeks,</div>
+              <div>with a median lag of <strong className="text-emerald-400">{pStudy.medianLagDays} days</strong> and a{" "}
+                <strong>{Math.round(pStudy.hitRate * 100)}%</strong> hit-rate.</div>
+            </div>
+          ) : (
+            <div className="text-xs text-slate-300 space-y-1.5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-500">Accumulating — not yet significant</div>
+              <div>Collected so far: <strong className="text-amber-400">{pStudy.nEvents}</strong> parity crossing{pStudy.nEvents === 1 ? "" : "s"} over{" "}
+                <strong className="text-amber-400">{pStudy.daysCovered}</strong> days ({pStudy.spanLabel}).</div>
+              <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-500/70 rounded-full" style={{ width: `${Math.min(100, (pStudy.daysCovered / 180) * 100)}%` }} />
+              </div>
+              <div className="text-slate-400 text-[11px]">{pStudy.need}. The pipeline appends one row per origin per day, so this fills in on its own.
+                {pStudy.nEvents > 0 && <> Provisional read (not yet trusted): ~<strong>{Math.round(pStudy.meanForwardLots).toLocaleString()} lots</strong> within {pStudy.horizonWeeks}w, median lag <strong>{pStudy.medianLagDays}d</strong>.</>}</div>
+            </div>
+          )}
+        </div>
+      )}
+
       <H>Reading & caveats</H>
       <ul className="space-y-1 mb-2">
         {[
           "Parity is a floor, not a trigger: a differential at/below parity makes tendering economic, but origins that can sell commercial (Vietnam) mostly do — so parity predicts capacity to tender, not the act.",
-          "The event study uses RC level as the parity driver and net all-origin stock change as the response — the per-origin differential→inflow fit needs a persisted differential series (only ~2 months exist today).",
+          "The §3 event study uses RC level as the parity driver over net all-origin stock change; the rigorous per-origin fit (§4) reads the newly-persisted daily differential series and activates once it has enough crossings and span.",
           "Δ(certified stock) is net (gradings − decertifications), so it understates gross inflow; the gradings bars above are the gross-inflow view.",
           "Structural breaks — Red Sea freight re-routing, the EUDR transition-stock allowances, age-allowance decay — move certified stock independently of parity.",
           "Robusta / London shown; the same framework applies to NY arabica (per-origin gradings exist in bags), but arabica farmgate history is too thin to draw the cost stack.",

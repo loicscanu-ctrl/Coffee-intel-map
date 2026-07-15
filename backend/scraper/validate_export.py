@@ -287,6 +287,17 @@ def validate_freight(data: dict) -> tuple[bool, str]:
     return True, "ok"
 
 
+def validate_tender_parity(data: dict) -> tuple[bool, str]:
+    if not isinstance(data, dict):
+        return False, "not a dict"
+    origins = data.get("origins")
+    if not isinstance(origins, dict) or not origins:
+        return False, "origins is empty"
+    if not any((o.get("history") or []) for o in origins.values()):
+        return False, "no origin has any history rows"
+    return True, "ok"
+
+
 def validate_oi_fnd_chart(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
