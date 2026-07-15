@@ -228,56 +228,20 @@
       }
     ]
   },
-  "scraped_at": "2026-07-15T22:30:34.425815+00:00",
+  "scraped_at": "2026-07-15T22:31:04.730697Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-14T22:31:07.381396Z",
-    "overall_sentiment": "Bullish",
-    "overall_confidence": 67.0,
-    "net_index": 25.0,
-    "bull_count": 5,
-    "bear_count": 2,
-    "neutral_count": 1,
+    "scraped_at": "2026-07-15T22:31:03.433336Z",
+    "overall_sentiment": "Neutral",
+    "overall_confidence": 90.0,
+    "net_index": 12.5,
+    "bull_count": 2,
+    "bear_count": 1,
+    "neutral_count": 5,
     "total": 8,
     "items": [
       {
-        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 50.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 65.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Dog Days Of Coffee Are Here",
-        "source": "Sprudge",
-        "sentiment": "Bearish",
-        "confidence": 60.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 85.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
+        "headline": "Build-Outs Of Coffee: Nandan Coffee In Bangalore, India",
         "source": "Sprudge",
         "sentiment": "Neutral",
         "confidence": 95.0,
@@ -286,28 +250,64 @@
         ]
       },
       {
-        "headline": "The Afternoon Coffee Crash Is A Myth",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 70.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Same Time Tomorrow In Harlem, NY",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 65.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Update: The Kauai Coffee Company Has Secured Their Land Lease",
+        "headline": "America\u2019s Next Hotbed For Coffee Production Is\u2026 Florida?",
         "source": "Sprudge",
         "sentiment": "Bearish",
         "confidence": 75.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The Dog Days Of Coffee Are Here",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "The Afternoon Coffee Crash Is A Myth",
+        "source": "Sprudge",
+        "sentiment": "Bullish",
+        "confidence": 85.0,
         "tags": [
           "sprudge"
         ]
