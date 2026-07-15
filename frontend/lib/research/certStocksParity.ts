@@ -181,3 +181,75 @@ export function eventStudy(rc: DatedPrice[], level: DatedPrice[], horizonWeeks =
     buildHiRc: mean(hi), buildLoRc: mean(lo), horizonWeeks,
   };
 }
+
+// ── Rigorous per-origin study (activates as tender_parity_history accrues) ───
+export interface ParityRow { date: string; parity_gap: number; tenderable: boolean; differential: number }
+export interface ParityInflowResult {
+  ready: boolean;
+  nEvents: number;          // parity crossings (not-tenderable → tenderable)
+  daysCovered: number;
+  spanLabel: string;
+  horizonWeeks: number;
+  meanForwardLots: number;  // avg gross graded lots for this origin in the horizon after a crossing
+  medianLagDays: number;    // crossing → first grading
+  hitRate: number;          // fraction of crossings followed by any grading within the horizon
+  need: string;             // what's still missing when not ready
+}
+
+const _parse = (d: string) => Date.parse(d + "T00:00:00Z");
+const _daysBetween = (a: string, b: string) => Math.round((_parse(b) - _parse(a)) / 86400000);
+function _addDays(d: string, n: number): string {
+  const t = new Date(_parse(d)); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10);
+}
+function _median(a: number[]): number {
+  if (!a.length) return 0;
+  const s = [...a].sort((x, y) => x - y); const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+/**
+ * The rigorous test the user is building history toward: when an origin's
+ * differential compresses to/below tenderable parity (parity flips
+ * not-tenderable → tenderable), how much of that origin grades onto the
+ * exchange, and how long after? Gated on enough crossings + span so it stays
+ * silent until the accumulating pipeline can support it.
+ */
+export function parityInflowStudy(
+  parityHist: ParityRow[],
+  gradings: GradingDay[],
+  gradingOrigin: string,
+  horizonWeeks = 8,
+  minEvents = 6,
+  minDays = 180,
+): ParityInflowResult {
+  const grad: { date: string; lots: number }[] = [];
+  for (const g of gradings) {
+    let lots = 0;
+    for (const e of g.entries ?? []) if (e.origin === gradingOrigin && typeof e.lots === "number") lots += e.lots;
+    if (lots > 0 && g.date) grad.push({ date: g.date, lots });
+  }
+  grad.sort((a, b) => a.date.localeCompare(b.date));
+
+  const rows = [...parityHist].sort((a, b) => a.date.localeCompare(b.date));
+  const events: string[] = [];
+  for (let i = 1; i < rows.length; i++) if (rows[i].tenderable && !rows[i - 1].tenderable) events.push(rows[i].date);
+  const daysCovered = rows.length ? _daysBetween(rows[0].date, rows[rows.length - 1].date) : 0;
+  const spanLabel = rows.length ? `${rows[0].date} → ${rows[rows.length - 1].date}` : "—";
+
+  const fwd: number[] = [], lags: number[] = [];
+  let hits = 0;
+  for (const ev of events) {
+    const end = _addDays(ev, horizonWeeks * 7);
+    const win = grad.filter(x => x.date > ev && x.date <= end);
+    fwd.push(win.reduce((s, x) => s + x.lots, 0));
+    if (win.length) { hits++; lags.push(_daysBetween(ev, win[0].date)); }
+  }
+  const ready = events.length >= minEvents && daysCovered >= minDays;
+  const need = ready ? "" :
+    `need ≥${minEvents} parity crossings and ≥${minDays} days of history — have ${events.length} crossing${events.length === 1 ? "" : "s"} over ${daysCovered} days`;
+  return {
+    ready, nEvents: events.length, daysCovered, spanLabel, horizonWeeks,
+    meanForwardLots: fwd.length ? fwd.reduce((s, x) => s + x, 0) / fwd.length : 0,
+    medianLagDays: _median(lags), hitRate: events.length ? hits / events.length : 0, need,
+  };
+}
