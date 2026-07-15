@@ -1,37 +1,7 @@
 {
-  "generated_at": "2026-07-14T04:42:04+00:00",
+  "generated_at": "2026-07-15T04:41:56+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
-    "colombia": {
-      "Caldas": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -2.2,
-            "forecast_7d_rain": 70.5
-          }
-        }
-      ]
-    },
-    "honduras": {
-      "Copán": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.55,
-            "forecast_7d_rain": 52.0
-          }
-        }
-      ]
-    },
     "uganda": {
       "Masaka": [
         {
@@ -96,7 +66,7 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.29,
-            "forecast_7d_rain": 50.0
+            "forecast_7d_rain": 51.7
           }
         }
       ],
@@ -111,6 +81,17 @@
             "vhi": 20.55,
             "spei_3": -1.85
           }
+        },
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -1.85,
+            "forecast_7d_rain": 60.6
+          }
         }
       ]
     },
@@ -124,21 +105,21 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -2.06,
-            "forecast_7d_rain": 58.1
+            "forecast_7d_rain": 58.9
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 9,
+    "total_alerts": 8,
     "by_severity": {
-      "watch": 4,
-      "critical": 5
+      "critical": 5,
+      "watch": 3
     },
     "by_threat": {
-      "blossom_drop": 4,
-      "severe_defoliation": 5
+      "severe_defoliation": 5,
+      "blossom_drop": 3
     }
   }
 }
