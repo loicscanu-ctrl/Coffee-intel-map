@@ -8,18 +8,17 @@ import { cachedFetchStatic } from "@/lib/api";
 import {
   buildCostStack, buildLevelSeries, buildOriginInflow, eventStudy, parityInflowStudy,
   PARITY_ORIGINS, CONTAINER_MT, PARITY_ADDERS_USD,
-  type DatedPrice, type Snapshot, type GradingDay, type ParityRow,
+  type DatedPrice, type Snapshot, type GradingDay, type ParityRow, type CostStackRow,
 } from "@/lib/research/certStocksParity";
 
 // ── colours (fixed categorical order — never cycled) ────────────────────────
-const C = { rc: "#f59e0b", farmgate: "#38bdf8", atPort: "#a78bfa", tendering: "#34d399", bar: "#38bdf8", up: "#34d399" };
+const C = { rc: "#f59e0b", farmgate: "#38bdf8", atPort: "#a78bfa", tendering: "#34d399", bar: "#38bdf8", up: "#34d399", grad: "#818cf8" };
 const AX = "#64748b", GRID = "#1e293b";
 
 const tip = {
   contentStyle: { background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 11 },
   labelStyle: { color: "#94a3b8" }, itemStyle: { color: "#e2e8f0" },
 };
-const mmdd = (d: string) => d.slice(5);
 
 function H({ children }: { children: React.ReactNode }) {
   return <h4 className="text-sm font-bold text-amber-400 mt-5 mb-2">{children}</h4>;
@@ -84,10 +83,28 @@ export default function CertifiedStocksParity() {
 
   const origin = PARITY_ORIGINS.find(o => o.key === originKey) ?? PARITY_ORIGINS[0];
 
-  const stack = useMemo(() => {
-    if (!data) return [];
-    return buildCostStack(data.farmgate[origin.key] ?? [], data.fx[origin.fxTicker] ?? [], data.rc, origin, data.freightUsdMt);
+  // Daily graded lots for the SELECTED origin, keyed by date (secondary-axis bars).
+  const dailyGrad = useMemo(() => {
+    const m = new Map<string, number>();
+    if (!data) return m;
+    for (const g of data.gradings) {
+      let lots = 0;
+      for (const e of g.entries ?? []) if (e.origin === origin.gradingOrigin && typeof e.lots === "number") lots += e.lots;
+      if (lots > 0 && g.date) m.set(g.date, (m.get(g.date) ?? 0) + lots);
+    }
+    return m;
   }, [data, origin]);
+
+  const stack = useMemo(() => {
+    if (!data) return [] as (CostStackRow & { gradedLots: number })[];
+    // Prefer the persisted pipeline series (per-day historical freight/FX/RC);
+    // fall back to an on-the-fly recompute (flat current freight) if absent.
+    const ph = data.parity[origin.key] ?? [];
+    const base: CostStackRow[] = ph.length
+      ? ph.map(r => ({ date: r.date, rc: r.rc ?? null, farmgate: r.farmgate_usd ?? null, atPort: r.at_port ?? null, tendering: r.tendering ?? null }))
+      : buildCostStack(data.farmgate[origin.key] ?? [], data.fx[origin.fxTicker] ?? [], data.rc, origin, data.freightUsdMt);
+    return base.map(r => ({ ...r, gradedLots: dailyGrad.get(r.date) ?? 0 }));
+  }, [data, origin, dailyGrad]);
 
   const level = useMemo(() => (data ? buildLevelSeries(...data.deep, data.snapshots) : []), [data]);
   const inflow = useMemo(() => (data ? buildOriginInflow(data.gradings, origin.gradingOrigin) : []), [data, origin]);
@@ -152,20 +169,25 @@ export default function CertifiedStocksParity() {
       <P>
         <Code>farmgate</Code> (local price → USD/MT) → <Code>+FOBbing</Code> = at-port → <Code>+freight +{PARITY_ADDERS_USD}</Code>
         (port transport, rent, loading-out, allowances) = <strong>all-in tendering cost</strong>. When the tendering line
-        sits <em>below</em> RC, tendering is profitable and certified stock should build.
+        sits <em>below</em> RC, tendering is profitable and certified stock should build. The <span style={{ color: C.grad }}>indigo
+        bars</span> (right axis) are <strong>{origin.label}&rsquo;s own daily gradings</strong> — so you can see whether inflow
+        actually clusters when the cost stack dips toward RC. FX and RC are per-day historical; freight is per-day where the
+        freight history reaches (recent months), falling back to the latest rate for earlier dates.
       </P>
       <div className="bg-slate-950/40 border border-slate-700/60 rounded-lg p-3">
         <ResponsiveContainer width="100%" height={260}>
           <ComposedChart data={stack} margin={{ top: 6, right: 8, bottom: 4, left: 4 }}>
             <CartesianGrid stroke={GRID} vertical={false} />
-            <XAxis dataKey="date" tickFormatter={mmdd} tick={{ fill: AX, fontSize: 10 }} minTickGap={28} />
-            <YAxis tick={{ fill: AX, fontSize: 10 }} width={44} domain={["auto", "auto"]} tickFormatter={(v) => `${Math.round(v / 100) / 10}k`} />
-            <Tooltip {...tip} formatter={(v, n) => [v == null ? "—" : `$${Math.round(Number(v))}`, n]} />
+            <XAxis dataKey="date" tickFormatter={(d) => d.slice(0, 7)} tick={{ fill: AX, fontSize: 10 }} minTickGap={44} />
+            <YAxis yAxisId="price" tick={{ fill: AX, fontSize: 10 }} width={44} domain={["auto", "auto"]} tickFormatter={(v) => `${Math.round(v / 100) / 10}k`} />
+            <YAxis yAxisId="lots" orientation="right" tick={{ fill: C.grad, fontSize: 9 }} width={30} domain={[0, "auto"]} allowDecimals={false} />
+            <Tooltip {...tip} formatter={(v, n) => n === "Graded (lots)" ? [`${Number(v)} lots`, n] : [v == null ? "—" : `$${Math.round(Number(v))}`, n]} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Line dataKey="farmgate" name="Farmgate" stroke={C.farmgate} dot={false} strokeWidth={1.5} connectNulls />
-            <Line dataKey="atPort" name="FOB + logistics" stroke={C.atPort} dot={false} strokeWidth={1.5} connectNulls />
-            <Line dataKey="tendering" name="All-in tendering cost" stroke={C.tendering} dot={false} strokeWidth={2} connectNulls />
-            <Line dataKey="rc" name="London RC" stroke={C.rc} dot={false} strokeWidth={2.5} connectNulls />
+            <Bar yAxisId="lots" dataKey="gradedLots" name="Graded (lots)" fill={C.grad} fillOpacity={0.55} radius={[2, 2, 0, 0]} maxBarSize={14} />
+            <Line yAxisId="price" dataKey="farmgate" name="Farmgate" stroke={C.farmgate} dot={false} strokeWidth={1.5} connectNulls />
+            <Line yAxisId="price" dataKey="atPort" name="FOB + logistics" stroke={C.atPort} dot={false} strokeWidth={1.5} connectNulls />
+            <Line yAxisId="price" dataKey="tendering" name="All-in tendering cost" stroke={C.tendering} dot={false} strokeWidth={2} connectNulls />
+            <Line yAxisId="price" dataKey="rc" name="London RC" stroke={C.rc} dot={false} strokeWidth={2.5} connectNulls />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
@@ -178,7 +200,7 @@ export default function CertifiedStocksParity() {
             Over the {stack.length}-day window, tendering was profitable on{" "}
             {stack.filter(r => r.rc != null && r.tendering != null && r.rc >= r.tendering).length} days.</>
         ) : "No overlapping price/farmgate data for this origin."}
-        {" "}Farmgate history is short (~2 months) — this is the current-mechanism view, not a back-cast.
+        {stack.length > 0 && <>{" "}Window: {stack[0].date} → {stack[stack.length - 1].date} ({stack.length} days of farmgate).</>}
       </P>
 
       {/* ── Chart B: gradings for this origin + who fills the exchange ── */}
