@@ -1,5 +1,57 @@
 [
   {
+    "id": 8232,
+    "title": "ICE-EU RC Daily OI Snapshot \u2013 2026-07-13",
+    "body": "ICE-EU RC Open Interest changed by +766 over the last session, with +317 on nearby two contracts and +449 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 51.51,
+    "lng": -0.09,
+    "tags": [
+      "daily-oi",
+      "robusta",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"robusta\", \"date\": \"2026-07-13\", \"_commentary\": {\"text\": \"ICE-EU RC Open Interest changed by +766 over the last session, with +317 on nearby two contracts and +449 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-15T04:26:48.434088",
+    "commentary": {
+      "text": "ICE-EU RC Open Interest changed by +766 over the last session, with +317 on nearby two contracts and +449 on forward contracts. Technical view: PRICE DOWN, SHORT BUILDING.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Neutral",
+    "sentiment_confidence": 62.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: no decisive technical view"
+  },
+  {
+    "id": 8231,
+    "title": "IFUS KC Daily OI Snapshot \u2013 2026-07-13",
+    "body": "IFUS KC Open Interest changed by -386 over the last session, with -773 on nearby two contracts and +387 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+    "source": "ICE",
+    "category": "futures",
+    "lat": 40.74,
+    "lng": -74.05,
+    "tags": [
+      "daily-oi",
+      "arabica",
+      "futures",
+      "auto-commentary"
+    ],
+    "meta": "{\"market\": \"arabica\", \"date\": \"2026-07-13\", \"_commentary\": {\"text\": \"IFUS KC Open Interest changed by -386 over the last session, with -773 on nearby two contracts and +387 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-15T04:26:45.375888",
+    "commentary": {
+      "text": "IFUS KC Open Interest changed by -386 over the last session, with -773 on nearby two contracts and +387 on forward contracts. Technical view: PRICE DOWN, LONG LIQUIDATION.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    },
+    "sentiment": "Bearish",
+    "sentiment_confidence": 75.0,
+    "sentiment_method": "deterministic",
+    "sentiment_reason": "OI snapshot: price down, long liquidation"
+  },
+  {
     "id": 8230,
     "title": "World Bank Population \u2013 2026-07-15",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3936,51 +3988,5 @@
     "sentiment_confidence": 88.0,
     "sentiment_method": "deterministic",
     "sentiment_reason": "RMN26 +4.0% on the day"
-  },
-  {
-    "id": 7821,
-    "title": "ICE NY Arabica (KC) Futures \u2013 2026-07-02",
-    "body": "Front (Coffee (Jul '26)): 363.95 (+48.3) OI:763 | 2nd (Coffee (Sep '26)): 349.95 (+48.75) OI:82,443",
-    "source": "Barchart",
-    "category": "general",
-    "lat": 0.0,
-    "lng": 0.0,
-    "tags": [
-      "futures",
-      "price",
-      "arabica"
-    ],
-    "meta": "{\"contracts\": [{\"contract\": \"Coffee (Jul '26)\", \"expiry\": \"2026-07-21\", \"last\": 363.95, \"chg\": 48.3, \"oi\": 763, \"volume\": 6, \"symbol\": \"KCN26\"}, {\"contract\": \"Coffee (Sep '26)\", \"expiry\": \"2026-09-18\", \"last\": 349.95, \"chg\": 48.75, \"oi\": 82443, \"volume\": 47771, \"symbol\": \"KCU26\"}, {\"contract\": \"Coffee (Dec '26)\", \"expiry\": \"2026-12-18\", \"last\": 335.4, \"chg\": 49.1, \"oi\": 52365, \"volume\": 24992, \"symbol\": \"KCZ26\"}, {\"contract\": \"Coffee (Mar '27)\", \"expiry\": \"2027-03-18\", \"last\": 329.75, \"chg\": 48.65, \"oi\": 19093, \"volume\": 8633, \"symbol\": \"KCH27\"}, {\"contract\": \"Coffee (May '27)\", \"expiry\": \"2027-05-18\", \"last\": 328.1, \"chg\": 47.2, \"oi\": 8719, \"volume\": 4232, \"symbol\": \"KCK27\"}, {\"contract\": \"Coffee (Jul '27)\", \"expiry\": \"2027-07-20\", \"last\": 327.1, \"chg\": 45.6, \"oi\": 4937, \"volume\": 2462, \"symbol\": \"KCN27\"}, {\"contract\": \"Coffee (Sep '27)\", \"expiry\": \"2027-09-20\", \"last\": 326, \"chg\": 43.9, \"oi\": 4476, \"volume\": 1559, \"symbol\": \"KCU27\"}, {\"contract\": \"Coffee (Dec '27)\", \"expiry\": \"2027-12-20\", \"last\": 325.15, \"chg\": 42.5, \"oi\": 5596, \"volume\": 823, \"symbol\": \"KCZ27\"}, {\"contract\": \"Coffee (Mar '28)\", \"expiry\": \"2028-03-21\", \"last\": 324.5, \"chg\": 41.8, \"oi\": 1181, \"volume\": 390, \"symbol\": \"KCH28\"}], \"quote_date\": \"2026-07-03\"}",
-    "pub_date": "2026-07-06T21:03:49.848238",
-    "sentiment": "Bullish",
-    "sentiment_confidence": 88.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "KCN26 +13.3% on the day"
-  },
-  {
-    "id": 7817,
-    "title": "Ethiopia Agronomic Status \u2013 2026-07-06",
-    "body": "Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 20.5.",
-    "source": "Open-Meteo + NOAA STAR",
-    "category": "supply",
-    "lat": 9.15,
-    "lng": 40.49,
-    "tags": [
-      "weather",
-      "ethiopia",
-      "agronomic",
-      "auto-commentary"
-    ],
-    "meta": "{\"origin\": \"ethiopia\", \"evaluation\": {\"at_risk_count\": 1, \"checked_count\": 5, \"skipped_count\": 0}, \"_commentary\": {\"text\": \"Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 20.5.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
-    "pub_date": "2026-07-06T06:19:15.833594",
-    "commentary": {
-      "text": "Agronomic Status Update: Ethiopia (Kaffa) is currently flagged as at drought risk. Forecasted rainfall of 99mm fails to clear the safe zone threshold while satellite VHI readings register critical vegetation stress at 20.5.",
-      "hasUpdate": true,
-      "isLatestTradingDay": true
-    },
-    "sentiment": "Bullish",
-    "sentiment_confidence": 75.0,
-    "sentiment_method": "deterministic",
-    "sentiment_reason": "Ethiopia: 1 growing region flagged at agronomic risk"
   }
 ]
