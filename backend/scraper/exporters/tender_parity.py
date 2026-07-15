@@ -92,15 +92,36 @@ def export_tender_parity() -> None:
         print("  tender_parity → no RC price history; skipping")
         return
 
-    # freight per route: prefer the daily history column, fall back to current rate.
+    # freight per route: prefer the daily history column; for dates earlier than
+    # that (short) history, estimate via the Containerized Freight Index shape,
+    # calibrated to the real route rate over their overlap window.
     freight_hist = freight.get("history") or []
     freight_routes = {r.get("id"): r.get("rate") for r in (freight.get("routes") or [])}
+    cfi_dates, cfi_by = _ffill_map([(r.get("date"), r.get("index")) for r in (_load("containerized_freight_index.json").get("series") or [])])
+
+    def _cfi_factor(route: str) -> float | None:
+        """Median (real route USD/FEU ÷ CFI index) over their overlap — maps the
+        index onto this route's price level."""
+        ratios = []
+        for row in freight_hist:
+            d, feu = row.get("date"), row.get(route)
+            c = _asof(cfi_dates, cfi_by, d) if (d and cfi_dates) else None
+            if feu and c:
+                ratios.append(feu / c)
+        if not ratios:
+            return None
+        ratios.sort()
+        return ratios[len(ratios) // 2]
+
+    factor = {cfg["freight_route"]: _cfi_factor(cfg["freight_route"]) for cfg in ORIGINS}
 
     def freight_usd_mt(route: str, on: str) -> float | None:
         dates, by = _ffill_map([(row.get("date"), row.get(route)) for row in freight_hist])
-        feu = _asof(dates, by, on) if dates else None
-        if feu is None:
-            feu = freight_routes.get(route)
+        if dates and on >= dates[0]:
+            feu = _asof(dates, by, on)                       # real, as-observed
+        else:
+            c, f = _asof(cfi_dates, cfi_by, on) if cfi_dates else None, factor.get(route)
+            feu = (f * c) if (c and f) else freight_routes.get(route)  # CFI-scaled, else flat
         return (feu / CONTAINER_MT) if feu else None
 
     existing = _load("tender_parity_history.json").get("origins") or {}

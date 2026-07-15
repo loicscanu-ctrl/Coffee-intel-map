@@ -172,7 +172,8 @@ export default function CertifiedStocksParity() {
         sits <em>below</em> RC, tendering is profitable and certified stock should build. The <span style={{ color: C.grad }}>indigo
         bars</span> (right axis) are <strong>{origin.label}&rsquo;s own daily gradings</strong> — so you can see whether inflow
         actually clusters when the cost stack dips toward RC. FX and RC are per-day historical; freight is per-day where the
-        freight history reaches (recent months), falling back to the latest rate for earlier dates.
+        freight-rate history reaches (recent months) and, before that, estimated from the <strong>Containerized Freight
+        Index</strong> shape (digitized from its chart, calibrated to the route) — approximate, but far better than a flat rate.
       </P>
       <div className="bg-slate-950/40 border border-slate-700/60 rounded-lg p-3">
         <ResponsiveContainer width="100%" height={260}>
