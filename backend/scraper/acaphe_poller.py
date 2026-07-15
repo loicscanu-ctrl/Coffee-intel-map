@@ -116,10 +116,13 @@ def _parse_vietnam(row14: dict) -> dict:
     # first number (greedy "Pepper[^(]*" turned "136-138000" into "6-138000").
     pep = re.search(r"Pepper[^(]*?([\d]+-[\d,]+)", raw)
 
-    # USD/VND from whenldclose: "87326(163976)" → first number
-    vc  = str(row14.get("whenldclose", "") or "")
-    vcm = re.match(r"(\d+)", vc)
-    usd_vnd = int(vcm.group(1)) if vcm else None
+    # USD/VND (VCB) rate lives in row14['Low']: "26,070 (11:26 Jul 15)" → 26070.
+    # (The old source, whenldclose="105615(166760)", is NOT the FX rate — its
+    # first number is a VND figure ~4x too high, which is what put 105,615 in
+    # the Vietnam Local Prices panel.)
+    low = str(row14.get("Low", "") or "")
+    vcm = re.match(r"\s*([\d.,]+)", low)
+    usd_vnd = int(re.sub(r"\D", "", vcm.group(1))) if vcm and re.sub(r"\D", "", vcm.group(1)) else None
 
     return {
         "local_time":  local_time,
