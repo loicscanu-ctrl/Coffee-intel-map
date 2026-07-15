@@ -70,8 +70,8 @@ ORIGINS = {
         "commodity": "robusta",
     },
     "brazil_arabica": {
-        "name":      "Brazil Arabica (CEPEA/ESALQ)",
-        "source":    "BCB SGS 4332 (CEPEA daily mirror)",
+        "name":      "Brazil Arabica Físico Tipo 6/7",
+        "source":    "noticiasagricolas (município trimmed mean)",
         "currency":  "BRL",
         "unit":      "per_saca_60kg",
         "color":     "#a855f7",
@@ -241,31 +241,17 @@ def _today_brazil_conilon_price(db) -> float | None:
 
 
 def _today_brazil_arabica_price(db) -> float | None:
-    """Read today's Arabica price from the latest CEPEA/ESALQ NewsItem.
+    """Brazil Arabica display price = the físico (Tipo 6/7) trimmed mean.
 
-    The CEPEA scraper writes two items per run — title pattern
-    'CEPEA Arabica – YYYY-MM-DD' and 'CEPEA Conilon (Robusta) – ...'. We
-    filter to the Arabica title so we don't accidentally read the Conilon
-    price. Body format: 'CEPEA Arabica price: R$ 1.234,50/sack (DD/MM/YYYY)'.
-
-    This complements the BCB SGS 4332 backfill — when 4332 returns empty
-    (the failure mode that produced an empty brazil_arabica history in
-    origin_prices_history.json), the CEPEA daily price is the live source.
-    """
+    Reads brazil_arabica_fisico.json (written earlier in the same export run by
+    export_brazil_arabica_fisico), which keeps every município quote and derives
+    the trimmed mean (drop highest+lowest, average the rest). `db` is unused —
+    kept for signature parity with the other _today_* helpers."""
     try:
-        from models import NewsItem
-        item = (db.query(NewsItem)
-                  .filter(NewsItem.source == "CEPEA/ESALQ")
-                  .filter(NewsItem.title.like("CEPEA Arabica%"))
-                  .order_by(NewsItem.pub_date.desc()).first())
-        if not item:
-            return None
-        m = re.search(r"R\$\s*([\d.]+,\d{2})", item.body or "")
-        if not m:
-            return None
-        return float(m.group(1).replace(".", "").replace(",", "."))
+        from scraper.sources.brazil_arabica_fisico import latest_trimmed_mean
+        return latest_trimmed_mean()
     except Exception as e:
-        print(f"[origin_prices_history] brazil_arabica_price unavailable from CEPEA/ESALQ NewsItem: {e}",
+        print(f"[origin_prices_history] brazil_arabica trimmed mean unavailable: {e}",
               file=sys.stderr, flush=True)
         return None
 
