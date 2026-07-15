@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T12:38:54.811815Z",
-  "count": 75,
+  "generated_at": "2026-07-15T12:52:41.848204Z",
+  "count": 76,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -12,6 +12,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 60
+    },
+    {
+      "file": "backfill-arabica-fisico.yml",
+      "name": "Z \u2013 Backfill: Brazil Arabica f\u00edsico",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 20
     },
     {
       "file": "backfill-brent-intraday.yml",
