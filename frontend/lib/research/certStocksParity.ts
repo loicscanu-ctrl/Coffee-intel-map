@@ -183,7 +183,18 @@ export function eventStudy(rc: DatedPrice[], level: DatedPrice[], horizonWeeks =
 }
 
 // ── Rigorous per-origin study (activates as tender_parity_history accrues) ───
-export interface ParityRow { date: string; parity_gap: number; tenderable: boolean; differential: number }
+export interface ParityRow {
+  date: string;
+  parity_gap: number;
+  tenderable: boolean;
+  differential: number;
+  // Cost-stack fields the pipeline persists (per-day, as-observed freight/FX/RC).
+  farmgate_usd?: number;
+  at_port?: number;
+  freight?: number;
+  tendering?: number;
+  rc?: number;
+}
 export interface ParityInflowResult {
   ready: boolean;
   nEvents: number;          // parity crossings (not-tenderable → tenderable)
