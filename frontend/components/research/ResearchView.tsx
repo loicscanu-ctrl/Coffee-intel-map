@@ -446,15 +446,15 @@ function ContractRules() {
           <strong> $18.75 per contract</strong>.</Spec>
         <Spec k="Price basis">A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
           Honduras, Uganda from the Mar 2026 month) with Board-set differentials for all other growths.</Spec>
-        <Spec k="Origin differentials">Basis growths at <strong>par</strong> (current list from Mar 2026 month: Mexico,
-          El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru; list revised Jan 2024). Board-set
-          premia and discounts — amounts below from prior rulebook, <em>verify in latest ICE Circular for current
-          values</em>:
-          <br />· <strong>Colombia</strong> <code>+0.04¢/lb</code><Tbc /> (historic; may have changed in Jan 2024 update)
-          <br />· <strong>Venezuela, Burundi, Rwanda, India</strong> <code>−0.01¢/lb</code><Tbc />
-          <br />· <strong>Dominican Republic, Ecuador</strong> <code>−0.04¢/lb</code><Tbc />
-          <br />· <strong>Brazil</strong> <code>−0.06¢/lb</code><Tbc /> (natural-process cup profile)
-          <br />· <strong>Vietnam</strong> (from May 2027) — differential TBD by ICE Board</Spec>
+        <Spec k="Origin differentials">Board-set premia and discounts vs. the basis (<strong>1 point = 0.01¢/lb</strong>,
+          i.e. 5 points = one 0.05¢ tick):
+          <br />· <strong>At par</strong>: Mexico, El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru
+          <br />· <strong>Colombia, Costa Rica, Kenya</strong> <code>+1000 pts (+10.00¢/lb)</code>
+          <br />· <strong>Guatemala</strong> <code>+500 pts (+5.00¢/lb)</code>
+          <br />· <strong>Burundi, Rwanda, Venezuela, India</strong> <code>−100 pts (−1.00¢/lb)</code>
+          <br />· <strong>Dominican Republic, Ecuador</strong> <code>−400 pts (−4.00¢/lb)</code>
+          <br />· <strong>Brazil</strong> <code>−600 pts (−6.00¢/lb)</code> (natural-process cup profile)
+          <br />· <strong>Vietnam</strong> <code>−600 pts (−6.00¢/lb)</code> — deliverable from the May 2027 expiry</Spec>
         <Spec k="Delivery point allowances">New York District and Virginia: <strong>at par</strong>.
           New Orleans, Miami, Houston: <strong>−0.50¢/lb</strong>.
           Antwerp, Hamburg/Bremen, Barcelona: <strong>−1.25¢/lb</strong>. Deducted from invoice at delivery.</Spec>
