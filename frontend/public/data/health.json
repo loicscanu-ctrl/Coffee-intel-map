@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T04:38:56.547018Z",
+  "generated_at": "2026-07-15T05:10:50.467225Z",
   "scrapers": {
     "futures": "2026-07-15T04:15:28.221632",
     "cot": "2026-07-07",
@@ -28,16 +28,16 @@
     "vietnam_exports": "2026-07-14T05:17:23.958107Z",
     "indonesia_exports": "2026-07-14T05:17:26.309673Z",
     "uganda_exports": "2026-07-14T05:17:26.871539+00:00",
-    "ice_certified_daily": "2026-07-13",
+    "ice_certified_daily": "2026-07-14",
     "ice_arabica_ageing": "2026-06-30",
     "ice_robusta_age_allowance": "2026-06-30"
   },
   "exporters": {
-    "latest_prices": "2026-07-15T04:38:53.544720Z",
+    "latest_prices": "2026-07-15T05:10:47.999209Z",
     "vn_physical_prices": "2026-07-15T04:38:54.238126Z",
     "news": "2026-07-15T04:38:54.531459Z",
-    "futures_chain": "2026-07-14T05:16:57.882371Z",
-    "oi_fnd_chart": "2026-07-14T21:59:11.868942Z",
+    "futures_chain": "2026-07-15T05:10:44.143325Z",
+    "oi_fnd_chart": "2026-07-15T05:10:47.005911Z",
     "cot": "2026-07-14T21:59:13.189302Z",
     "macro_cot": "2026-07-14T21:59:13.488871Z",
     "freight": "2026-07-14T05:17:03.474148Z",
