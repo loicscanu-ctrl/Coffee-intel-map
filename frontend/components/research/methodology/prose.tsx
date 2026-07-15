@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 // Shared typography + layout helpers for the Research "methodology paper"
 // components. Dark-theme, mirrors the inline helpers in ResearchView.tsx so the
 // new papers read identically to the existing ones.
@@ -41,16 +42,28 @@ export function Highlight({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Outer card for a methodology paper.
-export function Paper({ kicker, title, subtitle, children }: {
-  kicker: string; title: string; subtitle?: string; children: React.ReactNode;
+// Outer card for a methodology paper. Collapsed by default: the header (kicker /
+// title / subtitle) stays visible as a teaser and the body opens on "Read more".
+export function Paper({ kicker, title, subtitle, defaultOpen = false, children }: {
+  kicker: string; title: string; subtitle?: string; defaultOpen?: boolean; children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl">
-      <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>
-      <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1">{title}</h3>
-      {subtitle && <p className="text-xs text-slate-400 mb-2">{subtitle}</p>}
-      <div className="mt-2">{children}</div>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="group w-full flex items-start justify-between gap-3 text-left"
+      >
+        <div className="min-w-0">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>
+          <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1">{title}</h3>
+          {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        </div>
+        <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+          {open ? "▲ Less" : "▼ Read more"}
+        </span>
+      </button>
+      {open && <div className="mt-3">{children}</div>}
     </div>
   );
 }

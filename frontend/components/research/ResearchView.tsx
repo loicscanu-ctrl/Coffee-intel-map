@@ -21,26 +21,15 @@ import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
 import DeliveryProcessMethodology from "./methodology/DeliveryProcessMethodology";
 
-type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "delivery" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "parity" | "demand";
+// Top-level research categories. Each groups several articles/tools, which render
+// stacked as collapsible cards on the category page.
+type Cat = "quant" | "supply" | "logistics" | "exchange" | "demand";
 const CATS: { id: Cat; label: string }[] = [
-  { id: "cot",         label: "COT & positioning" },
-  { id: "signals",     label: "Signals & forecasts" },
-  { id: "sentiment",   label: "News & sentiment" },
-  { id: "futures",     label: "Futures analytics" },
-  { id: "macro",       label: "Macro & FX" },
-  { id: "weather",     label: "Weather" },
-  { id: "supply",      label: "Supply modelling" },
-  { id: "farmer",      label: "Farmer economics" },
-  { id: "fertilizer",  label: "Fertilizer" },
-  { id: "contracts",   label: "Contract rules" },
-  { id: "delivery",    label: "RC delivery process" },
-  { id: "agronomy",    label: "Agronomy" },
-  { id: "logistics",   label: "Origin Logistics" },
-  { id: "destination", label: "Destination In-store" },
-  { id: "freight",     label: "Freight & ports" },
-  { id: "certstocks",  label: "Certified stocks" },
-  { id: "parity",      label: "Tender parity" },
-  { id: "demand",      label: "Demand modelling" },
+  { id: "quant",     label: "Quant & positioning" },
+  { id: "supply",    label: "Supply" },
+  { id: "logistics", label: "Logistics" },
+  { id: "exchange",  label: "Exchange & certified stocks" },
+  { id: "demand",    label: "Demand" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -70,10 +59,52 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h3 className="text-base font-bold text-slate-100 mt-7 mb-1 pb-1 border-b border-slate-700">{children}</h3>;
 }
 
+// Collapsible research card. Collapsed by default — header (kicker/title/subtitle)
+// is always visible, body opens on "Read more". Two shapes:
+//   • default → a full bordered card whose body reveals inside it (prose articles)
+//   • bare    → just a clickable header bar; the child (a tool/dashboard that
+//               already renders its own card) appears below it when open.
+function CollapsibleCard({ kicker, title, subtitle, defaultOpen = false, bare = false, children }: {
+  kicker?: string; title: string; subtitle?: string; defaultOpen?: boolean; bare?: boolean; children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const header = (
+    <>
+      <div className="min-w-0">
+        {kicker && <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>}
+        <h3 className="text-base font-bold text-slate-100 leading-tight">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+      </div>
+      <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+        {open ? "▲ Less" : "▼ Read more"}
+      </span>
+    </>
+  );
+  if (bare) {
+    return (
+      <div>
+        <button onClick={() => setOpen(o => !o)}
+          className="group w-full flex items-start justify-between gap-3 text-left bg-slate-900 border border-slate-800 rounded-xl p-4">
+          {header}
+        </button>
+        {open && <div className="mt-3">{children}</div>}
+      </div>
+    );
+  }
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+      <button onClick={() => setOpen(o => !o)}
+        className="group w-full flex items-start justify-between gap-3 text-left">
+        {header}
+      </button>
+      {open && <div className="mt-3 space-y-1">{children}</div>}
+    </div>
+  );
+}
+
 function IntraweekMethodology() {
   return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+      <CollapsibleCard kicker="COT · positioning" title="Intraweek COT nowcast — methodology" subtitle="Bridging the weekly COT report with a daily positioning estimate">
         <H>What problem it solves</H>
         <P>
           The CFTC/ICE Commitments of Traders (COT) report is <strong>weekly</strong> — it tells you where each
@@ -171,14 +202,13 @@ function IntraweekMethodology() {
           prints the per-market multiplier and confidence-tier calibration. The model itself lives in
           <Code>lib/cot/intraweekModel.ts</Code>.
         </P>
-      </div>
+      </CollapsibleCard>
   );
 }
 
 function FrostRiskMethodology() {
   return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+      <CollapsibleCard kicker="Weather · tail risk" title="Frost risk — why radiative frost is the trade that matters" subtitle="The physics of Brazilian winter frost and how the monitor flags it">
         <H>Why frost is the trade that matters</H>
         <P>
           Frost is the single largest <strong>tail risk</strong> in coffee. Unlike drought, which trims a crop at the
@@ -335,29 +365,40 @@ function FrostRiskMethodology() {
           {" "}<Code>WeatherRiskPanel</Code> and the physics detail + historical anchor in <Code>FrostWatchPanel</Code>,
           on each origin&rsquo;s Farmer Economics tab.
         </P>
-      </div>
+      </CollapsibleCard>
   );
 }
 
 // Newspaper-style article card — bold headline over a double rule, justified
 // body. Used for the side-by-side contract-rule columns.
-function Article({ kicker, title, dateline, children }: {
-  kicker?: string; title: string; dateline?: string; children: React.ReactNode;
+function Article({ kicker, title, dateline, defaultOpen = false, children }: {
+  kicker?: string; title: string; dateline?: string; defaultOpen?: boolean; children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <article className="bg-slate-900 border border-slate-700 rounded-xl p-5">
-      {kicker && (
-        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
+      <button onClick={() => setOpen(o => !o)}
+        className="group w-full flex items-start justify-between gap-3 text-left">
+        <div className="min-w-0">
+          {kicker && (
+            <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
+          )}
+          <h3 className="text-xl font-bold text-slate-100 leading-tight pb-2 border-b-2 border-double border-slate-600">
+            {title}
+          </h3>
+          {dateline && (
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-2">{dateline}</div>
+          )}
+        </div>
+        <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+          {open ? "▲ Less" : "▼ Read more"}
+        </span>
+      </button>
+      {open && (
+        <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
+          {children}
+        </div>
       )}
-      <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1 pb-2 border-b-2 border-double border-slate-600">
-        {title}
-      </h3>
-      {dateline && (
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-3 mt-2">{dateline}</div>
-      )}
-      <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
-        {children}
-      </div>
     </article>
   );
 }
@@ -528,7 +569,7 @@ function ContractRules() {
 
 function FertilizerMethodology() {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+    <CollapsibleCard kicker="Supply · input cost" title="Fertilizer — why it's a coffee signal" subtitle="The largest cash input: short-term cost-push, medium-term yield lever">
       <H>Why fertilizer is a coffee signal</H>
       <P>
         Fertilizer is the largest cash input on a coffee farm and the one that swings most violently with the global
@@ -594,7 +635,7 @@ function FertilizerMethodology() {
         <LI>Benchmark prices are <strong>monthly</strong> and import data lags by weeks; treat the read as a trend, not a
           daily mark.</LI>
       </ul>
-    </div>
+    </CollapsibleCard>
   );
 }
 
@@ -1338,8 +1379,7 @@ function DestinationInstore() {
 
 function CertifiedStocksMethodology() {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+    <CollapsibleCard kicker="Exchange · certified stocks" title="Certified stocks — cohort flow methodology" subtitle="How daily stock totals and gradings reconcile into in / in-&-out / out flows">
       <H2>What this page documents</H2>
       <P>
         The <strong>Demand → Certified Stocks</strong> tab visualises the ICE-deliverable inventory the coffee
@@ -1581,13 +1621,13 @@ in & out (transit) = decerted bags whose cohort was graded in-window`}</Fml>
         <Code>frontend/components/demand/CertifiedStocksSystemFlow.tsx</Code> (<Code>buildDensityGrid</Code>); KPI tiles
         and the period selector live in <Code>CertifiedStocksPanel.tsx</Code>.
       </P>
-    </div>
+    </CollapsibleCard>
   );
 }
 
 export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
   const router = useRouter();
-  const [cat, setCat] = useState<Cat>(initialTab ?? "cot");
+  const [cat, setCat] = useState<Cat>(initialTab ?? "quant");
 
   useEffect(() => {
     if (initialTab && initialTab !== cat) setCat(initialTab);
@@ -1612,39 +1652,61 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
         ))}
       </div>
 
-      {cat === "cot" && (
+      {cat === "quant" && (
         <div className="space-y-4">
           <IntraweekMethodology />
-          <CotBacktestReport />
-        </div>
-      )}
-      {cat === "signals" && (
-        <div className="space-y-4">
+          <CollapsibleCard bare kicker="COT · positioning" title="COT backtest report"
+            subtitle="Walk-forward backtest of the intraweek positioning model">
+            <CotBacktestReport />
+          </CollapsibleCard>
           <SignalsMethodology />
-          <OpenDirectionRecord />
+          <CollapsibleCard bare kicker="Signals · track record" title="Open-price-direction — walk-forward record"
+            subtitle="Prediction vs. reality, out-of-sample">
+            <OpenDirectionRecord />
+          </CollapsibleCard>
+          <NewsSentimentMethodology />
+          <FuturesMethodology />
+          <MacroMethodology />
         </div>
       )}
-      {cat === "sentiment" && <NewsSentimentMethodology />}
-      {cat === "futures" && <FuturesMethodology />}
-      {cat === "macro" && <MacroMethodology />}
-      {cat === "weather" && (
+      {cat === "supply" && (
         <div className="space-y-4">
-          <EnsoExplainer />
+          <SupplyMethodology />
+          <FarmerMethodology />
+          <FertilizerMethodology />
+          <AgronomyArticles />
+          <CollapsibleCard bare kicker="Weather · ENSO" title="ENSO / El Niño — interactive explainer"
+            subtitle="Ocean–atmosphere simulation of the El Niño / La Niña cycle">
+            <EnsoExplainer />
+          </CollapsibleCard>
           <EnsoModelMethodology />
           <FrostRiskMethodology />
         </div>
       )}
-      {cat === "supply" && <SupplyMethodology />}
-      {cat === "farmer" && <FarmerMethodology />}
-      {cat === "fertilizer" && <FertilizerMethodology />}
-      {cat === "contracts" && <ContractRules />}
-      {cat === "delivery" && <DeliveryProcessMethodology />}
-      {cat === "agronomy"  && <AgronomyArticles />}
-      {cat === "logistics" && <OriginLogistics />}
-      {cat === "destination" && <DestinationInstore />}
-      {cat === "freight" && <FreightMethodology />}
-      {cat === "certstocks" && <CertifiedStocksMethodology />}
-      {cat === "parity" && <CertifiedStocksParity />}
+      {cat === "logistics" && (
+        <div className="space-y-4">
+          <CollapsibleCard bare kicker="Logistics · origin" title="Origin logistics — the FOBbing cost model"
+            subtitle="Farm-to-vessel cost stack by origin (Vietnam, Brazil, Uganda)">
+            <OriginLogistics />
+          </CollapsibleCard>
+          <CollapsibleCard bare kicker="Logistics · destination" title="Destination in-store cost"
+            subtitle="CIF → in-store cost & financing, live in USD off today's FAQ price and EUR/USD">
+            <DestinationInstore />
+          </CollapsibleCard>
+          <FreightMethodology />
+        </div>
+      )}
+      {cat === "exchange" && (
+        <div className="space-y-4">
+          <CertifiedStocksMethodology />
+          <CollapsibleCard bare kicker="Exchange · tender parity" title="Tender-parity tool"
+            subtitle="Cost-stack vs the exchange, origin gradings, and the parity→inflow study">
+            <CertifiedStocksParity />
+          </CollapsibleCard>
+          <ContractRules />
+          <DeliveryProcessMethodology />
+        </div>
+      )}
       {cat === "demand" && (
         <div className="space-y-4">
           <DemandArticles />
