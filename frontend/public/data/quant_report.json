@@ -241,7 +241,7 @@
     "total": 8,
     "items": [
       {
-        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
+        "headline": "In Washington, D.C., Coffee Meets Fine Dining At Jônt",
         "source": "Sprudge",
         "sentiment": "Bullish",
         "confidence": 50.0,
@@ -321,23 +321,23 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
   },
   "open_direction": {
     "available": true,
-    "as_of": "2026-07-13",
-    "for_session": "2026-07-14",
-    "scraped_at": "2026-07-14T07:17:29.471487Z",
+    "as_of": "2026-07-14",
+    "for_session": "2026-07-15",
+    "scraped_at": "2026-07-15T05:40:51.743738Z",
     "direction": "Abstain",
-    "base_margin": -0.14352357939236118,
-    "final_margin": -0.10534099332940558,
-    "base_prob": 0.4641805711405433,
-    "final_prob": 0.47368907759130313,
-    "prob_up": 0.47368907759130313,
-    "prob_down": 0.5263109224086968,
+    "base_margin": -0.1415814619261737,
+    "final_margin": 0.033519962251150476,
+    "base_prob": 0.4646636421624934,
+    "final_prob": 0.50837920601296,
+    "prob_up": 0.50837920601296,
+    "prob_down": 0.49162079398703995,
     "regime": {
       "ny_shock": false,
       "vol_regime": "high",
@@ -347,37 +347,37 @@
       "brent_overnight_pct": null,
       "oil_shock": false
     },
-    "expected_gap_pct": -0.021,
-    "expected_gap_usd_mt": -0.8,
+    "expected_gap_pct": 0.016,
+    "expected_gap_usd_mt": 0.6,
     "features": [
       {
         "var_name": "days_since_roll",
         "label": "Roll-Cycle Position",
-        "raw_value": 28.0,
-        "raw_fmt": "day 28",
-        "z": 0.81,
+        "raw_value": 29.0,
+        "raw_fmt": "day 29",
+        "z": 0.89,
         "usd_per_ton": null,
-        "phi": 0.13465171802535084,
+        "phi": 0.14803501670459626,
         "detail": {
-          "text": "day 28 of the bi-monthly front-contract cycle \u2014 gaps historically tilt down mid-cycle (~day 10), up late-cycle"
+          "text": "day 29 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
         }
       },
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
-        "raw_value": -0.0009068923821040631,
-        "raw_fmt": "-0.09%",
-        "z": -0.24,
-        "usd_per_ton": -3.5,
-        "phi": -0.09646913196239523,
+        "raw_value": 0.00030590394616103467,
+        "raw_fmt": "+0.03%",
+        "z": 0.07,
+        "usd_per_ton": 1.2,
+        "phi": 0.027066407472727937,
         "detail": {
-          "text": "KC at RC close (17:30 London) 330.80\u00a2/lb \u2192 KC close (18:30) 330.50\u00a2/lb = -6.6 $/t on arabica; -0.09% mapped on robusta \u2248 -3.5 $/t"
+          "text": "KC at RC close (17:30 London) 326.90¢/lb → KC close (18:30) 327.00¢/lb = +2.2 $/t on arabica; +0.03% mapped on robusta ≈ +1.2 $/t"
         }
       }
     ],
     "target": {
       "kind": "overnight_gap",
-      "definition": "RC first-bar open \u00f7 prior 17:30-London close \u2212 1; roll days excluded",
+      "definition": "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
       "abstain_band": 0.1
     },
     "model": {
@@ -387,18 +387,18 @@
         "days_since_roll"
       ],
       "n_features": 2,
-      "n_train": 1157,
-      "test_accuracy": 0.574585635359116,
-      "baseline_accuracy": 0.5359116022099447,
-      "edge": 0.03867403314917128,
+      "n_train": 1158,
+      "test_accuracy": 0.5739514348785872,
+      "baseline_accuracy": 0.5353200883002207,
+      "edge": 0.03863134657836653,
       "acted_accuracy": 0.6377245508982036,
       "acted_n": 334,
-      "abstain_rate": 0.630939226519337,
+      "abstain_rate": 0.6313465783664459,
       "eval_method": "walk_forward",
-      "n_test": 905,
-      "mag_mae_pct": 0.30359931050412614,
-      "mag_baseline_mae_pct": 0.3107076308403195,
-      "mag_skill": 0.02287784280343763,
+      "n_test": 906,
+      "mag_mae_pct": 0.3036620975376587,
+      "mag_baseline_mae_pct": 0.31073913283082477,
+      "mag_skill": 0.022774844058726873,
       "cci_available": false,
       "intraday_source": "barchart_15min",
       "roll_days_excluded": 88
