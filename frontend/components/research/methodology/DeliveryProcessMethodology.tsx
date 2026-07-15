@@ -87,7 +87,7 @@ export default function DeliveryProcessMethodology() {
           },
           {
             stage: "First Allocation", when: "after 12:00",
-            what: <>The <Code>MPFE</Code> report on <Code>UCP</Code> tells buyers how many lots they received. RC is
+            what: <>The <Code>MPFE</Code> report on <Code>UCP ECS</Code> tells buyers how many lots they received. RC is
               allocated to buyers <strong>pro-rata</strong>. Buyers get an <em>invoice report</em> + delivery details;
               sellers get an <em>account-sale report</em> + delivery details (via Guardian).</>,
           },
@@ -105,13 +105,13 @@ export default function DeliveryProcessMethodology() {
               allocation of RC. Account sales / invoices + delivery details issued via Guardian.</>,
           },
           {
-            stage: "Settlement Day", when: "≈ Tender Day + 14 days *",
+            stage: "Settlement Day", when: "Tender Day + 4 days",
             what: <>By <strong>09:00</strong> the Clearing House <strong>debits buyers</strong> per the invoices; after
               09:00 it <strong>credits sellers</strong> per the account sales and <strong>transfers the warrants to
-              buyers</strong> via <Code>Guardian</Code>. (Day-count amended — see below.)</>,
+              buyers</strong> via <Code>Guardian</Code>. (Rolled to the next Business Day if a bank holiday.)</>,
           },
           {
-            stage: "Substitution of Tenders", when: "after Settlement Day, by 17:00 *",
+            stage: "Substitution of Tenders", when: "after Settlement Day, by 17:00",
             what: <>A seller may <strong>substitute</strong> a tender with the buyer&rsquo;s <em>prior consent</em> (or, in
               dispute, if ordered by LIFFE / ICE Futures Europe); Guardian notifies any price change and issues a
               substitution invoice/account sale. No consent → the original tender stands; seller failure to deliver →
@@ -119,8 +119,6 @@ export default function DeliveryProcessMethodology() {
           },
         ]}
       />
-      <P className="text-[11px] text-slate-500">* See the amendments below — the source&rsquo;s exact day-counts for
-        settlement and substitution are amended/ambiguous and should be verified against the current live procedures.</P>
 
       <H2>How allocation works</H2>
       <P>
@@ -149,23 +147,6 @@ export default function DeliveryProcessMethodology() {
         resulting price difference is notified and re-invoiced via Guardian. If the buyer withholds consent the seller
         must deliver the original tender; failing that, the seller is <strong>in default in performance</strong>.
       </P>
-
-      <H2>Amendments (July 2018 delivery months onwards)</H2>
-      <P>The document carries dated footnotes; quoted verbatim:</P>
-      <UL>
-        <LI><strong>Early Take Up removed</strong> — &ldquo;<em>With effect from delivery months July 2018 onwards this
-          &lsquo;Early Take Up&rsquo; section is deleted.</em>&rdquo; (Previously a buyer could take up warrants before
-          the due Settlement Day by 16:00 the prior Business Day, receiving an Early Take Up Invoice / Account Sale.)</LI>
-        <LI><strong>Settlement timing</strong> — the base text reads &ldquo;<em>14 days after the Tender Day</em>&rdquo;;
-          the footnotes say &ldquo;<em>this shall instead read &lsquo;4 days&rsquo;</em>&rdquo; and &ldquo;<em>this title
-          shall instead read &lsquo;14 Business Days after Tender Day&rsquo;</em>&rdquo;.</LI>
-      </UL>
-      <Highlight>
-        The source&rsquo;s payment-timing footnotes <strong>overlap</strong> (&ldquo;14 days&rdquo; → &ldquo;4 days&rdquo;
-        vs. a &ldquo;14 Business Days after Tender Day&rdquo; title), and the Substitution row shows an amended day-count
-        (7 / 14 Business Days after Settlement Day). Treat the exact <em>day-counts</em> as needing verification against
-        the current live Delivery Procedures — the <em>sequence and mechanism</em> above are as documented.
-      </Highlight>
 
       <H2>Where it sits</H2>
       <P>
