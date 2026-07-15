@@ -54,7 +54,8 @@ def main() -> None:
         for kw in ("4/5", "Pregão", "pregão", "Fechamento"):
             idx = html.find(kw)
             if idx >= 0:
-                print(f"\n   raw around {kw!r}: {re.sub(r'\\s+',' ',html[idx-60:idx+180])!r}")
+                ctx = re.sub(r"\s+", " ", html[idx-60:idx+180])
+                print(f"\n   raw around {kw!r}: {ctx!r}")
 
 
 if __name__ == "__main__":
