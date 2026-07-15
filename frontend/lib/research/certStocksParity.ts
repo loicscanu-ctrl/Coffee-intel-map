@@ -22,7 +22,7 @@ export interface OriginParams {
   fobbingUsd: number;       // origin→vessel, USD/MT
 }
 
-export const PARITY_ADDERS_USD = 72;      // port transport 7 + rent 15 + loading-out 40 + allowances ~10
+export const PARITY_ADDERS_USD = 58;      // port transport 18 (EU avg DTHC+DO) + rent 0 (warehouse-financed) + loading-out 40 + import duty 0
 export const CONTAINER_MT = 21.6;
 
 export const PARITY_ORIGINS: OriginParams[] = [

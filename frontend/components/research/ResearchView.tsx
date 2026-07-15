@@ -502,9 +502,13 @@ function ContractRules() {
         <p className="mb-3 text-[10px] text-slate-400 bg-slate-800/60 rounded p-2 border border-slate-700/50">
           <strong className="text-slate-300">Tenderable parity</strong> — the break-even differential at which a trader
           is indifferent between selling FOB physical and tendering into the exchange — is:
-          {" "}<code className="text-amber-300">FOB + Freight + Port transport (~$7/t<Tbc />) + Rent (~$15/t<Tbc />) + Rent allowance + Loading Out (~$40/t<Tbc />) + Contract allowances</code>.
+          {" "}<code className="text-amber-300">FOB + Freight + Port transport (~$18/t) + Rent ($0) + Loading Out ($40/t) + Contract allowances</code>.
           If the physical FOB differential is <em>above</em> tenderable parity, traders sell commercial; below it, it pays
           to tender into the exchange. Certified stocks accumulate when FOB differentials compress toward or below parity.
+          {" "}Our operating adders beyond FOB + freight total <strong>≈ $58/t</strong>: <strong>port transport ~$18/t</strong>
+          {" "}(EU-average DTHC + DO from the Destination In-store cost research), <strong>rent $0</strong> (taken as
+          financed by the chosen ICE-nominated warehouse), <strong>loading-out $40/t</strong>, and <strong>import duty $0</strong>
+          {" "}(the EU MFN tariff on green robusta is nil). These are the values wired into the live tender-parity model.
         </p>
         <Spec k="Lot size">Nominal <strong>10 tonnes</strong> net, one Origin and shipment period, from no more than two
           parcels.</Spec>
@@ -542,16 +546,15 @@ function ContractRules() {
         <Spec k="Storage / Rent allowance">Rent accrues from warrant issue date. The invoice includes a <strong>rent
           allowance adjustment</strong>: if the delivery warehouse charges above the global average ICE-nominated rate, a
           deduction is applied; if below, an addition is made. Net effect: all lots settle at the same effective rent
-          regardless of warehouse location. Indicative warehouse rates: <strong>≈ €0.30–0.60/bag/month</strong><Tbc />
-          (≈ €5–10/tonne/month for ≤80 kg bags). Exact rates per ICE nominated warehouse schedule — verify before
-          tendering.</Spec>
-        <Spec k="Loading Out Charge">One-time charge paid by buyer when collecting from a licensed terminal.
-          EU ports indicatively <strong>≈ €4–8/tonne</strong><Tbc />; warehouse-specific.{" "}
-          <em>Exact current rate in ICE Section GGGG warehouse schedule — verify before tendering.</em></Spec>
-        <Spec k="Import-Duty allowance">For EU Customs Warehouse lots: the import duty on green Robusta coffee
-          (currently <strong>7.5% CIF</strong><Tbc /> in the EU) is deducted from the invoice, compensating the buyer
-          for the customs liability they assume on clearing. Amount calculated at EDSP × applicable tariff rate × net
-          weight.</Spec>
+          regardless of warehouse location. Published warehouse rates run <strong>≈ €0.30–0.60/bag/month</strong>
+          (≈ €5–10/tonne/month for ≤80 kg bags), but in our parity model <strong>rent is taken as $0</strong>: if we
+          choose the delivery warehouse, it can finance the rent for us, so it does not add to the tender-in cost.</Spec>
+        <Spec k="Loading Out Charge">One-time charge paid when collecting from the licensed terminal.
+          Wired into the parity model at <strong>$40/tonne</strong> (our confirmed operating figure).</Spec>
+        <Spec k="Import-Duty allowance">The EU MFN tariff on <strong>green</strong> robusta coffee (unroasted,
+          non-decaffeinated — HS <Code>0901.11</Code>) is <strong>0%</strong>, so for EU Customs Warehouse lots the
+          import-duty allowance is <strong>nil</strong> and it adds nothing to tender-in cost. (Duty applies only to
+          roasted/decaffeinated coffee, which is not deliverable.)</Spec>
         <Spec k="Transition Stock allowance (EUDR)">For lots delivered without Validated DDI documentation — EU/UK
           delivery areas only: <strong>−$5/t/month</strong> for 2026 delivery months; <strong>−$10/t/month</strong> from
           January 2027 onwards. US delivery areas: no allowance — transition stock without DDI not accepted.</Spec>
