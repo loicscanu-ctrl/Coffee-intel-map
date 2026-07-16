@@ -146,3 +146,9 @@ async def run(page) -> list[dict]:
     """Scrape the coffee-news list off the Playwright thread (plain HTTP works)."""
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, _scrape)
+
+
+if __name__ == "__main__":
+    # Manual check: print the scraped items (headline, category, timestamp).
+    for it in _scrape():
+        print(f"  [{it['category']:7}] {it['pub_date'].isoformat()}  {it['title'][:70]}")
