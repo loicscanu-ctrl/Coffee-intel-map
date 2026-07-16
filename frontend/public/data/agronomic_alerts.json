@@ -1,7 +1,22 @@
 {
-  "generated_at": "2026-07-15T04:41:56+00:00",
+  "generated_at": "2026-07-16T04:52:33+00:00",
   "ruleset_version": "iphm-v2-frost",
   "origins": {
+    "colombia": {
+      "Caldas": [
+        {
+          "threat_id": "blossom_drop",
+          "name": "Flowering Disruption / Blossom Drop",
+          "severity": "watch",
+          "timeframe": "forecast",
+          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
+          "triggers": {
+            "spei_3": -2.2,
+            "forecast_7d_rain": 113.0
+          }
+        }
+      ]
+    },
     "uganda": {
       "Masaka": [
         {
@@ -57,19 +72,6 @@
       ]
     },
     "ethiopia": {
-      "Limu": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -1.29,
-            "forecast_7d_rain": 51.7
-          }
-        }
-      ],
       "Kaffa": [
         {
           "threat_id": "severe_defoliation",
@@ -90,36 +92,21 @@
           "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
           "triggers": {
             "spei_3": -1.85,
-            "forecast_7d_rain": 60.6
-          }
-        }
-      ]
-    },
-    "vn": {
-      "Gia Lai": [
-        {
-          "threat_id": "blossom_drop",
-          "name": "Flowering Disruption / Blossom Drop",
-          "severity": "watch",
-          "timeframe": "forecast",
-          "market_impact": "Potential false flowering or dropped blossoms. Harvest delay.",
-          "triggers": {
-            "spei_3": -2.06,
-            "forecast_7d_rain": 58.9
+            "forecast_7d_rain": 60.1
           }
         }
       ]
     }
   },
   "summary": {
-    "total_alerts": 8,
+    "total_alerts": 7,
     "by_severity": {
-      "critical": 5,
-      "watch": 3
+      "watch": 2,
+      "critical": 5
     },
     "by_threat": {
-      "severe_defoliation": 5,
-      "blossom_drop": 3
+      "blossom_drop": 2,
+      "severe_defoliation": 5
     }
   }
 }
