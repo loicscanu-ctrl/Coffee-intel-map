@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T13:22:39.281969Z",
-  "count": 76,
+  "generated_at": "2026-07-16T09:46:43.195987Z",
+  "count": 77,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -490,6 +490,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 10
+    },
+    {
+      "file": "probe-na.yml",
+      "name": "Z \u2013 Probe: NA B3 + news (test)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 8
     },
     {
       "file": "quant-currency-index.yml",
