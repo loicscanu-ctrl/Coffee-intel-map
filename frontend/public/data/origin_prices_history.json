@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-07-15T05:39:05.187658Z",
+  "scraped_at": "2026-07-16T05:28:39.943549Z",
   "origins": {
     "vietnam": {
       "name": "Vietnam Robusta FAQ Grade 2 (Dak Lak)",
@@ -4191,6 +4191,10 @@
         {
           "date": "2026-07-15",
           "price": 97200.0
+        },
+        {
+          "date": "2026-07-16",
+          "price": 97200.0
         }
       ],
       "commodity": "robusta"
@@ -4453,6 +4457,10 @@
         {
           "date": "2026-07-15",
           "price": 185.25
+        },
+        {
+          "date": "2026-07-16",
+          "price": 185.93
         }
       ],
       "commodity": "robusta"
@@ -4715,13 +4723,17 @@
         {
           "date": "2026-07-15",
           "price": 1060.0
+        },
+        {
+          "date": "2026-07-16",
+          "price": 1060.0
         }
       ],
       "commodity": "robusta"
     },
     "brazil_arabica": {
-      "name": "Brazil Arabica (CEPEA/ESALQ)",
-      "source": "BCB SGS 4332 (CEPEA daily mirror)",
+      "name": "Brazil Arabica Físico Tipo 6/7",
+      "source": "noticiasagricolas (município trimmed mean)",
       "currency": "BRL",
       "unit": "per_saca_60kg",
       "color": "#a855f7",
@@ -7833,6 +7845,10 @@
         {
           "date": "2026-07-14",
           "price": 1797.4
+        },
+        {
+          "date": "2026-07-16",
+          "price": 1794.2
         }
       ],
       "commodity": "arabica"
@@ -7956,6 +7972,10 @@
         {
           "date": "2026-07-15",
           "price": 304.0
+        },
+        {
+          "date": "2026-07-16",
+          "price": 280.1
         }
       ]
     },
@@ -8078,6 +8098,10 @@
         {
           "date": "2026-07-15",
           "price": 323.0
+        },
+        {
+          "date": "2026-07-16",
+          "price": 299.1
         }
       ]
     },
@@ -8192,6 +8216,10 @@
         {
           "date": "2026-07-15",
           "price": 2281.65
+        },
+        {
+          "date": "2026-07-16",
+          "price": 2232.5
         }
       ]
     },
@@ -8306,6 +8334,10 @@
         {
           "date": "2026-07-15",
           "price": 2327.36
+        },
+        {
+          "date": "2026-07-16",
+          "price": 2278.22
         }
       ]
     },
@@ -8420,6 +8452,10 @@
         {
           "date": "2026-07-15",
           "price": 2350.21
+        },
+        {
+          "date": "2026-07-16",
+          "price": 2301.08
         }
       ]
     }
