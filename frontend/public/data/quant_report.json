@@ -228,23 +228,32 @@
       }
     ]
   },
-  "scraped_at": "2026-07-16T22:29:25.648421+00:00",
+  "scraped_at": "2026-07-16T22:29:52.737765Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-15T22:31:03.433336Z",
+    "scraped_at": "2026-07-16T22:29:51.142962Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 90.0,
-    "net_index": 12.5,
-    "bull_count": 2,
+    "overall_confidence": 92.5,
+    "net_index": 1.9,
+    "bull_count": 1,
     "bear_count": 1,
-    "neutral_count": 5,
+    "neutral_count": 6,
     "total": 8,
     "items": [
+      {
+        "headline": "Build-Outs Of Coffee: The Wild Fox In San Francisco, CA",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "Build-Outs Of Coffee: Nandan Coffee In Bangalore, India",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +271,7 @@
         "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -271,7 +280,7 @@
         "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -280,7 +289,7 @@
         "headline": "The Dog Days Of Coffee Are Here",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 80.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -298,16 +307,7 @@
         "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Afternoon Coffee Crash Is A Myth",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 85.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
