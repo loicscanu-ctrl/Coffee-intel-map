@@ -25,6 +25,7 @@ from scraper.sources import (
     brazil,
     cepea,
     futures,
+    noticias_cafe,
     origins,
     rss,
     technicals,
@@ -48,7 +49,7 @@ from scraper.sources import uganda_weather as _uganda_weather
 # _guatemala (ANACAFE) proven live via the "Probe: ANACAFE" workflow (run #1:
 # egress 200, RESULT PASS — 3 grades via the formula fallback), now in the daily
 # suite. The standalone probe-anacafe.yml workflow stays for ad-hoc re-checks.
-ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, b3_icf, _colombia, _honduras, _ethiopia, _guatemala]
+ALL_SOURCES = [barchart, b3, brazil, vietnam, origins, technicals, futures, uganda, cepea, rss, noticias_cafe, b3_icf, _colombia, _honduras, _ethiopia, _guatemala]
 CONCURRENCY       = 3    # Max parallel Playwright pages
 SCRAPER_TIMEOUT   = 180  # Seconds before a single scraper is killed
 

@@ -74,6 +74,7 @@ def _exporters(db):
     """
     from scraper.sources.origin_prices_history import export_origin_prices_history
     from scraper.sources.brazil_arabica_fisico import export_brazil_arabica_fisico
+    from scraper.sources.brazil_b3_arabica import export_brazil_b3_arabica
     from scraper.exporters.tender_parity import export_tender_parity
 
     def _country_pins():
@@ -111,6 +112,7 @@ def _exporters(db):
         # Must run BEFORE origin_prices_history: it writes brazil_arabica_fisico.json,
         # from which origin_prices_history reads the Brazil Arabica trimmed mean.
         ("brazil_arabica_fisico", lambda: export_brazil_arabica_fisico()),
+        ("brazil_b3_arabica",     lambda: export_brazil_b3_arabica()),
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
         ("tender_parity",         lambda: export_tender_parity()),
         ("news",                  lambda: export_news(db)),
