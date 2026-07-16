@@ -38,46 +38,50 @@ def probe_b3():
 
 def probe_news():
     from bs4 import BeautifulSoup
-    print("\n########## NEWS: RSS feed candidates ##########")
-    for feed in [
-        "https://www.noticiasagricolas.com.br/rss/noticias/cafe.xml",
-        "https://www.noticiasagricolas.com.br/rss/cafe.xml",
-        "https://www.noticiasagricolas.com.br/noticias/cafe/feed",
-        "https://www.noticiasagricolas.com.br/rss/",
-        "https://www.noticiasagricolas.com.br/feed/",
-    ]:
-        try:
-            st, body = get(feed)
-            is_rss = "<rss" in body[:600].lower() or "<feed" in body[:600].lower()
-            print(f"  [{st}] rss={is_rss} {len(body)}B  {feed}")
-            if is_rss:
-                items = re.findall(r"<item>.*?</item>", body, re.S)[:3]
-                for it in items:
-                    t = re.search(r"<title>(.*?)</title>", it, re.S)
-                    p = re.search(r"<pubDate>(.*?)</pubDate>", it, re.S)
-                    l = re.search(r"<link>(.*?)</link>", it, re.S)
-                    print(f"       · {(t.group(1) if t else '')[:70]!r} | {p.group(1) if p else '-'} | {l.group(1) if l else '-'}")
-        except Exception as e:  # noqa: BLE001
-            print(f"  ERR {type(e).__name__} {feed}")
+    base = "https://www.noticiasagricolas.com.br"
 
-    print("\n########## NEWS: list page structure ##########")
-    st, html = get("https://www.noticiasagricolas.com.br/noticias/cafe/")
+    print("\n########## NEWS: list page → links ##########")
+    st, html = get(base + "/noticias/cafe/")
     print(f"  list HTTP {st} {len(html)} bytes")
     soup = BeautifulSoup(html, "html.parser")
-    # dump the first few article containers with surrounding structure
-    arts = [a for a in soup.find_all("a", href=True)
-            if re.search(r"/noticias/cafe/\d+-.+\.html", a["href"]) and len(a.get_text(strip=True)) > 20]
-    print(f"  article links: {len(arts)}")
-    for a in arts[:5]:
-        # climb to the enclosing list item to see date/time markup
-        li = a
-        for _ in range(4):
-            if li.parent:
-                li = li.parent
-        block = re.sub(r"\s+", " ", li.get_text(" ", strip=True))[:220]
-        print(f"   · href={a['href']}")
-        print(f"     text={a.get_text(' ', strip=True)[:80]!r}")
-        print(f"     block={block!r}")
+    seen, arts = set(), []
+    for a in soup.find_all("a", href=True):
+        if re.search(r"/noticias/cafe/\d+-.+\.html", a["href"]) and len(a.get_text(strip=True)) > 20:
+            if a["href"] not in seen:
+                seen.add(a["href"])
+                arts.append(a)
+    print(f"  unique article links: {len(arts)}")
+
+    print("\n########## NEWS: article page metadata ##########")
+    for a in arts[:3]:
+        href = a["href"] if a["href"].startswith("http") else base + a["href"]
+        try:
+            _, ah = get(href)
+        except Exception as e:  # noqa: BLE001
+            print(f"   ERR {type(e).__name__} {href}")
+            continue
+        asoup = BeautifulSoup(ah, "html.parser")
+
+        def meta(*keys):
+            for k in keys:
+                m = (asoup.find("meta", attrs={"property": k})
+                     or asoup.find("meta", attrs={"name": k})
+                     or asoup.find("meta", attrs={"itemprop": k}))
+                if m and m.get("content"):
+                    return f"{k}={m['content']!r}"
+            return None
+
+        print(f"   · {href}")
+        print(f"     list_text={a.get_text(' ', strip=True)[:70]!r}")
+        print(f"     published={meta('article:published_time', 'article:modified_time', 'datePublished', 'date')}")
+        print(f"     og:title ={meta('og:title')}")
+        print(f"     og:desc  ={(meta('og:description', 'description') or '')[:120]}")
+        # visible date/time near the article header
+        tnode = asoup.find("time")
+        if tnode:
+            print(f"     <time>   ={tnode.get('datetime') or tnode.get_text(strip=True)!r}")
+        vis = re.search(r"\d{2}/\d{2}/\d{4}[^<]{0,12}\d{2}:\d{2}", ah)
+        print(f"     visible  ={vis.group(0) if vis else '-'!r}")
 
 
 def main():
