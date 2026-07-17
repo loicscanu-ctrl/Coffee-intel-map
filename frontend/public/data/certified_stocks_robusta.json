@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-17T05:51:07+00:00",
+  "generated_at": "2026-07-17T21:36:55+00:00",
   "as_of": "2026-07-16",
   "snapshots": [
     {
@@ -15496,6 +15496,13 @@
         "queue_lots": 0,
         "forecast_lots": 0,
         "total_pending_lots": 0
+      },
+      {
+        "date": "2026-07-16",
+        "report_date": "2026-07-16",
+        "queue_lots": 0,
+        "forecast_lots": 80,
+        "total_pending_lots": 80
       }
     ],
     "infested_warrants": []
