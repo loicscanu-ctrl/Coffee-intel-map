@@ -228,23 +228,32 @@
       }
     ]
   },
-  "scraped_at": "2026-07-17T22:22:24.396885+00:00",
+  "scraped_at": "2026-07-17T22:23:00.074795Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-16T22:29:51.142962Z",
-    "overall_sentiment": "Neutral",
-    "overall_confidence": 92.5,
-    "net_index": 1.9,
-    "bull_count": 1,
+    "scraped_at": "2026-07-17T22:22:58.352128Z",
+    "overall_sentiment": "Bullish",
+    "overall_confidence": 70.0,
+    "net_index": 30.0,
+    "bull_count": 4,
     "bear_count": 1,
-    "neutral_count": 6,
-    "total": 8,
+    "neutral_count": 2,
+    "total": 7,
     "items": [
+      {
+        "headline": "Some Green Coffee Importers Are Now Issuing Tariff Refunds",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 60.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "Build-Outs Of Coffee: The Wild Fox In San Francisco, CA",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
@@ -252,8 +261,8 @@
       {
         "headline": "Build-Outs Of Coffee: Nandan Coffee In Bangalore, India",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -262,7 +271,7 @@
         "headline": "America\u2019s Next Hotbed For Coffee Production Is\u2026 Florida?",
         "source": "Sprudge",
         "sentiment": "Bearish",
-        "confidence": 75.0,
+        "confidence": 70.0,
         "tags": [
           "sprudge"
         ]
@@ -270,8 +279,8 @@
       {
         "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 90.0,
+        "sentiment": "Bullish",
+        "confidence": 65.0,
         "tags": [
           "sprudge"
         ]
@@ -279,8 +288,8 @@
       {
         "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
         "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "sentiment": "Bullish",
+        "confidence": 60.0,
         "tags": [
           "sprudge"
         ]
@@ -289,25 +298,7 @@
         "headline": "The Dog Days Of Coffee Are Here",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "New Study Finds Drinking Coffee Protects Against Liver Disease, Cancer, And Death",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 90.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The San Franciscan Roaster Company Enters New Chapter Under New Ownership And Leadership",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 60.0,
         "tags": [
           "sprudge"
         ]
