@@ -298,7 +298,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=113.0]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=174.6]"
     },
     {
       "id": "AGRO_uganda_Masaka_severe_defoliation",
@@ -349,6 +349,18 @@
       "text": "uganda/Mt Elgon: Irreversible yield reduction likely. Bean size shrinkage.  [vhi=24.22, spei_3=-2.09]"
     },
     {
+      "id": "AGRO_ethiopia_Limu_blossom_drop",
+      "name": "Flowering Disruption / Blossom Drop",
+      "category": "AGRO",
+      "categoryLabel": "Agronomic",
+      "market": "PHYS",
+      "severity": "watch",
+      "timeframe": "forecast",
+      "score": 0,
+      "magnitude": "medium",
+      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=51.9]"
+    },
+    {
       "id": "AGRO_ethiopia_Kaffa_severe_defoliation",
       "name": "Severe Defoliation / Bean Shrinkage",
       "category": "AGRO",
@@ -370,7 +382,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=60.1]"
+      "text": "ethiopia/Kaffa: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.85, forecast_7d_rain=51.8]"
     }
   ],
   "history": [
@@ -2985,5 +2997,5 @@
       "priceLDN": 3872
     }
   ],
-  "generatedAt": "2026-07-16T22:05:17.140Z"
+  "generatedAt": "2026-07-17T04:52:53.820Z"
 }
