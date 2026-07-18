@@ -22,60 +22,60 @@
     },
     {
       "month": "Jul",
-      "value": 2225938,
+      "value": 3034389,
       "status": "certificados",
       "ym": "2026-07"
     },
     {
       "month": "Aug",
-      "value": 4502103,
+      "value": 4404867,
       "status": "seasonality",
       "ym": "2026-08"
     },
     {
       "month": "Sep",
-      "value": 5363824,
+      "value": 5247976,
       "status": "seasonality",
       "ym": "2026-09"
     },
     {
       "month": "Oct",
-      "value": 5889187,
+      "value": 5761993,
       "status": "seasonality",
       "ym": "2026-10"
     },
     {
       "month": "Nov",
-      "value": 5144212,
+      "value": 5033108,
       "status": "seasonality",
       "ym": "2026-11"
     },
     {
       "month": "Dec",
-      "value": 4473909,
+      "value": 4377282,
       "status": "seasonality",
       "ym": "2026-12"
     },
     {
       "month": "Jan",
-      "value": 3964085,
+      "value": 3878469,
       "status": "seasonality",
       "ym": "2027-01"
     },
     {
       "month": "Feb",
-      "value": 3738471,
+      "value": 3657728,
       "status": "seasonality",
       "ym": "2027-02"
     },
     {
       "month": "Mar",
-      "value": 4356072,
+      "value": 4261990,
       "status": "seasonality",
       "ym": "2027-03"
     }
   ],
-  "generated_at": "2026-07-17T19:08:37Z",
+  "generated_at": "2026-07-18T19:03:44Z",
   "target_source": "Manual override (USDA FAS GAIN report BR2026-0025 \u2014 Brazil Coffee Annual, June 1 2026)",
   "safeguard_triggered": false,
   "realized_through": "2026-05",
