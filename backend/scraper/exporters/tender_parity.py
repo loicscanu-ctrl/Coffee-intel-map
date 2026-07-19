@@ -22,7 +22,7 @@ the per-origin event study becomes statistically viable. Must run AFTER
 origin_prices_history, freight and futures_price_history in the export order.
 """
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from scraper.exporters.base import OUT_DIR
 from scraper.validate_export import safe_write_json, validate_tender_parity
@@ -164,7 +164,7 @@ def export_tender_parity() -> None:
         }
 
     payload = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "meta": {
             "adders_usd": PARITY_ADDERS_USD, "container_mt": CONTAINER_MT,
             "note": "differential = at_port − RC; parity_gap = RC − tendering (≥0 ⇒ tenderable). "
