@@ -268,7 +268,7 @@
         ]
       },
       {
-        "headline": "America\u2019s Next Hotbed For Coffee Production Is\u2026 Florida?",
+        "headline": "America’s Next Hotbed For Coffee Production Is… Florida?",
         "source": "Sprudge",
         "sentiment": "Bearish",
         "confidence": 70.0,
@@ -277,7 +277,7 @@
         ]
       },
       {
-        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
+        "headline": "In Washington, D.C., Coffee Meets Fine Dining At Jônt",
         "source": "Sprudge",
         "sentiment": "Bullish",
         "confidence": 65.0,
@@ -312,23 +312,23 @@
   "sentiment_calibration": {
     "available": false,
     "warmup": true,
-    "reason": "accumulating \u2014 1/8 paired days",
+    "reason": "accumulating — 1/8 paired days",
     "n": 1,
     "min_sample": 8,
     "horizon_days": 5
   },
   "open_direction": {
     "available": true,
-    "as_of": "2026-07-16",
-    "for_session": "2026-07-17",
-    "scraped_at": "2026-07-17T05:52:40.280086Z",
+    "as_of": "2026-07-17",
+    "for_session": "2026-07-20",
+    "scraped_at": "2026-07-20T06:24:51.814020Z",
     "direction": "Abstain",
-    "base_margin": -0.14496099915632582,
-    "final_margin": 0.38030736105977053,
-    "base_prob": 0.46382307892231844,
-    "final_prob": 0.5939472325449761,
-    "prob_up": 0.5939472325449761,
-    "prob_down": 0.40605276745502394,
+    "base_margin": -0.14305632689801506,
+    "final_margin": 0.40474329185332547,
+    "base_prob": 0.46429678670742136,
+    "final_prob": 0.5998267516010097,
+    "prob_up": 0.5998267516010097,
+    "prob_down": 0.40017324839899027,
     "regime": {
       "ny_shock": false,
       "vol_regime": "high",
@@ -338,37 +338,37 @@
       "brent_overnight_pct": null,
       "oil_shock": false
     },
-    "expected_gap_pct": 0.111,
-    "expected_gap_usd_mt": 4.2,
+    "expected_gap_pct": 0.115,
+    "expected_gap_usd_mt": 4.4,
     "features": [
       {
         "var_name": "kc_after_rc_diff",
         "label": "NY after RC-Close Move",
-        "raw_value": 0.0035160620105481044,
-        "raw_fmt": "+0.35%",
-        "z": 0.86,
-        "usd_per_ton": 13.4,
-        "phi": 0.3559481619052107,
+        "raw_value": 0.0035943116111893936,
+        "raw_fmt": "+0.36%",
+        "z": 0.88,
+        "usd_per_ton": 13.9,
+        "phi": 0.3649396365266392,
         "detail": {
-          "text": "KC at RC close (17:30 London) 312.85\u00a2/lb \u2192 KC close (18:30) 313.95\u00a2/lb = +24.3 $/t on arabica; +0.35% mapped on robusta \u2248 +13.4 $/t"
+          "text": "KC at RC close (17:30 London) 319.95¢/lb → KC close (18:30) 321.10¢/lb = +25.4 $/t on arabica; +0.36% mapped on robusta ≈ +13.9 $/t"
         }
       },
       {
         "var_name": "days_since_roll",
         "label": "Roll-Cycle Position",
-        "raw_value": 31.0,
-        "raw_fmt": "day 31",
-        "z": 1.03,
+        "raw_value": 32.0,
+        "raw_fmt": "day 32",
+        "z": 1.1,
         "usd_per_ton": null,
-        "phi": 0.16932019831088563,
+        "phi": 0.1828599822247013,
         "detail": {
-          "text": "day 31 of the bi-monthly front-contract cycle \u2014 gaps historically tilt down mid-cycle (~day 10), up late-cycle"
+          "text": "day 32 of the bi-monthly front-contract cycle — gaps historically tilt down mid-cycle (~day 10), up late-cycle"
         }
       }
     ],
     "target": {
       "kind": "overnight_gap",
-      "definition": "RC first-bar open \u00f7 prior 17:30-London close \u2212 1; roll days excluded",
+      "definition": "RC first-bar open ÷ prior 17:30-London close − 1; roll days excluded",
       "abstain_band": 0.1
     },
     "model": {
@@ -378,18 +378,18 @@
         "days_since_roll"
       ],
       "n_features": 2,
-      "n_train": 1160,
-      "test_accuracy": 0.5737885462555066,
-      "baseline_accuracy": 0.5363436123348018,
-      "edge": 0.037444933920704804,
+      "n_train": 1161,
+      "test_accuracy": 0.5742574257425742,
+      "baseline_accuracy": 0.5357535753575358,
+      "edge": 0.03850385038503845,
       "acted_accuracy": 0.6388059701492538,
       "acted_n": 335,
-      "abstain_rate": 0.6310572687224669,
+      "abstain_rate": 0.6314631463146315,
       "eval_method": "walk_forward",
-      "n_test": 908,
-      "mag_mae_pct": 0.30321182543092134,
-      "mag_baseline_mae_pct": 0.31045086108810716,
-      "mag_skill": 0.02331781471571237,
+      "n_test": 909,
+      "mag_mae_pct": 0.3028996901941241,
+      "mag_baseline_mae_pct": 0.31025393009555025,
+      "mag_skill": 0.02370393792968617,
       "cci_available": false,
       "intraday_source": "barchart_15min",
       "roll_days_excluded": 88
