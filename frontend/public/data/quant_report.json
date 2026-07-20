@@ -228,41 +228,219 @@
       }
     ]
   },
-  "scraped_at": "2026-07-20T22:30:36.451425+00:00",
+  "scraped_at": "2026-07-20T22:31:12.705111Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-17T22:22:58.352128Z",
-    "overall_sentiment": "Bullish",
-    "overall_confidence": 70.0,
-    "net_index": 30.0,
-    "bull_count": 4,
-    "bear_count": 1,
-    "neutral_count": 2,
-    "total": 7,
+    "scraped_at": "2026-07-20T22:31:11.287614Z",
+    "overall_sentiment": "Neutral",
+    "overall_confidence": 91.1,
+    "net_index": -5.4,
+    "bull_count": 6,
+    "bear_count": 8,
+    "neutral_count": 9,
+    "total": 23,
     "items": [
       {
-        "headline": "Some Green Coffee Importers Are Now Issuing Tariff Refunds",
+        "headline": "Caf\u00e9 fecha em alta nas bolsas com mercado ainda sustentado por atraso da safra brasileira",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Rejoice! Pope Leo Loves Drinking Coffee (And He Likes It Strong)",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 60.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
       },
       {
-        "headline": "Build-Outs Of Coffee: The Wild Fox In San Francisco, CA",
-        "source": "Sprudge",
+        "headline": "Colheita de caf\u00e9 supera metade do previsto na \u00e1rea de atua\u00e7\u00e3o da Expocacer",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 65.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 amplia ganhos em Nova York com atraso da colheita no Brasil; robusta opera perto da estabilidade",
+        "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: Blue Sparrow Coffee In Denver, CO",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 abre a semana com leves oscila\u00e7\u00f5es nas bolsas e mercado segue atento ao ritmo da colheita no Brasil",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Neutral",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 encerra semana em alta com atraso da colheita no Brasil sustentando as cota\u00e7\u00f5es",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 90.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Colheita de caf\u00e9 do Brasil atinge 64% do total, mas segue atrasada, diz Safras & Mercado",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 abre sem dire\u00e7\u00e3o \u00fanica nas bolsas ap\u00f3s forte volatilidade; mercado acompanha cen\u00e1rio comercial e oferta global",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Neutral",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "CNC representa o cooperativismo cafeeiro no 17\u00ba Workshop do Produtor Rural promovido pelo Sicoob",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Some Green Coffee Importers Are Now Issuing Tariff Refunds",
+        "source": "Sprudge",
+        "sentiment": "Bearish",
         "confidence": 75.0,
         "tags": [
           "sprudge"
         ]
       },
       {
+        "headline": "Caf\u00e9 despenca nas bolsas e encerra sess\u00e3o com perdas superiores a 4% em Nova York diante do avan\u00e7o da colheita no Brasil",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 90.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Entidades celebram isen\u00e7\u00e3o de todos os caf\u00e9s do Brasil do tarifa\u00e7o de 25% dos EUA",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "BSCA celebra isen\u00e7\u00e3o dos caf\u00e9s do Brasil do tarifa\u00e7o de 25% dos EUA",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 amplia perdas nas bolsas com press\u00e3o t\u00e9cnica e cautela sobre a safra brasileira",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 70.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Build-Outs Of Coffee: The Wild Fox In San Francisco, CA",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 95.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Pre\u00e7os do caf\u00e9 no Vietn\u00e3 sobem em mercado com baixa atividade",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 70.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 sol\u00favel do Brasil passa a ficar isento de tarifas dos EUA e garante exporta\u00e7\u00f5es",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 abre em queda nas bolsas, mas mercado segue sustentado por oferta restrita e ritmo lento da safra brasileira",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 75.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Exporta\u00e7\u00e3o de caf\u00e9 do Brasil pode saltar em 26/27, mas h\u00e1 desafios na qualidade, diz Cecaf\u00e9",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 70.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
         "headline": "Build-Outs Of Coffee: Nandan Coffee In Bangalore, India",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 80.0,
+        "sentiment": "Neutral",
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
@@ -270,8 +448,8 @@
       {
         "headline": "America\u2019s Next Hotbed For Coffee Production Is\u2026 Florida?",
         "source": "Sprudge",
-        "sentiment": "Bearish",
-        "confidence": 70.0,
+        "sentiment": "Neutral",
+        "confidence": 80.0,
         "tags": [
           "sprudge"
         ]
@@ -279,26 +457,8 @@
       {
         "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
         "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 65.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Coffee Equipment Pros In Spicewood, TX",
-        "source": "Sprudge",
-        "sentiment": "Bullish",
-        "confidence": 60.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "The Dog Days Of Coffee Are Here",
-        "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 60.0,
+        "confidence": 95.0,
         "tags": [
           "sprudge"
         ]
