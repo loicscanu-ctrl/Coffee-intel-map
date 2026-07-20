@@ -1,5 +1,49 @@
 [
   {
+    "id": 8503,
+    "title": "ICE RC Robusta Certified Stocks \u2013 2026-07-17",
+    "body": "RC Robusta certified stocks shifted by -14 lots today, bringing global visible exchange inventory to 4,137 lots. 102 lots graded.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "rc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/marketdata/publicdocs/liffe/coffee/stock_reports/Stock_Report_RC_20260717_103031.csv\", \"_commentary\": {\"text\": \"RC Robusta certified stocks shifted by -14 lots today, bringing global visible exchange inventory to 4,137 lots. 102 lots graded.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-20T05:10:50.878041",
+    "commentary": {
+      "text": "RC Robusta certified stocks shifted by -14 lots today, bringing global visible exchange inventory to 4,137 lots. 102 lots graded.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
+    "id": 8502,
+    "title": "ICE KC Arabica Certified Stocks \u2013 2026-07-17",
+    "body": "KC Arabica certified stocks shifted by -1,309 bags today, bringing global visible exchange inventory to 332,945 bags.",
+    "source": "ICE",
+    "category": "supply",
+    "lat": null,
+    "lng": null,
+    "tags": [
+      "ice",
+      "certified-stocks",
+      "kc",
+      "auto-commentary"
+    ],
+    "meta": "{\"source_url\": \"https://www.ice.com/publicdocs/futures_us_reports/coffee/coffee_cert_stock_20260717.xls\", \"_commentary\": {\"text\": \"KC Arabica certified stocks shifted by -1,309 bags today, bringing global visible exchange inventory to 332,945 bags.\", \"hasUpdate\": true, \"isLatestTradingDay\": true}}",
+    "pub_date": "2026-07-20T05:10:47.978051",
+    "commentary": {
+      "text": "KC Arabica certified stocks shifted by -1,309 bags today, bringing global visible exchange inventory to 332,945 bags.",
+      "hasUpdate": true,
+      "isLatestTradingDay": true
+    }
+  },
+  {
     "id": 8501,
     "title": "World Bank Population \u2013 2026-07-20",
     "body": "Tracked 15 countries for demand-tab per-capita normalization.",
@@ -3914,35 +3958,5 @@
     "sentiment_confidence": 75.0,
     "sentiment_method": "deterministic",
     "sentiment_reason": "Brazil exports -9.1% YoY"
-  },
-  {
-    "id": 8062,
-    "title": "USD/UGX FX Rate \u2013 2026-07-12",
-    "body": "USD/UGX FX Rate price: 3657",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 1.3733,
-    "lng": 32.2903,
-    "tags": [
-      "fx",
-      "uganda"
-    ],
-    "meta": null,
-    "pub_date": "2026-07-12T04:33:36.435199"
-  },
-  {
-    "id": 8061,
-    "title": "USD/HNL FX Rate \u2013 2026-07-12",
-    "body": "USD/HNL FX Rate price: 26.7659",
-    "source": "ExchangeRate-API",
-    "category": "general",
-    "lat": 15.2,
-    "lng": -86.242,
-    "tags": [
-      "fx",
-      "honduras"
-    ],
-    "meta": null,
-    "pub_date": "2026-07-12T04:33:35.244537"
   }
 ]
