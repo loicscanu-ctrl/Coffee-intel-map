@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-07-20T05:57:00.541907Z",
+  "generated_at": "2026-07-20T21:16:10.751221Z",
   "tickers": [
     {
       "label": "KCU26",
-      "value": "320.30 (+7.70)",
+      "value": "324.55 (+4.25)",
       "category": "futures"
     },
     {
       "label": "RMU26",
-      "value": "3,877 (+80)",
+      "value": "3,884 (+7)",
       "category": "futures"
     },
     {
       "label": "B3 4/5 Sep '26",
-      "value": "384.85 USD/sac",
+      "value": "387.20 USD/sac",
       "category": "futures"
     },
     {
@@ -28,12 +28,12 @@
     },
     {
       "label": "UGA S15",
-      "value": "183.57 ($4,047)",
+      "value": "187.20 ($4,127)",
       "category": "physical"
     },
     {
       "label": "GT SHB",
-      "value": "Q2,259.06 ($6,533)",
+      "value": "Q2,300.48 ($6,657)",
       "category": "physical"
     },
     {
