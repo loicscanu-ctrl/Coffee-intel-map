@@ -16602,9 +16602,9 @@
         "mm_short": 2502,
         "mm_spread": 204,
         "oi_total": 12736,
-        "close_price": 0.123900003433228,
-        "gross_exposure_usd": 1291285.8357811023,
-        "net_exposure_usd": 51294.6014213564,
+        "close_price": 12.66,
+        "gross_exposure_usd": 131942520.0,
+        "net_exposure_usd": 5241240.0,
         "initial_margin_usd": 7423185
       },
       {
@@ -16958,9 +16958,9 @@
         "mm_short": 2611,
         "mm_spread": 259,
         "oi_total": 12337,
-        "close_price": 0.118400001525879,
-        "gross_exposure_usd": 1022976.0131835944,
-        "net_exposure_usd": -213593.6027526857,
+        "close_price": 12.66,
+        "gross_exposure_usd": 109382400.0,
+        "net_exposure_usd": -22838640.0,
         "initial_margin_usd": 6267635
       },
       {
@@ -17314,9 +17314,9 @@
         "mm_short": 2555,
         "mm_spread": 108,
         "oi_total": 11653,
-        "close_price": 0.128950004577637,
-        "gross_exposure_usd": 992915.035247805,
-        "net_exposure_usd": -324954.01153564523,
+        "close_price": null,
+        "gross_exposure_usd": null,
+        "net_exposure_usd": null,
         "initial_margin_usd": 5430370
       },
       {
@@ -17670,9 +17670,9 @@
         "mm_short": 2710,
         "mm_spread": 87,
         "oi_total": 13644,
-        "close_price": 0.13335000038147,
-        "gross_exposure_usd": 1326565.8037948634,
-        "net_exposure_usd": -118948.20034027123,
+        "close_price": null,
+        "gross_exposure_usd": null,
+        "net_exposure_usd": null,
         "initial_margin_usd": 6949305
       }
     ]
@@ -17961,9 +17961,9 @@
         "mm_short": 2804,
         "mm_spread": 88,
         "oi_total": 12708,
-        "close_price": 0.136000003814697,
-        "gross_exposure_usd": 1392912.0390701268,
-        "net_exposure_usd": -132464.00371551487,
+        "close_price": null,
+        "gross_exposure_usd": null,
+        "net_exposure_usd": null,
         "initial_margin_usd": 7152695
       },
       {
@@ -18044,9 +18044,9 @@
         "mm_short": 119187,
         "mm_spread": 272638,
         "oi_total": 1875496,
-        "close_price": 4.01429986953735,
-        "gross_exposure_usd": 1205686937.2158039,
-        "net_exposure_usd": 248782220.1147077,
+        "close_price": 72.3899993896484,
+        "gross_exposure_usd": 21742191536.682117,
+        "net_exposure_usd": 4486297822.174069,
         "initial_margin_usd": 1518634860
       },
       {
@@ -18057,9 +18057,9 @@
         "mm_short": 14709,
         "mm_spread": 16730,
         "oi_total": 412348,
-        "close_price": 4.01429986953735,
-        "gross_exposure_usd": 2338731103.9924603,
-        "net_exposure_usd": 1157804368.3719625,
+        "close_price": 3.27099990844727,
+        "gross_exposure_usd": 1905684546.6613796,
+        "net_exposure_usd": 943421793.5943617,
         "initial_margin_usd": 374185440
       },
       {
@@ -18070,9 +18070,9 @@
         "mm_short": 25667,
         "mm_spread": 17056,
         "oi_total": 262842,
-        "close_price": 2.90400004386902,
-        "gross_exposure_usd": 7566772866.306786,
-        "net_exposure_usd": 1305667459.7239501,
+        "close_price": 3.3831000328064,
+        "gross_exposure_usd": 8815134003.281603,
+        "net_exposure_usd": 1521075605.7500856,
         "initial_margin_usd": 483016884
       },
       {
@@ -18083,9 +18083,9 @@
         "mm_short": 13650,
         "mm_spread": 31875,
         "oi_total": 324652,
-        "close_price": 2.90400004386902,
-        "gross_exposure_usd": 11711977376.925951,
-        "net_exposure_usd": 8382250926.625732,
+        "close_price": 2.84669995307922,
+        "gross_exposure_usd": 11480883245.76615,
+        "net_exposure_usd": 8216857079.5655155,
         "initial_margin_usd": 592369575
       },
       {
@@ -18096,9 +18096,9 @@
         "mm_short": 16126,
         "mm_spread": 18475,
         "oi_total": 383689,
-        "close_price": 4.01429986953735,
-        "gross_exposure_usd": 61431232.33351702,
-        "net_exposure_usd": 48484312.39428516,
+        "close_price": 4116.2998046875,
+        "gross_exposure_usd": 62992147541.11328,
+        "net_exposure_usd": 49716257411.03516,
         "initial_margin_usd": 5961061055
       },
       {
@@ -18109,9 +18109,9 @@
         "mm_short": 6053,
         "mm_spread": 6975,
         "oi_total": 105023,
-        "close_price": 79.3399963378906,
-        "gross_exposure_usd": 9364896467.742918,
-        "net_exposure_usd": 4562446489.410399,
+        "close_price": 60.3849983215332,
+        "gross_exposure_usd": 7127543276.882172,
+        "net_exposure_usd": 3472439328.479767,
         "initial_margin_usd": 1473886503
       },
       {
@@ -18122,9 +18122,9 @@
         "mm_short": 17153,
         "mm_spread": 29404,
         "oi_total": 259873,
-        "close_price": 79.3399963378906,
-        "gross_exposure_usd": 187422889849.0905,
-        "net_exposure_usd": 119376941989.89864,
+        "close_price": 6.17049980163574,
+        "gross_exposure_usd": 14576417418.909067,
+        "net_exposure_usd": 9284288264.036175,
         "initial_margin_usd": 1266687840
       },
       {
@@ -18135,9 +18135,9 @@
         "mm_short": 282967,
         "mm_spread": 221360,
         "oi_total": 1707063,
-        "close_price": 0.0322729992866516,
-        "gross_exposure_usd": 93155205.61593768,
-        "net_exposure_usd": 1833267.724478244,
+        "close_price": 4.635,
+        "gross_exposure_usd": 13378811625.0,
+        "net_exposure_usd": 263291175.0,
         "initial_margin_usd": 686509615
       },
       {
@@ -18148,9 +18148,9 @@
         "mm_short": 110907,
         "mm_spread": 83702,
         "oi_total": 429298,
-        "close_price": 0.793399963378906,
-        "gross_exposure_usd": 741539374.7726438,
-        "net_exposure_usd": -138396722.61199945,
+        "close_price": 6.1775,
+        "gross_exposure_usd": 5773707712.5,
+        "net_exposure_usd": -1077572212.5,
         "initial_margin_usd": 376101385
       },
       {
@@ -18161,9 +18161,9 @@
         "mm_short": 70739,
         "mm_spread": 150351,
         "oi_total": 1004746,
-        "close_price": 0.793399963378906,
-        "gross_exposure_usd": 859525883.326721,
-        "net_exposure_usd": 298282683.2321166,
+        "close_price": 11.965,
+        "gross_exposure_usd": 12962222925.0,
+        "net_exposure_usd": 4498301575.0,
         "initial_margin_usd": 575903460
       },
       {
@@ -18174,9 +18174,9 @@
         "mm_short": 72771,
         "mm_spread": 68065,
         "oi_total": 599353,
-        "close_price": 4061.10009765625,
-        "gross_exposure_usd": 78021042856.15234,
-        "net_exposure_usd": 18914979814.84375,
+        "close_price": 315.899993896484,
+        "gross_exposure_usd": 6069007502.740471,
+        "net_exposure_usd": 1471335811.5722637,
         "initial_margin_usd": 361253365
       },
       {
@@ -18187,9 +18187,9 @@
         "mm_short": 25376,
         "mm_spread": 84189,
         "oi_total": 638102,
-        "close_price": 4.3375,
-        "gross_exposure_usd": 41300894250.00001,
-        "net_exposure_usd": 28092686250.000004,
+        "close_price": 0.6725,
+        "gross_exposure_usd": 6403423950.0,
+        "net_exposure_usd": 4355580750.0,
         "initial_margin_usd": 417524415
       },
       {
@@ -18200,9 +18200,9 @@
         "mm_short": 10967,
         "mm_spread": 44806,
         "oi_total": 311766,
-        "close_price": 12.0725,
-        "gross_exposure_usd": 57981320100.0,
-        "net_exposure_usd": 47389391500.0,
+        "close_price": 2.38350006103516,
+        "gross_exposure_usd": 11447378753.137226,
+        "net_exposure_usd": 9356191139.587418,
         "initial_margin_usd": 485137070
       },
       {
@@ -18213,9 +18213,9 @@
         "mm_short": 7603,
         "mm_spread": 11135,
         "oi_total": 65681,
-        "close_price": 12.0725,
-        "gross_exposure_usd": 15991233500.0,
-        "net_exposure_usd": 6812511750.0,
+        "close_price": 3.60850006103516,
+        "gross_exposure_usd": 4779819180.847173,
+        "net_exposure_usd": 2036276584.4421406,
         "initial_margin_usd": 192607525
       },
       {
@@ -18226,9 +18226,9 @@
         "mm_short": 90943,
         "mm_spread": 50414,
         "oi_total": 284729,
-        "close_price": 4.3375,
-        "gross_exposure_usd": 24065317500.0,
-        "net_exposure_usd": -7491903500.0,
+        "close_price": 0.969250030517578,
+        "gross_exposure_usd": 5377593019.317626,
+        "net_exposure_usd": -1674127422.7111814,
         "initial_margin_usd": 348106990
       },
       {
@@ -18239,9 +18239,9 @@
         "mm_short": 22759,
         "mm_spread": 33290,
         "oi_total": 322307,
-        "close_price": 0.587719993591309,
-        "gross_exposure_usd": 2628401355.339052,
-        "net_exposure_usd": 1290809421.924592,
+        "close_price": 0.806800003051758,
+        "gross_exposure_usd": 3608170973.648072,
+        "net_exposure_usd": 1771974846.702576,
         "initial_margin_usd": 124280336
       },
       {
@@ -18252,9 +18252,9 @@
         "mm_short": 282241,
         "mm_spread": 112017,
         "oi_total": 1000488,
-        "close_price": 0.587719993591309,
-        "gross_exposure_usd": 30388932094.229145,
-        "net_exposure_usd": -6767891937.080693,
+        "close_price": 0.151000003814697,
+        "gross_exposure_usd": 7807678677.2445545,
+        "net_exposure_usd": -1738841147.9281585,
         "initial_margin_usd": 407374381
       },
       {
@@ -18265,9 +18265,9 @@
         "mm_short": 10374,
         "mm_spread": 25706,
         "oi_total": 166843,
-        "close_price": 6.3125,
-        "gross_exposure_usd": 12683864062.5,
-        "net_exposure_usd": 7772423437.5,
+        "close_price": 3.17399993896484,
+        "gross_exposure_usd": 6377597427.360527,
+        "net_exposure_usd": 3908066774.848933,
         "initial_margin_usd": 416556812
       },
       {
@@ -18278,9 +18278,9 @@
         "mm_short": 26423,
         "mm_spread": 31773,
         "oi_total": 203748,
-        "close_price": 631.25,
-        "gross_exposure_usd": 288683250.0,
-        "net_exposure_usd": -44907125.0,
+        "close_price": 5779.0,
+        "gross_exposure_usd": 2642852280.0,
+        "net_exposure_usd": -411118060.0,
         "initial_margin_usd": 243875007
       },
       {
@@ -18291,9 +18291,9 @@
         "mm_short": 2863,
         "mm_spread": 157,
         "oi_total": 9264,
-        "close_price": 6.3125,
-        "gross_exposure_usd": 494174062.5,
-        "net_exposure_usd": -48006562.5,
+        "close_price": 1.5675,
+        "gross_exposure_usd": 122711737.5,
+        "net_exposure_usd": -11920837.5,
         "initial_margin_usd": 25216042
       },
       {
@@ -18317,9 +18317,9 @@
         "mm_short": 2639,
         "mm_spread": 91,
         "oi_total": 13076,
-        "close_price": 0.0632999992370605,
-        "gross_exposure_usd": 690096.5916824336,
-        "net_exposure_usd": 21901.799736022935,
+        "close_price": null,
+        "gross_exposure_usd": null,
+        "net_exposure_usd": null,
         "initial_margin_usd": 7610240
       },
       {
@@ -18330,9 +18330,9 @@
         "mm_short": 151560,
         "mm_spread": 189828,
         "oi_total": 2613572,
-        "close_price": 6.32999992370605,
-        "gross_exposure_usd": 2980613394.075392,
-        "net_exposure_usd": 1061863817.2016137,
+        "close_price": 76.1500015258789,
+        "gross_exposure_usd": 35856827368.49213,
+        "net_exposure_usd": 12774238905.967712,
         "initial_margin_usd": 2355624855
       },
       {
@@ -18343,9 +18343,9 @@
         "mm_short": 26671,
         "mm_spread": 46380,
         "oi_total": 804041,
-        "close_price": 767.149691588879,
-        "gross_exposure_usd": 9634479546.726414,
-        "net_exposure_usd": 5542349661.853016,
+        "close_price": 893.713535666466,
+        "gross_exposure_usd": 11223969551.728014,
+        "net_exposure_usd": 6456722809.77595,
         "initial_margin_usd": 1166516884
       },
       {
@@ -18356,9 +18356,9 @@
         "mm_short": 6920,
         "mm_spread": 20412,
         "oi_total": 172478,
-        "close_price": 1295.69925227127,
-        "gross_exposure_usd": 4701963016.567212,
-        "net_exposure_usd": 3805339133.995493,
+        "close_price": 332.897628409958,
+        "gross_exposure_usd": 1208052203.7368965,
+        "net_exposure_usd": 977687044.8772056,
         "initial_margin_usd": 113815828
       },
       {
@@ -18369,9 +18369,9 @@
         "mm_short": 2749,
         "mm_spread": 13820,
         "oi_total": 105776,
-        "close_price": 3849.0,
-        "gross_exposure_usd": 1930542930.0,
-        "net_exposure_usd": 1718924910.0,
+        "close_price": 3892.0,
+        "gross_exposure_usd": 1952110440.0,
+        "net_exposure_usd": 1738128280.0,
         "initial_margin_usd": 257695000
       },
       {
@@ -18382,9 +18382,9 @@
         "mm_short": 8543,
         "mm_spread": 16361,
         "oi_total": 232514,
-        "close_price": 631.25,
-        "gross_exposure_usd": 132922312.5,
-        "net_exposure_usd": 25066937.5,
+        "close_price": 5779.0,
+        "gross_exposure_usd": 1216884030.0,
+        "net_exposure_usd": 229484090.0,
         "initial_margin_usd": 160304633
       }
     ]
