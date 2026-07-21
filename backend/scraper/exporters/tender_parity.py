@@ -29,7 +29,13 @@ from scraper.validate_export import safe_write_json, validate_tender_parity
 
 OUT_PATH = OUT_DIR / "tender_parity_history.json"
 
-PARITY_ADDERS_USD = 72.0   # port transport ~7 + rent ~15 + loading-out ~40 + allowances ~10
+# Tenderable-parity adders beyond FOB + freight (USD/MT), per confirmed values:
+#   port transport 18  EU-average DTHC + DO from the Destination In-store cost research
+#                      (Bremen/Le Havre/Barcelona/Genoa/Trieste ≈ €16.3/t ≈ $18/t)
+#   rent            0  taken as financed by the chosen ICE-nominated warehouse
+#   loading-out    40  one-time load-out charge (OCA) when the buyer collects
+#   import duty     0  EU MFN tariff on green robusta (HS 0901.11) is 0%
+PARITY_ADDERS_USD = 58.0
 CONTAINER_MT      = 21.6
 LB_PER_MT         = 2204.62
 

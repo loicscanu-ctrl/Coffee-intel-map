@@ -21,26 +21,15 @@ import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
 import DeliveryProcessMethodology from "./methodology/DeliveryProcessMethodology";
 
-type Cat = "cot" | "signals" | "sentiment" | "futures" | "macro" | "weather" | "supply" | "farmer" | "fertilizer" | "contracts" | "delivery" | "agronomy" | "logistics" | "destination" | "freight" | "certstocks" | "parity" | "demand";
+// Top-level research categories. Each groups several articles/tools, which render
+// stacked as collapsible cards on the category page.
+type Cat = "quant" | "supply" | "logistics" | "exchange" | "demand";
 const CATS: { id: Cat; label: string }[] = [
-  { id: "cot",         label: "COT & positioning" },
-  { id: "signals",     label: "Signals & forecasts" },
-  { id: "sentiment",   label: "News & sentiment" },
-  { id: "futures",     label: "Futures analytics" },
-  { id: "macro",       label: "Macro & FX" },
-  { id: "weather",     label: "Weather" },
-  { id: "supply",      label: "Supply modelling" },
-  { id: "farmer",      label: "Farmer economics" },
-  { id: "fertilizer",  label: "Fertilizer" },
-  { id: "contracts",   label: "Contract rules" },
-  { id: "delivery",    label: "RC delivery process" },
-  { id: "agronomy",    label: "Agronomy" },
-  { id: "logistics",   label: "Origin Logistics" },
-  { id: "destination", label: "Destination In-store" },
-  { id: "freight",     label: "Freight & ports" },
-  { id: "certstocks",  label: "Certified stocks" },
-  { id: "parity",      label: "Tender parity" },
-  { id: "demand",      label: "Demand modelling" },
+  { id: "quant",     label: "Quant & positioning" },
+  { id: "supply",    label: "Supply" },
+  { id: "logistics", label: "Logistics" },
+  { id: "exchange",  label: "Exchange & certified stocks" },
+  { id: "demand",    label: "Demand" },
 ];
 
 function H({ children }: { children: React.ReactNode }) {
@@ -70,10 +59,52 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h3 className="text-base font-bold text-slate-100 mt-7 mb-1 pb-1 border-b border-slate-700">{children}</h3>;
 }
 
+// Collapsible research card. Collapsed by default — header (kicker/title/subtitle)
+// is always visible, body opens on "Read more". Two shapes:
+//   • default → a full bordered card whose body reveals inside it (prose articles)
+//   • bare    → just a clickable header bar; the child (a tool/dashboard that
+//               already renders its own card) appears below it when open.
+function CollapsibleCard({ kicker, title, subtitle, defaultOpen = false, bare = false, children }: {
+  kicker?: string; title: string; subtitle?: string; defaultOpen?: boolean; bare?: boolean; children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const header = (
+    <>
+      <div className="min-w-0">
+        {kicker && <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>}
+        <h3 className="text-base font-bold text-slate-100 leading-tight">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+      </div>
+      <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+        {open ? "▲ Less" : "▼ Read more"}
+      </span>
+    </>
+  );
+  if (bare) {
+    return (
+      <div>
+        <button onClick={() => setOpen(o => !o)}
+          className="group w-full flex items-start justify-between gap-3 text-left bg-slate-900 border border-slate-800 rounded-xl p-4">
+          {header}
+        </button>
+        {open && <div className="mt-3">{children}</div>}
+      </div>
+    );
+  }
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+      <button onClick={() => setOpen(o => !o)}
+        className="group w-full flex items-start justify-between gap-3 text-left">
+        {header}
+      </button>
+      {open && <div className="mt-3 space-y-1">{children}</div>}
+    </div>
+  );
+}
+
 function IntraweekMethodology() {
   return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+      <CollapsibleCard kicker="COT · positioning" title="Intraweek COT nowcast — methodology" subtitle="Bridging the weekly COT report with a daily positioning estimate">
         <H>What problem it solves</H>
         <P>
           The CFTC/ICE Commitments of Traders (COT) report is <strong>weekly</strong> — it tells you where each
@@ -171,14 +202,13 @@ function IntraweekMethodology() {
           prints the per-market multiplier and confidence-tier calibration. The model itself lives in
           <Code>lib/cot/intraweekModel.ts</Code>.
         </P>
-      </div>
+      </CollapsibleCard>
   );
 }
 
 function FrostRiskMethodology() {
   return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+      <CollapsibleCard kicker="Weather · tail risk" title="Frost risk — why radiative frost is the trade that matters" subtitle="The physics of Brazilian winter frost and how the monitor flags it">
         <H>Why frost is the trade that matters</H>
         <P>
           Frost is the single largest <strong>tail risk</strong> in coffee. Unlike drought, which trims a crop at the
@@ -335,29 +365,40 @@ function FrostRiskMethodology() {
           {" "}<Code>WeatherRiskPanel</Code> and the physics detail + historical anchor in <Code>FrostWatchPanel</Code>,
           on each origin&rsquo;s Farmer Economics tab.
         </P>
-      </div>
+      </CollapsibleCard>
   );
 }
 
 // Newspaper-style article card — bold headline over a double rule, justified
 // body. Used for the side-by-side contract-rule columns.
-function Article({ kicker, title, dateline, children }: {
-  kicker?: string; title: string; dateline?: string; children: React.ReactNode;
+function Article({ kicker, title, dateline, defaultOpen = false, children }: {
+  kicker?: string; title: string; dateline?: string; defaultOpen?: boolean; children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <article className="bg-slate-900 border border-slate-700 rounded-xl p-5">
-      {kicker && (
-        <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
+      <button onClick={() => setOpen(o => !o)}
+        className="group w-full flex items-start justify-between gap-3 text-left">
+        <div className="min-w-0">
+          {kicker && (
+            <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
+          )}
+          <h3 className="text-xl font-bold text-slate-100 leading-tight pb-2 border-b-2 border-double border-slate-600">
+            {title}
+          </h3>
+          {dateline && (
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-2">{dateline}</div>
+          )}
+        </div>
+        <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+          {open ? "▲ Less" : "▼ Read more"}
+        </span>
+      </button>
+      {open && (
+        <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
+          {children}
+        </div>
       )}
-      <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1 pb-2 border-b-2 border-double border-slate-600">
-        {title}
-      </h3>
-      {dateline && (
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-3 mt-2">{dateline}</div>
-      )}
-      <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
-        {children}
-      </div>
     </article>
   );
 }
@@ -371,9 +412,6 @@ function Spec({ k, children }: { k: string; children: React.ReactNode }) {
   );
 }
 
-function Tbc() {
-  return <span className="text-amber-400/90 text-[7px] font-bold ml-1 border border-amber-400/40 rounded px-0.5 align-middle">TBC</span>;
-}
 
 function PdfLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -405,31 +443,29 @@ function ContractRules() {
           <strong> $18.75 per contract</strong>.</Spec>
         <Spec k="Price basis">A basket of basis growths (Mexico, Nicaragua, Panama, PNG, El Salvador, Tanzania, Peru,
           Honduras, Uganda from the Mar 2026 month) with Board-set differentials for all other growths.</Spec>
-        <Spec k="Origin differentials">Basis growths at <strong>par</strong> (current list from Mar 2026 month: Mexico,
-          El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru; list revised Jan 2024). Board-set
-          premia and discounts — amounts below from prior rulebook, <em>verify in latest ICE Circular for current
-          values</em>:
-          <br />· <strong>Colombia</strong> <code>+0.04¢/lb</code><Tbc /> (historic; may have changed in Jan 2024 update)
-          <br />· <strong>Venezuela, Burundi, Rwanda, India</strong> <code>−0.01¢/lb</code><Tbc />
-          <br />· <strong>Dominican Republic, Ecuador</strong> <code>−0.04¢/lb</code><Tbc />
-          <br />· <strong>Brazil</strong> <code>−0.06¢/lb</code><Tbc /> (natural-process cup profile)
-          <br />· <strong>Vietnam</strong> (from May 2027) — differential TBD by ICE Board</Spec>
+        <Spec k="Origin differentials">Board-set premia and discounts vs. the basis (<strong>1 point = 0.01¢/lb</strong>,
+          i.e. 5 points = one 0.05¢ tick):
+          <br />· <strong>At par</strong>: Mexico, El Salvador, Nicaragua, PNG, Panama, Tanzania, Uganda, Honduras, Peru
+          <br />· <strong>Colombia, Costa Rica, Kenya</strong> <code>+1000 pts (+10.00¢/lb)</code>
+          <br />· <strong>Guatemala</strong> <code>+500 pts (+5.00¢/lb)</code>
+          <br />· <strong>Burundi, Rwanda, Venezuela, India</strong> <code>−100 pts (−1.00¢/lb)</code>
+          <br />· <strong>Dominican Republic, Ecuador</strong> <code>−400 pts (−4.00¢/lb)</code>
+          <br />· <strong>Brazil</strong> <code>−600 pts (−6.00¢/lb)</code> (natural-process cup profile)
+          <br />· <strong>Vietnam</strong> <code>−600 pts (−6.00¢/lb)</code> — deliverable from the May 2027 expiry</Spec>
         <Spec k="Delivery point allowances">New York District and Virginia: <strong>at par</strong>.
           New Orleans, Miami, Houston: <strong>−0.50¢/lb</strong>.
           Antwerp, Hamburg/Bremen, Barcelona: <strong>−1.25¢/lb</strong>. Deducted from invoice at delivery.</Spec>
         <Spec k="Weight allowance (outturn)">Tolerance <strong>±2% of 37,500 lb</strong>. Deficiency ≤2%: delivery
           permitted; buyer pays only for actual weight. Deficiency &gt;2%: not permitted without mutual consent.
           Excess &gt;2%: buyer not obligated to accept or pay for the excess weight.</Spec>
-        <Spec k="Age allowance"><Tbc /> Monthly deduction in ¢/lb accruing from certification date — <em>rates below from prior rulebook, verify in current ICE Chapter 8 circular</em>:
-          <br />· <strong>M1–M3</strong>: no deduction &nbsp;·&nbsp; <strong>M4</strong>: −0.50¢/lb (threshold step)
-          <br />· <strong>M5–Y1</strong>: −0.25¢/lb / month &nbsp;·&nbsp; <strong>Y1–Y2</strong>: −0.50¢/lb / month
-          <br />· <strong>Y2–Y3</strong>: −1.00¢/lb / month &nbsp;·&nbsp; <strong>Y3–Y4</strong>: −1.25¢/lb / month
-          <br />· <strong>Y4–Y5</strong>: −1.50¢/lb / month &nbsp;·&nbsp; <strong>Y5–Y6</strong>: −1.75¢/lb / month
-          <br />· <strong>Y6–Y7</strong>: −2.00¢/lb / month &nbsp;·&nbsp; <strong>Y7–Y8</strong>: −2.25¢/lb / month
-          <br />· <strong>Y8–Y9</strong>: −2.50¢/lb / month &nbsp;·&nbsp; <strong>Y9–Y10</strong>: −2.75¢/lb / month
-          <br />· <strong>Y10+</strong>: −3.00¢/lb / month
-          <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) allowing
-          traders to estimate aggregate deduction exposure across exchange stocks.</Spec>
+        <Spec k="Age allowance">A <strong>120-day &ldquo;safe-harbour&rdquo;</strong> window from certification: for the
+          first ~4 months a certified lot delivers <strong>at par</strong> with zero age penalty.
+          <br />· From <strong>day 121</strong> a cumulative age discount activates: a rolling deduction stepping up by
+          <strong> −0.25¢/lb per month</strong> is docked from the invoice for every month the lot keeps sitting.
+          <br />· Contract math: on a 37,500 lb lot, 0.25¢/lb = <strong>$93.75 per contract per month</strong>; a
+          lot bled down to a 1.00¢/lb penalty is <strong>−$375/contract</strong>.
+          <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) so traders
+          can estimate aggregate deduction exposure across exchange stocks.</Spec>
         <Spec k="Delivery mechanism">Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
           7 business days after the Delivery Notice.</Spec>
         <Spec k="Key dates">Last Notice Day = 7th business day before the last business day of the delivery month;
@@ -438,11 +474,14 @@ function ContractRules() {
           Virginia, Antwerp, Hamburg/Bremen and Barcelona.</Spec>
         <Spec k="Packaging">Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
           deforestation (EUDR) appendices apply.</Spec>
-        <Spec k="Storage / Rent">Accrues from certification date; deducted on invoice. Indicative licensed-warehouse
-          rates: <strong>≈ $0.85–1.25/bag/month</strong><Tbc /> (≈ $240–355/lot/month for a ~284-bag lot; EU locations may
-          differ). Exact rates per warehouse, approved by ICE — verify in current warehouse schedule.</Spec>
-        <Spec k="Loading Out Charge (OCA)">One-time charge paid by buyer when collecting from licensed warehouse.<Tbc />{" "}
-          <em>Exact amounts set per warehouse in ICE schedule — verify in current circular before tendering.</em></Spec>
+        <Spec k="Storage / Rent">Accrues from certification date; deducted on invoice. Per 69 kg bag / month:
+          <strong> New York ≈ $1.23–1.33</strong>, <strong>Antwerp ≈ $0.85–1.25</strong> (Molenbergnatie / Pacorini).
+          <br /><strong>RCA (Rent Cost Adjustment)</strong> — ICE enforces a mandatory rent adjustment on settlement:
+          <strong> 2 months</strong> for March / May / July deliveries, <strong>3 months</strong> for September /
+          December deliveries.</Spec>
+        <Spec k="Loading Out Charge (OCA)">One-time charge paid by the buyer to decertify and physically take the
+          coffee out of the warehouse — <strong>New York ≈ $2.42–2.60 per 69 kg bag</strong>. If the original jute
+          bags are damaged, <strong>rebagging</strong> adds a steep <strong>≈ $20–22 per bag</strong>.</Spec>
         <Spec k="Grading / Sampling fee">ICE charges <strong>$1.50 per bag</strong> (minimum $40 per EWR) for
           sampling and grading at certification — raised from $1.25/bag in Nov 2024. Appeal of a grade costs the same
           fee. Redelivery grading incurs a similar fee borne by the certifying party.</Spec>
@@ -461,9 +500,13 @@ function ContractRules() {
         <p className="mb-3 text-[10px] text-slate-400 bg-slate-800/60 rounded p-2 border border-slate-700/50">
           <strong className="text-slate-300">Tenderable parity</strong> — the break-even differential at which a trader
           is indifferent between selling FOB physical and tendering into the exchange — is:
-          {" "}<code className="text-amber-300">FOB + Freight + Port transport (~$7/t<Tbc />) + Rent (~$15/t<Tbc />) + Rent allowance + Loading Out (~$40/t<Tbc />) + Contract allowances</code>.
+          {" "}<code className="text-amber-300">FOB + Freight + Port transport (~$18/t) + Rent ($0) + Loading Out ($40/t) + Contract allowances</code>.
           If the physical FOB differential is <em>above</em> tenderable parity, traders sell commercial; below it, it pays
           to tender into the exchange. Certified stocks accumulate when FOB differentials compress toward or below parity.
+          {" "}Our operating adders beyond FOB + freight total <strong>≈ $58/t</strong>: <strong>port transport ~$18/t</strong>
+          {" "}(EU-average DTHC + DO from the Destination In-store cost research), <strong>rent $0</strong> (taken as
+          financed by the chosen ICE-nominated warehouse), <strong>loading-out $40/t</strong>, and <strong>import duty $0</strong>
+          {" "}(the EU MFN tariff on green robusta is nil). These are the values wired into the live tender-parity model.
         </p>
         <Spec k="Lot size">Nominal <strong>10 tonnes</strong> net, one Origin and shipment period, from no more than two
           parcels.</Spec>
@@ -485,11 +528,11 @@ function ContractRules() {
         <Spec k="Weight allowance">Two components:
           <br /><strong>1. Outturn tolerance</strong> — ±3% of 10 tonnes. Deviation within band settles at EDSP on
           the invoice; deficiency &gt;3% is non-conforming.
-          <br /><strong>2. Age-related moisture loss</strong><Tbc /> — from year 2 of storage: fixed deduction of
-          <strong>+0.75%</strong> of nominal weight, then an additional <strong>−0.065% per month</strong>, capping
-          at <strong>−1.5% of net weight</strong> (reached approximately at year 3). This allowance compensates the
-          holder for natural moisture loss during extended bonded storage; it is deducted from the invoice separately
-          from the outturn measurement.</Spec>
+          <br /><strong>2. Age-related moisture / weight loss</strong> — because robusta loses moisture as it sits,
+          ICE compensates the buyer through the per-tonne <em>Age allowance</em> above (−$5/tonne/month at 13–48
+          months&rsquo; grading age, −$10/tonne/month from 49 months), docked from the invoice by grading age rather
+          than as a separate physical weight cut. Parallel <strong>Transition-Stock allowances</strong> step up toward
+          −$10/tonne/month as the EU/UK (EUDR) deforestation-compliance rules phase in.</Spec>
         <Spec k="Packaging">Bags ≤80 kg gross; bulk in FIBCs of 900–1,100 kg.</Spec>
         <Spec k="Delivery areas">Amsterdam, Antwerp, Barcelona, Bremen, Felixstowe, Genoa-Savona, Hamburg, Le Havre,
           London (Tilbury), New Orleans, New York, Rotterdam, Trieste.</Spec>
@@ -501,22 +544,24 @@ function ContractRules() {
         <Spec k="Storage / Rent allowance">Rent accrues from warrant issue date. The invoice includes a <strong>rent
           allowance adjustment</strong>: if the delivery warehouse charges above the global average ICE-nominated rate, a
           deduction is applied; if below, an addition is made. Net effect: all lots settle at the same effective rent
-          regardless of warehouse location. Indicative warehouse rates: <strong>≈ €0.30–0.60/bag/month</strong><Tbc />
-          (≈ €5–10/tonne/month for ≤80 kg bags). Exact rates per ICE nominated warehouse schedule — verify before
-          tendering.</Spec>
-        <Spec k="Loading Out Charge">One-time charge paid by buyer when collecting from a licensed terminal.
-          EU ports indicatively <strong>≈ €4–8/tonne</strong><Tbc />; warehouse-specific.{" "}
-          <em>Exact current rate in ICE Section GGGG warehouse schedule — verify before tendering.</em></Spec>
-        <Spec k="Import-Duty allowance">For EU Customs Warehouse lots: the import duty on green Robusta coffee
-          (currently <strong>7.5% CIF</strong><Tbc /> in the EU) is deducted from the invoice, compensating the buyer
-          for the customs liability they assume on clearing. Amount calculated at EDSP × applicable tariff rate × net
-          weight.</Spec>
+          regardless of warehouse location. Published warehouse rates run <strong>≈ €0.30–0.60/bag/month</strong>
+          (≈ €5–10/tonne/month for ≤80 kg bags), but in our parity model <strong>rent is taken as $0</strong>: if we
+          choose the delivery warehouse, it can finance the rent for us, so it does not add to the tender-in cost.</Spec>
+        <Spec k="Loading Out Charge">One-time charge paid when collecting from the licensed terminal.
+          Wired into the parity model at <strong>$40/tonne</strong> (our confirmed operating figure).</Spec>
+        <Spec k="Import-Duty allowance">The EU MFN tariff on <strong>green</strong> robusta coffee (unroasted,
+          non-decaffeinated — HS <Code>0901.11</Code>) is <strong>0%</strong>, so for EU Customs Warehouse lots the
+          import-duty allowance is <strong>nil</strong> and it adds nothing to tender-in cost. (Duty applies only to
+          roasted/decaffeinated coffee, which is not deliverable.)</Spec>
         <Spec k="Transition Stock allowance (EUDR)">For lots delivered without Validated DDI documentation — EU/UK
           delivery areas only: <strong>−$5/t/month</strong> for 2026 delivery months; <strong>−$10/t/month</strong> from
           January 2027 onwards. US delivery areas: no allowance — transition stock without DDI not accepted.</Spec>
-        <Spec k="Grading / Sampling"><Tbc /> Sampling and grading required at certification. Fees set by ICE-nominated
-          graders — exact amounts in current ICE grading fee circular (not published openly online; contact ICE Commodity
-          Operations).</Spec>
+        <Spec k="Grading / Sampling">Required at certification, and heavily optimised for scale via <strong>grouped
+          lots</strong> (up to 50 tonnes of the same origin, vessel and bill of lading):
+          <br />· <strong>Single lot (10 t)</strong>: ≈ <strong>£72.50/lot</strong> (£7.25/tonne)
+          <br />· <strong>Grouped lot (50 t)</strong>: ≈ <strong>£87.50 total</strong> (£1.75/tonne)
+          <br />So grouping cuts the per-tonne grading cost roughly <strong>4×</strong>. (Contrast Arabica: $1.50/bag,
+          min $40 per EWR.)</Spec>
         <Spec k="Invoicing">EDSP × Net Outturn Weight, adjusted by: Quality Class allowance ± Age allowance ± Weight
           deviation ± Rent allowance − Import-Duty allowance (EU/UK) − Transition-Stock allowance (if applicable).</Spec>
         <PdfLink href="https://www.ice.com/publicdocs/contractregs/105_SECTION_GGGG.pdf">Full rulebook on ICE (PDF)</PdfLink>
@@ -528,7 +573,7 @@ function ContractRules() {
 
 function FertilizerMethodology() {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
+    <CollapsibleCard kicker="Supply · input cost" title="Fertilizer — why it's a coffee signal" subtitle="The largest cash input: short-term cost-push, medium-term yield lever">
       <H>Why fertilizer is a coffee signal</H>
       <P>
         Fertilizer is the largest cash input on a coffee farm and the one that swings most violently with the global
@@ -594,7 +639,7 @@ function FertilizerMethodology() {
         <LI>Benchmark prices are <strong>monthly</strong> and import data lags by weeks; treat the read as a trend, not a
           daily mark.</LI>
       </ul>
-    </div>
+    </CollapsibleCard>
   );
 }
 
@@ -1338,8 +1383,7 @@ function DestinationInstore() {
 
 function CertifiedStocksMethodology() {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-
+    <CollapsibleCard kicker="Exchange · certified stocks" title="Certified stocks — cohort flow methodology" subtitle="How daily stock totals and gradings reconcile into in / in-&-out / out flows">
       <H2>What this page documents</H2>
       <P>
         The <strong>Demand → Certified Stocks</strong> tab visualises the ICE-deliverable inventory the coffee
@@ -1581,13 +1625,13 @@ in & out (transit) = decerted bags whose cohort was graded in-window`}</Fml>
         <Code>frontend/components/demand/CertifiedStocksSystemFlow.tsx</Code> (<Code>buildDensityGrid</Code>); KPI tiles
         and the period selector live in <Code>CertifiedStocksPanel.tsx</Code>.
       </P>
-    </div>
+    </CollapsibleCard>
   );
 }
 
 export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
   const router = useRouter();
-  const [cat, setCat] = useState<Cat>(initialTab ?? "cot");
+  const [cat, setCat] = useState<Cat>(initialTab ?? "quant");
 
   useEffect(() => {
     if (initialTab && initialTab !== cat) setCat(initialTab);
@@ -1612,39 +1656,61 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
         ))}
       </div>
 
-      {cat === "cot" && (
+      {cat === "quant" && (
         <div className="space-y-4">
           <IntraweekMethodology />
-          <CotBacktestReport />
-        </div>
-      )}
-      {cat === "signals" && (
-        <div className="space-y-4">
+          <CollapsibleCard bare kicker="COT · positioning" title="COT backtest report"
+            subtitle="Walk-forward backtest of the intraweek positioning model">
+            <CotBacktestReport />
+          </CollapsibleCard>
           <SignalsMethodology />
-          <OpenDirectionRecord />
+          <CollapsibleCard bare kicker="Signals · track record" title="Open-price-direction — walk-forward record"
+            subtitle="Prediction vs. reality, out-of-sample">
+            <OpenDirectionRecord />
+          </CollapsibleCard>
+          <NewsSentimentMethodology />
+          <FuturesMethodology />
+          <MacroMethodology />
         </div>
       )}
-      {cat === "sentiment" && <NewsSentimentMethodology />}
-      {cat === "futures" && <FuturesMethodology />}
-      {cat === "macro" && <MacroMethodology />}
-      {cat === "weather" && (
+      {cat === "supply" && (
         <div className="space-y-4">
-          <EnsoExplainer />
+          <SupplyMethodology />
+          <FarmerMethodology />
+          <FertilizerMethodology />
+          <AgronomyArticles />
+          <CollapsibleCard bare kicker="Weather · ENSO" title="ENSO / El Niño — interactive explainer"
+            subtitle="Ocean–atmosphere simulation of the El Niño / La Niña cycle">
+            <EnsoExplainer />
+          </CollapsibleCard>
           <EnsoModelMethodology />
           <FrostRiskMethodology />
         </div>
       )}
-      {cat === "supply" && <SupplyMethodology />}
-      {cat === "farmer" && <FarmerMethodology />}
-      {cat === "fertilizer" && <FertilizerMethodology />}
-      {cat === "contracts" && <ContractRules />}
-      {cat === "delivery" && <DeliveryProcessMethodology />}
-      {cat === "agronomy"  && <AgronomyArticles />}
-      {cat === "logistics" && <OriginLogistics />}
-      {cat === "destination" && <DestinationInstore />}
-      {cat === "freight" && <FreightMethodology />}
-      {cat === "certstocks" && <CertifiedStocksMethodology />}
-      {cat === "parity" && <CertifiedStocksParity />}
+      {cat === "logistics" && (
+        <div className="space-y-4">
+          <CollapsibleCard bare kicker="Logistics · origin" title="Origin logistics — the FOBbing cost model"
+            subtitle="Farm-to-vessel cost stack by origin (Vietnam, Brazil, Uganda)">
+            <OriginLogistics />
+          </CollapsibleCard>
+          <CollapsibleCard bare kicker="Logistics · destination" title="Destination in-store cost"
+            subtitle="CIF → in-store cost & financing, live in USD off today's FAQ price and EUR/USD">
+            <DestinationInstore />
+          </CollapsibleCard>
+          <FreightMethodology />
+        </div>
+      )}
+      {cat === "exchange" && (
+        <div className="space-y-4">
+          <CertifiedStocksMethodology />
+          <CollapsibleCard bare kicker="Exchange · tender parity" title="Tender-parity tool"
+            subtitle="Cost-stack vs the exchange, origin gradings, and the parity→inflow study">
+            <CertifiedStocksParity />
+          </CollapsibleCard>
+          <ContractRules />
+          <DeliveryProcessMethodology />
+        </div>
+      )}
       {cat === "demand" && (
         <div className="space-y-4">
           <DemandArticles />
