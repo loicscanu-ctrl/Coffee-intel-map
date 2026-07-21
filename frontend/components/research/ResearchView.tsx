@@ -412,9 +412,6 @@ function Spec({ k, children }: { k: string; children: React.ReactNode }) {
   );
 }
 
-function Tbc() {
-  return <span className="text-amber-400/90 text-[7px] font-bold ml-1 border border-amber-400/40 rounded px-0.5 align-middle">TBC</span>;
-}
 
 function PdfLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -461,16 +458,14 @@ function ContractRules() {
         <Spec k="Weight allowance (outturn)">Tolerance <strong>±2% of 37,500 lb</strong>. Deficiency ≤2%: delivery
           permitted; buyer pays only for actual weight. Deficiency &gt;2%: not permitted without mutual consent.
           Excess &gt;2%: buyer not obligated to accept or pay for the excess weight.</Spec>
-        <Spec k="Age allowance"><Tbc /> Monthly deduction in ¢/lb accruing from certification date — <em>rates below from prior rulebook, verify in current ICE Chapter 8 circular</em>:
-          <br />· <strong>M1–M3</strong>: no deduction &nbsp;·&nbsp; <strong>M4</strong>: −0.50¢/lb (threshold step)
-          <br />· <strong>M5–Y1</strong>: −0.25¢/lb / month &nbsp;·&nbsp; <strong>Y1–Y2</strong>: −0.50¢/lb / month
-          <br />· <strong>Y2–Y3</strong>: −1.00¢/lb / month &nbsp;·&nbsp; <strong>Y3–Y4</strong>: −1.25¢/lb / month
-          <br />· <strong>Y4–Y5</strong>: −1.50¢/lb / month &nbsp;·&nbsp; <strong>Y5–Y6</strong>: −1.75¢/lb / month
-          <br />· <strong>Y6–Y7</strong>: −2.00¢/lb / month &nbsp;·&nbsp; <strong>Y7–Y8</strong>: −2.25¢/lb / month
-          <br />· <strong>Y8–Y9</strong>: −2.50¢/lb / month &nbsp;·&nbsp; <strong>Y9–Y10</strong>: −2.75¢/lb / month
-          <br />· <strong>Y10+</strong>: −3.00¢/lb / month
-          <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) allowing
-          traders to estimate aggregate deduction exposure across exchange stocks.</Spec>
+        <Spec k="Age allowance">A <strong>120-day &ldquo;safe-harbour&rdquo;</strong> window from certification: for the
+          first ~4 months a certified lot delivers <strong>at par</strong> with zero age penalty.
+          <br />· From <strong>day 121</strong> a cumulative age discount activates: a rolling deduction stepping up by
+          <strong> −0.25¢/lb per month</strong> is docked from the invoice for every month the lot keeps sitting.
+          <br />· Contract math: on a 37,500 lb lot, 0.25¢/lb = <strong>$93.75 per contract per month</strong>; a
+          lot bled down to a 1.00¢/lb penalty is <strong>−$375/contract</strong>.
+          <br />ICE publishes a <strong>monthly Aging Report</strong> (certified stocks by port × age bucket) so traders
+          can estimate aggregate deduction exposure across exchange stocks.</Spec>
         <Spec k="Delivery mechanism">Electronic warehouse receipts (EWRs) via <Code>eCOPS</Code>; Date of Delivery is
           7 business days after the Delivery Notice.</Spec>
         <Spec k="Key dates">Last Notice Day = 7th business day before the last business day of the delivery month;
@@ -479,11 +474,14 @@ function ContractRules() {
           Virginia, Antwerp, Hamburg/Bremen and Barcelona.</Spec>
         <Spec k="Packaging">Max 5 chops per lot; sisal/jute/burlap bags ≥700 g; ≤15 slack bags. Customs-status and EU
           deforestation (EUDR) appendices apply.</Spec>
-        <Spec k="Storage / Rent">Accrues from certification date; deducted on invoice. Indicative licensed-warehouse
-          rates: <strong>≈ $0.85–1.25/bag/month</strong><Tbc /> (≈ $240–355/lot/month for a ~284-bag lot; EU locations may
-          differ). Exact rates per warehouse, approved by ICE — verify in current warehouse schedule.</Spec>
-        <Spec k="Loading Out Charge (OCA)">One-time charge paid by buyer when collecting from licensed warehouse.<Tbc />{" "}
-          <em>Exact amounts set per warehouse in ICE schedule — verify in current circular before tendering.</em></Spec>
+        <Spec k="Storage / Rent">Accrues from certification date; deducted on invoice. Per 69 kg bag / month:
+          <strong> New York ≈ $1.23–1.33</strong>, <strong>Antwerp ≈ $0.85–1.25</strong> (Molenbergnatie / Pacorini).
+          <br /><strong>RCA (Rent Cost Adjustment)</strong> — ICE enforces a mandatory rent adjustment on settlement:
+          <strong> 2 months</strong> for March / May / July deliveries, <strong>3 months</strong> for September /
+          December deliveries.</Spec>
+        <Spec k="Loading Out Charge (OCA)">One-time charge paid by the buyer to decertify and physically take the
+          coffee out of the warehouse — <strong>New York ≈ $2.42–2.60 per 69 kg bag</strong>. If the original jute
+          bags are damaged, <strong>rebagging</strong> adds a steep <strong>≈ $20–22 per bag</strong>.</Spec>
         <Spec k="Grading / Sampling fee">ICE charges <strong>$1.50 per bag</strong> (minimum $40 per EWR) for
           sampling and grading at certification — raised from $1.25/bag in Nov 2024. Appeal of a grade costs the same
           fee. Redelivery grading incurs a similar fee borne by the certifying party.</Spec>
@@ -530,11 +528,11 @@ function ContractRules() {
         <Spec k="Weight allowance">Two components:
           <br /><strong>1. Outturn tolerance</strong> — ±3% of 10 tonnes. Deviation within band settles at EDSP on
           the invoice; deficiency &gt;3% is non-conforming.
-          <br /><strong>2. Age-related moisture loss</strong><Tbc /> — from year 2 of storage: fixed deduction of
-          <strong>+0.75%</strong> of nominal weight, then an additional <strong>−0.065% per month</strong>, capping
-          at <strong>−1.5% of net weight</strong> (reached approximately at year 3). This allowance compensates the
-          holder for natural moisture loss during extended bonded storage; it is deducted from the invoice separately
-          from the outturn measurement.</Spec>
+          <br /><strong>2. Age-related moisture / weight loss</strong> — because robusta loses moisture as it sits,
+          ICE compensates the buyer through the per-tonne <em>Age allowance</em> above (−$5/tonne/month at 13–48
+          months&rsquo; grading age, −$10/tonne/month from 49 months), docked from the invoice by grading age rather
+          than as a separate physical weight cut. Parallel <strong>Transition-Stock allowances</strong> step up toward
+          −$10/tonne/month as the EU/UK (EUDR) deforestation-compliance rules phase in.</Spec>
         <Spec k="Packaging">Bags ≤80 kg gross; bulk in FIBCs of 900–1,100 kg.</Spec>
         <Spec k="Delivery areas">Amsterdam, Antwerp, Barcelona, Bremen, Felixstowe, Genoa-Savona, Hamburg, Le Havre,
           London (Tilbury), New Orleans, New York, Rotterdam, Trieste.</Spec>
@@ -558,9 +556,12 @@ function ContractRules() {
         <Spec k="Transition Stock allowance (EUDR)">For lots delivered without Validated DDI documentation — EU/UK
           delivery areas only: <strong>−$5/t/month</strong> for 2026 delivery months; <strong>−$10/t/month</strong> from
           January 2027 onwards. US delivery areas: no allowance — transition stock without DDI not accepted.</Spec>
-        <Spec k="Grading / Sampling"><Tbc /> Sampling and grading required at certification. Fees set by ICE-nominated
-          graders — exact amounts in current ICE grading fee circular (not published openly online; contact ICE Commodity
-          Operations).</Spec>
+        <Spec k="Grading / Sampling">Required at certification, and heavily optimised for scale via <strong>grouped
+          lots</strong> (up to 50 tonnes of the same origin, vessel and bill of lading):
+          <br />· <strong>Single lot (10 t)</strong>: ≈ <strong>£72.50/lot</strong> (£7.25/tonne)
+          <br />· <strong>Grouped lot (50 t)</strong>: ≈ <strong>£87.50 total</strong> (£1.75/tonne)
+          <br />So grouping cuts the per-tonne grading cost roughly <strong>4×</strong>. (Contrast Arabica: $1.50/bag,
+          min $40 per EWR.)</Spec>
         <Spec k="Invoicing">EDSP × Net Outturn Weight, adjusted by: Quality Class allowance ± Age allowance ± Weight
           deviation ± Rent allowance − Import-Duty allowance (EU/UK) − Transition-Stock allowance (if applicable).</Spec>
         <PdfLink href="https://www.ice.com/publicdocs/contractregs/105_SECTION_GGGG.pdf">Full rulebook on ICE (PDF)</PdfLink>
