@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { fetchMacroCot, type MacroCotWeek, type CotWeekly } from "@/lib/api";
-import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
-import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 import { transformApiData } from "@/lib/cot/transformApiData";
 
 import { generateData } from "./generateData";
@@ -56,12 +54,6 @@ export default function CotDashboard() {
   const recent52  = data.slice(-52);
   const signals            = useMemo(() => evaluateSignals(data), [data]);
   const historicalSignals  = useMemo(() => evaluateHistoricalSignals(data), [data]);
-
-  const globalFlowMetrics = useMemo(
-    (): GlobalFlowMetrics | null =>
-      macroData.length >= 2 ? buildGlobalFlowMetrics(macroData) : null,
-    [macroData]
-  );
 
   return (
     <div className="space-y-4" style={{ position: "relative" }}>
@@ -117,7 +109,7 @@ export default function CotDashboard() {
       <div id="cot-section-2"><CotHeatmap data={data} /></div>
       <div id="cot-section-3"><CotGauges data={data} /></div>
 
-      <div id="cot-section-1"><Step1GlobalFlow macroData={macroData} macroError={macroError} globalFlowMetrics={globalFlowMetrics} /></div>
+      <div id="cot-section-1"><Step1GlobalFlow macroData={macroData} macroError={macroError} /></div>
 
       <div id="cot-section-4"><Step4IndustryPulse  data={data} /></div>
       <div id="cot-section-5"><Step5DryPowder      data={data} /></div>

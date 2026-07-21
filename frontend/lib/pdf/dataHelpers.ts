@@ -115,10 +115,19 @@ function percRank(value: number, history: number[], positiveOnly = true): number
   return (below / valid.length) * 100;
 }
 
-export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMetrics | null {
+export function buildGlobalFlowMetrics(
+  macroData: MacroCotWeek[],
+  windowWeeks = 1,
+): GlobalFlowMetrics | null {
   if (macroData.length < 2) return null;
   const latest = macroData[macroData.length - 1];
-  const prev   = macroData[macroData.length - 2];
+  // Comparison week for every Δ field: N weeks back, clamped to the oldest
+  // available week so a short history degrades gracefully instead of erroring.
+  const prev = macroData[Math.max(0, macroData.length - 1 - Math.max(1, windowWeeks))];
+  // Immediately-previous week — used ONLY for the priceOutlier data-quality
+  // flag, which must stay a weekly check regardless of the display window
+  // (corruption manifests as one week's batch being garbage).
+  const weekPrev = macroData[macroData.length - 2];
 
   // Helper: sum gross exposure for a week
   const sumGross = (week: MacroCotWeek) =>
@@ -216,11 +225,28 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
         netPriceEffectB   = ((curMmLong - curMmShort)  * dPrice    * cu) / 1e9;
       }
 
+      // Raw price/OI verification columns + weekly outlier flag. The outlier
+      // check compares against the immediately previous week (not the window)
+      // — a >±50% one-week jump is the signature of a corrupt feed batch.
+      const weekPrevPrice = weekPrev.commodities.find(c => c.symbol === sym)?.close_price ?? null;
+      const priceOutlier =
+        curPrice !== null && weekPrevPrice !== null && weekPrevPrice > 0 &&
+        Math.abs((curPrice - weekPrevPrice) / weekPrevPrice) * 100 > 50;
+      const prevOi = prevEntry?.oi_total ?? 0;
+
       return {
         symbol: sym,
         name:   entry.name,
         displaySector: dSector,
         isCoffee: sym === "arabica" || sym === "robusta",
+        closePrice: curPrice,
+        priceDeltaPct:
+          curPrice !== null && prevPrice !== null && prevPrice > 0
+            ? ((curPrice - prevPrice) / prevPrice) * 100
+            : null,
+        oiTotal: entry.oi_total ?? 0,
+        oiDeltaPct: prevOi > 0 ? (((entry.oi_total ?? 0) - prevOi) / prevOi) * 100 : null,
+        priceOutlier,
         grossB:          curG / 1e9,
         netB:            curN / 1e9,
         deltaB:          (curG - prevG2) / 1e9,
@@ -316,6 +342,8 @@ export function buildGlobalFlowMetrics(macroData: MacroCotWeek[]): GlobalFlowMet
     wowDeltaNetB:       (netExp - prevNetExp) / 1e9,
     softsGrossB:        softsGross / 1e9,
     commodityTable,
+    windowWeeks:        Math.max(1, windowWeeks),
+    prevDate:           prev.date,
   };
 }
 

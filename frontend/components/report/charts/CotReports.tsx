@@ -13,8 +13,6 @@ import { transformApiData } from "@/lib/cot/transformApiData";
 import type { CotRawRow, ProcessedCotRow } from "@/lib/cot/types";
 import { evaluateSignals, evaluateHistoricalSignals } from "@/lib/cot/signalEngine";
 import { fetchMacroCot, type MacroCotWeek } from "@/lib/api";
-import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
-import type { GlobalFlowMetrics } from "@/lib/pdf/types";
 
 import CotHeatmap from "@/components/futures/CotDashboard/Heatmap";
 import CotGauges from "@/components/futures/CotDashboard/Gauges";
@@ -75,10 +73,7 @@ export function CotGlobalFlowReport() {
       .catch(() => setMacroError(true))
       .finally(() => setLoaded(true));
   }, []);
-  const globalFlowMetrics = useMemo<GlobalFlowMetrics | null>(
-    () => (macroData.length >= 2 ? buildGlobalFlowMetrics(macroData) : null),
-    [macroData],
-  );
   if (!loaded && !macroError) return <Loading />;
-  return <Step1GlobalFlow macroData={macroData} macroError={macroError} globalFlowMetrics={globalFlowMetrics} />;
+  // Step1GlobalFlow computes its own window-aware GlobalFlowMetrics internally.
+  return <Step1GlobalFlow macroData={macroData} macroError={macroError} />;
 }
