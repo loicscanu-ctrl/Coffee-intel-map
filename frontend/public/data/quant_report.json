@@ -228,23 +228,81 @@
       }
     ]
   },
-  "scraped_at": "2026-07-21T22:27:34.693455+00:00",
+  "scraped_at": "2026-07-21T22:28:27.018832Z",
   "sentiment": {
     "available": true,
-    "scraped_at": "2026-07-20T22:31:11.287614Z",
+    "scraped_at": "2026-07-21T22:28:25.911817Z",
     "overall_sentiment": "Neutral",
-    "overall_confidence": 91.1,
-    "net_index": -5.4,
+    "overall_confidence": 86.0,
+    "net_index": -9.2,
     "bull_count": 6,
-    "bear_count": 8,
-    "neutral_count": 9,
-    "total": 23,
+    "bear_count": 9,
+    "neutral_count": 10,
+    "total": 25,
     "items": [
+      {
+        "headline": "Caf\u00e9 perde for\u00e7a no fim do preg\u00e3o e fecha no vermelho ap\u00f3s mercado virar com melhora no clima",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bearish",
+        "confidence": 85.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Cafeicultura movimenta mais de R$ 3 bilh\u00f5es em defensivos na safra 2025-26, com alta de 22% e recorde hist\u00f3rico",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Neutral",
+        "confidence": 70.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "F\u00f3rum Caf\u00e9 e Clima debate impactos das condi\u00e7\u00f5es meteorol\u00f3gicas na \u00e1rea da Cooxup\u00e9",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Neutral",
+        "confidence": 80.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "At Brooklyn\u2019s Hyunah Coffee Club, Enthusiasts Get Off The Internet And Into The Lab",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
+      {
+        "headline": "Caf\u00e9 abre a ter\u00e7a-feira(21) com ar\u00e1bica em alta e robusta pr\u00f3ximo da estabilidade",
+        "source": "Not\u00edcias Agr\u00edcolas",
+        "sentiment": "Bullish",
+        "confidence": 88.0,
+        "tags": [
+          "cafe",
+          "noticias_agricolas"
+        ]
+      },
+      {
+        "headline": "Regionals Return For The 2027 US Coffee Championships Season",
+        "source": "Sprudge",
+        "sentiment": "Neutral",
+        "confidence": 90.0,
+        "tags": [
+          "sprudge"
+        ]
+      },
       {
         "headline": "Caf\u00e9 fecha em alta nas bolsas com mercado ainda sustentado por atraso da safra brasileira",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
-        "confidence": 90.0,
+        "confidence": 92.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -254,7 +312,7 @@
         "headline": "Rejoice! Pope Leo Loves Drinking Coffee (And He Likes It Strong)",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -263,7 +321,7 @@
         "headline": "Colheita de caf\u00e9 supera metade do previsto na \u00e1rea de atua\u00e7\u00e3o da Expocacer",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 65.0,
+        "confidence": 78.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -273,7 +331,7 @@
         "headline": "Caf\u00e9 amplia ganhos em Nova York com atraso da colheita no Brasil; robusta opera perto da estabilidade",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
-        "confidence": 90.0,
+        "confidence": 92.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -283,7 +341,7 @@
         "headline": "Build-Outs Of Coffee: Blue Sparrow Coffee In Denver, CO",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -302,7 +360,7 @@
         "headline": "Caf\u00e9 encerra semana em alta com atraso da colheita no Brasil sustentando as cota\u00e7\u00f5es",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
-        "confidence": 90.0,
+        "confidence": 92.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -311,8 +369,8 @@
       {
         "headline": "Colheita de caf\u00e9 do Brasil atinge 64% do total, mas segue atrasada, diz Safras & Mercado",
         "source": "Not\u00edcias Agr\u00edcolas",
-        "sentiment": "Bullish",
-        "confidence": 85.0,
+        "sentiment": "Bearish",
+        "confidence": 80.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -332,7 +390,7 @@
         "headline": "CNC representa o cooperativismo cafeeiro no 17\u00ba Workshop do Produtor Rural promovido pelo Sicoob",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -351,7 +409,7 @@
         "headline": "Caf\u00e9 despenca nas bolsas e encerra sess\u00e3o com perdas superiores a 4% em Nova York diante do avan\u00e7o da colheita no Brasil",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 90.0,
+        "confidence": 95.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -361,7 +419,7 @@
         "headline": "Entidades celebram isen\u00e7\u00e3o de todos os caf\u00e9s do Brasil do tarifa\u00e7o de 25% dos EUA",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 85.0,
+        "confidence": 90.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -371,7 +429,7 @@
         "headline": "BSCA celebra isen\u00e7\u00e3o dos caf\u00e9s do Brasil do tarifa\u00e7o de 25% dos EUA",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 85.0,
+        "confidence": 90.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -381,7 +439,7 @@
         "headline": "Caf\u00e9 amplia perdas nas bolsas com press\u00e3o t\u00e9cnica e cautela sobre a safra brasileira",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 70.0,
+        "confidence": 85.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -391,7 +449,7 @@
         "headline": "Build-Outs Of Coffee: The Wild Fox In San Francisco, CA",
         "source": "Sprudge",
         "sentiment": "Neutral",
-        "confidence": 95.0,
+        "confidence": 90.0,
         "tags": [
           "sprudge"
         ]
@@ -400,7 +458,7 @@
         "headline": "Pre\u00e7os do caf\u00e9 no Vietn\u00e3 sobem em mercado com baixa atividade",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
-        "confidence": 70.0,
+        "confidence": 88.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -410,7 +468,7 @@
         "headline": "Caf\u00e9 sol\u00favel do Brasil passa a ficar isento de tarifas dos EUA e garante exporta\u00e7\u00f5es",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bearish",
-        "confidence": 85.0,
+        "confidence": 90.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
@@ -420,47 +478,10 @@
         "headline": "Caf\u00e9 abre em queda nas bolsas, mas mercado segue sustentado por oferta restrita e ritmo lento da safra brasileira",
         "source": "Not\u00edcias Agr\u00edcolas",
         "sentiment": "Bullish",
-        "confidence": 75.0,
+        "confidence": 85.0,
         "tags": [
           "cafe",
           "noticias_agricolas"
-        ]
-      },
-      {
-        "headline": "Exporta\u00e7\u00e3o de caf\u00e9 do Brasil pode saltar em 26/27, mas h\u00e1 desafios na qualidade, diz Cecaf\u00e9",
-        "source": "Not\u00edcias Agr\u00edcolas",
-        "sentiment": "Bearish",
-        "confidence": 70.0,
-        "tags": [
-          "cafe",
-          "noticias_agricolas"
-        ]
-      },
-      {
-        "headline": "Build-Outs Of Coffee: Nandan Coffee In Bangalore, India",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "America\u2019s Next Hotbed For Coffee Production Is\u2026 Florida?",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 80.0,
-        "tags": [
-          "sprudge"
-        ]
-      },
-      {
-        "headline": "In Washington, D.C., Coffee Meets Fine Dining At J\u00f4nt",
-        "source": "Sprudge",
-        "sentiment": "Neutral",
-        "confidence": 95.0,
-        "tags": [
-          "sprudge"
         ]
       }
     ]
