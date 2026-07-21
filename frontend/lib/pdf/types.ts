@@ -86,6 +86,15 @@ export interface CommodityRow {
   grossPriceEffectB: number | null;
   netOiEffectB:      number | null;
   netPriceEffectB:   number | null;
+  // Raw price / OI verification columns (per selected comparison window)
+  closePrice: number | null;    // latest close, USD per base unit (scraper-normalized)
+  priceDeltaPct: number | null; // % price change vs comparison week
+  oiTotal: number;              // total open interest, lots (all participants)
+  oiDeltaPct: number | null;    // % OI change vs comparison week
+  // Data-quality flag: latest price moved >±50% vs the IMMEDIATELY previous
+  // week (independent of the display window) — the signature of a corrupt
+  // feed batch (e.g. the 2026-07-14 yfinance misalignment), not a real move.
+  priceOutlier: boolean;
 }
 
 export interface GlobalFlowMetrics {
@@ -122,4 +131,8 @@ export interface GlobalFlowMetrics {
   wowDeltaNetB: number;         // WoW net exposure change $B
   softsGrossB: number;          // current softs sector gross $B
   commodityTable: CommodityRow[]; // all commodities sorted sector-then-gross-desc
+  // Comparison window all Δ fields were computed over: 1 = week-over-week
+  // (default), N = latest vs N weeks back. prevDate is the comparison week.
+  windowWeeks: number;
+  prevDate: string;
 }

@@ -10,24 +10,33 @@ import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 type LabelFmt = NonNullable<TooltipContentProps<ValueType, NameType>["labelFormatter"]>;
 const weekLabel: LabelFmt = (l) => `Week: ${l}`;
 import type { MacroCotWeek } from "@/lib/api";
-import type { GlobalFlowMetrics } from "@/lib/pdf/types";
+import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import AttributionTable from "./AttributionTable";
 import SectionHeader from "./SectionHeader";
 import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS, type SectorKey } from "./constants";
 import { transformMacroData } from "./transformMacroData";
 import type { MacroChartRow, MacroToggle } from "./types";
 
+// Selectable comparison windows for the Δ / attribution columns (weeks back).
+const VAR_WINDOWS = [1, 2, 4, 13, 26, 52] as const;
+
 export default function Step1GlobalFlow({
   macroData,
   macroError,
-  globalFlowMetrics,
 }: {
   macroData: MacroCotWeek[];
   macroError: boolean;
-  globalFlowMetrics: GlobalFlowMetrics | null;
 }) {
   const [macroToggle, setMacroToggle] = useState<MacroToggle>("gross");
   const [step1View, setStep1View]     = useState<"chart" | "table">("chart");
+  const [varWeeks, setVarWeeks]       = useState<number>(1);
+
+  // Window-aware metrics: every Δ / attribution field compares the latest week
+  // against `varWeeks` back (1 = classic WoW).
+  const globalFlowMetrics = useMemo(
+    () => (macroData.length >= 2 ? buildGlobalFlowMetrics(macroData, varWeeks) : null),
+    [macroData, varWeeks]
+  );
 
   const macroChartData = useMemo(
     () => transformMacroData(macroData, macroToggle),
@@ -69,8 +78,11 @@ export default function Step1GlobalFlow({
       }
       return { gross: g, net: n, margin: im };
     };
-    const cur  = weekTotals(macroData[macroData.length - 1]);
-    const prev = macroData.length >= 2 ? weekTotals(macroData[macroData.length - 2]) : null;
+    const cur = weekTotals(macroData[macroData.length - 1]);
+    // Same comparison window as the attribution metrics (clamped to the oldest
+    // available week), so KPIs and table always agree on what Δ means.
+    const prevIdx = Math.max(0, macroData.length - 1 - varWeeks);
+    const prev = macroData.length >= 2 ? weekTotals(macroData[prevIdx]) : null;
     return {
       totalGross: cur.gross,
       netExp:     cur.net,
@@ -79,8 +91,9 @@ export default function Step1GlobalFlow({
       netWoW:     prev ? cur.net    - prev.net    : null,
       marginWoW:  prev ? cur.margin - prev.margin : null,
       date:       macroData[macroData.length - 1].date,
+      prevDate:   macroData.length >= 2 ? macroData[prevIdx].date : null,
     };
-  }, [macroData]);
+  }, [macroData, varWeeks]);
 
   const softChartData = useMemo(() =>
     macroData
@@ -152,6 +165,28 @@ export default function Step1GlobalFlow({
             </button>
           );
         })}
+        <span style={{ width: 1, height: 20, background: "#374151", margin: "0 4px" }} />
+        {/* Variation window — what every Δ / attribution column compares against */}
+        <span style={{ fontSize: 10, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.05em" }}>Δ window</span>
+        {VAR_WINDOWS.map(w => {
+          const enough = macroData.length > w; // need latest + w weeks back
+          return (
+            <button
+              key={w}
+              onClick={() => setVarWeeks(w)}
+              disabled={!enough}
+              title={enough ? `Compare latest week vs ${w} week${w > 1 ? "s" : ""} back` : "Not enough history"}
+              style={{
+                padding: "4px 10px", borderRadius: 4, border: "1px solid #374151",
+                background: varWeeks === w ? "#92400e" : "#1f2937",
+                color: enough ? "#f9fafb" : "#4b5563",
+                cursor: enough ? "pointer" : "not-allowed", fontSize: 12,
+              }}
+            >
+              {w}W
+            </button>
+          );
+        })}
       </div>
 
       {/* KPI Toddles */}
@@ -183,21 +218,23 @@ export default function Step1GlobalFlow({
           v == null ? "—"
           : Math.abs(v) >= 1e9 ? `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e9).toFixed(2)}B`
           : `${v >= 0 ? "+" : "-"}$${Math.abs(v / 1e6).toFixed(0)}M`;
+        // Δ label follows the selected comparison window (1W = classic WoW).
+        const dLbl = varWeeks === 1 ? "WoW" : `Δ${varWeeks}W`;
         const kpis = [
-          { label: "Gross Exposure",     value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
-          { label: "Gross Exposure WoW", value: fmtWoW(macroKpis.grossWoW), color: wowColor(macroKpis.grossWoW) },
-          { label: "Gross OI Δ",         value: fmtAttr(grossOiTotal),       color: wowColor(grossOiTotal) },
-          { label: "Gross Px Δ",         value: fmtAttr(grossPxTotal),       color: wowColor(grossPxTotal) },
-          { label: "Net Exposure",       value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
-          { label: "Net Exposure WoW",   value: fmtWoW(macroKpis.netWoW),   color: wowColor(macroKpis.netWoW) },
-          { label: "Net OI Δ",           value: fmtAttr(netOiTotal),         color: wowColor(netOiTotal) },
-          { label: "Net Px Δ",           value: fmtAttr(netPxTotal),         color: wowColor(netPxTotal) },
+          { label: "Gross Exposure",             value: fmtB(macroKpis.totalGross),  color: "#f9fafb" },
+          { label: `Gross Exposure ${dLbl}`,     value: fmtWoW(macroKpis.grossWoW), color: wowColor(macroKpis.grossWoW) },
+          { label: `Gross OI Δ (${varWeeks}W)`,  value: fmtAttr(grossOiTotal),       color: wowColor(grossOiTotal) },
+          { label: `Gross Px Δ (${varWeeks}W)`,  value: fmtAttr(grossPxTotal),       color: wowColor(grossPxTotal) },
+          { label: "Net Exposure",               value: fmtB(macroKpis.netExp),      color: macroKpis.netExp >= 0 ? "#10b981" : "#ef4444" },
+          { label: `Net Exposure ${dLbl}`,       value: fmtWoW(macroKpis.netWoW),   color: wowColor(macroKpis.netWoW) },
+          { label: `Net OI Δ (${varWeeks}W)`,    value: fmtAttr(netOiTotal),         color: wowColor(netOiTotal) },
+          { label: `Net Px Δ (${varWeeks}W)`,    value: fmtAttr(netPxTotal),         color: wowColor(netPxTotal) },
           // Initial margin = (mm_long+mm_short)·outright_rate + mm_spread·spread_rate.
           // Sources the per-symbol margin rates from the RJO Brien guide eff. 3/14/2026
           // (see COMMODITY_SPECS in macro_cot.py). Gives a "$ of speculative cash
           // actually posted" read alongside the notional gross/net columns.
-          { label: "Initial Margin",     value: fmtMgn(macroKpis.initialMgn), color: "#fbbf24" },
-          { label: "Initial Margin WoW", value: fmtMgnWoW(macroKpis.marginWoW), color: wowColor(macroKpis.marginWoW) },
+          { label: "Initial Margin",             value: fmtMgn(macroKpis.initialMgn), color: "#fbbf24" },
+          { label: `Initial Margin ${dLbl}`,     value: fmtMgnWoW(macroKpis.marginWoW), color: wowColor(macroKpis.marginWoW) },
         ];
         return (
           <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
@@ -208,7 +245,9 @@ export default function Step1GlobalFlow({
               }}>
                 <div style={{ fontSize: 10, color: "#6b7280", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>{k.label}</div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: k.color, fontFamily: "monospace" }}>{k.value}</div>
-                <div style={{ fontSize: 9, color: "#4b5563", marginTop: 2 }}>{macroKpis.date}</div>
+                <div style={{ fontSize: 9, color: "#4b5563", marginTop: 2 }}>
+                  {varWeeks > 1 && macroKpis.prevDate ? `${macroKpis.prevDate} → ${macroKpis.date}` : macroKpis.date}
+                </div>
               </div>
             ))}
           </div>
