@@ -8,6 +8,11 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import CommodityCot, CommodityPrice
+from scraper.price_sanity import (
+    baselines_by_symbol,
+    corrupt_batch_dates,
+    is_price_sane,
+)
 from scraper.sources.macro_cot import (
     COMMODITY_SPECS,
     _front_month_price_from_archive,
@@ -77,17 +82,26 @@ def get_macro_cot(
                   .order_by(CommodityCot.date.asc())
                   .all())
 
-    # Build price lookup {(date, symbol): close_price}
+    # Build price lookup {(date, symbol): close_price}. Reject corrupt/misaligned
+    # prices (yfinance batch glitches — see price_sanity) via a robust per-symbol
+    # baseline so a garbage value can't balloon the money flow; rejected prices
+    # carry forward from the last good value below.
     price_rows = (db.query(CommodityPrice)
                     .filter(CommodityPrice.date > cutoff)
                     .all())
-    price_map = {(p.date, p.symbol): p.close_price for p in price_rows}
+    baseline = baselines_by_symbol(price_rows)
+    corrupt_dates = corrupt_batch_dates(price_rows, baseline)
+
+    def _sane(p) -> bool:
+        return p.date not in corrupt_dates and is_price_sane(p.close_price, baseline.get(p.symbol))
+
+    price_map = {(p.date, p.symbol): p.close_price for p in price_rows if _sane(p)}
 
     # Per-symbol latest available price — used as fallback when exact date is missing
     # (e.g. robusta price stored for a different date than the COT report date)
     symbol_latest: dict[str, tuple[DateType, float]] = {}
     for p in price_rows:
-        if p.close_price is not None:
+        if _sane(p):
             if p.symbol not in symbol_latest or p.date > symbol_latest[p.symbol][0]:
                 symbol_latest[p.symbol] = (p.date, p.close_price)
 

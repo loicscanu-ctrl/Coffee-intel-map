@@ -9,6 +9,11 @@ from models import (
     CotWeekly,
 )
 from scraper.exporters.base import OUT_DIR
+from scraper.price_sanity import (
+    baselines_by_symbol,
+    corrupt_batch_dates,
+    is_price_sane,
+)
 from scraper.sources.macro_cot import (
     COMMODITY_SPECS,
     _front_month_price_from_archive,
@@ -75,10 +80,21 @@ def export_macro_cot(db) -> None:
         .filter(CommodityPrice.date > cutoff)
         .all()
     )
-    price_map = {(p.date, p.symbol): p.close_price for p in price_rows}
+    # Reject corrupt/misaligned prices (yfinance batch glitches — see
+    # price_sanity): compute a robust per-symbol baseline and drop any price
+    # that's >3x off it, so a garbage value can't balloon the money flow. Bad
+    # prices fall out of both lookups and get carried forward from the last good
+    # value by the fallbacks below.
+    baseline = baselines_by_symbol(price_rows)
+    corrupt_dates = corrupt_batch_dates(price_rows, baseline)
+
+    def _sane(p) -> bool:
+        return p.date not in corrupt_dates and is_price_sane(p.close_price, baseline.get(p.symbol))
+
+    price_map = {(p.date, p.symbol): p.close_price for p in price_rows if _sane(p)}
     symbol_latest: dict = {}
     for p in price_rows:
-        if p.close_price is not None:
+        if _sane(p):
             if p.symbol not in symbol_latest or p.date > symbol_latest[p.symbol][0]:
                 symbol_latest[p.symbol] = (p.date, p.close_price)
 
