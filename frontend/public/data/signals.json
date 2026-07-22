@@ -183,7 +183,7 @@
       "market": "NY",
       "severity": "info",
       "score": 1,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
     },
     {
@@ -194,7 +194,7 @@
       "market": "NY",
       "severity": "warn",
       "score": -1,
-      "magnitude": "medium",
+      "magnitude": "large",
       "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
@@ -2885,7 +2885,7 @@
           "market": "NY",
           "severity": "info",
           "score": 1,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "KC curve in backwardation — front premium rewards long holders, supportive of bullish positioning. Verify that roll yield exceeds the risk-free rate to confirm the incentive is real."
         },
         {
@@ -2896,7 +2896,7 @@
           "market": "NY",
           "severity": "warn",
           "score": -1,
-          "magnitude": "medium",
+          "magnitude": "large",
           "text": "KC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
@@ -2945,5 +2945,5 @@
       "priceLDN": 3849
     }
   ],
-  "generatedAt": "2026-07-22T12:23:05.488Z"
+  "generatedAt": "2026-07-22T22:05:03.083Z"
 }
