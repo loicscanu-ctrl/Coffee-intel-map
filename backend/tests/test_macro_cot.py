@@ -36,3 +36,18 @@ def test_commodity_specs_proxy_has_factor():
         if spec["price_source"] == "proxy":
             assert "proxy_to_usd_per_mt_factor" in spec, f"{sym} proxy missing factor"
             assert spec["price_proxy"] is not None, f"{sym} proxy missing price_proxy"
+
+
+def test_rough_rice_retired_and_replacements_present():
+    """2026-07 swap: rice (dead price feed) out; audit-chosen markets in."""
+    import os
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    from scraper.sources.macro_cot import COMMODITY_SPECS
+
+    assert "rough_rice" not in COMMODITY_SPECS
+    assert COMMODITY_SPECS["wheat_hrw"]["cftc_filter"] == "WHEAT-HRW - CHICAGO BOARD OF TRADE"
+    assert COMMODITY_SPECS["platinum"]["cftc_filter"] == "PLATINUM - NEW YORK MERCANTILE EXCHANGE"
+    assert COMMODITY_SPECS["palladium"]["cftc_filter"] == "PALLADIUM - NEW YORK MERCANTILE EXCHANGE"
+    # HRW filter must never swallow SRW or Spring wheat rows
+    assert COMMODITY_SPECS["wheat"]["cftc_filter"].startswith("WHEAT-SRW")

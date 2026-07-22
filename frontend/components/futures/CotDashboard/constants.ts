@@ -41,16 +41,19 @@ export const SECTOR_CONTRACTS: Record<SectorKey, { key: string; label: string; c
     { key: "lsgo",        label: "Gasoil",        color: "#94a3b8" },
   ],
   metals: [
-    { key: "gold",   label: "Gold",   color: "#facc15" },
-    { key: "silver", label: "Silver", color: "#cbd5e1" },
-    { key: "copper", label: "Copper", color: "#ea580c" },
+    { key: "gold",      label: "Gold",      color: "#facc15" },
+    { key: "silver",    label: "Silver",    color: "#cbd5e1" },
+    { key: "copper",    label: "Copper",    color: "#ea580c" },
+    { key: "platinum",  label: "Platinum",  color: "#5eead4" },
+    { key: "palladium", label: "Palladium", color: "#f0abfc" },
   ],
   grains: [
-    { key: "corn",     label: "Corn",         color: "#facc15" },
-    { key: "wheat",    label: "Wheat (SRW)",  color: "#d6a760" },
-    { key: "soybeans", label: "Soybeans",     color: "#84cc16" },
-    { key: "soy_meal", label: "Soybean Meal", color: "#a16207" },
-    { key: "soy_oil",  label: "Soybean Oil",  color: "#fde68a" },
+    { key: "corn",      label: "Corn",         color: "#facc15" },
+    { key: "wheat",     label: "Wheat (SRW)",  color: "#d6a760" },
+    { key: "wheat_hrw", label: "Wheat (HRW)",  color: "#f87171" },
+    { key: "soybeans",  label: "Soybeans",     color: "#84cc16" },
+    { key: "soy_meal",  label: "Soybean Meal", color: "#a16207" },
+    { key: "soy_oil",   label: "Soybean Oil",  color: "#fde68a" },
   ],
   meats: [
     { key: "live_cattle",   label: "Live Cattle",   color: "#ef4444" },
@@ -60,7 +63,6 @@ export const SECTOR_CONTRACTS: Record<SectorKey, { key: string; label: string; c
   micros: [
     { key: "oats",       label: "Oats",       color: "#a3e635" },
     { key: "lumber",     label: "Lumber",     color: "#a16207" },
-    { key: "rough_rice", label: "Rough Rice", color: "#e2e8f0" },
   ],
 };
 

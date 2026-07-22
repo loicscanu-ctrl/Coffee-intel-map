@@ -291,16 +291,36 @@ COMMODITY_SPECS = {
     "contract_unit": 110000, "price_unit": "usd_per_mbf", "currency": "USD",
     "margin_outright_usd": 9500, "margin_spread_usd": 950,  # *est*
   },
-  "rough_rice": {
-    "name": "Rough Rice", "sector": "micros", "exchange": "CBOT",
-    "cftc_filter": "ROUGH RICE - CHICAGO BOARD OF TRADE",
-    # ZR=F on Yahoo froze at 12.66 in June 2026 then went bad (the export's
-    # price-sanity guard nulled rice exposure from 06-23). Source from stooq's
-    # continuous rice future instead; stooq quotes USD/cwt directly.
-    "ice_filter": None, "yfinance_ticker": None, "price_proxy": None,
-    "price_source": "stooq", "stooq_ticker": "zr.f",
-    "contract_unit": 2000, "price_unit": "usd_per_cwt", "currency": "USD",
-    "margin_outright_usd": 1375, "margin_spread_usd": 1265,
+  # rough_rice was retired 2026-07: ZR=F died on Yahoo (froze at 12.66 then went
+  # bad) and stooq's zr.f 404s, leaving no viable price source — exposure had
+  # been honestly null since 06-23. Replaced by the markets below, chosen from
+  # the audit-cftc-markets coverage run (biggest untracked MM-active physical
+  # commodities with a clean USD yfinance feed). Exact cftc_filter strings come
+  # from that audit's log — the hardened matcher requires exact/prefix names.
+  # Margin fields intentionally omitted (Initial Margin KPI guard treats them
+  # as not-posted) until real RJO guide numbers are added.
+  "wheat_hrw": {
+    "name": "Wheat (HRW)", "sector": "grains", "exchange": "CBOT",
+    "cftc_filter": "WHEAT-HRW - CHICAGO BOARD OF TRADE",
+    "ice_filter": None, "yfinance_ticker": "KE=F", "price_proxy": None,
+    "price_source": "yfinance",
+    # KE=F quotes in cents/bushel
+    "yfinance_mult": 0.01,
+    "contract_unit": 5000, "price_unit": "usd_per_bushel", "currency": "USD",
+  },
+  "platinum": {
+    "name": "Platinum", "sector": "hard", "exchange": "NYMEX",
+    "cftc_filter": "PLATINUM - NEW YORK MERCANTILE EXCHANGE",
+    "ice_filter": None, "yfinance_ticker": "PL=F", "price_proxy": None,
+    "price_source": "yfinance",
+    "contract_unit": 50, "price_unit": "usd_per_oz", "currency": "USD",
+  },
+  "palladium": {
+    "name": "Palladium", "sector": "hard", "exchange": "NYMEX",
+    "cftc_filter": "PALLADIUM - NEW YORK MERCANTILE EXCHANGE",
+    "ice_filter": None, "yfinance_ticker": "PA=F", "price_proxy": None,
+    "price_source": "yfinance",
+    "contract_unit": 100, "price_unit": "usd_per_oz", "currency": "USD",
   },
 }
 

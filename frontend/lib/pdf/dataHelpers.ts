@@ -97,8 +97,10 @@ const COMMODITY_SPECS_FRONTEND: Record<string, { contract_unit: number }> = {
   cocoa_ldn:     { contract_unit: 10      },
   oj:            { contract_unit: 15000   },
   oats:          { contract_unit: 5000    },
-  rough_rice:    { contract_unit: 2000    },
   lumber:        { contract_unit: 110000  },
+  wheat_hrw:     { contract_unit: 5000    },
+  platinum:      { contract_unit: 50      },
+  palladium:     { contract_unit: 100     },
 };
 
 // MacroCotEntry.sector values: "hard" | "grains" | "meats" | "softs" | "micros"
