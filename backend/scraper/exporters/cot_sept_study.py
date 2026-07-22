@@ -31,7 +31,7 @@ import io
 import json
 import urllib.request
 import zipfile
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 from scraper.exporters.base import OUT_DIR
 from scraper.validate_export import safe_write_json, validate_cot_sept_study
@@ -223,7 +223,8 @@ def _app_records() -> list[dict]:
         ny = (r or {}).get("ny") or {}
         if ny.get("mm_long_old") is None:
             continue
-        g = lambda k: ny.get(k) or 0
+        def g(k, _ny=ny):  # bind loop var — B023
+            return _ny.get(k) or 0
         # CFTC long-side identity: OI = every cohort's longs + spreads.
         oi_old = (g("pmpu_long_old") + g("swap_long_old") + g("swap_spread_old")
                   + g("mm_long_old") + g("mm_spread_old")
@@ -426,7 +427,7 @@ def _build_study(years: dict[str, dict]) -> dict:
 
 
 def export_cot_sept_study() -> None:
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     current_year = today.year if today.month <= 9 else today.year + 1
 
     existing = (_load_json("sept_positioning.json") or {}).get("years") or {}
@@ -470,7 +471,7 @@ def export_cot_sept_study() -> None:
             years[str(y)] = built
 
     payload = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "market": "KC Coffee C (ICE Futures U.S.) — CFTC disaggregated futures-only, old-crop bucket",
         "current_year": current_year,
         "meta": {
