@@ -10,6 +10,7 @@ import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
 import CertifiedStocksParity from "./CertifiedStocksParity";
 import SeptemberXray from "./SeptemberXray";
+import CropyearXray from "./CropyearXray";
 import SignalsMethodology from "./methodology/SignalsMethodology";
 import OpenDirectionRecord from "./methodology/OpenDirectionRecord";
 import NewsSentimentMethodology from "./methodology/NewsSentimentMethodology";
@@ -1622,6 +1623,10 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <CollapsibleCard bare tone="amber" updated="2026-07-22" kicker="COT · single-contract X-ray" title="September X-ray — KC September positioning via the old-crop bucket"
             subtitle="Once July trades out, the CFTC 'old crop' split shows the September contract's exact cohort positioning — compared against past Septembers">
             <SeptemberXray />
+          </CollapsibleCard>
+          <CollapsibleCard bare tone="amber" updated="2026-07-22" kicker="COT · cross-commodity" title="Crop-year X-ray — the same trick across seven CFTC markets"
+            subtitle="Cocoa, sugar, cotton, wheat, corn and soybeans carry the same old-crop split — single-contract positioning on each market's own crop calendar">
+            <CropyearXray />
           </CollapsibleCard>
           <SignalsMethodology />
           <CollapsibleCard bare tone="sky" updated="2026-07-14" kicker="Signals · track record" title="Open-price-direction — walk-forward record"

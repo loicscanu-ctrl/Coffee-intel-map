@@ -311,6 +311,20 @@ def validate_cot_sept_study(data: dict) -> tuple[bool, str]:
     return True, "ok"
 
 
+def validate_cropyear_xray(data: dict) -> tuple[bool, str]:
+    if not isinstance(data, dict):
+        return False, "not a dict"
+    markets = data.get("markets")
+    if not isinstance(markets, dict) or not markets:
+        return False, "markets is empty"
+    if not any(
+        sum(len(y.get("rows") or []) for y in (m.get("years") or {}).values()) >= 5
+        for m in markets.values()
+    ):
+        return False, "no market has ≥5 weekly rows"
+    return True, "ok"
+
+
 def validate_oi_fnd_chart(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
