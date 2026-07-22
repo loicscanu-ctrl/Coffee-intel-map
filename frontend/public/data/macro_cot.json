@@ -237,19 +237,6 @@
         "initial_margin_usd": 11381574
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 332,
-        "mm_short": 6475,
-        "mm_spread": 35,
-        "oi_total": 12167,
-        "close_price": 12.385,
-        "gross_exposure_usd": 168609390.0,
-        "net_exposure_usd": -152162110.0,
-        "initial_margin_usd": 9403900
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -591,19 +578,6 @@
         "gross_exposure_usd": 94399692.54455553,
         "net_exposure_usd": 71521318.13964833,
         "initial_margin_usd": 12881790
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 340,
-        "mm_short": 7038,
-        "mm_spread": 60,
-        "oi_total": 12958,
-        "close_price": 12.525,
-        "gross_exposure_usd": 184818900.0,
-        "net_exposure_usd": -167784900.0,
-        "initial_margin_usd": 10220650
       },
       {
         "symbol": "brent",
@@ -949,19 +923,6 @@
         "initial_margin_usd": 14940540
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 245,
-        "mm_short": 6756,
-        "mm_spread": 5,
-        "oi_total": 11996,
-        "close_price": 12.78,
-        "gross_exposure_usd": 178945560.0,
-        "net_exposure_usd": -166421160.0,
-        "initial_margin_usd": 9632700
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -1303,19 +1264,6 @@
         "gross_exposure_usd": 114815419.60601789,
         "net_exposure_usd": 57207936.058044344,
         "initial_margin_usd": 15291280
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 429,
-        "mm_short": 6145,
-        "mm_spread": 5,
-        "oi_total": 12095,
-        "close_price": 12.51,
-        "gross_exposure_usd": 164481480.0,
-        "net_exposure_usd": -143014320.0,
-        "initial_margin_usd": 9045575
       },
       {
         "symbol": "brent",
@@ -1661,19 +1609,6 @@
         "initial_margin_usd": 14729423
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 318,
-        "mm_short": 6176,
-        "mm_spread": 2,
-        "oi_total": 11811,
-        "close_price": 11.865,
-        "gross_exposure_usd": 154102620.0,
-        "net_exposure_usd": -139010340.0,
-        "initial_margin_usd": 8931780
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -2015,19 +1950,6 @@
         "gross_exposure_usd": 103885831.40716562,
         "net_exposure_usd": 48597210.658264205,
         "initial_margin_usd": 14855164
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 267,
-        "mm_short": 6405,
-        "mm_spread": 1,
-        "oi_total": 11950,
-        "close_price": 11.685,
-        "gross_exposure_usd": 155924640.0,
-        "net_exposure_usd": -143445060.0,
-        "initial_margin_usd": 9175265
       },
       {
         "symbol": "brent",
@@ -2386,19 +2308,6 @@
         "initial_margin_usd": 772750
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 349,
-        "mm_short": 6216,
-        "mm_spread": 87,
-        "oi_total": 11794,
-        "close_price": 11.345,
-        "gross_exposure_usd": 148959850.0,
-        "net_exposure_usd": -133122230.0,
-        "initial_margin_usd": 9136930
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -2753,19 +2662,6 @@
         "gross_exposure_usd": 15567200.0,
         "net_exposure_usd": -15567200.0,
         "initial_margin_usd": 1342000
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 286,
-        "mm_short": 6367,
-        "mm_spread": 54,
-        "oi_total": 12148,
-        "close_price": 11.74,
-        "gross_exposure_usd": 156212440.0,
-        "net_exposure_usd": -142781880.0,
-        "initial_margin_usd": 9216185
       },
       {
         "symbol": "brent",
@@ -3124,19 +3020,6 @@
         "initial_margin_usd": 1608750
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 301,
-        "mm_short": 6411,
-        "mm_spread": 0,
-        "oi_total": 12185,
-        "close_price": 11.48,
-        "gross_exposure_usd": 154107520.0,
-        "net_exposure_usd": -140285600.0,
-        "initial_margin_usd": 9229000
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -3491,19 +3374,6 @@
         "gross_exposure_usd": 21140625.0,
         "net_exposure_usd": -21140625.0,
         "initial_margin_usd": 1890625
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 355,
-        "mm_short": 6834,
-        "mm_spread": 52,
-        "oi_total": 13230,
-        "close_price": 11.165,
-        "gross_exposure_usd": 160530370.0,
-        "net_exposure_usd": -144676070.0,
-        "initial_margin_usd": 9950655
       },
       {
         "symbol": "brent",
@@ -3875,19 +3745,6 @@
         "initial_margin_usd": 2197250
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 510,
-        "mm_short": 7469,
-        "mm_spread": 104,
-        "oi_total": 14046,
-        "close_price": 10.89,
-        "gross_exposure_usd": 173782620.0,
-        "net_exposure_usd": -151567020.0,
-        "initial_margin_usd": 11102685
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -4229,19 +4086,6 @@
         "gross_exposure_usd": 26040375.0,
         "net_exposure_usd": -26040375.0,
         "initial_margin_usd": 2417250
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 646,
-        "mm_short": 7566,
-        "mm_spread": 56,
-        "oi_total": 14501,
-        "close_price": 10.725,
-        "gross_exposure_usd": 176147400.0,
-        "net_exposure_usd": -148434000.0,
-        "initial_margin_usd": 11362340
       },
       {
         "symbol": "brent",
@@ -4600,19 +4444,6 @@
         "initial_margin_usd": 2663375
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 605,
-        "mm_short": 7656,
-        "mm_spread": 70,
-        "oi_total": 14952,
-        "close_price": 10.47,
-        "gross_exposure_usd": 172985340.0,
-        "net_exposure_usd": -147647940.0,
-        "initial_margin_usd": 11447425
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -4967,19 +4798,6 @@
         "gross_exposure_usd": 26277300.0,
         "net_exposure_usd": -26277300.0,
         "initial_margin_usd": 2483250
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 759,
-        "mm_short": 7900,
-        "mm_spread": 8,
-        "oi_total": 13676,
-        "close_price": 10.285,
-        "gross_exposure_usd": 178115630.0,
-        "net_exposure_usd": -146890370.0,
-        "initial_margin_usd": 11916245
       },
       {
         "symbol": "brent",
@@ -5338,19 +5156,6 @@
         "initial_margin_usd": 2219250
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 826,
-        "mm_short": 7814,
-        "mm_spread": 11,
-        "oi_total": 13545,
-        "close_price": 10.2,
-        "gross_exposure_usd": 176256000.0,
-        "net_exposure_usd": -142555200.0,
-        "initial_margin_usd": 11893915
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -5705,19 +5510,6 @@
         "gross_exposure_usd": 23869800.0,
         "net_exposure_usd": -23869800.0,
         "initial_margin_usd": 2202750
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 890,
-        "mm_short": 7853,
-        "mm_spread": 49,
-        "oi_total": 13734,
-        "close_price": 10.125,
-        "gross_exposure_usd": 177045750.0,
-        "net_exposure_usd": -141000750.0,
-        "initial_margin_usd": 12083610
       },
       {
         "symbol": "lumber",
@@ -6076,19 +5868,6 @@
         "initial_margin_usd": 1892000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 796,
-        "mm_short": 7878,
-        "mm_spread": 17,
-        "oi_total": 13716,
-        "close_price": 10.35,
-        "gross_exposure_usd": 179551800.0,
-        "net_exposure_usd": -146597400.0,
-        "initial_margin_usd": 11948255
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -6443,19 +6222,6 @@
         "gross_exposure_usd": 21049000.0,
         "net_exposure_usd": -21049000.0,
         "initial_margin_usd": 1867250
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 752,
-        "mm_short": 7681,
-        "mm_spread": 0,
-        "oi_total": 13893,
-        "close_price": 10.17,
-        "gross_exposure_usd": 171527220.0,
-        "net_exposure_usd": -140935860.0,
-        "initial_margin_usd": 11595375
       },
       {
         "symbol": "brent",
@@ -6814,19 +6580,6 @@
         "initial_margin_usd": 1853500
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 786,
-        "mm_short": 7952,
-        "mm_spread": 20,
-        "oi_total": 14526,
-        "close_price": 10.115,
-        "gross_exposure_usd": 176769740.0,
-        "net_exposure_usd": -144968180.0,
-        "initial_margin_usd": 12040050
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -7181,19 +6934,6 @@
         "gross_exposure_usd": 18494437.5,
         "net_exposure_usd": -18494437.5,
         "initial_margin_usd": 1761375
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 802,
-        "mm_short": 7994,
-        "mm_spread": 29,
-        "oi_total": 15055,
-        "close_price": 10.095,
-        "gross_exposure_usd": 177591240.0,
-        "net_exposure_usd": -145206480.0,
-        "initial_margin_usd": 12131185
       },
       {
         "symbol": "brent",
@@ -7565,19 +7305,6 @@
         "initial_margin_usd": 2373250
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 892,
-        "mm_short": 7930,
-        "mm_spread": 54,
-        "oi_total": 14840,
-        "close_price": 9.495,
-        "gross_exposure_usd": 167529780.0,
-        "net_exposure_usd": -133651620.0,
-        "initial_margin_usd": 12198560
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -7921,19 +7648,6 @@
         "initial_margin_usd": 2329250
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 932,
-        "mm_short": 7765,
-        "mm_spread": 0,
-        "oi_total": 13251,
-        "close_price": 9.81,
-        "gross_exposure_usd": 170635140.0,
-        "net_exposure_usd": -134063460.0,
-        "initial_margin_usd": 11958375
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -8275,19 +7989,6 @@
         "gross_exposure_usd": 181709994.5068356,
         "net_exposure_usd": -84374007.44934067,
         "initial_margin_usd": 28960365
-      },
-      {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1264,
-        "mm_short": 7881,
-        "mm_spread": 0,
-        "oi_total": 13941,
-        "close_price": 9.48,
-        "gross_exposure_usd": 173389200.0,
-        "net_exposure_usd": -125458320.0,
-        "initial_margin_usd": 12574375
       },
       {
         "symbol": "brent",
@@ -8659,19 +8360,6 @@
         "initial_margin_usd": 29372461
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1325,
-        "mm_short": 7418,
-        "mm_spread": 16,
-        "oi_total": 13166,
-        "close_price": 10.07,
-        "gross_exposure_usd": 176084020.0,
-        "net_exposure_usd": -122713020.0,
-        "initial_margin_usd": 12041865
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -8748,6 +8436,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 56145950
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 66643,
+        "mm_short": 82397,
+        "mm_spread": 64195,
+        "oi_total": 301270,
+        "close_price": 5.215,
+        "gross_exposure_usd": 3886218000.0,
+        "net_exposure_usd": -410785550.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 19857,
+        "mm_short": 12740,
+        "mm_spread": 5863,
+        "oi_total": 79050,
+        "close_price": 2434.0,
+        "gross_exposure_usd": 3967054900.0,
+        "net_exposure_usd": 866138900.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 6689,
+        "mm_short": 6609,
+        "mm_spread": 282,
+        "oi_total": 19349,
+        "close_price": 1865.59997558594,
+        "gross_exposure_usd": 2480874847.534183,
+        "net_exposure_usd": 14924799.80468752,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -9028,19 +8755,6 @@
         "initial_margin_usd": 1568875
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1434,
-        "mm_short": 6997,
-        "mm_spread": 46,
-        "oi_total": 12889,
-        "close_price": 10.34,
-        "gross_exposure_usd": 174353080.0,
-        "net_exposure_usd": -115042840.0,
-        "initial_margin_usd": 11650815
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -9117,6 +8831,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 61246500
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 65090,
+        "mm_short": 78265,
+        "mm_spread": 63853,
+        "oi_total": 302940,
+        "close_price": 5.195,
+        "gross_exposure_usd": 3723646125.0,
+        "net_exposure_usd": -342220625.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 19499,
+        "mm_short": 11634,
+        "mm_spread": 5572,
+        "oi_total": 78337,
+        "close_price": 2333.80004882812,
+        "gross_exposure_usd": 3632909846.008293,
+        "net_exposure_usd": 917766869.2016582,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 6756,
+        "mm_short": 6772,
+        "mm_spread": 436,
+        "oi_total": 19483,
+        "close_price": 1900.40002441406,
+        "gross_exposure_usd": 2570861153.0273404,
+        "net_exposure_usd": -3040640.039062496,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -9397,19 +9150,6 @@
         "initial_margin_usd": 1810875
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1333,
-        "mm_short": 6795,
-        "mm_spread": 6,
-        "oi_total": 12787,
-        "close_price": 10.69,
-        "gross_exposure_usd": 173776640.0,
-        "net_exposure_usd": -116777560.0,
-        "initial_margin_usd": 11183590
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -9486,6 +9226,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 52693650
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 63350,
+        "mm_short": 76363,
+        "mm_spread": 66228,
+        "oi_total": 310140,
+        "close_price": 5.23,
+        "gross_exposure_usd": 3653494950.0000005,
+        "net_exposure_usd": -340289950.00000006,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 18423,
+        "mm_short": 12925,
+        "mm_spread": 5579,
+        "oi_total": 79009,
+        "close_price": 2431.5,
+        "gross_exposure_usd": 3811133100.0,
+        "net_exposure_usd": 668419350.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 6554,
+        "mm_short": 6809,
+        "mm_spread": 462,
+        "oi_total": 19167,
+        "close_price": 1890.90002441406,
+        "gross_exposure_usd": 2526809702.6245084,
+        "net_exposure_usd": -48217950.62255853,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -9766,19 +9545,6 @@
         "initial_margin_usd": 1861750
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1256,
-        "mm_short": 6050,
-        "mm_spread": 26,
-        "oi_total": 12242,
-        "close_price": 10.96,
-        "gross_exposure_usd": 160147520.0,
-        "net_exposure_usd": -105084480.0,
-        "initial_margin_usd": 10078640
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -9855,6 +9621,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 45239000
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 63868,
+        "mm_short": 72762,
+        "mm_spread": 70270,
+        "oi_total": 312290,
+        "close_price": 5.3275,
+        "gross_exposure_usd": 3639481625.0,
+        "net_exposure_usd": -236913925.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 15649,
+        "mm_short": 13221,
+        "mm_spread": 7367,
+        "oi_total": 79441,
+        "close_price": 2513.19995117188,
+        "gross_exposure_usd": 3627804129.5166087,
+        "net_exposure_usd": 305102474.0722662,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 6182,
+        "mm_short": 6725,
+        "mm_spread": 462,
+        "oi_total": 19123,
+        "close_price": 1861.80004882812,
+        "gross_exposure_usd": 2403025323.0224547,
+        "net_exposure_usd": -101095742.65136692,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -10135,19 +9940,6 @@
         "initial_margin_usd": 1821875
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1062,
-        "mm_short": 5110,
-        "mm_spread": 243,
-        "oi_total": 11984,
-        "close_price": 11.09,
-        "gross_exposure_usd": 136894960.0,
-        "net_exposure_usd": -89784640.0,
-        "initial_margin_usd": 8793895
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -10224,6 +10016,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 44412500
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 70707,
+        "mm_short": 78484,
+        "mm_spread": 66091,
+        "oi_total": 312784,
+        "close_price": 5.3475,
+        "gross_exposure_usd": 3988994362.5,
+        "net_exposure_usd": -207937537.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 13519,
+        "mm_short": 12242,
+        "mm_spread": 8525,
+        "oi_total": 73590,
+        "close_price": 2195.60009765625,
+        "gross_exposure_usd": 2828042705.786133,
+        "net_exposure_usd": 140189066.23535156,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5815,
+        "mm_short": 5364,
+        "mm_spread": 360,
+        "oi_total": 17304,
+        "close_price": 1746.09997558594,
+        "gross_exposure_usd": 1951965162.7075224,
+        "net_exposure_usd": 78749108.8989259,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -10491,19 +10322,6 @@
         "initial_margin_usd": 19162206
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1029,
-        "mm_short": 3815,
-        "mm_spread": 248,
-        "oi_total": 11860,
-        "close_price": 11.23,
-        "gross_exposure_usd": 108796240.0,
-        "net_exposure_usd": -62573560.0,
-        "initial_margin_usd": 6974220
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -10580,6 +10398,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 46058850
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 65033,
+        "mm_short": 83045,
+        "mm_spread": 57860,
+        "oi_total": 295884,
+        "close_price": 5.305,
+        "gross_exposure_usd": 3927768950.0,
+        "net_exposure_usd": -477768300.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 11708,
+        "mm_short": 10000,
+        "mm_spread": 8568,
+        "oi_total": 69061,
+        "close_price": 2091.60009765625,
+        "gross_exposure_usd": 2270222745.9960938,
+        "net_exposure_usd": 178622648.33984375,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5606,
+        "mm_short": 5084,
+        "mm_spread": 343,
+        "oi_total": 16538,
+        "close_price": 1722.69995117188,
+        "gross_exposure_usd": 1841566247.8027396,
+        "net_exposure_usd": 89924937.45117213,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -10847,19 +10704,6 @@
         "initial_margin_usd": 19499781
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1073,
-        "mm_short": 3113,
-        "mm_spread": 226,
-        "oi_total": 11541,
-        "close_price": 10.755,
-        "gross_exposure_usd": 90040860.0,
-        "net_exposure_usd": -43880400.0,
-        "initial_margin_usd": 6041640
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -10936,6 +10780,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 45823250
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 68392,
+        "mm_short": 79487,
+        "mm_spread": 62027,
+        "oi_total": 304868,
+        "close_price": 5.3875,
+        "gross_exposure_usd": 3983490562.5,
+        "net_exposure_usd": -298871562.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 12515,
+        "mm_short": 9089,
+        "mm_spread": 8466,
+        "oi_total": 69291,
+        "close_price": 2012.5,
+        "gross_exposure_usd": 2173902500.0,
+        "net_exposure_usd": 344741250.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5589,
+        "mm_short": 5056,
+        "mm_spread": 447,
+        "oi_total": 16789,
+        "close_price": 1675.19995117188,
+        "gross_exposure_usd": 1783250348.0224662,
+        "net_exposure_usd": 89288157.3974612,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -11203,19 +11086,6 @@
         "initial_margin_usd": 19437420
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1124,
-        "mm_short": 4847,
-        "mm_spread": 193,
-        "oi_total": 12900,
-        "close_price": 9.86,
-        "gross_exposure_usd": 117748120.0,
-        "net_exposure_usd": -73417560.0,
-        "initial_margin_usd": 8454270
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -11292,6 +11162,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 52440000
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 75041,
+        "mm_short": 68741,
+        "mm_spread": 61787,
+        "oi_total": 305533,
+        "close_price": 5.5425,
+        "gross_exposure_usd": 3984558675.0000005,
+        "net_exposure_usd": 174588750.00000003,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 14174,
+        "mm_short": 9087,
+        "mm_spread": 8159,
+        "oi_total": 72351,
+        "close_price": 2181.10009765625,
+        "gross_exposure_usd": 2536728468.5791016,
+        "net_exposure_usd": 554762809.8388672,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5928,
+        "mm_short": 4844,
+        "mm_spread": 500,
+        "oi_total": 16423,
+        "close_price": 1813.5,
+        "gross_exposure_usd": 1953502200.0,
+        "net_exposure_usd": 196583400.0,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -11559,19 +11468,6 @@
         "initial_margin_usd": 20309503
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1334,
-        "mm_short": 5641,
-        "mm_spread": 122,
-        "oi_total": 12550,
-        "close_price": 10.585,
-        "gross_exposure_usd": 147660750.0,
-        "net_exposure_usd": -91179190.0,
-        "initial_margin_usd": 9744955
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -11648,6 +11544,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 65265000
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 69829,
+        "mm_short": 66394,
+        "mm_spread": 61300,
+        "oi_total": 291526,
+        "close_price": 5.705,
+        "gross_exposure_usd": 3885761075.0,
+        "net_exposure_usd": 97983375.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 15415,
+        "mm_short": 10496,
+        "mm_spread": 5985,
+        "oi_total": 70154,
+        "close_price": 2074.80004882812,
+        "gross_exposure_usd": 2688007203.259271,
+        "net_exposure_usd": 510297072.00927615,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5979,
+        "mm_short": 5342,
+        "mm_spread": 217,
+        "oi_total": 16093,
+        "close_price": 1635.0,
+        "gross_exposure_usd": 1850983500.0,
+        "net_exposure_usd": 104149500.0,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -11915,19 +11850,6 @@
         "initial_margin_usd": 21363477
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1107,
-        "mm_short": 4693,
-        "mm_spread": 117,
-        "oi_total": 11601,
-        "close_price": 10.915,
-        "gross_exposure_usd": 126614000.0,
-        "net_exposure_usd": -78282380.0,
-        "initial_margin_usd": 8123005
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -12004,6 +11926,45 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 68875000
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 69553,
+        "mm_short": 59619,
+        "mm_spread": 61501,
+        "oi_total": 289815,
+        "close_price": 5.9675,
+        "gross_exposure_usd": 3854169550.0,
+        "net_exposure_usd": 296405725.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 16286,
+        "mm_short": 8563,
+        "mm_spread": 5942,
+        "oi_total": 68758,
+        "close_price": 2235.0,
+        "gross_exposure_usd": 2776875750.0,
+        "net_exposure_usd": 863045250.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5703,
+        "mm_short": 5355,
+        "mm_spread": 511,
+        "oi_total": 15679,
+        "close_price": 1668.69995117188,
+        "gross_exposure_usd": 1845248406.0058649,
+        "net_exposure_usd": 58070758.30078142,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -12284,19 +12245,6 @@
         "initial_margin_usd": 64058500
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1006,
-        "mm_short": 3607,
-        "mm_spread": 134,
-        "oi_total": 10897,
-        "close_price": 11.34,
-        "gross_exposure_usd": 104622840.0,
-        "net_exposure_usd": -58990680.0,
-        "initial_margin_usd": 6512385
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -12360,6 +12308,45 @@
         "gross_exposure_usd": 1517532370.0,
         "net_exposure_usd": -870572550.0,
         "initial_margin_usd": 332121697
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 73424,
+        "mm_short": 62102,
+        "mm_spread": 62688,
+        "oi_total": 301414,
+        "close_price": 6.0675,
+        "gross_exposure_usd": 4111520025.0,
+        "net_exposure_usd": 343481175.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 17494,
+        "mm_short": 6656,
+        "mm_spread": 5890,
+        "oi_total": 67292,
+        "close_price": 2131.80004882812,
+        "gross_exposure_usd": 2574148558.9599547,
+        "net_exposure_usd": 1155222446.4599583,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5559,
+        "mm_short": 5657,
+        "mm_spread": 563,
+        "oi_total": 15556,
+        "close_price": 1614.0,
+        "gross_exposure_usd": 1810262400.0,
+        "net_exposure_usd": -15817200.0,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -12640,19 +12627,6 @@
         "initial_margin_usd": 56050000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1035,
-        "mm_short": 3845,
-        "mm_spread": 134,
-        "oi_total": 11268,
-        "close_price": 10.99,
-        "gross_exposure_usd": 107262400.0,
-        "net_exposure_usd": -61763800.0,
-        "initial_margin_usd": 6879510
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -12716,6 +12690,45 @@
         "gross_exposure_usd": 1533312000.0,
         "net_exposure_usd": -936276000.0,
         "initial_margin_usd": 341282916
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 71212,
+        "mm_short": 61694,
+        "mm_spread": 62556,
+        "oi_total": 300452,
+        "close_price": 6.04,
+        "gross_exposure_usd": 4013761200.0,
+        "net_exposure_usd": 287443600.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 16788,
+        "mm_short": 4984,
+        "mm_spread": 5077,
+        "oi_total": 61473,
+        "close_price": 1892.0,
+        "gross_exposure_usd": 2059631200.0,
+        "net_exposure_usd": 1116658400.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4734,
+        "mm_short": 6246,
+        "mm_spread": 640,
+        "oi_total": 15069,
+        "close_price": 1411.19995117188,
+        "gross_exposure_usd": 1549497546.3867242,
+        "net_exposure_usd": -213373432.61718825,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -12996,19 +13009,6 @@
         "initial_margin_usd": 54036000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1009,
-        "mm_short": 4200,
-        "mm_spread": 149,
-        "oi_total": 11664,
-        "close_price": 11.375,
-        "gross_exposure_usd": 118504750.0,
-        "net_exposure_usd": -72595250.0,
-        "initial_margin_usd": 7350860
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -13072,6 +13072,45 @@
         "gross_exposure_usd": 1633995000.0,
         "net_exposure_usd": -1027125000.0,
         "initial_margin_usd": 362995335
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 75328,
+        "mm_short": 51528,
+        "mm_spread": 65344,
+        "oi_total": 294333,
+        "close_price": 6.355,
+        "gross_exposure_usd": 4030849400.0000005,
+        "net_exposure_usd": 756245000.0000001,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 16992,
+        "mm_short": 4556,
+        "mm_spread": 4859,
+        "oi_total": 60515,
+        "close_price": 1950.0,
+        "gross_exposure_usd": 2100930000.0,
+        "net_exposure_usd": 1212510000.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4578,
+        "mm_short": 6590,
+        "mm_spread": 660,
+        "oi_total": 15220,
+        "close_price": 1471.19995117188,
+        "gross_exposure_usd": 1643036105.4687555,
+        "net_exposure_usd": -296005430.17578226,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -13352,19 +13391,6 @@
         "initial_margin_usd": 58345200
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1108,
-        "mm_short": 4060,
-        "mm_spread": 151,
-        "oi_total": 11829,
-        "close_price": 11.145,
-        "gross_exposure_usd": 115194720.0,
-        "net_exposure_usd": -65800080.0,
-        "initial_margin_usd": 7297015
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -13428,6 +13454,45 @@
         "gross_exposure_usd": 1512546560.0,
         "net_exposure_usd": -957393040.0,
         "initial_margin_usd": 364044688
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 76551,
+        "mm_short": 57791,
+        "mm_spread": 61122,
+        "oi_total": 297896,
+        "close_price": 6.075,
+        "gross_exposure_usd": 4080638250.0,
+        "net_exposure_usd": 569835000.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 18166,
+        "mm_short": 4528,
+        "mm_spread": 4844,
+        "oi_total": 59884,
+        "close_price": 1929.09997558594,
+        "gross_exposure_usd": 2188949742.297366,
+        "net_exposure_usd": 1315453273.3520525,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4539,
+        "mm_short": 7080,
+        "mm_spread": 564,
+        "oi_total": 15187,
+        "close_price": 1442.0,
+        "gross_exposure_usd": 1675459800.0,
+        "net_exposure_usd": -366412200.0,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -13708,19 +13773,6 @@
         "initial_margin_usd": 59688500
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1053,
-        "mm_short": 4641,
-        "mm_spread": 150,
-        "oi_total": 12462,
-        "close_price": 10.785,
-        "gross_exposure_usd": 122819580.0,
-        "net_exposure_usd": -77393160.0,
-        "initial_margin_usd": 8019000
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -13784,6 +13836,45 @@
         "gross_exposure_usd": 1868669950.0,
         "net_exposure_usd": -1008018230.0,
         "initial_margin_usd": 382641315
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 63863,
+        "mm_short": 44408,
+        "mm_spread": 65033,
+        "oi_total": 297784,
+        "close_price": 6.2275,
+        "gross_exposure_usd": 3371288262.5,
+        "net_exposure_usd": 605780062.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 20744,
+        "mm_short": 4120,
+        "mm_spread": 5121,
+        "oi_total": 62452,
+        "close_price": 2084.60009765625,
+        "gross_exposure_usd": 2591574841.40625,
+        "net_exposure_usd": 1732719601.171875,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4732,
+        "mm_short": 6540,
+        "mm_spread": 356,
+        "oi_total": 14648,
+        "close_price": 1579.40002441406,
+        "gross_exposure_usd": 1780299707.5195284,
+        "net_exposure_usd": -285555524.414062,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -14064,19 +14155,6 @@
         "initial_margin_usd": 59180250
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 942,
-        "mm_short": 4443,
-        "mm_spread": 118,
-        "oi_total": 12761,
-        "close_price": 10.99,
-        "gross_exposure_usd": 118362300.0,
-        "net_exposure_usd": -76951980.0,
-        "initial_margin_usd": 7553645
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -14140,6 +14218,45 @@
         "gross_exposure_usd": 1651055000.0,
         "net_exposure_usd": -858870600.0,
         "initial_margin_usd": 374843175
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 72047,
+        "mm_short": 40642,
+        "mm_spread": 52607,
+        "oi_total": 293233,
+        "close_price": 6.435,
+        "gross_exposure_usd": 3625768574.9999995,
+        "net_exposure_usd": 1010455874.9999999,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 19974,
+        "mm_short": 4047,
+        "mm_spread": 5282,
+        "oi_total": 61997,
+        "close_price": 2024.30004882812,
+        "gross_exposure_usd": 2431285573.645014,
+        "net_exposure_usd": 1612051343.8842733,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4848,
+        "mm_short": 6634,
+        "mm_spread": 364,
+        "oi_total": 14921,
+        "close_price": 1531.69995117188,
+        "gross_exposure_usd": 1758697883.9355526,
+        "net_exposure_usd": -273561611.27929777,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -14420,19 +14537,6 @@
         "initial_margin_usd": 61465000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1014,
-        "mm_short": 5009,
-        "mm_spread": 99,
-        "oi_total": 12767,
-        "close_price": 10.575,
-        "gross_exposure_usd": 127386450.0,
-        "net_exposure_usd": -84494250.0,
-        "initial_margin_usd": 8406860
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -14496,6 +14600,45 @@
         "gross_exposure_usd": 1656003300.0,
         "net_exposure_usd": -962812600.0,
         "initial_margin_usd": 367589614
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 71571,
+        "mm_short": 40322,
+        "mm_spread": 52598,
+        "oi_total": 280070,
+        "close_price": 6.9675,
+        "gross_exposure_usd": 3898072387.5,
+        "net_exposure_usd": 1088637037.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 18661,
+        "mm_short": 4586,
+        "mm_spread": 5488,
+        "oi_total": 61055,
+        "close_price": 1942.30004882812,
+        "gross_exposure_usd": 2257632461.7553654,
+        "net_exposure_usd": 1366893659.3627894,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4782,
+        "mm_short": 7118,
+        "mm_spread": 579,
+        "oi_total": 15794,
+        "close_price": 1461.09997558594,
+        "gross_exposure_usd": 1738708970.9472687,
+        "net_exposure_usd": -341312954.2968756,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -14776,19 +14919,6 @@
         "initial_margin_usd": 58524750
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1111,
-        "mm_short": 4815,
-        "mm_spread": 158,
-        "oi_total": 12769,
-        "close_price": 11.71,
-        "gross_exposure_usd": 138786920.0,
-        "net_exposure_usd": -86747680.0,
-        "initial_margin_usd": 8348120
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -14852,6 +14982,45 @@
         "gross_exposure_usd": 2125593000.0,
         "net_exposure_usd": -803802400.0,
         "initial_margin_usd": 385178600
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 76005,
+        "mm_short": 38024,
+        "mm_spread": 60508,
+        "oi_total": 293054,
+        "close_price": 6.7725,
+        "gross_exposure_usd": 3861307012.5,
+        "net_exposure_usd": 1286131612.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 17356,
+        "mm_short": 4984,
+        "mm_spread": 5491,
+        "oi_total": 60646,
+        "close_price": 1960.69995117188,
+        "gross_exposure_usd": 2190101845.45899,
+        "net_exposure_usd": 1212888989.794925,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4628,
+        "mm_short": 6566,
+        "mm_spread": 685,
+        "oi_total": 15985,
+        "close_price": 1507.09997558594,
+        "gross_exposure_usd": 1687047712.6709013,
+        "net_exposure_usd": -292075975.2685552,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -15132,19 +15301,6 @@
         "initial_margin_usd": 56948700
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1408,
-        "mm_short": 2985,
-        "mm_spread": 169,
-        "oi_total": 12368,
-        "close_price": 12.04,
-        "gross_exposure_usd": 105783440.0,
-        "net_exposure_usd": -37974160.0,
-        "initial_margin_usd": 6254160
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -15208,6 +15364,45 @@
         "gross_exposure_usd": 1686553620.0,
         "net_exposure_usd": -522708240.0,
         "initial_margin_usd": 272458826
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 74853,
+        "mm_short": 38146,
+        "mm_spread": 62146,
+        "oi_total": 297542,
+        "close_price": 7.205,
+        "gross_exposure_usd": 4070788975.0,
+        "net_exposure_usd": 1322369675.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 19980,
+        "mm_short": 3869,
+        "mm_spread": 6242,
+        "oi_total": 63375,
+        "close_price": 2110.0,
+        "gross_exposure_usd": 2516069500.0,
+        "net_exposure_usd": 1699710500.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4698,
+        "mm_short": 6646,
+        "mm_spread": 1319,
+        "oi_total": 17419,
+        "close_price": 1485.69995117188,
+        "gross_exposure_usd": 1685378024.6093807,
+        "net_exposure_usd": -289414350.4882822,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -15501,19 +15696,6 @@
         "initial_margin_usd": 57303050
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2090,
-        "mm_short": 2640,
-        "mm_spread": 100,
-        "oi_total": 12720,
-        "close_price": 12.97,
-        "gross_exposure_usd": 122696200.0,
-        "net_exposure_usd": -14267000.0,
-        "initial_margin_usd": 6630250
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -15577,6 +15759,45 @@
         "gross_exposure_usd": 1478135310.0,
         "net_exposure_usd": -397693530.0,
         "initial_margin_usd": 277228877
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 74860,
+        "mm_short": 44069,
+        "mm_spread": 65540,
+        "oi_total": 307999,
+        "close_price": 7.0375,
+        "gross_exposure_usd": 4184814187.5,
+        "net_exposure_usd": 1083458312.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 18813,
+        "mm_short": 5479,
+        "mm_spread": 6348,
+        "oi_total": 62782,
+        "close_price": 1933.80004882812,
+        "gross_exposure_usd": 2348793539.3066344,
+        "net_exposure_usd": 1289264492.5537076,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4301,
+        "mm_short": 7034,
+        "mm_spread": 1071,
+        "oi_total": 17259,
+        "close_price": 1360.19995117188,
+        "gross_exposure_usd": 1541786644.653326,
+        "net_exposure_usd": -371742646.6552748,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -15870,19 +16091,6 @@
         "initial_margin_usd": 57680200
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2752,
-        "mm_short": 2559,
-        "mm_spread": 101,
-        "oi_total": 13513,
-        "close_price": 13.0,
-        "gross_exposure_usd": 138086000.0,
-        "net_exposure_usd": 5018000.0,
-        "initial_margin_usd": 7430390
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -15946,6 +16154,45 @@
         "gross_exposure_usd": 1670393230.0,
         "net_exposure_usd": -466636170.0,
         "initial_margin_usd": 293651723
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 70797,
+        "mm_short": 42668,
+        "mm_spread": 64458,
+        "oi_total": 315775,
+        "close_price": 6.7625,
+        "gross_exposure_usd": 3836535312.5,
+        "net_exposure_usd": 951111812.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 18562,
+        "mm_short": 5737,
+        "mm_spread": 6793,
+        "oi_total": 62711,
+        "close_price": 1942.19995117188,
+        "gross_exposure_usd": 2359675830.6762757,
+        "net_exposure_usd": 1245435718.688968,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4126,
+        "mm_short": 7898,
+        "mm_spread": 911,
+        "oi_total": 16692,
+        "close_price": 1385.80004882812,
+        "gross_exposure_usd": 1666285978.7109315,
+        "net_exposure_usd": -522723778.4179669,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -16239,19 +16486,6 @@
         "initial_margin_usd": 57836000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2700,
-        "mm_short": 2340,
-        "mm_spread": 157,
-        "oi_total": 13478,
-        "close_price": 12.66,
-        "gross_exposure_usd": 127612800.0,
-        "net_exposure_usd": 9115200.0,
-        "initial_margin_usd": 7128605
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -16315,6 +16549,45 @@
         "gross_exposure_usd": 1610870040.0,
         "net_exposure_usd": -345113080.0,
         "initial_margin_usd": 286834997
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 59253,
+        "mm_short": 45018,
+        "mm_spread": 63896,
+        "oi_total": 315942,
+        "close_price": 6.3475,
+        "gross_exposure_usd": 3309300862.5,
+        "net_exposure_usd": 451783312.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 17644,
+        "mm_short": 5827,
+        "mm_spread": 6033,
+        "oi_total": 65697,
+        "close_price": 1937.40002441406,
+        "gross_exposure_usd": 2273635798.65112,
+        "net_exposure_usd": 1144712804.4250474,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4710,
+        "mm_short": 8201,
+        "mm_spread": 423,
+        "oi_total": 16284,
+        "close_price": 1373.09997558594,
+        "gross_exposure_usd": 1772809378.4790072,
+        "net_exposure_usd": -479349201.4770517,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -16595,19 +16868,6 @@
         "initial_margin_usd": 53289300
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2709,
-        "mm_short": 2502,
-        "mm_spread": 204,
-        "oi_total": 12736,
-        "close_price": 12.66,
-        "gross_exposure_usd": 131942520.0,
-        "net_exposure_usd": 5241240.0,
-        "initial_margin_usd": 7423185
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -16671,6 +16931,45 @@
         "gross_exposure_usd": 1562090250.0,
         "net_exposure_usd": -394018350.0,
         "initial_margin_usd": 298190375
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 53348,
+        "mm_short": 57346,
+        "mm_spread": 51014,
+        "oi_total": 290952,
+        "close_price": 6.3075,
+        "gross_exposure_usd": 3491012025.0,
+        "net_exposure_usd": -126086925.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 15442,
+        "mm_short": 7168,
+        "mm_spread": 5273,
+        "oi_total": 62457,
+        "close_price": 1708.59997558594,
+        "gross_exposure_usd": 1931572272.3999052,
+        "net_exposure_usd": 706847809.8999034,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4700,
+        "mm_short": 9160,
+        "mm_spread": 480,
+        "oi_total": 17455,
+        "close_price": 1213.59997558594,
+        "gross_exposure_usd": 1682049566.1621127,
+        "net_exposure_usd": -541265589.1113292,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -16951,19 +17250,6 @@
         "initial_margin_usd": 30503550
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1709,
-        "mm_short": 2611,
-        "mm_spread": 259,
-        "oi_total": 12337,
-        "close_price": 12.66,
-        "gross_exposure_usd": 109382400.0,
-        "net_exposure_usd": -22838640.0,
-        "initial_margin_usd": 6267635
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -17027,6 +17313,45 @@
         "gross_exposure_usd": 1784207920.0,
         "net_exposure_usd": -309490240.0,
         "initial_margin_usd": 314402244
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 59034,
+        "mm_short": 50671,
+        "mm_spread": 53468,
+        "oi_total": 289534,
+        "close_price": 6.3375,
+        "gross_exposure_usd": 3476277187.5,
+        "net_exposure_usd": 265002562.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 14700,
+        "mm_short": 6816,
+        "mm_spread": 6938,
+        "oi_total": 62420,
+        "close_price": 1812.09997558594,
+        "gross_exposure_usd": 1949457153.7353544,
+        "net_exposure_usd": 714329810.3759776,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 5146,
+        "mm_short": 9465,
+        "mm_spread": 542,
+        "oi_total": 17011,
+        "close_price": 1355.90002441406,
+        "gross_exposure_usd": 1981105525.671383,
+        "net_exposure_usd": -585613220.5444325,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -17307,19 +17632,6 @@
         "initial_margin_usd": 22885500
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 1295,
-        "mm_short": 2555,
-        "mm_spread": 108,
-        "oi_total": 11653,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null,
-        "initial_margin_usd": 5430370
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -17383,6 +17695,45 @@
         "gross_exposure_usd": 1676332350.0,
         "net_exposure_usd": -119669850.0,
         "initial_margin_usd": 271865727
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 56863,
+        "mm_short": 57621,
+        "mm_spread": 48082,
+        "oi_total": 269180,
+        "close_price": 6.1825,
+        "gross_exposure_usd": 3538986650.0,
+        "net_exposure_usd": -23431675.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 14986,
+        "mm_short": 6329,
+        "mm_spread": 6184,
+        "oi_total": 57738,
+        "close_price": 1660.90002441406,
+        "gross_exposure_usd": 1770104201.0192842,
+        "net_exposure_usd": 718920575.5676258,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4783,
+        "mm_short": 9507,
+        "mm_spread": 615,
+        "oi_total": 17149,
+        "close_price": 1230.69995117188,
+        "gross_exposure_usd": 1758670230.2246165,
+        "net_exposure_usd": -581382656.9335961,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -17663,19 +18014,6 @@
         "initial_margin_usd": 24785500
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2264,
-        "mm_short": 2710,
-        "mm_spread": 87,
-        "oi_total": 13644,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null,
-        "initial_margin_usd": 6949305
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -17739,6 +18077,45 @@
         "gross_exposure_usd": 1205637120.0,
         "net_exposure_usd": -122650080.0,
         "initial_margin_usd": 179961452
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 59570,
+        "mm_short": 54608,
+        "mm_spread": 45494,
+        "oi_total": 260913,
+        "close_price": 6.11,
+        "gross_exposure_usd": 3488137900.0,
+        "net_exposure_usd": 151589100.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 15752,
+        "mm_short": 7855,
+        "mm_spread": 1794,
+        "oi_total": 53719,
+        "close_price": 1550.19995117188,
+        "gross_exposure_usd": 1829778512.3657284,
+        "net_exposure_usd": 612096450.7202168,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4164,
+        "mm_short": 10133,
+        "mm_spread": 706,
+        "oi_total": 17847,
+        "close_price": 1200.0,
+        "gross_exposure_usd": 1715640000.0,
+        "net_exposure_usd": -716280000.0,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -18019,19 +18396,6 @@
         "initial_margin_usd": 23723400
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2317,
-        "mm_short": 2804,
-        "mm_spread": 88,
-        "oi_total": 12708,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null,
-        "initial_margin_usd": 7152695
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -18095,6 +18459,45 @@
         "gross_exposure_usd": 1306400740.0,
         "net_exposure_usd": 53860280.0,
         "initial_margin_usd": 171591914
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 63305,
+        "mm_short": 54576,
+        "mm_spread": 49140,
+        "oi_total": 268328,
+        "close_price": 6.3975,
+        "gross_exposure_usd": 3770718487.5,
+        "net_exposure_usd": 279218887.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 14543,
+        "mm_short": 6958,
+        "mm_spread": 2767,
+        "oi_total": 53645,
+        "close_price": 1651.19995117188,
+        "gross_exposure_usd": 1775122507.5073295,
+        "net_exposure_usd": 626217581.4819355,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 3622,
+        "mm_short": 10003,
+        "mm_spread": 802,
+        "oi_total": 17854,
+        "close_price": 1270.59997558594,
+        "gross_exposure_usd": 1731192466.7358432,
+        "net_exposure_usd": -810769844.4213883,
+        "initial_margin_usd": null
       }
     ]
   },
@@ -18375,19 +18778,6 @@
         "initial_margin_usd": 24453000
       },
       {
-        "symbol": "rough_rice",
-        "sector": "micros",
-        "name": "Rough Rice",
-        "mm_long": 2812,
-        "mm_short": 2639,
-        "mm_spread": 91,
-        "oi_total": 13076,
-        "close_price": null,
-        "gross_exposure_usd": null,
-        "net_exposure_usd": null,
-        "initial_margin_usd": 7610240
-      },
-      {
         "symbol": "brent",
         "sector": "hard",
         "name": "Brent Crude Oil",
@@ -18451,6 +18841,45 @@
         "gross_exposure_usd": 1191826200.0,
         "net_exposure_usd": 224758600.0,
         "initial_margin_usd": 160304633
+      },
+      {
+        "symbol": "wheat_hrw",
+        "sector": "grains",
+        "name": "Wheat (HRW)",
+        "mm_long": 61680,
+        "mm_short": 47891,
+        "mm_spread": 49263,
+        "oi_total": 267937,
+        "close_price": 6.6425,
+        "gross_exposure_usd": 3639126837.5,
+        "net_exposure_usd": 457967162.5,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "platinum",
+        "sector": "hard",
+        "name": "Platinum",
+        "mm_long": 14866,
+        "mm_short": 6600,
+        "mm_spread": 3336,
+        "oi_total": 53837,
+        "close_price": 1631.5,
+        "gross_exposure_usd": 1751088950.0,
+        "net_exposure_usd": 674298950.0,
+        "initial_margin_usd": null
+      },
+      {
+        "symbol": "palladium",
+        "sector": "hard",
+        "name": "Palladium",
+        "mm_long": 4147,
+        "mm_short": 10374,
+        "mm_spread": 682,
+        "oi_total": 18578,
+        "close_price": 1298.59997558594,
+        "gross_exposure_usd": 1885697024.5483434,
+        "net_exposure_usd": -808638204.7973648,
+        "initial_margin_usd": null
       }
     ]
   }
