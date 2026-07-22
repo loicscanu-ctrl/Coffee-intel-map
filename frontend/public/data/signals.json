@@ -220,17 +220,6 @@
       "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
     },
     {
-      "id": "SP2",
-      "name": "Spreading Decrease",
-      "category": "SP",
-      "categoryLabel": "Spreading",
-      "market": "NY",
-      "severity": "info",
-      "score": 0,
-      "magnitude": "medium",
-      "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-    },
-    {
       "id": "SP1",
       "name": "Spreading Increase",
       "category": "SP",
@@ -2227,17 +2216,6 @@
           "text": "Roasters dangerously under-covered (<25th pct) into rising price — high risk of being forced to buy at unfavorable levels."
         },
         {
-          "id": "CR7",
-          "name": "Roaster Concentration",
-          "category": "CR",
-          "categoryLabel": "Roaster",
-          "market": "LDN",
-          "severity": "warn",
-          "score": 1,
-          "magnitude": "small",
-          "text": "Roaster long OI rising while number of buying entities falls — fewer, larger coverage positions. Concentration suggests urgency from a small number of actors, potentially amplifying short-term price impact."
-        },
-        {
           "id": "CI2",
           "name": "Commercial Convergence Bearish",
           "category": "CI",
@@ -2280,17 +2258,6 @@
           "score": -2,
           "magnitude": "large",
           "text": "Funds adding longs but near capacity (>75th pct) — bullish momentum likely limited, reversal risk increasing."
-        },
-        {
-          "id": "ML7",
-          "name": "Long Concentration",
-          "category": "ML",
-          "categoryLabel": "MM Longs",
-          "market": "LDN",
-          "severity": "warn",
-          "score": -1,
-          "magnitude": "medium",
-          "text": "MM long OI rising while number of long traders falls — fewer, larger positions. Concentration increases fragility: a forced exit by one actor can cascade."
         },
         {
           "id": "MS4",
@@ -2426,7 +2393,7 @@
         }
       ],
       "scoreNY": 0,
-      "scoreLDN": 8,
+      "scoreLDN": 9,
       "priceNY": 296.45,
       "priceLDN": 3658
     },
@@ -2564,6 +2531,17 @@
           "score": -2,
           "magnitude": "large",
           "text": "Funds shorting into rising price — contrarian positioning, betting on reversal."
+        },
+        {
+          "id": "MS7",
+          "name": "Short Concentration",
+          "category": "MS",
+          "categoryLabel": "MM Shorts",
+          "market": "LDN",
+          "severity": "warn",
+          "score": 1,
+          "magnitude": "large",
+          "text": "MM short OI rising while number of short traders falls — fewer, larger short positions. Concentration increases squeeze fragility: a stop-out by one large actor can compress the market rapidly."
         },
         {
           "id": "MI1",
@@ -2720,7 +2698,7 @@
         }
       ],
       "scoreNY": 5,
-      "scoreLDN": -3,
+      "scoreLDN": -2,
       "priceNY": 317.6,
       "priceLDN": 3872
     },
@@ -2944,17 +2922,6 @@
           "text": "RC backwardation losing strength — reduces incentive for longs to hold, may trigger gradual long liquidation. Check if easing coincides with roll window."
         },
         {
-          "id": "SP2",
-          "name": "Spreading Decrease",
-          "category": "SP",
-          "categoryLabel": "Spreading",
-          "market": "NY",
-          "severity": "info",
-          "score": 0,
-          "magnitude": "medium",
-          "text": "Funds collapsing spread positions — may signal transition to outright directional positioning. Watch which direction longs and shorts move next."
-        },
-        {
           "id": "SP1",
           "name": "Spreading Increase",
           "category": "SP",
@@ -2978,5 +2945,5 @@
       "priceLDN": 3849
     }
   ],
-  "generatedAt": "2026-07-22T05:37:38.552Z"
+  "generatedAt": "2026-07-22T09:21:02.775Z"
 }

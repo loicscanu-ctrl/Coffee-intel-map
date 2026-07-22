@@ -17674,6 +17674,71 @@
         "gross_exposure_usd": null,
         "net_exposure_usd": null,
         "initial_margin_usd": 6949305
+      },
+      {
+        "symbol": "brent",
+        "sector": "hard",
+        "name": "Brent Crude Oil",
+        "mm_long": 271135,
+        "mm_short": 169984,
+        "mm_spread": 214308,
+        "oi_total": 2666332,
+        "close_price": 73.379997253418,
+        "gross_exposure_usd": 32369311008.430492,
+        "net_exposure_usd": 7422460102.180484,
+        "initial_margin_usd": 2226480735
+      },
+      {
+        "symbol": "lsgo",
+        "sector": "hard",
+        "name": "Low Sulphur Gasoil",
+        "mm_long": 90381,
+        "mm_short": 30376,
+        "mm_spread": 51074,
+        "oi_total": 818080,
+        "close_price": 852.899268651009,
+        "gross_exposure_usd": 10299355698.44899,
+        "net_exposure_usd": 5117822061.54038,
+        "initial_margin_usd": 1126826901
+      },
+      {
+        "symbol": "white_sugar",
+        "sector": "softs",
+        "name": "White Sugar No. 5",
+        "mm_long": 56327,
+        "mm_short": 8959,
+        "mm_spread": 20934,
+        "oi_total": 167761,
+        "close_price": 326.283764204979,
+        "gross_exposure_usd": 1065088091.4943129,
+        "net_exposure_usd": 772770467.1430722,
+        "initial_margin_usd": 102766536
+      },
+      {
+        "symbol": "robusta",
+        "sector": "softs",
+        "name": "Coffee Robusta",
+        "mm_long": 43540,
+        "mm_short": 4824,
+        "mm_spread": 10113,
+        "oi_total": 97740,
+        "close_price": 3845.0,
+        "gross_exposure_usd": 1859595800.0,
+        "net_exposure_usd": 1488630200.0,
+        "initial_margin_usd": 246876500
+      },
+      {
+        "symbol": "cocoa_ldn",
+        "sector": "softs",
+        "name": "Cocoa London",
+        "mm_long": 10693,
+        "mm_short": 13115,
+        "mm_spread": 16661,
+        "oi_total": 229575,
+        "close_price": 5064.0,
+        "gross_exposure_usd": 1205637120.0,
+        "net_exposure_usd": -122650080.0,
+        "initial_margin_usd": 179961452
       }
     ]
   },
