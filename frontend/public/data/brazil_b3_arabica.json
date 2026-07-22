@@ -17475,7 +17475,46 @@
           "var": "1,83"
         }
       ]
+    },
+    {
+      "date": "2026-07-20",
+      "front_month": "Setembro/2026",
+      "front_price": 385.0,
+      "contracts": [
+        {
+          "month": "Setembro/2026",
+          "price": 385.0,
+          "var": "0,04"
+        },
+        {
+          "month": "Dezembro/2026",
+          "price": 376.45,
+          "var": "1,55"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-21",
+      "front_month": "Setembro/2026",
+      "front_price": 388.85,
+      "contracts": [
+        {
+          "month": "Setembro/2026",
+          "price": 388.85,
+          "var": "1,00"
+        },
+        {
+          "month": "Dezembro/2026",
+          "price": 375.55,
+          "var": "-0,24"
+        },
+        {
+          "month": "Março/2027",
+          "price": 379.15,
+          "var": "4,52"
+        }
+      ]
     }
   ],
-  "updated": "2026-07-19T17:26:44.873495+00:00"
+  "updated": "2026-07-22T11:19:49.900049+00:00"
 }
