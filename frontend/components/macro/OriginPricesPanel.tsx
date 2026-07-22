@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Legend, CartesianGrid, ReferenceLine,
 } from "recharts";
 
 import { fmtDateLabel } from "@/lib/formatters";
+import { CIF_FINANCING_RATE, FEU_MT, ORIGIN_EXPORT_COSTS } from "@/lib/originCosts";
 
 interface HistoryPoint {
   date:  string;
@@ -43,6 +44,18 @@ const ORIGIN_ORDER = [
 ] as const;
 type OriginKey = string;
 type Commodity = "robusta" | "arabica";
+
+// Price basis: farmgate as scraped, FOB (+ fobbing cost stack), or CIF Antwerp
+// (+ ocean freight + 8% p.a. financing over the transit time). FOB/CIF are
+// USD/MT constructions, so those bases force the USD/MT view.
+type Basis = "farmgate" | "fob" | "cif";
+
+// freight.json: FBX-derived USD/FEU per route — latest per-route rates plus a
+// (shorter) daily history with one column per route id.
+interface FreightData {
+  routes?:  { id: string; rate: number }[];
+  history?: ({ date: string } & Record<string, number | string>)[];
+}
 
 type Window = "1M" | "3M" | "6M" | "1Y" | "2Y";
 const WINDOW_DAYS: Record<Window, number> = {
@@ -126,9 +139,14 @@ export default function OriginPricesPanel() {
   const [usd,       setUsd]       = useState(false);
   const [axisMode,  setAxisMode]  = useState<"index" | "value">("index");
   const [commodity, setCommodity] = useState<Commodity>("robusta");
+  const [basis,     setBasis]     = useState<Basis>("farmgate");
   const [fx,        setFx]        = useState<FxSeries>({});
+  const [freight,   setFreight]   = useState<FreightData | null>(null);
   const [oiHist,    setOiHist]    = useState<OiHistory | null>(null);
   const [priceHist, setPriceHist] = useState<FuturesPriceHistory | null>(null);
+
+  // FOB/CIF only exist in USD/MT space; the basis toggle overrides Native.
+  const effUsd = usd || basis !== "farmgate";
 
   useEffect(() => {
     fetch("/data/origin_prices_history.json")
@@ -157,6 +175,12 @@ export default function OriginPricesPanel() {
       .then(r => r.ok ? r.json() : null)
       .then((ph: FuturesPriceHistory | null) => { if (ph) setPriceHist(ph); })
       .catch(() => { /* fall back to oi_history */ });
+    // FBX freight per route, for the CIF Antwerp basis (per-day where the
+    // history covers the date, latest flat rate otherwise).
+    fetch("/data/freight.json")
+      .then(r => r.ok ? r.json() : null)
+      .then((f: FreightData | null) => { if (f) setFreight(f); })
+      .catch(() => { /* CIF falls back to FOB-only if freight is missing */ });
     // Fallback: the 14-day OI window (used only if the price-history file is
     // missing, e.g. before its first export run).
     fetch("/data/oi_history.json")
@@ -164,6 +188,57 @@ export default function OriginPricesPanel() {
       .then((oi: OiHistory | null) => { if (oi) setOiHist(oi); })
       .catch(() => { /* no overlay */ });
   }, []);
+
+  // Per-route freight history (sorted, for as-of lookups) + latest flat rates.
+  const freightByRoute = useMemo(() => {
+    const perRoute = new Map<string, { dates: string[]; by: Map<string, number> }>();
+    for (const row of freight?.history ?? []) {
+      if (!row?.date) continue;
+      for (const [key, val] of Object.entries(row)) {
+        if (key === "date" || typeof val !== "number") continue;
+        let r = perRoute.get(key);
+        if (!r) { r = { dates: [], by: new Map() }; perRoute.set(key, r); }
+        r.dates.push(row.date as string);
+        r.by.set(row.date as string, val);
+      }
+    }
+    perRoute.forEach(r => r.dates.sort());
+    const latest = new Map((freight?.routes ?? []).map(r => [r.id, r.rate]));
+    return { perRoute, latest };
+  }, [freight]);
+
+  // Ocean freight USD/MT on a date: forward-filled route history where it
+  // covers the date, else the latest flat route rate. USD/FEU ÷ 21.6 MT.
+  const freightMtOnDate = useCallback((route: string, date: string): number | null => {
+    const rh = freightByRoute.perRoute.get(route);
+    let feu: number | null = null;
+    if (rh && rh.dates.length && date >= rh.dates[0]) {
+      for (const d of rh.dates) { if (d <= date) feu = rh.by.get(d)!; else break; }
+    }
+    if (feu == null) feu = freightByRoute.latest.get(route) ?? null;
+    return feu == null ? null : feu / FEU_MT;
+  }, [freightByRoute]);
+
+  // One converter for chart + KPI: native price, or USD/MT at that day's FX,
+  // lifted to the selected basis — FOB adds the research-tab fobbing stack;
+  // CIF Antwerp adds ocean freight and 8% p.a. financing on the FOB value over
+  // the route's transit time. Returns null (a gap, not a wrong number) when
+  // FX, the cost table or freight can't price that origin/date.
+  const convertPoint = useCallback((k: OriginKey, h: HistoryPoint): number | null => {
+    if (h.price == null) return null;
+    const o = data?.origins?.[k];
+    if (!o) return null;
+    if (!effUsd) return h.price;
+    const usdMt = toUsdMtOnDate(h.price, o.unit, o.currency, h.date, fx);
+    if (usdMt == null || basis === "farmgate") return usdMt;
+    const cost = ORIGIN_EXPORT_COSTS[k];
+    if (!cost) return null;
+    const fob = usdMt + cost.fobbingUsdMt;
+    if (basis === "fob") return fob;
+    const fr = freightMtOnDate(cost.freightRoute, h.date);
+    if (fr == null) return null;
+    return fob + fr + fob * CIF_FINANCING_RATE * (cost.transitDays / 365);
+  }, [data, effUsd, basis, fx, freightMtOnDate]);
 
   // Origins of the selected commodity that actually have a price history.
   const presentOrigins = useMemo<OriginKey[]>(
@@ -206,8 +281,9 @@ export default function OriginPricesPanel() {
 
   const futuresName = commodity === "arabica" ? "ICE NY Arabica (KC)" : "ICE London Robusta (RC)";
   // The futures price is a USD/MT figure, so only overlay it where the origins
-  // share that scale: any index view, or a USD/MT value view.
-  const showFutures = futuresSeries.length > 0 && (axisMode === "index" || usd);
+  // share that scale: any index view, or a USD/MT value view (FOB/CIF included
+  // — comparing CIF Antwerp against the exchange front month IS the point).
+  const showFutures = futuresSeries.length > 0 && (axisMode === "index" || effUsd);
 
   const chartData = useMemo(() => {
     if (!data) return [];
@@ -216,13 +292,8 @@ export default function OriginPricesPanel() {
     cutoff.setDate(cutoff.getDate() - days);
     const cutoffIso = cutoff.toISOString().slice(0, 10);
 
-    // Per-point chart value: native price, or USD/MT at THAT day's FX.
-    const valueOf = (k: OriginKey, h: HistoryPoint): number | null => {
-      if (h.price == null) return null;
-      if (!usd) return h.price;
-      const o = data.origins[k];
-      return o ? toUsdMtOnDate(h.price, o.unit, o.currency, h.date, fx) : null;
-    };
+    // Per-point chart value on the selected basis (see convertPoint).
+    const valueOf = convertPoint;
 
     // Union of dates across present origins + the futures overlay, in window.
     const dateSet = new Set<string>();
@@ -257,7 +328,7 @@ export default function OriginPricesPanel() {
       }
       return row;
     });
-  }, [data, window, presentOrigins, usd, fx, axisMode, futuresSeries, showFutures]);
+  }, [data, window, presentOrigins, convertPoint, axisMode, futuresSeries, showFutures]);
 
   const stats = useMemo(() => {
     if (!data) return [] as { key: OriginKey; name: string; latest: HistoryPoint | null; pct: number | null; color: string; unit: string; currency: string; source: string; count: number }[];
@@ -271,7 +342,7 @@ export default function OriginPricesPanel() {
       const inWindow = o.history.filter(h => h.date >= cutoffIso);
       const firstPt  = inWindow.find(h => h.price > 0) ?? null;
       const last     = inWindow.length ? inWindow[inWindow.length - 1] : null;
-      const conv = (h: HistoryPoint) => usd ? toUsdMtOnDate(h.price, o.unit, o.currency, h.date, fx) : h.price;
+      const conv = (h: HistoryPoint) => convertPoint(k, h);
       const fv = firstPt ? conv(firstPt) : null;
       const lv = last ? conv(last) : null;
       const pct = fv && lv ? ((lv - fv) / fv) * 100 : null;
@@ -281,7 +352,7 @@ export default function OriginPricesPanel() {
         source: o.source, count: inWindow.length,
       };
     });
-  }, [data, window, presentOrigins, usd, fx]);
+  }, [data, window, presentOrigins, convertPoint]);
 
   if (error) {
     return (
@@ -303,8 +374,10 @@ export default function OriginPricesPanel() {
         <div>
           <h2 className="text-lg font-bold text-white">Origin Farmgate Prices</h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Local farmgate prices per origin. Index view rebases each series to 100 at the start of the window
-            (cross-origin % moves); Value view plots the actual price (USD/MT when the USD toggle is on).
+            Local farmgate prices per origin, liftable to FOB (+ the Origin Logistics fobbing stack) or
+            CIF Antwerp (+ FBX ocean freight ÷ {FEU_MT} MT/FEU + {(CIF_FINANCING_RATE * 100).toFixed(0)}% p.a.
+            financing on FOB over the route&apos;s transit time). Index view rebases each series to 100 at the
+            start of the window (cross-origin % moves); Value view plots the actual price.
             The {futuresName} front month is overlaid for context. Last update {new Date(data.scraped_at).toISOString().slice(0,10)}.
           </p>
         </div>
@@ -318,6 +391,18 @@ export default function OriginPricesPanel() {
               </button>
             ))}
           </div>
+          {/* Farmgate ⇄ FOB ⇄ CIF Antwerp basis */}
+          <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
+            {([["farmgate","Farmgate"],["fob","FOB"],["cif","CIF ANR"]] as const).map(([b, label]) => (
+              <button key={b} onClick={() => setBasis(b)}
+                title={b === "fob" ? "Farmgate + origin fobbing cost (Research → Origin Logistics)"
+                     : b === "cif" ? `FOB + FBX ocean freight + ${(CIF_FINANCING_RATE * 100).toFixed(0)}% p.a. financing over transit to Antwerp`
+                     : "Local price as scraped"}
+                className={`px-2.5 py-1.5 transition ${basis === b ? "bg-rose-600 text-white" : "text-slate-300 hover:bg-slate-700"}`}>
+                {label}
+              </button>
+            ))}
+          </div>
           {/* Index ⇄ Value axis */}
           <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
             {([["index","Index"],["value","Value"]] as const).map(([m, label]) => (
@@ -327,14 +412,20 @@ export default function OriginPricesPanel() {
               </button>
             ))}
           </div>
-          {/* Native ⇄ USD/MT */}
+          {/* Native ⇄ USD/MT (FOB/CIF are USD/MT by construction, so Native is
+              unavailable on those bases) */}
           <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
-            {([["native","Native"],["usd","USD/MT"]] as const).map(([mode, label]) => (
-              <button key={mode} onClick={() => setUsd(mode === "usd")}
-                className={`px-2.5 py-1.5 transition ${(usd ? "usd" : "native") === mode ? "bg-emerald-600 text-white" : "text-slate-300 hover:bg-slate-700"}`}>
-                {label}
-              </button>
-            ))}
+            {([["native","Native"],["usd","USD/MT"]] as const).map(([mode, label]) => {
+              const nativeLocked = mode === "native" && basis !== "farmgate";
+              return (
+                <button key={mode} onClick={() => !nativeLocked && setUsd(mode === "usd")}
+                  disabled={nativeLocked}
+                  title={nativeLocked ? "FOB / CIF are USD/MT constructions — switch basis to Farmgate for native units" : undefined}
+                  className={`px-2.5 py-1.5 transition ${(effUsd ? "usd" : "native") === mode ? "bg-emerald-600 text-white" : nativeLocked ? "text-slate-600 cursor-not-allowed" : "text-slate-300 hover:bg-slate-700"}`}>
+                  {label}
+                </button>
+              );
+            })}
           </div>
           {/* Window */}
           <div className="flex bg-slate-800 border border-slate-700 rounded-md overflow-hidden text-[10px]">
@@ -365,9 +456,9 @@ export default function OriginPricesPanel() {
                   <div className="text-base font-bold font-mono text-slate-100">
                     {(() => {
                       if (!s.latest) return "—";
-                      if (usd) {
-                        const v = toUsdMtOnDate(s.latest.price, s.unit, s.currency, s.latest.date, fx);
-                        if (v != null) return `$${Math.round(v).toLocaleString()}/MT`;
+                      if (effUsd) {
+                        const v = convertPoint(s.key, s.latest);
+                        return v != null ? `$${Math.round(v).toLocaleString()}/MT` : "—";
                       }
                       return fmtNative(s.latest.price, s.unit, s.currency);
                     })()}
@@ -392,7 +483,11 @@ export default function OriginPricesPanel() {
       <div className="bg-slate-800 rounded-lg border border-slate-700 p-3">
         <div className="text-[10px] text-slate-400 uppercase tracking-wide mb-2">
           {axisMode === "index" ? `Rebased to 100 at start of ${window}` : "Price level"}
-          {" · "}{usd ? "USD/MT, per-day FX" : "local currency, native unit"}
+          {" · "}
+          {basis === "fob" ? "FOB basis (farmgate + fobbing)"
+            : basis === "cif" ? "CIF Antwerp basis (FOB + freight + transit financing)"
+            : "farmgate basis"}
+          {" · "}{effUsd ? "USD/MT, per-day FX" : "local currency, native unit"}
           {showFutures ? ` · ${futuresName} overlay` : ""}
         </div>
         <div className="h-72">
