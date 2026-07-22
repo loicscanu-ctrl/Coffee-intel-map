@@ -836,6 +836,34 @@ def _fetch_and_upsert(db) -> None:
     )
     missing_positions = all_pairs - existing_positions
 
+    # Price trust-state for the window, computed BEFORE the guard so poisoned
+    # prices count as a reason to proceed: pairs whose stored price is
+    # per-value insane (dead/garbled feed) or a >±50% weekly jump (sub-3x
+    # corrupt-batch survivor — arabica's poisoned 6.31 vs real ~3.15). Both are
+    # transient (a fresh refetch resolves them), unlike permanently price-less
+    # symbols (lumber) whose null rows deliberately do NOT trigger runs.
+    from scraper.price_sanity import baselines_by_symbol, is_price_sane, weekly_jump_pairs
+
+    price_rows_window = (
+        db.query(CommodityPrice)
+          .filter(CommodityPrice.date >= window_start)
+          .all()
+    )
+    price_baselines = baselines_by_symbol(price_rows_window)
+    sane_priced = {
+        (p.symbol, p.date) for p in price_rows_window
+        if p.close_price is not None and is_price_sane(p.close_price, price_baselines.get(p.symbol))
+    }
+    stored_insane = {
+        (p.symbol, p.date) for p in price_rows_window
+        if p.close_price is not None and not is_price_sane(p.close_price, price_baselines.get(p.symbol))
+    }
+    jump_pairs = weekly_jump_pairs(price_rows_window) & all_pairs
+    poisoned_pairs = (stored_insane & all_pairs) | jump_pairs
+    if poisoned_pairs:
+        print(f"[macro_cot] {len(poisoned_pairs)} poisoned price pairs to refetch: "
+              f"{sorted(poisoned_pairs)[:8]}", file=sys.stderr)
+
     new_arabica_date = cot_data.get("arabica", [(None, None)])[0][0]
 
     # Guard: if downloaded arabica date is not newer than DB, CFTC hasn't
@@ -859,7 +887,7 @@ def _fetch_and_upsert(db) -> None:
                 f"the {next_report_tue} report was due {expected_release} and is "
                 "still missing — CFTC may be having a real outage, investigate."
             )
-        if not missing_positions and not force_heal:
+        if not missing_positions and not poisoned_pairs and not force_heal:
             print(
                 f"[macro_cot] no new COT data yet — DB has {prev_arabica_date}, "
                 f"downloaded {new_arabica_date} (gap {gap_days} d). Next report "
@@ -918,26 +946,12 @@ def _fetch_and_upsert(db) -> None:
     else:
         print("[macro_cot] WARNING: robusta full parse returned no data", file=sys.stderr)
 
-    # ── Prices: (re)fetch every pair in the window without a SANE stored price ──
-    # Covers the newest week (no price row yet), older holes, AND pairs whose
-    # stored price fails the robust sanity check (a dead/garbled feed like
-    # ZR=F freezing then going bad leaves poisoned rows behind — the export
-    # rejects them, so they must be refetched, not skipped). Symbols with no
-    # price source (lumber) are excluded.
-    from scraper.price_sanity import baselines_by_symbol, is_price_sane
-
-    price_rows_window = (
-        db.query(CommodityPrice)
-          .filter(CommodityPrice.date >= window_start)
-          .all()
-    )
-    price_baselines = baselines_by_symbol(price_rows_window)
-    sane_priced = {
-        (p.symbol, p.date) for p in price_rows_window
-        if p.close_price is not None and is_price_sane(p.close_price, price_baselines.get(p.symbol))
-    }
+    # ── Prices: (re)fetch every pair in the window without a TRUSTED stored price ──
+    # Trust-state (sane_priced / poisoned_pairs) was computed above, before the
+    # staleness guard. need_price = holes (incl. the newest week) + poisoned
+    # pairs; symbols with no price source (lumber) are excluded.
     need_price = {
-        (sym, rd) for (sym, rd) in all_pairs - sane_priced
+        (sym, rd) for (sym, rd) in (all_pairs - sane_priced) | poisoned_pairs
         if COMMODITY_SPECS[sym].get("price_source")
     }
 
@@ -975,6 +989,15 @@ def _fetch_and_upsert(db) -> None:
     _phase(f"fetch_gbpusd({len(gbp_dates)} dates)")
     gbpusd_cache = _fetch_gbpusd_rates(gbp_dates) if gbp_dates else {}
 
+    def _upsert_price_checked(sym_, d_, price_):
+        """Refuse to (re)ingest a per-value-insane price — a refetch that comes
+        back garbled must not overwrite the DB with new garbage."""
+        if not is_price_sane(price_, price_baselines.get(sym_)):
+            print(f"[macro_cot] WARNING: refusing insane fetched price {price_} "
+                  f"for {sym_} on {d_}", file=sys.stderr)
+            return
+        upsert_commodity_price(db, sym_, d_, price_)
+
     _phase(f"upsert_prices({len(need_price)} pairs)")
     for sym, report_date in sorted(need_price):
         spec = COMMODITY_SPECS[sym]
@@ -985,7 +1008,7 @@ def _fetch_and_upsert(db) -> None:
             if price is None:
                 print(f"[macro_cot] WARNING: no yfinance price for {sym} on {report_date}", file=sys.stderr)
                 continue
-            upsert_commodity_price(db, sym, report_date, price)
+            _upsert_price_checked(sym, report_date, price)
 
         elif src == "yfinance_gbp":
             price_gbp = price_cache.get((sym, report_date))
@@ -996,7 +1019,7 @@ def _fetch_and_upsert(db) -> None:
             if gbpusd is None:
                 print(f"[macro_cot] WARNING: no GBPUSD rate for {report_date}, skipping {sym}", file=sys.stderr)
                 continue
-            upsert_commodity_price(db, sym, report_date, price_gbp * gbpusd)
+            _upsert_price_checked(sym, report_date, price_gbp * gbpusd)
 
         elif src == "proxy":
             proxy_sym = spec["price_proxy"]
@@ -1007,21 +1030,21 @@ def _fetch_and_upsert(db) -> None:
                 print(f"[macro_cot] WARNING: no proxy price for {sym} on {report_date} (proxy={proxy_sym})", file=sys.stderr)
                 continue
             converted = proxy_price * spec["proxy_to_usd_per_mt_factor"]
-            upsert_commodity_price(db, sym, report_date, converted)
+            _upsert_price_checked(sym, report_date, converted)
 
         elif src == "stooq":
             price = stooq_cache.get((sym, report_date))
             if price is None:
                 print(f"[macro_cot] WARNING: no stooq price for {sym} on {report_date}", file=sys.stderr)
                 continue
-            upsert_commodity_price(db, sym, report_date, price)
+            _upsert_price_checked(sym, report_date, price)
 
         elif src == "internal_archive":
             price = _front_month_price_from_archive(spec["internal_market"], report_date)
             if price is None:
                 print(f"[macro_cot] WARNING: no internal-archive price for {sym} on {report_date}", file=sys.stderr)
                 continue
-            upsert_commodity_price(db, sym, report_date, price)
+            _upsert_price_checked(sym, report_date, price)
 
     # Fill in the rest of the history for archive-priced symbols so the
     # cross-commodity 1W/1M/YTD columns are correct immediately, not only after

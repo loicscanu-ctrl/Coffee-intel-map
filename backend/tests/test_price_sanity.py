@@ -99,3 +99,31 @@ def test_no_corrupt_batch_on_clean_weeks():
     good = date(2026, 7, 7)
     rows = [_row("gold", 4116, good), _row("wti", 72, good), _row("copper", 6.17, good)]
     assert corrupt_batch_dates(rows, baselines_by_symbol(rows)) == set()
+
+
+def test_weekly_jump_pairs_flags_corrupt_batch_survivor():
+    from scraper.price_sanity import weekly_jump_pairs
+    # Arabica's poisoned 07-14: 3.174 -> 6.312 (+99%) — sub-3x vs the window
+    # median, so per-value passes; the weekly step is what must catch it.
+    rows = [_row("arabica", 3.10, date(2026, 6, 30)),
+            _row("arabica", 3.174, date(2026, 7, 7)),
+            _row("arabica", 6.312, date(2026, 7, 14)),
+            _row("gold", 4100, date(2026, 7, 7)),
+            _row("gold", 4150, date(2026, 7, 14))]
+    assert weekly_jump_pairs(rows) == {("arabica", date(2026, 7, 14))}
+
+
+def test_weekly_jump_pairs_ignores_normal_moves_and_first_week():
+    from scraper.price_sanity import weekly_jump_pairs
+    rows = [_row("wti", 72, date(2026, 7, 7)), _row("wti", 98, date(2026, 7, 14))]  # +36%
+    assert weekly_jump_pairs(rows) == set()
+    assert weekly_jump_pairs([_row("new_sym", 5.0, date(2026, 7, 14))]) == set()
+
+
+def test_weekly_jump_pairs_skips_null_prices():
+    from scraper.price_sanity import weekly_jump_pairs
+    rows = [_row("oj", 3.0, date(2026, 6, 30)),
+            _row("oj", None, date(2026, 7, 7)),
+            _row("oj", 3.1, date(2026, 7, 14))]
+    # Null week is skipped entirely; 3.0 -> 3.1 across the gap is no jump.
+    assert weekly_jump_pairs(rows) == set()

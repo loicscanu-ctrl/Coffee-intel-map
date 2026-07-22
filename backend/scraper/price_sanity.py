@@ -78,3 +78,31 @@ def corrupt_batch_dates(rows, baselines, min_insane: int = CORRUPT_BATCH_MIN) ->
         if r.close_price is not None and not is_price_sane(r.close_price, baselines.get(r.symbol)):
             counts[r.date] += 1
     return {d for d, n in counts.items() if n >= min_insane}
+
+
+# A stored price that moved more than this % vs the same symbol's previous
+# stored week is refetched by the scraper. Sub-3x members of a corrupt batch
+# slip past the per-value check (arabica's poisoned 6.31 vs real ~3.15 was only
+# 2x off its window median), and once the batch's egregious values are healed
+# the batch flag clears — the weekly step is the signature that survives.
+# Genuine >50% single-week moves in these futures are vanishingly rare, and the
+# consequence is benign either way: a fresh single-ticker refetch confirms a
+# real spike (same value re-upserted) or corrects a poisoned one.
+WEEKLY_JUMP_PCT = 50.0
+
+
+def weekly_jump_pairs(rows, jump_pct: float = WEEKLY_JUMP_PCT) -> set:
+    """(symbol, date) pairs whose stored price moved >±jump_pct% vs the same
+    symbol's immediately-preceding stored week. Rows expose `.date`, `.symbol`,
+    `.close_price`; a symbol's first stored week can't jump."""
+    by_symbol: dict[str, list] = {}
+    for r in rows:
+        if r.close_price is not None and r.close_price > 0:
+            by_symbol.setdefault(r.symbol, []).append((r.date, r.close_price))
+    out = set()
+    for sym, series in by_symbol.items():
+        series.sort()
+        for (_, prev_px), (d, px) in zip(series, series[1:]):
+            if abs(px - prev_px) / prev_px * 100 > jump_pct:
+                out.add((sym, d))
+    return out

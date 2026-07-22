@@ -219,11 +219,13 @@ def test_deep_heal_env_forces_upsert_on_complete_window(healing_env, monkeypatch
 
 def test_insane_stored_price_is_refetched(healing_env):
     # A poisoned price row (dead-feed garbage) must be treated as missing and
-    # refetched, not skipped — the ZR=F rough-rice failure mode.
+    # refetched, not skipped — the ZR=F rough-rice failure mode. History sits
+    # near the mocked refetch value (100.0) so the refetched price passes the
+    # upsert sanity guard and actually overwrites the garbage.
     dates, run, db, yf_calls = healing_env
     for d in dates:
-        upsert_commodity_price(db, "arabica", d, 3.2)     # sane history
-    upsert_commodity_price(db, "arabica", dates[-1], 900.0)  # poisoned latest
+        upsert_commodity_price(db, "arabica", d, 98.0)    # sane history
+    upsert_commodity_price(db, "arabica", dates[-1], 9000.0)  # poisoned latest
     run()
     assert ("arabica", dates[-1]) in set(yf_calls[0])
     from models import CommodityPrice
@@ -245,3 +247,22 @@ def test_price_holes_fetched_only_for_missing_pairs(healing_env):
     yf_calls.clear()
     run()
     assert yf_calls == []
+
+
+def test_weekly_jump_price_is_refetched_and_corrected(healing_env):
+    # A corrupt-batch survivor: last week's stored arabica price is 2x off —
+    # per-value sane (within 3x of the window median), but a >50% weekly jump.
+    # The run must refetch that pair and overwrite it with the fresh value.
+    dates, run, db, yf_calls = healing_env
+    for sym in ("arabica", "robusta"):
+        for d in dates:
+            upsert_commodity_cot(db, sym, d, {"mm_long": 1, "mm_short": 1, "mm_spread": 1, "oi_total": 1})
+    for d in dates[:-1]:
+        upsert_commodity_price(db, "arabica", d, 100.0)
+    upsert_commodity_price(db, "arabica", dates[-1], 199.0)  # +99% jump, <3x median
+    for d in dates:
+        upsert_commodity_price(db, "robusta", d, 3800.0)
+    run()
+    assert ("arabica", dates[-1]) in set(yf_calls[0])
+    row = db.query(CommodityPrice).filter_by(symbol="arabica", date=dates[-1]).first()
+    assert row.close_price == 100.0  # mocked refetch returns 100.0
