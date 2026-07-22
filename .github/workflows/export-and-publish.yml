@@ -141,6 +141,20 @@ jobs:
             [ -f "$f" ] && git add "$f" || true
           done
 
+          # Backstop: stage ANY tracked data file the export modified but the
+          # allowlist above forgot. `git add -u` touches tracked files only (no
+          # untracked strays), and files under frontend/public/data are written
+          # solely by export_static_json / export:signals in this job, so
+          # anything modified here is canonical exporter output. Without this,
+          # a new exporter whose file misses the allowlist regenerates daily
+          # but never commits — futures_price_history.json froze for a week
+          # that way (Jul 2026) while health.json showed the exporter green.
+          # oi_history.json stays excluded: owned + committed by workflow 1.3.
+          git add -u frontend/public/data/
+          git reset -q frontend/public/data/oi_history.json 2>/dev/null || true
+          leftover=$(git status --porcelain frontend/public/data/ | grep -v '^[MARC]' || true)
+          [ -n "$leftover" ] && echo "::warning::unstaged data files after backstop: $leftover"
+
           if git diff --cached --quiet; then
             echo "No changes."
             exit 0
