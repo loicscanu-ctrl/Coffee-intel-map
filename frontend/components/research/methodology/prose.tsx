@@ -42,29 +42,74 @@ export function Highlight({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Outer card for a methodology paper. Collapsed by default: the header (kicker /
-// title / subtitle) stays visible as a teaser and the body opens on "Read more".
-export function Paper({ kicker, title, subtitle, defaultOpen = false, children }: {
-  kicker: string; title: string; subtitle?: string; defaultOpen?: boolean; children: React.ReactNode;
+// ── Unified research card shell ──────────────────────────────────────────────
+// Every research article/tool renders through this shell so the collapsed
+// ("pre-Read-more") state is identical across the whole Research tab: one-line
+// kicker (sub-category colour), one-line title, one-line subtitle, the toggle,
+// and the last-edited date. `tone` colour-codes the former sub-category the
+// piece belongs to. Bump `updated` whenever an article's CONTENT changes.
+export type Tone = "amber" | "sky" | "emerald" | "violet" | "rose" | "teal" | "lime" | "cyan" | "orange" | "green";
+const TONES: Record<Tone, { kicker: string; border: string }> = {
+  amber:   { kicker: "text-amber-500/90",   border: "border-l-amber-400/60" },
+  sky:     { kicker: "text-sky-400/90",     border: "border-l-sky-400/60" },
+  emerald: { kicker: "text-emerald-400/90", border: "border-l-emerald-400/60" },
+  violet:  { kicker: "text-violet-400/90",  border: "border-l-violet-400/60" },
+  rose:    { kicker: "text-rose-400/90",    border: "border-l-rose-400/60" },
+  teal:    { kicker: "text-teal-400/90",    border: "border-l-teal-400/60" },
+  lime:    { kicker: "text-lime-400/90",    border: "border-l-lime-400/60" },
+  cyan:    { kicker: "text-cyan-400/90",    border: "border-l-cyan-400/60" },
+  orange:  { kicker: "text-orange-400/90",  border: "border-l-orange-400/60" },
+  green:   { kicker: "text-green-400/90",   border: "border-l-green-400/60" },
+};
+
+export function ResearchCard({ tone = "amber", kicker, title, subtitle, updated, defaultOpen = false, bare = false, children }: {
+  tone?: Tone; kicker: string; title: string; subtitle?: string; updated?: string;
+  defaultOpen?: boolean; bare?: boolean; children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="group w-full flex items-start justify-between gap-3 text-left"
-      >
-        <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>
-          <h3 className="text-xl font-bold text-slate-100 leading-tight mb-1">{title}</h3>
-          {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
-        </div>
-        <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
+  const t = TONES[tone];
+  const header = (
+    <button onClick={() => setOpen(o => !o)}
+      className="group w-full flex items-start justify-between gap-3 text-left p-4">
+      <div className="min-w-0">
+        <div className={`text-[10px] uppercase tracking-[0.25em] ${t.kicker} mb-1`}>{kicker}</div>
+        <h3 className="text-base font-bold text-slate-100 leading-tight truncate">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-400 mt-0.5 truncate">{subtitle}</p>}
+      </div>
+      <div className="shrink-0 text-right mt-0.5">
+        <span className="block text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap">
           {open ? "▲ Less" : "▼ Read more"}
         </span>
-      </button>
-      {open && <div className="mt-3">{children}</div>}
+        {updated && <span className="block text-[9px] text-slate-600 mt-1 whitespace-nowrap">updated {updated}</span>}
+      </div>
+    </button>
+  );
+  if (bare) {
+    // Tool/dashboard mode: the child renders its own panels below the header card.
+    return (
+      <div>
+        <div className={`bg-slate-900 border border-slate-800 border-l-2 ${t.border} rounded-xl`}>{header}</div>
+        {open && <div className="mt-3">{children}</div>}
+      </div>
+    );
+  }
+  return (
+    <div className={`bg-slate-900 border border-slate-800 border-l-2 ${t.border} rounded-xl`}>
+      {header}
+      {open && <div className="px-4 pb-4 sm:px-5 sm:pb-5"><div className="max-w-3xl">{children}</div></div>}
     </div>
+  );
+}
+
+// Outer card for a methodology paper — thin alias over the unified shell.
+export function Paper({ kicker, title, subtitle, tone, updated, defaultOpen = false, children }: {
+  kicker: string; title: string; subtitle?: string; tone?: Tone; updated?: string;
+  defaultOpen?: boolean; children: React.ReactNode;
+}) {
+  return (
+    <ResearchCard tone={tone} kicker={kicker} title={title} subtitle={subtitle} updated={updated} defaultOpen={defaultOpen}>
+      {children}
+    </ResearchCard>
   );
 }
 

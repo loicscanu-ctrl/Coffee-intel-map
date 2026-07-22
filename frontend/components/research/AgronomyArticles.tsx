@@ -9,7 +9,7 @@ import Article5 from "./agronomy/Article5";
 
 export default function AgronomyArticles() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+    <div className="space-y-4">
       <Article1 />
       <Article2 />
       <Article3 />

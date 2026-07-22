@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ResearchCard, type Tone } from "../methodology/prose";
 
 // Shared typography + card helpers for the agronomy articles
 // (mirror ResearchView.tsx pattern).
@@ -25,27 +25,22 @@ export function Code({ children }: { children: React.ReactNode }) {
 }
 
 // ── Expand/collapse article card ──────────────────────────────────────────────
-export function AgronomyCard({ kicker, title, briefing, children }: {
+// Delegates to the unified ResearchCard shell so collapsed size matches every
+// other research article; the briefing paragraph now opens WITH the body
+// (subtitle carries the one-line teaser).
+export function AgronomyCard({ kicker, title, subtitle, briefing, tone = "green", updated = "2026-07-14", children }: {
   kicker: string;
   title: string;
+  subtitle?: string;
   briefing: React.ReactNode;
+  tone?: Tone;
+  updated?: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-      <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">
-        {kicker}
-      </div>
-      <h3 className="text-base font-bold text-slate-100 mb-3">{title}</h3>
-      <div className="text-xs text-slate-300 leading-relaxed mb-3">{briefing}</div>
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="text-[11px] text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1"
-      >
-        {open ? "▲ Less detail" : "▼ Read more"}
-      </button>
-      {open && <div className="mt-4 space-y-5">{children}</div>}
-    </div>
+    <ResearchCard tone={tone} kicker={kicker} title={title} subtitle={subtitle} updated={updated}>
+      <div className="text-xs text-slate-300 leading-relaxed mb-3 border-l-2 border-slate-700/60 pl-3 italic">{briefing}</div>
+      <div className="space-y-5">{children}</div>
+    </ResearchCard>
   );
 }

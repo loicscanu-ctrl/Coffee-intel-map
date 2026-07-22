@@ -21,6 +21,7 @@ import FreightMethodology from "./methodology/FreightMethodology";
 import EnsoModelMethodology from "./methodology/EnsoModelMethodology";
 import DemandDataMethodology from "./methodology/DemandDataMethodology";
 import DeliveryProcessMethodology from "./methodology/DeliveryProcessMethodology";
+import { ResearchCard, type Tone } from "./methodology/prose";
 
 // Top-level research categories. Each groups several articles/tools, which render
 // stacked as collapsible cards on the category page.
@@ -60,52 +61,24 @@ function H2({ children }: { children: React.ReactNode }) {
   return <h3 className="text-base font-bold text-slate-100 mt-7 mb-1 pb-1 border-b border-slate-700">{children}</h3>;
 }
 
-// Collapsible research card. Collapsed by default — header (kicker/title/subtitle)
-// is always visible, body opens on "Read more". Two shapes:
-//   • default → a full bordered card whose body reveals inside it (prose articles)
-//   • bare    → just a clickable header bar; the child (a tool/dashboard that
-//               already renders its own card) appears below it when open.
-function CollapsibleCard({ kicker, title, subtitle, defaultOpen = false, bare = false, children }: {
-  kicker?: string; title: string; subtitle?: string; defaultOpen?: boolean; bare?: boolean; children: React.ReactNode;
+// Collapsible research card — thin alias over the unified ResearchCard shell
+// (methodology/prose.tsx) so every article shares the same collapsed format,
+// sub-category tone and last-edited date.
+function CollapsibleCard({ kicker, title, subtitle, tone, updated, defaultOpen = false, bare = false, children }: {
+  kicker?: string; title: string; subtitle?: string; tone?: Tone; updated?: string;
+  defaultOpen?: boolean; bare?: boolean; children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const header = (
-    <>
-      <div className="min-w-0">
-        {kicker && <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-1">{kicker}</div>}
-        <h3 className="text-base font-bold text-slate-100 leading-tight">{title}</h3>
-        {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
-      </div>
-      <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
-        {open ? "▲ Less" : "▼ Read more"}
-      </span>
-    </>
-  );
-  if (bare) {
-    return (
-      <div>
-        <button onClick={() => setOpen(o => !o)}
-          className="group w-full flex items-start justify-between gap-3 text-left bg-slate-900 border border-slate-800 rounded-xl p-4">
-          {header}
-        </button>
-        {open && <div className="mt-3">{children}</div>}
-      </div>
-    );
-  }
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 max-w-3xl space-y-1">
-      <button onClick={() => setOpen(o => !o)}
-        className="group w-full flex items-start justify-between gap-3 text-left">
-        {header}
-      </button>
-      {open && <div className="mt-3 space-y-1">{children}</div>}
-    </div>
+    <ResearchCard tone={tone} kicker={kicker ?? ""} title={title} subtitle={subtitle} updated={updated}
+      defaultOpen={defaultOpen} bare={bare}>
+      {children}
+    </ResearchCard>
   );
 }
 
 function IntraweekMethodology() {
   return (
-      <CollapsibleCard kicker="COT · positioning" title="Intraweek COT nowcast — methodology" subtitle="Bridging the weekly COT report with a daily positioning estimate">
+      <CollapsibleCard tone="amber" updated="2026-07-14" kicker="COT · positioning" title="Intraweek COT nowcast — methodology" subtitle="Bridging the weekly COT report with a daily positioning estimate">
         <H>What problem it solves</H>
         <P>
           The CFTC/ICE Commitments of Traders (COT) report is <strong>weekly</strong> — it tells you where each
@@ -209,7 +182,7 @@ function IntraweekMethodology() {
 
 function FrostRiskMethodology() {
   return (
-      <CollapsibleCard kicker="Weather · tail risk" title="Frost risk — why radiative frost is the trade that matters" subtitle="The physics of Brazilian winter frost and how the monitor flags it">
+      <CollapsibleCard tone="cyan" updated="2026-07-14" kicker="Weather · tail risk" title="Frost risk — why radiative frost is the trade that matters" subtitle="The physics of Brazilian winter frost and how the monitor flags it">
         <H>Why frost is the trade that matters</H>
         <P>
           Frost is the single largest <strong>tail risk</strong> in coffee. Unlike drought, which trims a crop at the
@@ -372,35 +345,17 @@ function FrostRiskMethodology() {
 
 // Newspaper-style article card — bold headline over a double rule, justified
 // body. Used for the side-by-side contract-rule columns.
-function Article({ kicker, title, dateline, defaultOpen = false, children }: {
-  kicker?: string; title: string; dateline?: string; defaultOpen?: boolean; children: React.ReactNode;
+function Article({ kicker, title, dateline, tone, updated, defaultOpen = false, children }: {
+  kicker?: string; title: string; dateline?: string; tone?: Tone; updated?: string;
+  defaultOpen?: boolean; children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
   return (
-    <article className="bg-slate-900 border border-slate-700 rounded-xl p-5">
-      <button onClick={() => setOpen(o => !o)}
-        className="group w-full flex items-start justify-between gap-3 text-left">
-        <div className="min-w-0">
-          {kicker && (
-            <div className="text-[10px] uppercase tracking-[0.25em] text-amber-500/80 mb-2">{kicker}</div>
-          )}
-          <h3 className="text-xl font-bold text-slate-100 leading-tight pb-2 border-b-2 border-double border-slate-600">
-            {title}
-          </h3>
-          {dateline && (
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-2">{dateline}</div>
-          )}
-        </div>
-        <span className="text-[11px] text-amber-400/80 group-hover:text-amber-400 whitespace-nowrap mt-0.5 shrink-0">
-          {open ? "▲ Less" : "▼ Read more"}
-        </span>
-      </button>
-      {open && (
-        <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2 mt-3">
-          {children}
-        </div>
-      )}
-    </article>
+    <ResearchCard tone={tone} kicker={kicker ?? ""} title={title} subtitle={dateline} updated={updated}
+      defaultOpen={defaultOpen}>
+      <div className="text-xs text-slate-300 leading-relaxed text-justify space-y-2">
+        {children}
+      </div>
+    </ResearchCard>
   );
 }
 
@@ -425,9 +380,9 @@ function PdfLink({ href, children }: { href: string; children: React.ReactNode }
 
 function ContractRules() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+    <div className="space-y-4">
 
-      <Article kicker="ICE Futures U.S." title={'Coffee "C" Futures (Arabica · KC)'} dateline={'Chapter 8 · Coffee "C" Rules'}>
+      <Article tone="violet" updated="2026-07-22" kicker="Contract rules · ICE Futures U.S." title={'Coffee "C" Futures (Arabica · KC)'} dateline={'Chapter 8 · Coffee "C" Rules'}>
         <p className="mb-3">
           The Coffee &ldquo;C&rdquo; contract is the world benchmark for <strong>washed Arabica</strong>. The rulebook
           opens with a notice that ICE is <em>phasing it out</em>: a new Arabica contract was slated to list in fall 2025,
@@ -491,7 +446,7 @@ function ContractRules() {
         <PdfLink href="https://www.ice.com/publicdocs/rulebooks/futures_us/8_Coffee.pdf">Full rulebook on ICE (PDF)</PdfLink>
       </Article>
 
-      <Article kicker="ICE Futures Europe" title={"Robusta Coffee Futures (RC · Section GGGG)"} dateline="Section GGGG · Contract Rules">
+      <Article tone="violet" updated="2026-07-22" kicker="Contract rules · ICE Futures Europe" title={"Robusta Coffee Futures (RC · Section GGGG)"} dateline="Section GGGG · Contract Rules">
         <p className="mb-2">
           The London Robusta contract — rulebook <strong>Section GGGG</strong> — is the global benchmark for
           <strong> Robusta</strong> (<em>Coffea canephora</em>). It is sized and priced per <strong>tonne</strong> and
@@ -574,7 +529,7 @@ function ContractRules() {
 
 function FertilizerMethodology() {
   return (
-    <CollapsibleCard kicker="Supply · input cost" title="Fertilizer — why it's a coffee signal" subtitle="The largest cash input: short-term cost-push, medium-term yield lever">
+    <CollapsibleCard tone="teal" updated="2026-07-14" kicker="Fertilizer · input cost" title="Fertilizer — why it's a coffee signal" subtitle="The largest cash input: short-term cost-push, medium-term yield lever">
       <H>Why fertilizer is a coffee signal</H>
       <P>
         Fertilizer is the largest cash input on a coffee farm and the one that swings most violently with the global
@@ -1384,7 +1339,7 @@ function DestinationInstore() {
 
 function CertifiedStocksMethodology() {
   return (
-    <CollapsibleCard kicker="Exchange · certified stocks" title="Certified stocks — cohort flow methodology" subtitle="How daily stock totals and gradings reconcile into in / in-&-out / out flows">
+    <CollapsibleCard tone="amber" updated="2026-07-15" kicker="Exchange · certified stocks" title="Certified stocks — cohort flow methodology" subtitle="How daily stock totals and gradings reconcile into in / in-&-out / out flows">
       <H2>What this page documents</H2>
       <P>
         The <strong>Demand → Certified Stocks</strong> tab visualises the ICE-deliverable inventory the coffee
@@ -1660,16 +1615,16 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "quant" && (
         <div className="space-y-4">
           <IntraweekMethodology />
-          <CollapsibleCard bare kicker="COT · positioning" title="COT backtest report"
+          <CollapsibleCard bare tone="amber" updated="2026-07-14" kicker="COT · positioning" title="COT backtest report"
             subtitle="Walk-forward backtest of the intraweek positioning model">
             <CotBacktestReport />
           </CollapsibleCard>
-          <CollapsibleCard bare kicker="COT · single-contract X-ray" title="September X-ray — KC September positioning via the old-crop bucket"
+          <CollapsibleCard bare tone="amber" updated="2026-07-22" kicker="COT · single-contract X-ray" title="September X-ray — KC September positioning via the old-crop bucket"
             subtitle="Once July trades out, the CFTC 'old crop' split shows the September contract's exact cohort positioning — compared against past Septembers">
             <SeptemberXray />
           </CollapsibleCard>
           <SignalsMethodology />
-          <CollapsibleCard bare kicker="Signals · track record" title="Open-price-direction — walk-forward record"
+          <CollapsibleCard bare tone="sky" updated="2026-07-14" kicker="Signals · track record" title="Open-price-direction — walk-forward record"
             subtitle="Prediction vs. reality, out-of-sample">
             <OpenDirectionRecord />
           </CollapsibleCard>
@@ -1684,7 +1639,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <FarmerMethodology />
           <FertilizerMethodology />
           <AgronomyArticles />
-          <CollapsibleCard bare kicker="Weather · ENSO" title="ENSO / El Niño — interactive explainer"
+          <CollapsibleCard bare tone="cyan" updated="2026-07-14" kicker="Weather · ENSO" title="ENSO / El Niño — interactive explainer"
             subtitle="Ocean–atmosphere simulation of the El Niño / La Niña cycle">
             <EnsoExplainer />
           </CollapsibleCard>
@@ -1694,11 +1649,11 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       )}
       {cat === "logistics" && (
         <div className="space-y-4">
-          <CollapsibleCard bare kicker="Logistics · origin" title="Origin logistics — the FOBbing cost model"
+          <CollapsibleCard bare tone="emerald" updated="2026-07-14" kicker="Logistics · origin" title="Origin logistics — the FOBbing cost model"
             subtitle="Farm-to-vessel cost stack by origin (Vietnam, Brazil, Uganda)">
             <OriginLogistics />
           </CollapsibleCard>
-          <CollapsibleCard bare kicker="Logistics · destination" title="Destination in-store cost"
+          <CollapsibleCard bare tone="sky" updated="2026-07-14" kicker="Logistics · destination" title="Destination in-store cost"
             subtitle="CIF → in-store cost & financing, live in USD off today's FAQ price and EUR/USD">
             <DestinationInstore />
           </CollapsibleCard>
@@ -1708,7 +1663,7 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
       {cat === "exchange" && (
         <div className="space-y-4">
           <CertifiedStocksMethodology />
-          <CollapsibleCard bare kicker="Exchange · tender parity" title="Tender-parity tool"
+          <CollapsibleCard bare tone="sky" updated="2026-07-15" kicker="Exchange · tender parity" title="Tender-parity tool"
             subtitle="Cost-stack vs the exchange, origin gradings, and the parity→inflow study">
             <CertifiedStocksParity />
           </CollapsibleCard>

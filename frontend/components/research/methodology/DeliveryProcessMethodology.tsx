@@ -30,6 +30,8 @@ function Timeline({ rows }: { rows: { stage: string; when: string; what: React.R
 export default function DeliveryProcessMethodology() {
   return (
     <Paper
+      tone="emerald"
+      updated="2026-07-15"
       kicker="Contract rules · Delivery"
       title="Robusta delivery — the ICE tender & settlement process"
       subtitle="How a short tenders, how longs are allocated, and how cash & warrants settle (ICE Clear Europe Part P)"

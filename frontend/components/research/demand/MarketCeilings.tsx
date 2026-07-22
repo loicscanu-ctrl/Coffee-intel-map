@@ -47,8 +47,10 @@ function clsTone(c: Row["cls"]) {
 export default function MarketCeilings() {
   return (
     <AgronomyCard
+      tone="rose"
       kicker="Demand · Proposed Saturation Ceilings (K)"
       title="K table for our 12 markets — proposed ceilings & the logic behind each"
+      subtitle="Per-market saturation ceilings with the reasoning behind every K"
       briefing={
         <span>
           Translating the study into numbers for the markets actually in our projection. Each ceiling

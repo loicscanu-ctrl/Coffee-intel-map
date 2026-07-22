@@ -4,6 +4,8 @@ import { Paper, H2, P, Code, Fml, Highlight } from "./prose";
 export default function FarmerMethodology() {
   return (
     <Paper
+      tone="orange"
+      updated="2026-07-14"
       kicker="Farmer economics · Methodology"
       title="Farmer economics — cost of production, break-even & crop stress"
       subtitle="What it costs to grow a bag, the margin, and the agronomic-stress models that move yield"

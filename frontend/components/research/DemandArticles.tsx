@@ -8,12 +8,10 @@ import MarketCeilings from "./demand/MarketCeilings";
 
 export default function DemandArticles() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+    <div className="space-y-4">
       <LogisticModel />
       <SaturationLimits />
-      <div className="lg:col-span-2">
-        <MarketCeilings />
-      </div>
+      <MarketCeilings />
     </div>
   );
 }

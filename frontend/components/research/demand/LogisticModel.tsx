@@ -49,8 +49,10 @@ function JapanSCurveChart() {
 export default function LogisticModel() {
   return (
     <AgronomyCard
+      tone="rose"
       kicker="Demand · Forecasting Methodology"
       title="Beyond the hockey stick: an S-curve model for emerging-market coffee demand"
+      subtitle="Logistic growth fitted per market instead of naive linear extrapolation"
       briefing={
         <span>
           Applying a flat compound growth rate (CAGR) to a low starting base produces the classic

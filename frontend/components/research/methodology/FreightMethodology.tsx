@@ -4,6 +4,8 @@ import { Paper, H2, P, UL, LI, Code, Fml, Highlight, RefTable } from "./prose";
 export default function FreightMethodology() {
   return (
     <Paper
+      tone="violet"
+      updated="2026-07-14"
       kicker="Freight · Methodology"
       title="Freight & port activity — how the numbers are built"
       subtitle="Container route estimates, the dry-bulk fertilizer proxy, and satellite port throughput"

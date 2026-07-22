@@ -28,6 +28,8 @@ function Matrix({ head, rows }: { head: string[]; rows: string[][] }) {
 export default function NewsSentimentMethodology() {
   return (
     <Paper
+      tone="rose"
+      updated="2026-07-14"
       kicker="Signals · Applied"
       title="News & sentiment — turning headlines into a coffee signal"
       subtitle="How to read the LLM sentiment score, and how to trade with (and around) it"
