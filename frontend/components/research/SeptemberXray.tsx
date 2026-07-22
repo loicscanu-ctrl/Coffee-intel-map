@@ -167,7 +167,7 @@ export default function SeptemberXray() {
 
       {/* §1 the mechanism */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <h4 className="text-sm font-bold text-slate-100 mb-2">The trick — a single contract month, X-rayed from public data</h4>
+        <h4 className="text-sm font-bold text-slate-100 mb-2">1 · The trick — a single contract month, X-rayed from public data</h4>
         <p className="text-xs text-slate-300 leading-relaxed mb-2">
           The CFTC&rsquo;s disaggregated COT report never shows positioning per contract month — except by accident.
           For Coffee &ldquo;C&rdquo; it publishes a <strong>crop-year split</strong>: &ldquo;old&rdquo; = delivery months of the
@@ -201,7 +201,7 @@ export default function SeptemberXray() {
       {/* §2 chart */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
         <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
-          <h4 className="text-sm font-bold text-slate-100">September &ldquo;{metricDef.label}&rdquo; into First Notice Day — {curKey} vs history</h4>
+          <h4 className="text-sm font-bold text-slate-100">2 · September &ldquo;{metricDef.label}&rdquo; into First Notice Day — {curKey} vs history</h4>
         </div>
         <div className="flex items-center gap-1 flex-wrap mb-2">
           {METRICS.map(m => (
@@ -268,7 +268,7 @@ export default function SeptemberXray() {
 
       {/* §3 heat map */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <h4 className="text-sm font-bold text-slate-100 mb-1">Current year vs history — percentile heat map</h4>
+        <h4 className="text-sm font-bold text-slate-100 mb-1">3 · Current year vs history — percentile heat map</h4>
         <p className="text-[10px] text-slate-500 mb-2">
           Each cell: {curKey}&rsquo;s value at that week, painted by its percentile within the {histYears.length} past
           Septembers at the same week (<span className="text-indigo-300">indigo = low vs usual</span>,
@@ -312,7 +312,7 @@ export default function SeptemberXray() {
       {/* §4 the "now" readout */}
       {latest && (
         <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-4">
-          <h4 className="text-sm font-bold text-amber-400 mb-2">Where {curKey} stands now</h4>
+          <h4 className="text-sm font-bold text-amber-400 mb-2">4 · Where {curKey} stands now</h4>
           <p className="text-xs text-slate-300 leading-relaxed">
             At <strong>{latest.dtf} days before Sept FND</strong> ({PHASE_LABEL[latest.phase] ?? latest.phase},
             COT of {latest.date}), the September bucket carries <strong>{latest.oi.toLocaleString()} lots</strong>
@@ -342,7 +342,7 @@ export default function SeptemberXray() {
         const fmtK = (v: number | null | undefined, digits = 1) => v == null ? "·" : Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(digits)}k` : String(Math.round(v));
         return (
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <h4 className="text-sm font-bold text-slate-100 mb-1">The event study — does Sept spec length at ~30d predict the delivery window?</h4>
+            <h4 className="text-sm font-bold text-slate-100 mb-1">5 · The event study — does Sept spec length at ~30d predict the delivery window?</h4>
             <p className="text-[10px] text-slate-500 mb-3">
               Predictor: {st.predictor}. Outcomes measured per year, {st.rows.length - (curRow ? 1 : 0)} completed
               Septembers. Small n — read direction, not significance.
@@ -467,37 +467,43 @@ export default function SeptemberXray() {
         );
       })()}
 
-      {/* §5 findings & next steps */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <h4 className="text-sm font-bold text-slate-100 mb-2">What 20 Septembers of history show (2006–2025)</h4>
+      {/* §6 conclusions */}
+      <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-4">
+        <h4 className="text-sm font-bold text-slate-100 mb-2">6 · Conclusions</h4>
         <ul className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>The liquidation glide path is remarkably tight</strong>: measured against its own level 9 weeks
-            out, September&rsquo;s OI runs a median <strong>84%</strong> at 4 weeks before FND → <strong>60%</strong> at
-            2 weeks → <strong>28%</strong> at 1 week → <strong>5.6%</strong> at FND → ~0 a week into notice. Twenty
-            years never broke far from that corridor — so a September running <em>above</em> the corridor late is
-            unrolled length (forced-roll fuel), and one running below has already made its exit.
+            <strong>The mechanism is real and exclusive to KC.</strong> Between July&rsquo;s last trade and the ~Sep 1
+            crop-year roll, the CFTC old-crop bucket is the September contract alone — ~6 weekly reports a year of
+            per-cohort, single-month positioning nobody publishes directly. ICE offers no crop-year split for RC, so
+            this stays an Arabica-specific edge.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>Commercials almost always stay net short into notice</strong> — the delivery-<em>making</em> side.
-            In only <strong>5 of 20 years</strong> did commercial net flip positive a week before FND (longs standing
-            for delivery): 2016, 2020, and the certified-stock rebuild era 2022 / 2023 / 2024. That flip is rare
-            enough to be a genuine delivery-intent tell, readable ~2 weeks ahead of the gradings data.
+            <strong>The liquidation corridor is the baseline</strong> (20 years, never broken by much): median
+            {" "}<strong>84%</strong> of the 9-week-out OI still on at 4 weeks before FND → <strong>60%</strong> at
+            2 weeks → <strong>28%</strong> at 1 week → <strong>5.6%</strong> at FND → ~0 in notice. Read the current
+            year against it: above the corridor late = unrolled length; below = the exit already happened.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>Spec positioning in September marks the price regime</strong>: the big net-short Septembers
-            (2018 −40k, 2019 −31k, 2006, 2017) are the low-price capitulation years; the big net-long ones
-            (2010 +27.5k, 2014 +25.7k, 2025 +22.1k) are bull years. <strong>{curKey} is running at the ~95th
-            percentile of 21 years</strong> in spec net length at ~5 weeks out — top-two ever for that point —
-            while September&rsquo;s share of total KC OI sits near its 21-year <em>low</em>: a thin contract carrying
-            unusually crowded, unusually unhedged spec length into the delivery run-up.
+            <strong>Crowded spec length is momentum, not washout fuel</strong> (event study, n=20): the most-crowded
+            third of Septembers saw the U contract move <strong>+8.0%</strong> into FND vs <strong>+0.5%</strong> for
+            the least-crowded — while paying about <strong>1 c/lb</strong> of Sept-vs-Dec slippage on the roll
+            (corr ≈ −0.24). Positioning extremes here mark the price regime (2018/2019 record shorts = capitulation
+            lows; 2010/2014/2025 big longs = bull years) rather than predicting a reversal.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>Next</strong>: with n=20 the event study is now viable — does abnormal Sept spec length at
-            ~30d before FND predict Jul→Sep / Sep→Dec spread behaviour and gradings volume? Cross-wire with
-            Research → Tender parity (deliveries should cluster when parity is open <em>and</em> commercials hold
-            the September long side). The same trick can&rsquo;t be ported to RC — ICE publishes no crop-year split —
-            so this stays a KC-specific edge.
+            <strong>The commercial flip is the delivery tell — 15-for-15 so far</strong>: in all 5 years commercials
+            flipped net long a week before FND (2016, 2020, 2022, 2023, 2024), certified stocks <em>drew</em> during
+            the notice month (mean −90k bags — warrants taken up); every ≥100k-bag build (2012, 2017, 2018) came in
+            a no-flip year (+39k mean). The COT flip reads warrant flow ~2 weeks ahead of the stocks data — cross-check
+            it against Research → Tender parity when it fires.
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>The {curKey} read</strong>: spec net length at the ~95th percentile of 21 years (top-two for this
+            point in the calendar) on a September whose share of total KC OI is near its 21-year low — thin contract,
+            crowded and unusually unhedged length. The crowded-cohort precedent is flat-price strength into FND with
+            modest roll slippage and a certified-stock draw; whether commercials flip net long in late August is the
+            deciding signal to watch. This page updates itself with each weekly COT — the first pure Sept-only print
+            of {curKey} lands with the post-July-expiry report.
           </span></li>
         </ul>
       </div>
