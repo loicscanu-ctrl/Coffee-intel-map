@@ -4,6 +4,8 @@ import { Paper, H2, P, Code, Fml, Highlight } from "./prose";
 export default function EnsoModelMethodology() {
   return (
     <Paper
+      tone="cyan"
+      updated="2026-07-14"
       kicker="Weather · ENSO model"
       title="The ENSO risk model — from ONI to per-origin coffee risk"
       subtitle="How the app quantifies the cycle the explainer above describes"

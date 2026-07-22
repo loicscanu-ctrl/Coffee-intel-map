@@ -114,6 +114,7 @@ export default function Article2() {
     <AgronomyCard
       kicker="Agronomy · Varieties"
       title="Which clones ship when, and how much?"
+      subtitle="Vietnamese clone calendar — harvest timing and screen-size yield by variety"
       briefing={
         <span>
           Vietnam&rsquo;s late-ripening clones TR14 and TR15 were engineered to

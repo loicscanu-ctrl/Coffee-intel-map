@@ -86,6 +86,7 @@ export default function Article4() {
     <AgronomyCard
       kicker="Agronomy · Long-term Risk"
       title="How fragile is Vietnamese supply long-term?"
+      subtitle="Ageing trees, water stress and land competition as slow structural risks"
       briefing={
         <span>
           Intensive monoculture has driven soil pH below 4.0 across large areas

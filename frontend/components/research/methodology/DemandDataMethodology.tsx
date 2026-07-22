@@ -4,6 +4,8 @@ import { Paper, H2, P, UL, LI, Code, Fml } from "./prose";
 export default function DemandDataMethodology() {
   return (
     <Paper
+      tone="rose"
+      updated="2026-07-14"
       kicker="Demand · Data methods"
       title="Demand data & indices — the reconciliation and concentration math"
       subtitle="The smaller indices behind the import, consumption and spot panels"

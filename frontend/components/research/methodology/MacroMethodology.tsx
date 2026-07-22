@@ -4,6 +4,8 @@ import { Paper, H2, P, UL, LI, Code, Fml, Highlight, RefTable } from "./prose";
 export default function MacroMethodology() {
   return (
     <Paper
+      tone="emerald"
+      updated="2026-07-14"
       kicker="Macro · Methodology"
       title="Macro & FX — the currency index and cross-commodity positioning"
       subtitle="The Coffee Currency Index, FX framing, and the macro-COT exposure & attribution model"

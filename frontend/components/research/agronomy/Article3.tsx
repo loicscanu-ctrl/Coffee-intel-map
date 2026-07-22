@@ -235,6 +235,7 @@ export default function Article3() {
     <AgronomyCard
       kicker="Agronomy · Production Costs"
       title="What does a kilo of Robusta actually cost to grow?"
+      subtitle="Farm production-cost stack and the farmgate break-even"
       briefing={
         <span>
           Producing one tonne of green Robusta beans permanently extracts 34.2 kg

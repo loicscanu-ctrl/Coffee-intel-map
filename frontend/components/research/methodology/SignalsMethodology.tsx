@@ -4,6 +4,8 @@ import { Paper, H2, P, Code, Fml, Highlight } from "./prose";
 export default function SignalsMethodology() {
   return (
     <Paper
+      tone="sky"
+      updated="2026-07-14"
       kicker="Signals · Methodology"
       title="Signals & forecasts — the four models behind the tab"
       subtitle="Two live statistical/LLM models and two illustrative ML scaffolds"

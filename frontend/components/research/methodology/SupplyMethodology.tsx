@@ -4,6 +4,8 @@ import { Paper, H2, P, UL, LI, Code, Fml, Highlight } from "./prose";
 export default function SupplyMethodology() {
   return (
     <Paper
+      tone="lime"
+      updated="2026-07-14"
       kicker="Supply · Methodology"
       title="Supply modelling — production estimates, balance sheets & export nowcasts"
       subtitle="How the app turns USDA, CONAB, CECAFE and customs data into a forward view"

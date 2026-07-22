@@ -144,6 +144,7 @@ export default function Article1() {
     <AgronomyCard
       kicker="Agronomy · Supply Risk"
       title="When does rain become a supply shock?"
+      subtitle="Phenology windows: when rainfall matters, and when it doesn't"
       briefing={
         <span>
           The mandatory 2–3 month dry period following harvest is a physiological

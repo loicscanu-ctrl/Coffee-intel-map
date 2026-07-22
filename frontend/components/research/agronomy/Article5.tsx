@@ -111,6 +111,7 @@ export default function Article5() {
     <AgronomyCard
       kicker="Agronomy · Fertilizer Fundamentals"
       title="NPK, Urea and MAP: why agronomists and traders speak different languages"
+      subtitle="Translating fertilizer market tickers into field application reality"
       briefing={
         <span>
           Agronomists prescribe fertilizer in NPK — the three plant-available nutrients.

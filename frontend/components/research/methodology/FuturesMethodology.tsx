@@ -4,6 +4,8 @@ import { Paper, H2, P, Code, Fml, Highlight } from "./prose";
 export default function FuturesMethodology() {
   return (
     <Paper
+      tone="violet"
+      updated="2026-07-14"
       kicker="Futures · Methodology"
       title="Futures analytics — contract math, roll dynamics & the pricelist engine"
       subtitle="The calendar, OI-to-FND, live arbitrage and the Quotation flat-price model"

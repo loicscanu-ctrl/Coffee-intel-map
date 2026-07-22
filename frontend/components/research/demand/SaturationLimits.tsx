@@ -16,8 +16,10 @@ const BACKTEST = [
 export default function SaturationLimits() {
   return (
     <AgronomyCard
+      tone="rose"
       kicker="Demand · Saturation & Risk"
       title="The ceiling (K), the retail multiplier, and where the analogy breaks"
+      subtitle="What bounds K — culture, demographics, price — and how it can shift"
       briefing={
         <span>
           The S-curve is only as good as its ceiling. The big modelling trap is assuming Asian and African
