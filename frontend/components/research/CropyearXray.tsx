@@ -127,12 +127,19 @@ export default function CropyearXray() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
         <h4 className="text-sm font-bold text-slate-100 mb-2">1 · One trick, seven markets</h4>
         <p className="text-xs text-slate-300 leading-relaxed mb-2">
-          The KC September X-ray works because the CFTC splits Coffee &ldquo;C&rdquo; positions into crop-year buckets.
-          It does the same for <strong>six other agricultural markets</strong>. In each, as the crop year&rsquo;s earlier
+          The KC September X-ray works because the CFTC splits Coffee &ldquo;C&rdquo; positions into crop-year buckets —
+          and it maintains the same split for other agricultural markets. In each, as the crop year&rsquo;s earlier
           delivery months expire, the &ldquo;old&rdquo; bucket degenerates to the <strong>last crop-year contract
           alone</strong> — the same single-contract cohort X-ray, on a different calendar per market. The crop-year
           roll (old jumping back to ~all of OI) is <em>detected empirically</em> per market from the same signature
-          validated on coffee, not assumed.
+          validated on coffee, not assumed. Every detected roll matches its market&rsquo;s crop calendar: cocoa is
+          coffee&rsquo;s exact structural twin (Oct–Sep, roll Sep 1); cotton rolls Jul 1 (Aug–Jul crop year), wheat
+          May 1 (Jun–May), soybeans Aug 1, corn Sep 1.
+        </p>
+        <p className="text-[10px] text-slate-500 mb-2">
+          <strong className="text-slate-400">Tested and excluded:</strong> Sugar No. 11 — its COT rows were fetched
+          (551 weeks) but show <em>no</em> crop-year roll signature: the CFTC keeps all sugar positions in
+          &ldquo;old&rdquo;, so no single-contract window exists there.
         </p>
         <div className="flex flex-wrap gap-1.5 text-[10px]">
           {marketKeys.map(k => {
@@ -264,6 +271,39 @@ export default function CropyearXray() {
           Markets sit at different points of their crop calendars — a market &ldquo;between cycles&rdquo; simply has no
           contract inside the 120-day pre-roll window right now. Data appends weekly from the CFTC report.
         </p>
+      </div>
+
+      {/* §4 conclusions */}
+      <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-4">
+        <h4 className="text-sm font-bold text-slate-100 mb-2">4 · Conclusions — what generalizes and what doesn&rsquo;t (20 years, 6 markets)</h4>
+        <ul className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>Two families of delivery behavior.</strong> The softs liquidate essentially to zero before their
+            delivery window — old-bucket OI remaining a week before the roll: coffee <strong>0.6%</strong>, cocoa
+            {" "}<strong>0.5%</strong>, cotton <strong>0.9%</strong> (median of ~20 cycles) — while the grains
+            routinely <em>stand for delivery</em>: wheat <strong>16%</strong>, corn <strong>22%</strong>, soybeans
+            {" "}<strong>12%</strong> still open. Certificate-style softs exit; registrar-delivery grains deliver.
+            The &ldquo;who blinks before notice&rdquo; read is therefore a <em>softs</em> tool above all.
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>Cocoa exits earliest of all</strong>: 1.5% of the old bucket left already two weeks before the
+            roll (coffee still has 13%) — cocoa positioning is effectively decided a full two weeks before coffee&rsquo;s.
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>Coffee&rsquo;s crowding behavior is NOT a commodity universal.</strong> Correlating spec net length
+            at ~30d with how much OI survives to the final week: coffee <strong>−0.40</strong> (crowded years exit
+            <em> earlier</em>), cotton <strong>+0.34</strong> (crowded years hang on), cocoa/wheat/corn ≈ 0. Each
+            market has its own liquidation personality — pool them and the signal vanishes, so the X-ray must be
+            read per-market against its own history (which is what §3 does).
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>The cross-market snapshot already shows a rare divergence</strong>: at the same point of the same
+            Oct–Sep calendar, coffee&rsquo;s last old contract carries near-record spec <em>length</em> (P90) while
+            cocoa&rsquo;s carries near-record spec <em>shortness</em> (P5) — the two softs twins entering their
+            delivery run-ups positioned in opposite extremes. Corn pairs a P95 old-bucket OI with record-short specs
+            (P5) into its Sep 1 roll.
+          </span></li>
+        </ul>
       </div>
     </div>
   );
