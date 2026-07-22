@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-22T08:04:51.322672Z",
-  "count": 78,
+  "generated_at": "2026-07-22T08:35:52.519292Z",
+  "count": 79,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -133,6 +133,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 30
+    },
+    {
+      "file": "backfill-sept-spreads.yml",
+      "name": "9.6 \u2013 Backfill KC Sept/Dec contract settles + event study (one-off)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 25
     },
     {
       "file": "backfill-sept-study.yml",
@@ -1078,6 +1089,11 @@
         "file": "backfill-sept-study.yml",
         "name": "9.5 \u2013 Backfill September X-ray CFTC history (one-off)",
         "version": "9.5"
+      },
+      {
+        "file": "backfill-sept-spreads.yml",
+        "name": "9.6 \u2013 Backfill KC Sept/Dec contract settles + event study (one-off)",
+        "version": "9.6"
       }
     ],
     "stale_curation": [],
@@ -1091,7 +1107,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 8,
+    "uncovered_workflows_count": 9,
     "stale_curation_count": 0
   }
 }
