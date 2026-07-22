@@ -257,7 +257,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=169.5]"
+      "text": "colombia/Caldas: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-2.2, forecast_7d_rain=139.1]"
     },
     {
       "id": "AGRO_uganda_Masaka_severe_defoliation",
@@ -317,7 +317,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=52.2]"
+      "text": "ethiopia/Limu: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.29, forecast_7d_rain=60.0]"
     },
     {
       "id": "AGRO_ethiopia_Kaffa_severe_defoliation",
@@ -353,7 +353,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=71.0]"
+      "text": "vn/Lam Dong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.14, forecast_7d_rain=81.8]"
     },
     {
       "id": "AGRO_vn_Dak_Nong_blossom_drop",
@@ -365,7 +365,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=100.4]"
+      "text": "vn/Dak Nong: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.42, forecast_7d_rain=101.8]"
     },
     {
       "id": "AGRO_vn_Gia_Lai_blossom_drop",
@@ -389,7 +389,7 @@
       "timeframe": "forecast",
       "score": 0,
       "magnitude": "medium",
-      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=75.7]"
+      "text": "vn/Kon Tum: Potential false flowering or dropped blossoms. Harvest delay.  [spei_3=-1.99, forecast_7d_rain=76.0]"
     }
   ],
   "history": [
@@ -2978,5 +2978,5 @@
       "priceLDN": 3849
     }
   ],
-  "generatedAt": "2026-07-21T22:04:35.129Z"
+  "generatedAt": "2026-07-22T05:00:26.699Z"
 }
