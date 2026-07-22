@@ -72,6 +72,7 @@ def _exporters(db):
     oi_history.json is owned solely by the Daily OI workflow (1.3) and is NOT
     exported here (avoids clobbering 1.3's fresher copy with a stale one).
     """
+    from scraper.exporters.cot_sept_study import export_cot_sept_study
     from scraper.exporters.tender_parity import export_tender_parity
     from scraper.sources.brazil_arabica_fisico import export_brazil_arabica_fisico
     from scraper.sources.brazil_b3_arabica import export_brazil_b3_arabica
@@ -115,6 +116,7 @@ def _exporters(db):
         ("brazil_b3_arabica",     lambda: export_brazil_b3_arabica()),
         ("origin_prices_history", lambda: export_origin_prices_history(db)),
         ("tender_parity",         lambda: export_tender_parity()),
+        ("cot_sept_study",        lambda: export_cot_sept_study()),
         ("news",                  lambda: export_news(db)),
         ("country_pins",          _country_pins),
         ("enso",                  _enso_intel),

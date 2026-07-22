@@ -9,6 +9,7 @@ import AgronomyArticles from "./AgronomyArticles";
 import DemandArticles from "./DemandArticles";
 import EnsoExplainer from "./EnsoExplainer";
 import CertifiedStocksParity from "./CertifiedStocksParity";
+import SeptemberXray from "./SeptemberXray";
 import SignalsMethodology from "./methodology/SignalsMethodology";
 import OpenDirectionRecord from "./methodology/OpenDirectionRecord";
 import NewsSentimentMethodology from "./methodology/NewsSentimentMethodology";
@@ -1662,6 +1663,10 @@ export default function ResearchView({ initialTab }: { initialTab?: Cat }) {
           <CollapsibleCard bare kicker="COT · positioning" title="COT backtest report"
             subtitle="Walk-forward backtest of the intraweek positioning model">
             <CotBacktestReport />
+          </CollapsibleCard>
+          <CollapsibleCard bare kicker="COT · single-contract X-ray" title="September X-ray — KC September positioning via the old-crop bucket"
+            subtitle="Once July trades out, the CFTC 'old crop' split shows the September contract's exact cohort positioning — compared against past Septembers">
+            <SeptemberXray />
           </CollapsibleCard>
           <SignalsMethodology />
           <CollapsibleCard bare kicker="Signals · track record" title="Open-price-direction — walk-forward record"

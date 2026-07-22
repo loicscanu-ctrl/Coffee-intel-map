@@ -298,6 +298,19 @@ def validate_tender_parity(data: dict) -> tuple[bool, str]:
     return True, "ok"
 
 
+def validate_cot_sept_study(data: dict) -> tuple[bool, str]:
+    if not isinstance(data, dict):
+        return False, "not a dict"
+    years = data.get("years")
+    if not isinstance(years, dict) or not years:
+        return False, "years is empty"
+    if not isinstance(data.get("current_year"), int):
+        return False, "current_year missing"
+    if not any(len(v.get("rows") or []) >= 3 for v in years.values()):
+        return False, "no year has ≥3 weekly rows"
+    return True, "ok"
+
+
 def validate_oi_fnd_chart(data: dict) -> tuple[bool, str]:
     if not isinstance(data, dict):
         return False, "not a dict"
