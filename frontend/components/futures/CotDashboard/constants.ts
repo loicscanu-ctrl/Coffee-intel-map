@@ -27,6 +27,43 @@ export const SOFT_SYMBOLS: { key: string; label: string; color: string }[] = [
   { key: "oj",          label: "Orange Juice",    color: "#fb923c" },
 ];
 
+// Per-sector contract lists for the "MM Exposure — by Contract" detail panels.
+// Keys match MacroCotEntry symbols; sector membership mirrors COMMODITY_SPECS
+// in backend/scraper/sources/macro_cot.py ("hard" split into energy vs metals).
+export const SECTOR_CONTRACTS: Record<SectorKey, { key: string; label: string; color: string }[]> = {
+  softs: SOFT_SYMBOLS,
+  energy: [
+    { key: "wti",         label: "WTI Crude",     color: "#f97316" },
+    { key: "brent",       label: "Brent Crude",   color: "#fbbf24" },
+    { key: "natgas",      label: "Natural Gas",   color: "#38bdf8" },
+    { key: "heating_oil", label: "Heating Oil",   color: "#f87171" },
+    { key: "rbob",        label: "RBOB Gasoline", color: "#c084fc" },
+    { key: "lsgo",        label: "Gasoil",        color: "#94a3b8" },
+  ],
+  metals: [
+    { key: "gold",   label: "Gold",   color: "#facc15" },
+    { key: "silver", label: "Silver", color: "#cbd5e1" },
+    { key: "copper", label: "Copper", color: "#ea580c" },
+  ],
+  grains: [
+    { key: "corn",     label: "Corn",         color: "#facc15" },
+    { key: "wheat",    label: "Wheat (SRW)",  color: "#d6a760" },
+    { key: "soybeans", label: "Soybeans",     color: "#84cc16" },
+    { key: "soy_meal", label: "Soybean Meal", color: "#a16207" },
+    { key: "soy_oil",  label: "Soybean Oil",  color: "#fde68a" },
+  ],
+  meats: [
+    { key: "live_cattle",   label: "Live Cattle",   color: "#ef4444" },
+    { key: "feeder_cattle", label: "Feeder Cattle", color: "#fb923c" },
+    { key: "lean_hogs",     label: "Lean Hogs",     color: "#f9a8d4" },
+  ],
+  micros: [
+    { key: "oats",       label: "Oats",       color: "#a3e635" },
+    { key: "lumber",     label: "Lumber",     color: "#a16207" },
+    { key: "rough_rice", label: "Rough Rice", color: "#e2e8f0" },
+  ],
+};
+
 // ── Step 5 (Dry Powder) categories ────────────────────────────────────────────
 
 export const CAT_ITEMS = [

@@ -13,7 +13,7 @@ import type { MacroCotWeek } from "@/lib/api";
 import { buildGlobalFlowMetrics } from "@/lib/pdf/dataHelpers";
 import AttributionTable from "./AttributionTable";
 import SectionHeader from "./SectionHeader";
-import { SECTOR_COLORS, SECTORS, SOFT_SYMBOLS, type SectorKey } from "./constants";
+import { SECTOR_COLORS, SECTOR_CONTRACTS, SECTOR_LABELS_ATTR, SECTORS, type SectorKey } from "./constants";
 import { transformMacroData } from "./transformMacroData";
 import type { MacroChartRow, MacroToggle } from "./types";
 
@@ -30,6 +30,10 @@ export default function Step1GlobalFlow({
   const [macroToggle, setMacroToggle] = useState<MacroToggle>("gross");
   const [step1View, setStep1View]     = useState<"chart" | "table">("chart");
   const [varWeeks, setVarWeeks]       = useState<number>(1);
+  // Which sector the per-contract detail panels (C & D) break down.
+  const [detailSector, setDetailSector] = useState<SectorKey>("softs");
+  const detailSyms  = SECTOR_CONTRACTS[detailSector];
+  const detailLabel = SECTOR_LABELS_ATTR[detailSector];
 
   // Window-aware metrics: every Δ / attribution field compares the latest week
   // against `varWeeks` back (1 = classic WoW).
@@ -95,11 +99,11 @@ export default function Step1GlobalFlow({
     };
   }, [macroData, varWeeks]);
 
-  const softChartData = useMemo(() =>
+  const sectorChartData = useMemo(() =>
     macroData
       .map(week => {
         const row: Record<string, number | string | null> = { date: week.date };
-        for (const sym of SOFT_SYMBOLS) {
+        for (const sym of detailSyms) {
           const c = week.commodities.find(c => c.symbol === sym.key);
           if (!c) { row[sym.key] = 0; continue; }
           const g = c.gross_exposure_usd;
@@ -113,8 +117,8 @@ export default function Step1GlobalFlow({
         }
         return row;
       })
-      .filter(row => SOFT_SYMBOLS.some(s => Math.abs(Number(row[s.key] ?? 0)) > 0)),
-    [macroData, macroToggle]);
+      .filter(row => detailSyms.some(s => Math.abs(Number(row[s.key] ?? 0)) > 0)),
+    [macroData, macroToggle, detailSyms]);
 
   return (
     <div id="cot-section-1">
@@ -422,15 +426,36 @@ export default function Step1GlobalFlow({
         </div>
       )}
 
-      {/* Panel C — MM Exposure on Softs (by contract) */}
+      {/* Sector selector for the per-contract detail panels (C & D). Rendered
+          outside the panel guard so an empty sector can still be switched away. */}
+      <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <span style={{ fontSize: 10, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.05em" }}>Detail sector</span>
+        {SECTORS.map(s => (
+          <button
+            key={s}
+            onClick={() => setDetailSector(s)}
+            style={{
+              padding: "4px 12px", borderRadius: 4,
+              border: `1px solid ${detailSector === s ? SECTOR_COLORS[s] : "#374151"}`,
+              background: detailSector === s ? "#1f2937" : "#111827",
+              color: detailSector === s ? SECTOR_COLORS[s] : "#9ca3af",
+              cursor: "pointer", fontSize: 12, fontWeight: detailSector === s ? 700 : 400,
+            }}
+          >
+            {SECTOR_LABELS_ATTR[s]}
+          </button>
+        ))}
+      </div>
+
+      {/* Panel C — MM Exposure by contract for the selected sector */}
       {(() => {
-        if (!softChartData.length) return null;
+        if (!sectorChartData.length) return null;
 
         // For net mode: split pos/neg per contract
-        const softNetSplit = macroToggle === "net"
-          ? softChartData.map(row => {
+        const sectorNetSplit = macroToggle === "net"
+          ? sectorChartData.map(row => {
               const r: Record<string, number | string | null> = { date: row.date };
-              for (const s of SOFT_SYMBOLS) {
+              for (const s of detailSyms) {
                 const v = row[s.key] as number;
                 r[`${s.key}_pos`] = v > 0 ? v : 0;
                 r[`${s.key}_neg`] = v < 0 ? v : 0;
@@ -439,8 +464,8 @@ export default function Step1GlobalFlow({
             })
           : null;
 
-        const softYDomain: [number, number] | undefined = macroToggle === "net" ? (() => {
-          const vals = softChartData.flatMap(row => SOFT_SYMBOLS.map(s => row[s.key] as number));
+        const sectorYDomain: [number, number] | undefined = macroToggle === "net" ? (() => {
+          const vals = sectorChartData.flatMap(row => detailSyms.map(s => row[s.key] as number));
           const mn = Math.min(...vals), mx = Math.max(...vals);
           const pad = Math.max(Math.abs(mn), Math.abs(mx)) * 0.15;
           return [+(mn - pad).toFixed(2), +(mx + pad).toFixed(2)];
@@ -449,12 +474,12 @@ export default function Step1GlobalFlow({
         return (
           <>
             <div style={{ marginBottom: 8, marginTop: 16 }}>
-              <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure — Softs by Contract (USD bn)</span>
+              <span style={{ fontSize: 12, color: "#9ca3af" }}>MM Exposure — {detailLabel} by Contract (USD bn)</span>
             </div>
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl" style={{ marginBottom: 16 }}>
               <ResponsiveContainer width="100%" height={220}>
                 <AreaChart
-                  data={macroToggle === "net" && softNetSplit ? softNetSplit : softChartData}
+                  data={macroToggle === "net" && sectorNetSplit ? sectorNetSplit : sectorChartData}
                   margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -462,7 +487,7 @@ export default function Step1GlobalFlow({
                     tickFormatter={(v: string) => v.slice(0, 7)} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }}
                     tickFormatter={(v: number) => `${v < 0 ? "-$" : "$"}${Math.abs(v).toFixed(2)}B`} width={58}
-                    domain={softYDomain} />
+                    domain={sectorYDomain} />
                   {macroToggle === "net" && <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1} />}
                   <Tooltip
                     contentStyle={{ background: "#111827", border: "1px solid #374151", fontSize: 11 }}
@@ -471,7 +496,7 @@ export default function Step1GlobalFlow({
                       const byLabel: Record<string, { value: number; color: string }> = {};
                       for (const entry of props.payload) {
                         const key = String(entry.dataKey).replace("_pos", "").replace("_neg", "");
-                        const sym = SOFT_SYMBOLS.find(s => s.key === key);
+                        const sym = detailSyms.find(s => s.key === key);
                         if (!sym) continue;
                         if (!byLabel[sym.label]) byLabel[sym.label] = { value: 0, color: sym.color };
                         byLabel[sym.label].value += (entry.value as number) || 0;
@@ -494,19 +519,19 @@ export default function Step1GlobalFlow({
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                   {macroToggle === "net" ? (
                     <>
-                      {SOFT_SYMBOLS.map(s => (
+                      {detailSyms.map(s => (
                         <Area key={`${s.key}_pos`} type="monotone" dataKey={`${s.key}_pos`}
                           stackId="pos" name={s.label}
                           stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
                       ))}
-                      {SOFT_SYMBOLS.map(s => (
+                      {detailSyms.map(s => (
                         <Area key={`${s.key}_neg`} type="monotone" dataKey={`${s.key}_neg`}
                           stackId="neg" name={`${s.key}_neg`}
                           stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} legendType="none" />
                       ))}
                     </>
                   ) : (
-                    SOFT_SYMBOLS.map(s => (
+                    detailSyms.map(s => (
                       <Area key={s.key} type="monotone" dataKey={s.key}
                         stackId="1" name={s.label}
                         stroke={s.color} fill={s.color} fillOpacity={0.7} dot={false} />
@@ -519,21 +544,21 @@ export default function Step1GlobalFlow({
         );
       })()}
 
-      {/* Panel D — Weekly Change by Contract (Softs) */}
+      {/* Panel D — Weekly Change by contract for the selected sector */}
       {(() => {
-        if (softChartData.length < 2) return null;
+        if (sectorChartData.length < 2) return null;
 
-        const weeklyChangeData = softChartData.slice(1).map((row, i) => {
-          const prev = softChartData[i];
+        const weeklyChangeData = sectorChartData.slice(1).map((row, i) => {
+          const prev = sectorChartData[i];
           const r: Record<string, number | string | null> = { date: row.date };
-          for (const s of SOFT_SYMBOLS) r[s.key] = (row[s.key] as number) - (prev[s.key] as number);
+          for (const s of detailSyms) r[s.key] = (row[s.key] as number) - (prev[s.key] as number);
           return r;
         });
 
         return (
           <>
             <div style={{ marginBottom: 6 }}>
-              <span style={{ fontSize: 12, color: "#9ca3af" }}>Weekly Change — Softs by Contract (USD bn) — inflows positive, outflows negative</span>
+              <span style={{ fontSize: 12, color: "#9ca3af" }}>Weekly Change — {detailLabel} by Contract (USD bn) — inflows positive, outflows negative</span>
             </div>
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
               <ResponsiveContainer width="100%" height={150}>
@@ -553,7 +578,7 @@ export default function Step1GlobalFlow({
                     labelFormatter={weekLabel}
                   />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  {SOFT_SYMBOLS.map(s => (
+                  {detailSyms.map(s => (
                     <Bar key={s.key} dataKey={s.key} stackId="1" name={s.label} fill={s.color} />
                   ))}
                 </BarChart>

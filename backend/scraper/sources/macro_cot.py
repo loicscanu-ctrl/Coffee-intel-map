@@ -5,6 +5,7 @@
 import functools
 import io
 import json
+import os
 import sys
 import zipfile
 from datetime import date, timedelta
@@ -293,8 +294,11 @@ COMMODITY_SPECS = {
   "rough_rice": {
     "name": "Rough Rice", "sector": "micros", "exchange": "CBOT",
     "cftc_filter": "ROUGH RICE - CHICAGO BOARD OF TRADE",
-    "ice_filter": None, "yfinance_ticker": "ZR=F", "price_proxy": None,
-    "price_source": "yfinance", "yfinance_mult": 0.01,
+    # ZR=F on Yahoo froze at 12.66 in June 2026 then went bad (the export's
+    # price-sanity guard nulled rice exposure from 06-23). Source from stooq's
+    # continuous rice future instead; stooq quotes USD/cwt directly.
+    "ice_filter": None, "yfinance_ticker": None, "price_proxy": None,
+    "price_source": "stooq", "stooq_ticker": "zr.f",
     "contract_unit": 2000, "price_unit": "usd_per_cwt", "currency": "USD",
     "margin_outright_usd": 1375, "margin_spread_usd": 1265,
   },
@@ -421,6 +425,32 @@ def _download_ice_df(year: int) -> pd.DataFrame:
 # outage tolerance; upserts are idempotent so re-writing existing rows is a no-op.
 SELF_HEAL_WEEKS = 8
 
+# Env override for the window (workflow_dispatch "heal_weeks" input). When set,
+# the run also FORCES the upsert phase even with no new data and no detected
+# holes — that's what lets a manual deep heal re-read and overwrite months of
+# history (e.g. re-ingesting Jan–Mar to fix rows corrupted by an older parser).
+_HEAL_WEEKS_ENV = "MACRO_COT_HEAL_WEEKS"
+
+
+def _match_market_rows(df: pd.DataFrame, market_col: str, market_filter: str) -> pd.DataFrame:
+    """Rows belonging to exactly this market, and never a lookalike.
+
+    Exact stripped-name match wins. If none exists (formatting variance), fall
+    back to rows whose stripped name STARTS WITH the filter — never rows that
+    merely embed it. That distinction matters: "MICRO SILVER - COMMODITY
+    EXCHANGE INC." CONTAINS "SILVER - COMMODITY EXCHANGE INC.", and the old
+    contains-fallback ingested those micro rows (mm_long=mm_short=0, OI ~30k)
+    as full-size silver for 4 weeks in early 2026 whenever the real row was
+    absent from a partially-written file. Returning an empty frame is the safe
+    failure: a skipped symbol heals on the next run's window; a wrong-market
+    ingest is silent corruption.
+    """
+    names = df[market_col].astype(str).str.strip()
+    exact = df[names == market_filter]
+    if not exact.empty:
+        return exact
+    return df[names.str.startswith(market_filter)]
+
 
 def _parse_cftc(df: pd.DataFrame, weeks_back: int = SELF_HEAL_WEEKS) -> dict:
     """Return {symbol: [(report_date, fields), ...]} newest-first for the last
@@ -430,15 +460,10 @@ def _parse_cftc(df: pd.DataFrame, weeks_back: int = SELF_HEAL_WEEKS) -> dict:
         filt = spec.get("cftc_filter")
         if not filt:
             continue
-        mask = df[_CFTC_MARKET_COL].str.contains(filt, na=False, regex=False)
-        rows = df[mask]
+        rows = _match_market_rows(df, _CFTC_MARKET_COL, filt)
         if rows.empty:
             print(f"[macro_cot] WARNING: no CFTC rows matched '{filt}' for {sym}", file=sys.stderr)
             continue
-        # Prefer exact match to avoid e.g. "E-MICRO GOLD" matching "GOLD - COMMODITY EXCHANGE INC."
-        exact = rows[rows[_CFTC_MARKET_COL].str.strip() == filt]
-        if not exact.empty:
-            rows = exact
         rows = rows.copy()
         rows["_date_parsed"] = pd.to_datetime(rows[_CFTC_DATE_COL], format="%y%m%d", errors="coerce")
         rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
@@ -462,8 +487,7 @@ def _parse_ice(df: pd.DataFrame, weeks_back: int = SELF_HEAL_WEEKS) -> dict:
         filt = spec.get("ice_filter")
         if not filt:
             continue
-        mask = df[_ICE_MARKET_COL].str.contains(filt, na=False, regex=False)
-        rows = df[mask]
+        rows = _match_market_rows(df, _ICE_MARKET_COL, filt)
         if rows.empty:
             print(f"[macro_cot] WARNING: no ICE rows matched '{filt}' for {sym}", file=sys.stderr)
             continue
@@ -491,13 +515,9 @@ def _parse_full_symbol(df: pd.DataFrame, market_col: str, date_col: str,
     Works with both CFTC and ICE disaggregated CSV files (same column format).
     Only position/trader fields are returned — price fields are left for Excel import.
     """
-    mask = df[market_col].str.contains(market_filter, na=False, regex=False)
-    rows = df[mask]
+    rows = _match_market_rows(df, market_col, market_filter)
     if rows.empty:
         return []
-    exact = rows[rows[market_col].str.strip() == market_filter]
-    if not exact.empty:
-        rows = exact
     rows = rows.copy()
     rows["_date_parsed"] = pd.to_datetime(rows[date_col], format="%y%m%d", errors="coerce")
     rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
@@ -765,15 +785,23 @@ def _fetch_and_upsert(db) -> None:
 
     _phase("parse_positions")
     # {symbol: [(report_date, fields), ...]} newest-first over the trailing
-    # SELF_HEAL_WEEKS window — every run re-reads the recent history it already
-    # downloaded, so a week missed by an earlier run heals automatically.
+    # window — every run re-reads the recent history it already downloaded, so a
+    # week missed by an earlier run heals automatically. The MACRO_COT_HEAL_WEEKS
+    # env (workflow_dispatch "heal_weeks" input) widens the window for manual
+    # deep heals AND forces the upsert phase even when nothing looks missing —
+    # that's how months-old rows corrupted by an older parser get overwritten.
+    heal_env = os.environ.get(_HEAL_WEEKS_ENV, "")
+    weeks_back = int(heal_env) if heal_env else SELF_HEAL_WEEKS
+    force_heal = bool(heal_env)
+    if force_heal:
+        print(f"[macro_cot] {_HEAL_WEEKS_ENV}={weeks_back} — deep heal, forcing upsert", file=sys.stderr)
     cot_data = {}
-    cot_data.update(_parse_cftc(cftc_df))
-    cot_data.update(_parse_ice(ice_df))
+    cot_data.update(_parse_cftc(cftc_df, weeks_back=weeks_back))
+    cot_data.update(_parse_ice(ice_df, weeks_back=weeks_back))
 
     # Log report dates seen in the window (helps diagnose stale/lagging feeds)
     dates_seen = sorted({str(rd) for rows_ in cot_data.values() for (rd, _) in rows_})
-    print(f"[macro_cot] report dates in this run ({SELF_HEAL_WEEKS}wk window): {dates_seen}", file=sys.stderr)
+    print(f"[macro_cot] report dates in this run ({weeks_back}wk window): {dates_seen}", file=sys.stderr)
 
     # ── Self-heal detection: which (symbol, date) rows are missing in the DB? ──
     # E.g. 2026-06-30 lost the whole ICE complex (robusta/brent/gasoil/white
@@ -811,7 +839,7 @@ def _fetch_and_upsert(db) -> None:
                 f"the {next_report_tue} report was due {expected_release} and is "
                 "still missing — CFTC may be having a real outage, investigate."
             )
-        if not missing_positions:
+        if not missing_positions and not force_heal:
             print(
                 f"[macro_cot] no new COT data yet — DB has {prev_arabica_date}, "
                 f"downloaded {new_arabica_date} (gap {gap_days} d). Next report "
@@ -820,12 +848,13 @@ def _fetch_and_upsert(db) -> None:
                 file=sys.stderr,
             )
             return
-        print(
-            f"[macro_cot] no new COT data, but {len(missing_positions)} "
-            f"(symbol, date) rows are missing in the {SELF_HEAL_WEEKS}wk window "
-            f"— proceeding to self-heal: {sorted(missing_positions)[:10]}",
-            file=sys.stderr,
-        )
+        if missing_positions:
+            print(
+                f"[macro_cot] no new COT data, but {len(missing_positions)} "
+                f"(symbol, date) rows are missing in the {weeks_back}wk window "
+                f"— proceeding to self-heal: {sorted(missing_positions)[:10]}",
+                file=sys.stderr,
+            )
     elif missing_positions - {(s, new_arabica_date) for s in cot_data}:
         healed = sorted(p for p in missing_positions if p[1] != new_arabica_date)
         print(f"[macro_cot] self-healing {len(healed)} older missing rows alongside "
@@ -846,7 +875,7 @@ def _fetch_and_upsert(db) -> None:
     arabica_full = _parse_full_symbol(
         cftc_df, _CFTC_MARKET_COL, _CFTC_DATE_COL,
         COMMODITY_SPECS["arabica"]["cftc_filter"],
-        has_nr_traders=True,
+        has_nr_traders=True, weeks_back=weeks_back,
     )
     for ard, arf in arabica_full:
         upsert_cot_weekly("ny", ard, arf)
@@ -859,7 +888,7 @@ def _fetch_and_upsert(db) -> None:
     robusta_full = _parse_full_symbol(
         ice_df, _ICE_MARKET_COL, _ICE_DATE_COL,
         COMMODITY_SPECS["robusta"]["ice_filter"],
-        has_nr_traders=False,
+        has_nr_traders=False, weeks_back=weeks_back,
     )
     for rbd, rbf in robusta_full:
         upsert_cot_weekly("ldn", rbd, rbf)
@@ -869,18 +898,26 @@ def _fetch_and_upsert(db) -> None:
     else:
         print("[macro_cot] WARNING: robusta full parse returned no data", file=sys.stderr)
 
-    # ── Prices: (re)fetch every pair in the window that has no stored price ──
-    # Covers the newest week (no price row yet) AND any older holes, so price
-    # gaps heal alongside position gaps. Symbols with no price source (lumber)
-    # are excluded.
-    existing_prices = set(
-        db.query(CommodityPrice.symbol, CommodityPrice.date)
-          .filter(CommodityPrice.date >= window_start,
-                  CommodityPrice.close_price.isnot(None))
+    # ── Prices: (re)fetch every pair in the window without a SANE stored price ──
+    # Covers the newest week (no price row yet), older holes, AND pairs whose
+    # stored price fails the robust sanity check (a dead/garbled feed like
+    # ZR=F freezing then going bad leaves poisoned rows behind — the export
+    # rejects them, so they must be refetched, not skipped). Symbols with no
+    # price source (lumber) are excluded.
+    from scraper.price_sanity import baselines_by_symbol, is_price_sane
+
+    price_rows_window = (
+        db.query(CommodityPrice)
+          .filter(CommodityPrice.date >= window_start)
           .all()
     )
+    price_baselines = baselines_by_symbol(price_rows_window)
+    sane_priced = {
+        (p.symbol, p.date) for p in price_rows_window
+        if p.close_price is not None and is_price_sane(p.close_price, price_baselines.get(p.symbol))
+    }
     need_price = {
-        (sym, rd) for (sym, rd) in all_pairs - existing_prices
+        (sym, rd) for (sym, rd) in all_pairs - sane_priced
         if COMMODITY_SPECS[sym].get("price_source")
     }
 
