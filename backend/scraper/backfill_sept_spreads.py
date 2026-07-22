@@ -16,7 +16,7 @@ Run from backend/:  python -m scraper.backfill_sept_spreads
 import asyncio
 import json
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -73,7 +73,7 @@ def main() -> None:
         print("[sept_spreads] nothing fetched — file unchanged")
         return
     existing["_meta"] = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "source": "Barchart queryeod (KC N/U/Z per-contract daily settles, c/lb)",
         "window": "May 1 → Oct 15 of contract year",
     }
