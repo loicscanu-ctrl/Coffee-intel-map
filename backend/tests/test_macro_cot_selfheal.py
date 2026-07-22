@@ -101,6 +101,47 @@ def test_parse_full_symbol_no_match_returns_empty_list():
     ) == []
 
 
+# ── Market-name matching: lookalikes must never be ingested ───────────────────
+
+SILVER = "SILVER - COMMODITY EXCHANGE INC."
+MICRO_SILVER = "MICRO SILVER - COMMODITY EXCHANGE INC."
+
+
+def _silver_frame(names: list[str]) -> pd.DataFrame:
+    d = _recent_tuesdays(1)[0]
+    return pd.DataFrame([{
+        "Market_and_Exchange_Names": n,
+        "As_of_Date_In_Form_YYMMDD": _yymmdd(d),
+        "Open_Interest_All": 150_000 if n == SILVER else 30_000,
+        "M_Money_Positions_Long_All": 27_000 if n == SILVER else 0,
+        "M_Money_Positions_Short_All": 11_000 if n == SILVER else 0,
+        "M_Money_Positions_Spread_All": 0,
+    } for n in names])
+
+
+def test_match_prefers_exact_row_over_micro_lookalike():
+    rows = mc._match_market_rows(_silver_frame([MICRO_SILVER, SILVER]),
+                                 "Market_and_Exchange_Names", SILVER)
+    assert list(rows["Market_and_Exchange_Names"]) == [SILVER]
+
+
+def test_match_never_falls_back_to_embedding_lookalike():
+    # The early-2026 silver corruption: exact row absent from a partial file →
+    # the old contains-fallback ingested MICRO SILVER (mm=0, OI ~30k) as
+    # full-size silver. The matcher must return NOTHING instead.
+    rows = mc._match_market_rows(_silver_frame([MICRO_SILVER]),
+                                 "Market_and_Exchange_Names", SILVER)
+    assert rows.empty
+
+
+def test_match_accepts_prefix_variant_when_exact_absent():
+    # A trailing-suffix variant (formatting drift) still matches via startswith.
+    variant = SILVER + "  "
+    rows = mc._match_market_rows(_silver_frame([variant, MICRO_SILVER]),
+                                 "Market_and_Exchange_Names", SILVER)
+    assert list(rows["Market_and_Exchange_Names"]) == [variant]
+
+
 # ── End-to-end self-heal tests (sqlite via conftest fixtures) ─────────────────
 
 @pytest.fixture
@@ -158,6 +199,36 @@ def test_complete_window_skips_early(healing_env):
             upsert_commodity_price(db, sym, d, 123.0)
     run()
     assert yf_calls == []
+
+
+def test_deep_heal_env_forces_upsert_on_complete_window(healing_env, monkeypatch):
+    # Complete window would normally no-op; MACRO_COT_HEAL_WEEKS forces the
+    # upsert phase so stale/corrupt rows get overwritten by the re-parse.
+    dates, run, db, _ = healing_env
+    for sym in ("arabica", "robusta"):
+        for d in dates:
+            upsert_commodity_cot(db, sym, d, {"mm_long": 1, "mm_short": 1, "mm_spread": 1, "oi_total": 1})
+            upsert_commodity_price(db, sym, d, 123.0)
+    monkeypatch.setenv("MACRO_COT_HEAL_WEEKS", "3")
+    run()
+    from models import CommodityCot
+    row = db.query(CommodityCot).filter_by(symbol="arabica", date=dates[-1]).first()
+    # Overwritten with the parsed frame's values (oi 200_002), not the seeded 1s
+    assert row.oi_total == 200_002
+
+
+def test_insane_stored_price_is_refetched(healing_env):
+    # A poisoned price row (dead-feed garbage) must be treated as missing and
+    # refetched, not skipped — the ZR=F rough-rice failure mode.
+    dates, run, db, yf_calls = healing_env
+    for d in dates:
+        upsert_commodity_price(db, "arabica", d, 3.2)     # sane history
+    upsert_commodity_price(db, "arabica", dates[-1], 900.0)  # poisoned latest
+    run()
+    assert ("arabica", dates[-1]) in set(yf_calls[0])
+    from models import CommodityPrice
+    row = db.query(CommodityPrice).filter_by(symbol="arabica", date=dates[-1]).first()
+    assert row.close_price == 100.0  # overwritten by the (mocked) refetch
 
 
 def test_price_holes_fetched_only_for_missing_pairs(healing_env):

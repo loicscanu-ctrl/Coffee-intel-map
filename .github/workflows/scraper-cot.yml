@@ -14,6 +14,15 @@ on:
     # skipping the whole week. Non-release weekdays are cheap no-op skips.
     - cron: '0 21 * * 1-5'
   workflow_dispatch:
+    inputs:
+      heal_weeks:
+        description: >-
+          Deep-heal window in weeks (e.g. 32). Widens the self-heal re-parse
+          window and FORCES the upsert phase, so months of history are
+          re-ingested from the source files and stale/corrupt DB rows are
+          overwritten. Leave empty for a normal run (8-week window).
+        required: false
+        default: ''
 
 jobs:
   scrape:
@@ -50,6 +59,9 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Empty on scheduled runs → normal 8-week self-heal window. Set via
+          # the workflow_dispatch input for manual deep heals (forces upsert).
+          MACRO_COT_HEAL_WEEKS: ${{ inputs.heal_weeks }}
         run: |
           for attempt in 1 2 3; do
             python -m scraper.run_cot && break
