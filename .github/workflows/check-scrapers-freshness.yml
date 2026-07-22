@@ -1,7 +1,7 @@
 name: "1.5 – Check Data Pipeline Freshness"
 
 # Reads frontend/public/data/health.json and pings Telegram if anything is
-# stale. Two checks in one workflow:
+# stale. Three checks in one workflow:
 #
 #   scrapers:  per-upstream-source timestamp — "when did the source last
 #              write data into our DB". Catches a silently-failing scraper.
@@ -13,6 +13,14 @@ name: "1.5 – Check Data Pipeline Freshness"
 #              after the export_static_json.py failure-isolation refactor
 #              (PR #423 / #424) made per-topic failures non-fatal — that
 #              gain in resilience needed an observability backstop here.
+#
+#   artifacts: last data date INSIDE key committed time-series files.
+#              Catches the layer both maps above miss: an exporter that
+#              runs green and regenerates its file, whose bytes then never
+#              reach main (e.g. missing from 1.4's git-add allowlist).
+#              Added 2026-07 after futures_price_history.json froze for a
+#              week that exact way while health.json showed the exporter
+#              fresh every day.
 
 on:
   schedule:
@@ -109,6 +117,25 @@ jobs:
               # publishes weekly only) land in one obvious place.
           }
 
+          # Committed-artifact checks: newest data date embedded in key derived
+          # time-series files, read straight from this checkout of main. This is
+          # the only check that sees what actually shipped — the scraper and
+          # exporter maps both go green even when the regenerated file is never
+          # committed. Each entry: path -> (staleness limit in hours, extractor
+          # returning the newest YYYY-MM-DD in the file). Limits allow weekends,
+          # holiday clusters and the T+1 export lag before alerting:
+          #   futures  — ICE trades Mon–Fri; 6d matches ice_certified_daily.
+          #   Brazil   — noticiasagricolas publishes business days; Brazilian
+          #              holiday runs (e.g. Carnival Mon+Tue) need extra slack.
+          ARTIFACTS = {
+              "frontend/public/data/futures_price_history.json":
+                  (6 * 24, lambda d: max(s[-1]["date"] for s in (d.get("arabica"), d.get("robusta")) if s)),
+              "frontend/public/data/brazil_arabica_fisico.json":
+                  (7 * 24, lambda d: d["history"][-1]["date"] if d.get("history") else None),
+              "frontend/public/data/brazil_b3_arabica.json":
+                  (7 * 24, lambda d: d["history"][-1]["date"] if d.get("history") else None),
+          }
+
           def _parse_ts(ts):
               """Accept YYYY-MM-DD or full ISO; return tz-aware datetime or raise."""
               if len(ts) == 10:
@@ -154,13 +181,27 @@ jobs:
                            label_prefix="exporter:")
               if msg: stale.append(msg)
 
+          # 3. Committed-artifact content freshness (see ARTIFACTS above).
+          for apath, (limit_h, extract) in ARTIFACTS.items():
+              name = os.path.basename(apath)
+              try:
+                  with open(apath) as f:
+                      last = extract(json.load(f))
+              except FileNotFoundError:
+                  stale.append(f"artifact:{name}: file missing"); continue
+              except Exception as e:
+                  stale.append(f"artifact:{name}: unreadable ({e})"); continue
+              msg = _check(name, last, limit_h, label_prefix="artifact:")
+              if msg: stale.append(msg)
+
           if stale:
               msg = "Stale entries in health.json:\n" + "\n".join(f"• {s}" for s in stale)
               print(msg)
               with open(os.environ["GITHUB_OUTPUT"], "a") as g:
                   g.write("stale<<EOF\n" + msg + "\nEOF\n")
               sys.exit(1)
-          print(f"All fresh: {len(scrapers)} scrapers, {len(exporters)} exporters.")
+          print(f"All fresh: {len(scrapers)} scrapers, {len(exporters)} exporters, "
+                f"{len(ARTIFACTS)} artifacts.")
           PY
 
       - name: Notify Telegram on stale data
