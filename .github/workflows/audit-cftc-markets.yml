@@ -1,0 +1,30 @@
+name: "9.9 – Audit CFTC markets"
+
+# Manual coverage audit: lists every market in the current CFTC disaggregated
+# and ICE Europe COT files with OI / MM positions, split into tracked vs
+# UNTRACKED by COMMODITY_SPECS. Read the job log to see what the COT universe
+# reports that the Global Money Flow doesn't cover yet. No DB access, no writes.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install minimal dependencies
+        run: pip install pandas requests
+
+      - name: List tracked vs untracked markets
+        working-directory: backend
+        run: python scripts/audit_cftc_markets.py
