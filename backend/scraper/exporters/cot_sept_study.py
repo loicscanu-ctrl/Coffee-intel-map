@@ -276,6 +276,155 @@ def _build_year(year: int, records: list[dict], source: str) -> dict | None:
     }
 
 
+# ── Event study: does Sept spec length at ~30d before FND predict outcomes? ──
+def _nearest(dmap: dict[str, float], target: date, back: int, fwd: int):
+    """Value at the date closest to target within [-back, +fwd] days."""
+    best, best_gap = None, None
+    for off in range(0, max(back, fwd) + 1):
+        for sgn in (1, -1):
+            d = target + timedelta(days=off * sgn)
+            if (sgn < 0 and off > back) or (sgn > 0 and off > fwd):
+                continue
+            v = dmap.get(d.isoformat())
+            if v is not None and (best_gap is None or off < best_gap):
+                best, best_gap = v, off
+        if best is not None:
+            return best
+    return None
+
+
+def _pearson(xs: list[float], ys: list[float]):
+    n = len(xs)
+    if n < 3:
+        return None
+    mx, my = sum(xs) / n, sum(ys) / n
+    sxx = sum((x - mx) ** 2 for x in xs)
+    syy = sum((y - my) ** 2 for y in ys)
+    if sxx <= 0 or syy <= 0:
+        return None
+    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+    return round(sxy / (sxx * syy) ** 0.5, 3)
+
+
+def _spearman(xs: list[float], ys: list[float]):
+    def rank(v):
+        order = sorted(range(len(v)), key=lambda i: v[i])
+        r = [0.0] * len(v)
+        for pos, i in enumerate(order):
+            r[i] = pos
+        return r
+    return _pearson(rank(xs), rank(ys))
+
+
+def _load_cert_totals() -> dict[str, float]:
+    """Daily KC certified totals (bags), merged across the deep bucket files."""
+    out: dict[str, float] = {}
+    for p in sorted(OUT_DIR.glob("certified_stocks_arabica_deep_*.json")):
+        try:
+            for snap in json.loads(p.read_text(encoding="utf-8")).get("snapshots") or []:
+                d, t = snap.get("date"), snap.get("total_bags")
+                if d and t is not None:
+                    out[d] = t
+        except Exception:
+            continue
+    return out
+
+
+def _row_near(rows: list[dict], dtf_target: int, lo: int, hi: int):
+    """Row whose dtf is closest to dtf_target within [lo, hi]."""
+    cand = [r for r in rows if lo <= r["dtf"] <= hi]
+    return min(cand, key=lambda r: abs(r["dtf"] - dtf_target)) if cand else None
+
+
+def _build_study(years: dict[str, dict]) -> dict:
+    root_data = OUT_DIR.parents[2] / "data" / "kc_sept_dec_contracts.json"
+    try:
+        contracts = json.loads(root_data.read_text(encoding="utf-8"))
+    except Exception:
+        contracts = {}
+    cert = _load_cert_totals()
+
+    rows = []
+    for y, yd in sorted(years.items()):
+        r30 = _row_near(yd["rows"], 30, 21, 42)
+        if not r30:
+            continue
+        fnd = date.fromisoformat(yd["sept_fnd"])
+        rec: dict = {
+            "year": int(y),
+            "mm_net_30": r30["mm_net"], "oi_30": r30["oi"], "dtf_30": r30["dtf"],
+        }
+        r63 = _row_near(yd["rows"], 63, 56, 70)
+        r7 = _row_near(yd["rows"], 7, 4, 11)
+        r0 = _row_near(yd["rows"], 0, -3, 3)
+        if r63 and r63["oi"]:
+            rec["oi_rem_7"] = round(r7["oi"] / r63["oi"] * 100, 1) if r7 else None
+            rec["oi_rem_0"] = round(r0["oi"] / r63["oi"] * 100, 1) if r0 else None
+        rc7 = _row_near(yd["rows"], 7, 4, 11)
+        rec["comm_net_7"] = rc7["comm_net"] if rc7 else None
+        rec["comm_flip"] = (rc7["comm_net"] > 0) if rc7 else None
+
+        # delivery outcome: certified-stock build FND−3d → FND+28d (bags)
+        c0 = _nearest(cert, fnd - timedelta(days=3), back=7, fwd=2)
+        c1 = _nearest(cert, fnd + timedelta(days=28), back=6, fwd=7)
+        if c0 is not None and c1 is not None:
+            rec["cert_build"] = int(c1 - c0)
+
+        # spread outcome: (U − Z) change from the predictor date into FND
+        legs = contracts.get(y) or {}
+        u, z = legs.get("U") or {}, legs.get("Z") or {}
+        if u and z:
+            d30 = date.fromisoformat(r30["date"])
+            u30, z30 = _nearest(u, d30, 5, 1), _nearest(z, d30, 5, 1)
+            uf, zf = _nearest(u, fnd - timedelta(days=1), 5, 0), _nearest(z, fnd - timedelta(days=1), 5, 0)
+            if None not in (u30, z30, uf, zf):
+                rec["uz_30"] = round(u30 - z30, 2)
+                rec["uz_fnd"] = round(uf - zf, 2)
+                rec["uz_chg"] = round((uf - zf) - (u30 - z30), 2)
+                rec["u_ret"] = round((uf / u30 - 1) * 100, 2) if u30 else None
+        rows.append(rec)
+
+    # z-score the predictor across completed rows
+    mm = [r["mm_net_30"] for r in rows]
+    if len(mm) >= 3:
+        mean = sum(mm) / len(mm)
+        sd = (sum((v - mean) ** 2 for v in mm) / len(mm)) ** 0.5
+        for r in rows:
+            r["mm_net_30_z"] = round((r["mm_net_30"] - mean) / sd, 2) if sd else None
+
+    def _agg(okey: str) -> dict | None:
+        pairs = [(r["mm_net_30"], r[okey]) for r in rows if r.get(okey) is not None]
+        if len(pairs) < 5:
+            return None
+        xs, ys = [p[0] for p in pairs], [float(p[1]) for p in pairs]
+        srt = sorted(pairs, key=lambda p: p[0])
+        k = max(1, len(srt) // 3)
+        lo = sum(p[1] for p in srt[:k]) / k
+        hi = sum(p[1] for p in srt[-k:]) / k
+        return {"n": len(pairs), "pearson": _pearson(xs, ys), "spearman": _spearman(xs, ys),
+                "bottom_third_mean": round(lo, 1), "top_third_mean": round(hi, 1)}
+
+    flips = [r["cert_build"] for r in rows if r.get("comm_flip") is True and r.get("cert_build") is not None]
+    noflips = [r["cert_build"] for r in rows if r.get("comm_flip") is False and r.get("cert_build") is not None]
+    return {
+        "predictor": "mm_net_30 — Sept old-bucket managed-money net at the COT closest to 30d before Sept FND",
+        "outcomes": {
+            "uz_chg": _agg("uz_chg"),
+            "cert_build": _agg("cert_build"),
+            "oi_rem_7": _agg("oi_rem_7"),
+            "oi_rem_0": _agg("oi_rem_0"),
+        },
+        "comm_flip_cert": {
+            "flip_mean": round(sum(flips) / len(flips), 0) if flips else None, "flip_n": len(flips),
+            "noflip_mean": round(sum(noflips) / len(noflips), 0) if noflips else None, "noflip_n": len(noflips),
+        },
+        "rows": rows,
+        "notes": "uz_chg = Δ(U−Z) c/lb from ~30d-before-FND into FND−1d (negative = Sept weakened vs Dec, roll "
+                 "pressure). cert_build = Δ certified bags FND−3d → FND+28d (deep files, 2011+). oi_rem_* = OI at "
+                 "7d/0d as % of the 63d level. Small n — read as direction, not significance.",
+    }
+
+
 def export_cot_sept_study() -> None:
     today = datetime.now(timezone.utc).date()
     current_year = today.year if today.month <= 9 else today.year + 1
@@ -338,6 +487,7 @@ def export_cot_sept_study() -> None:
             "units": "contracts (lots of 37,500 lb)",
         },
         "years": dict(sorted(years.items())),
+        "study": _build_study(years),
     }
     safe_write_json(OUT_PATH, payload, validate_cot_sept_study)
     n_rows = sum(len(v["rows"]) for v in years.values())
