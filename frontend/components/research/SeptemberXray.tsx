@@ -207,13 +207,22 @@ export default function SeptemberXray() {
               label={{ value: "days before Sept First Notice Day (weekly COT)", position: "insideBottom", dy: 12, fill: "#475569", fontSize: 10 }} />
             <YAxis tickFormatter={(v: number) => metricDef.pct ? `${(v * 100).toFixed(0)}%` : fmtLots(v)}
               tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={52} />
-            <Tooltip
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 11 }}
-              labelFormatter={(w) => `~${Number(w) * 7} days before FND`}
-              formatter={(v, name) => {
-                const label = name === "cur" ? `${curKey} (current)` : name === "med" ? "median (history)" : String(name).replace(/^y/, "");
-                return [fmtVal(Number(v), metricDef.pct), label];
-              }} />
+            <Tooltip content={({ active, payload, label }) => {
+              if (!active || !payload?.length) return null;
+              const by: Record<string, number> = {};
+              for (const p of payload) if (p.value != null && p.dataKey) by[String(p.dataKey)] = Number(p.value);
+              const hist = Object.entries(by).filter(([k]) => k.startsWith("y")).map(([, v]) => v);
+              return (
+                <div style={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 11, padding: "6px 10px" }}>
+                  <div className="text-slate-400 mb-0.5">~{Number(label) * 7} days before FND</div>
+                  {by.cur != null && <div className="text-amber-400 font-semibold">{curKey}: {fmtVal(by.cur, metricDef.pct)}</div>}
+                  {by.med != null && <div className="text-slate-200">history median: {fmtVal(by.med, metricDef.pct)}</div>}
+                  {hist.length > 0 && (
+                    <div className="text-slate-500">range: {fmtVal(Math.min(...hist), metricDef.pct)} – {fmtVal(Math.max(...hist), metricDef.pct)} (n={hist.length})</div>
+                  )}
+                </div>
+              );
+            }} />
             {histYears.map(y => (
               <Line key={y} dataKey={`y${y}`} stroke="#64748b" strokeWidth={1} strokeOpacity={0.55}
                 dot={false} connectNulls isAnimationActive={false} />
@@ -306,29 +315,35 @@ export default function SeptemberXray() {
 
       {/* §5 findings & next steps */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <h4 className="text-sm font-bold text-slate-100 mb-2">What the first pass shows — and where this goes next</h4>
+        <h4 className="text-sm font-bold text-slate-100 mb-2">What 20 Septembers of history show (2006–2025)</h4>
         <ul className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>The liquidation fingerprint is sharp and repeatable</strong>: spec (MM) net length in September
-            evaporates over the final ~4 pure-window weeks (2024: +13.9k → −2.4k → 0; 2025: +22.1k → +1.5k → 0),
-            while OI collapses ~95% into FND. Deviations from that glide path are the signal — length still on
-            late is forced-roll fuel; early evaporation says the roll is done and Sept pressure is spent.
+            <strong>The liquidation glide path is remarkably tight</strong>: measured against its own level 9 weeks
+            out, September&rsquo;s OI runs a median <strong>84%</strong> at 4 weeks before FND → <strong>60%</strong> at
+            2 weeks → <strong>28%</strong> at 1 week → <strong>5.6%</strong> at FND → ~0 a week into notice. Twenty
+            years never broke far from that corridor — so a September running <em>above</em> the corridor late is
+            unrolled length (forced-roll fuel), and one running below has already made its exit.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>Commercials tell the delivery story</strong>: in 2024 commercial net flipped <em>positive</em> into
-            the notice period (longs standing for delivery — consistent with the certified-stock rebuild that
-            followed); in 2025 they stayed net short to the end (shorts prepared to tender). Watching which way
-            {" "}{curKey} resolves reads delivery intentions ahead of the gradings data.
+            <strong>Commercials almost always stay net short into notice</strong> — the delivery-<em>making</em> side.
+            In only <strong>5 of 20 years</strong> did commercial net flip positive a week before FND (longs standing
+            for delivery): 2016, 2020, and the certified-stock rebuild era 2022 / 2023 / 2024. That flip is rare
+            enough to be a genuine delivery-intent tell, readable ~2 weeks ahead of the gradings data.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            <strong>Next, once the CFTC backfill lands (2006→2023)</strong>: percentile bands become meaningful
-            (n≈20); then an event study — does abnormal Sept spec length at ~30d before FND predict the
-            Jul→Sep / Sep→Dec spread behaviour and gradings volume? Cross-wire with Research → Tender parity
-            (deliveries should cluster when parity is open <em>and</em> commercials hold the September long side).
+            <strong>Spec positioning in September marks the price regime</strong>: the big net-short Septembers
+            (2018 −40k, 2019 −31k, 2006, 2017) are the low-price capitulation years; the big net-long ones
+            (2010 +27.5k, 2014 +25.7k, 2025 +22.1k) are bull years. <strong>{curKey} is running at the ~95th
+            percentile of 21 years</strong> in spec net length at ~5 weeks out — top-two ever for that point —
+            while September&rsquo;s share of total KC OI sits near its 21-year <em>low</em>: a thin contract carrying
+            unusually crowded, unusually unhedged spec length into the delivery run-up.
           </span></li>
           <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
-            The same trick works on <strong>RC</strong> only if ICE publishes a crop-year split (it doesn&rsquo;t) — so
-            this stays a KC-specific edge.
+            <strong>Next</strong>: with n=20 the event study is now viable — does abnormal Sept spec length at
+            ~30d before FND predict Jul→Sep / Sep→Dec spread behaviour and gradings volume? Cross-wire with
+            Research → Tender parity (deliveries should cluster when parity is open <em>and</em> commercials hold
+            the September long side). The same trick can&rsquo;t be ported to RC — ICE publishes no crop-year split —
+            so this stays a KC-specific edge.
           </span></li>
         </ul>
       </div>
