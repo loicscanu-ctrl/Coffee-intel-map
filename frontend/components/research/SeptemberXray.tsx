@@ -1,0 +1,337 @@
+"use client";
+// September X-ray — single-contract COT positioning for KC September futures,
+// extracted from the CFTC old-crop bucket (see backend/scraper/exporters/
+// cot_sept_study.py for the mechanism and the empirical validation).
+import { useEffect, useMemo, useState } from "react";
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
+  ReferenceLine, CartesianGrid,
+} from "recharts";
+import { cachedFetchStatic } from "@/lib/api";
+
+interface SeptRow {
+  date: string; dtf: number; phase: string;
+  oi: number; oi_all: number; share: number | null;
+  comm_l: number; comm_s: number; comm_net: number;
+  swap_l: number; swap_s: number; swap_sp: number;
+  mm_l: number; mm_s: number; mm_sp: number; mm_net: number;
+  oth_l: number; oth_s: number; oth_sp: number;
+  nr_l: number; nr_s: number;
+}
+interface SeptYear {
+  jul_fnd: string; jul_ltd: string; sept_fnd: string; sept_ltd: string;
+  source: string; rows: SeptRow[];
+}
+interface SeptData { generated_at: string; current_year: number; years: Record<string, SeptYear> }
+
+type MetricKey = "oi" | "mm_net" | "mm_l" | "mm_s" | "comm_net" | "comm_s" | "share";
+const METRICS: { key: MetricKey; label: string; pct?: boolean }[] = [
+  { key: "oi",       label: "Sept OI" },
+  { key: "mm_net",   label: "Specs net (MM)" },
+  { key: "mm_l",     label: "Specs long" },
+  { key: "mm_s",     label: "Specs short" },
+  { key: "comm_net", label: "Commercials net" },
+  { key: "comm_s",   label: "Commercials short" },
+  { key: "share",    label: "% of total KC OI", pct: true },
+];
+
+const PHASE_LABEL: Record<string, string> = {
+  baseline: "baseline (Jul+Sep)", jul_delivery: "July delivery (Sep + Jul stub)",
+  pure: "pure (Sept only)", sept_delivery: "Sept notice period",
+};
+
+const fmtLots = (v: number) => Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : String(v);
+const fmtVal = (v: number | null, pct?: boolean) =>
+  v == null ? "—" : pct ? `${(v * 100).toFixed(1)}%` : v.toLocaleString("en-US");
+const wkBin = (dtf: number) => Math.round(dtf / 7);
+
+function median(xs: number[]): number | null {
+  if (!xs.length) return null;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+// Mid-rank percentile of v among hist (0–100).
+function percentile(v: number, hist: number[]): number | null {
+  if (!hist.length) return null;
+  const below = hist.filter(h => h < v).length;
+  const equal = hist.filter(h => h === v).length;
+  return Math.round(((below + equal / 2) / hist.length) * 100);
+}
+// Diverging cell paint: indigo (low) ← neutral → amber (high); values stay as
+// visible text in every cell, so color is never the only carrier.
+function cellBg(p: number | null): string {
+  if (p == null) return "transparent";
+  if (p <= 15) return "rgba(129,140,248,0.42)";
+  if (p <= 35) return "rgba(129,140,248,0.22)";
+  if (p < 65)  return "rgba(51,65,85,0.45)";
+  if (p < 85)  return "rgba(251,191,36,0.18)";
+  return "rgba(251,191,36,0.38)";
+}
+
+export default function SeptemberXray() {
+  const [data, setData] = useState<SeptData | null>(null);
+  const [missing, setMissing] = useState(false);
+  const [metric, setMetric] = useState<MetricKey>("oi");
+
+  useEffect(() => {
+    let alive = true;
+    cachedFetchStatic<SeptData>("/data/sept_positioning.json")
+      .then(d => { if (alive) setData(d); })
+      .catch(() => { if (alive) setMissing(true); });
+    return () => { alive = false; };
+  }, []);
+
+  const model = useMemo(() => {
+    if (!data) return null;
+    const curKey = String(data.current_year);
+    const histYears = Object.keys(data.years).filter(y => y !== curKey).sort();
+    const cur = data.years[curKey];
+    // wk-binned lookup: year → wk → row
+    const byWk: Record<string, Map<number, SeptRow>> = {};
+    for (const [y, yd] of Object.entries(data.years)) {
+      const m = new Map<number, SeptRow>();
+      for (const r of yd.rows) m.set(wkBin(r.dtf), r);
+      byWk[y] = m;
+    }
+    const allWks = Array.from(
+      new Set(Object.values(byWk).flatMap(m => Array.from(m.keys()))),
+    ).sort((a, b) => b - a);
+    return { curKey, histYears, cur, byWk, allWks };
+  }, [data]);
+
+  const chartData = useMemo(() => {
+    if (!model) return [];
+    const mk = metric;
+    return model.allWks.map(wk => {
+      const row: Record<string, number | null> & { wk: number } = { wk };
+      const hist: number[] = [];
+      for (const y of model.histYears) {
+        const v = model.byWk[y].get(wk)?.[mk];
+        row[`y${y}`] = v ?? null;
+        if (v != null) hist.push(v);
+      }
+      row.med = median(hist);
+      row.cur = model.byWk[model.curKey]?.get(wk)?.[mk] ?? null;
+      return row;
+    });
+  }, [model, metric]);
+
+  if (missing) {
+    return <div className="px-3 py-2 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-500">
+      sept_positioning.json not published yet — run the exporter.
+    </div>;
+  }
+  if (!data || !model) {
+    return <div className="px-3 py-2 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-500">Loading…</div>;
+  }
+
+  const { curKey, histYears, cur } = model;
+  const metricDef = METRICS.find(m => m.key === metric)!;
+  const latest = cur?.rows.length ? cur.rows[cur.rows.length - 1] : null;
+  const latestWk = latest ? wkBin(latest.dtf) : null;
+  const histAtLatest = latestWk == null ? [] :
+    histYears.map(y => model.byWk[y].get(latestWk)).filter((r): r is SeptRow => !!r);
+  const provisional = histYears.length < 8;
+
+  // Phase boundaries in wk units, taken from the current year's calendar.
+  const wkOf = (iso: string | undefined) => {
+    if (!cur || !iso) return null;
+    return wkBin(Math.round((new Date(cur.sept_fnd).getTime() - new Date(iso).getTime()) / 86400000));
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* depth banner */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-slate-500 px-1">
+        <span>History depth: <strong className="text-slate-300">{histYears.length} Septembers</strong> ({histYears[0]}–{histYears[histYears.length - 1]}) + current {curKey}</span>
+        {provisional && <span className="text-amber-400/80 border border-amber-400/30 rounded px-1.5 py-0.5">
+          provisional — percentiles firm up as the pipeline backfills CFTC history to 2006
+        </span>}
+      </div>
+
+      {/* §1 the mechanism */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <h4 className="text-sm font-bold text-slate-100 mb-2">The trick — a single contract month, X-rayed from public data</h4>
+        <p className="text-xs text-slate-300 leading-relaxed mb-2">
+          The CFTC&rsquo;s disaggregated COT report never shows positioning per contract month — except by accident.
+          For Coffee &ldquo;C&rdquo; it publishes a <strong>crop-year split</strong>: &ldquo;old&rdquo; = delivery months of the
+          current Oct–Sep crop year, &ldquo;other&rdquo; = everything later. <strong>September is the last month of the
+          coffee crop year</strong>, so as the year&rsquo;s earlier months expire, the old bucket empties out until —
+          between July&rsquo;s last trade and September&rsquo;s first notice — it contains <strong>exactly the September
+          contract</strong>. For those ~6 weekly reports, every cohort&rsquo;s longs, shorts and spreads in
+          &ldquo;old&rdquo; are the September contract&rsquo;s alone.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-[10px]">
+          {[
+            ["baseline", "until Jul FND", "old = July + September"],
+            ["July delivery", "Jul FND → Jul LTD", "September + a shrinking July stub"],
+            ["pure", "Jul LTD → Sept FND", "September exactly — the X-ray window"],
+            ["Sept notice", "Sept FND → Aug 31", "September inside its own delivery; ~Sep 1 the CFTC rolls the crop year and the window closes"],
+          ].map(([name, when, what]) => (
+            <div key={name} className={`rounded border p-2 ${name === "pure" ? "border-amber-500/40 bg-amber-500/5" : "border-slate-800 bg-slate-950/40"}`}>
+              <div className={`font-bold mb-0.5 ${name === "pure" ? "text-amber-400" : "text-slate-200"}`}>{name}</div>
+              <div className="text-slate-500 font-mono mb-1">{when}</div>
+              <div className="text-slate-400 leading-snug">{what}</div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-slate-500 mt-2">
+          Mechanism verified empirically: the old bucket collapsed to 550 lots by 27 Aug 2024 and 315 by 26 Aug 2025
+          (September&rsquo;s own residual OI in its notice period), then jumped to ~95% of total OI on the first
+          September COT — the crop-year roll.
+        </p>
+      </div>
+
+      {/* §2 chart */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
+          <h4 className="text-sm font-bold text-slate-100">September &ldquo;{metricDef.label}&rdquo; into First Notice Day — {curKey} vs history</h4>
+        </div>
+        <div className="flex items-center gap-1 flex-wrap mb-2">
+          {METRICS.map(m => (
+            <button key={m.key} onClick={() => setMetric(m.key)}
+              className={`px-2 py-1 rounded text-[10px] font-medium transition-colors ${
+                metric === m.key ? "bg-slate-800 text-amber-400 border border-slate-700" : "text-slate-500 hover:text-slate-300 border border-transparent"
+              }`}>
+              {m.label}
+            </button>
+          ))}
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData} margin={{ top: 8, right: 16, bottom: 20, left: 4 }}>
+            <CartesianGrid stroke="#1e293b" strokeDasharray="2 4" />
+            <XAxis dataKey="wk" type="number" reversed domain={["dataMax", "dataMin"]}
+              tickFormatter={(w: number) => `${w * 7}d`}
+              tick={{ fill: "#64748b", fontSize: 10 }} axisLine={{ stroke: "#334155" }} tickLine={false}
+              label={{ value: "days before Sept First Notice Day (weekly COT)", position: "insideBottom", dy: 12, fill: "#475569", fontSize: 10 }} />
+            <YAxis tickFormatter={(v: number) => metricDef.pct ? `${(v * 100).toFixed(0)}%` : fmtLots(v)}
+              tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={52} />
+            <Tooltip
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 8, fontSize: 11 }}
+              labelFormatter={(w) => `~${Number(w) * 7} days before FND`}
+              formatter={(v, name) => {
+                const label = name === "cur" ? `${curKey} (current)` : name === "med" ? "median (history)" : String(name).replace(/^y/, "");
+                return [fmtVal(Number(v), metricDef.pct), label];
+              }} />
+            {histYears.map(y => (
+              <Line key={y} dataKey={`y${y}`} stroke="#64748b" strokeWidth={1} strokeOpacity={0.55}
+                dot={false} connectNulls isAnimationActive={false} />
+            ))}
+            <Line dataKey="med" stroke="#e2e8f0" strokeWidth={1.5} strokeDasharray="5 4" dot={false}
+              connectNulls isAnimationActive={false} />
+            <Line dataKey="cur" stroke="#fbbf24" strokeWidth={2.5} dot={{ r: 2.5, fill: "#fbbf24" }}
+              connectNulls isAnimationActive={false} />
+            {wkOf(cur?.jul_fnd) != null && (
+              <ReferenceLine x={wkOf(cur?.jul_fnd)!} stroke="#475569" strokeDasharray="3 3"
+                label={{ value: "Jul FND", fill: "#64748b", fontSize: 9, position: "insideTopLeft" }} />
+            )}
+            {wkOf(cur?.jul_ltd) != null && (
+              <ReferenceLine x={wkOf(cur?.jul_ltd)!} stroke="#475569" strokeDasharray="3 3"
+                label={{ value: "Jul LTD — old = Sept only →", fill: "#94a3b8", fontSize: 9, position: "insideTopLeft" }} />
+            )}
+            <ReferenceLine x={0} stroke="#b45309" strokeDasharray="3 3"
+              label={{ value: "Sept FND", fill: "#d97706", fontSize: 9, position: "insideTopRight" }} />
+          </LineChart>
+        </ResponsiveContainer>
+        {/* legend: role identities, reinforced by weight/dash — not color alone */}
+        <div className="flex items-center gap-4 text-[10px] text-slate-400 mt-1 px-1">
+          <span className="flex items-center gap-1.5"><span className="inline-block w-4 h-0 border-t-[2.5px] border-amber-400" /> {curKey} (current)</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-4 h-0 border-t-[1.5px] border-dashed border-slate-200" /> median of history</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-4 h-0 border-t border-slate-500" /> each past September ({histYears[0]}–{histYears[histYears.length - 1]})</span>
+        </div>
+      </div>
+
+      {/* §3 heat map */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <h4 className="text-sm font-bold text-slate-100 mb-1">Current year vs history — percentile heat map</h4>
+        <p className="text-[10px] text-slate-500 mb-2">
+          Each cell: {curKey}&rsquo;s value at that week, painted by its percentile within the {histYears.length} past
+          Septembers at the same week (<span className="text-indigo-300">indigo = low vs usual</span>,
+          neutral = in line, <span className="text-amber-300">amber = high vs usual</span>). Hover for detail.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="text-[10px] w-full">
+            <thead>
+              <tr className="text-slate-500">
+                <th className="text-left pr-3 pb-1 font-medium">metric \ days to FND</th>
+                {model.allWks.map(wk => (
+                  <th key={wk} className="px-1 pb-1 text-right font-mono font-medium">{wk * 7}d</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {METRICS.map(m => (
+                <tr key={m.key} className="border-t border-slate-800/60">
+                  <td className="pr-3 py-1 text-slate-300 whitespace-nowrap">{m.label}</td>
+                  {model.allWks.map(wk => {
+                    const cv = model.byWk[curKey]?.get(wk)?.[m.key];
+                    const hist = histYears.map(y => model.byWk[y].get(wk)?.[m.key]).filter((v): v is number => v != null);
+                    const p = cv == null ? null : percentile(cv, hist);
+                    const md = median(hist);
+                    return (
+                      <td key={wk} className="px-1 py-1 text-right font-mono text-slate-200"
+                        style={{ background: cellBg(p) }}
+                        title={cv == null ? "no current-year data yet"
+                          : `P${p} vs history (n=${hist.length})\n${curKey}: ${fmtVal(cv, m.pct)}\nhist median: ${fmtVal(md, m.pct)}`}>
+                        {cv == null ? "·" : m.pct ? `${((cv as number) * 100).toFixed(0)}%` : fmtLots(cv as number)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* §4 the "now" readout */}
+      {latest && (
+        <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-4">
+          <h4 className="text-sm font-bold text-amber-400 mb-2">Where {curKey} stands now</h4>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            At <strong>{latest.dtf} days before Sept FND</strong> ({PHASE_LABEL[latest.phase] ?? latest.phase},
+            COT of {latest.date}), the September bucket carries <strong>{latest.oi.toLocaleString()} lots</strong>
+            {(() => { const h = histAtLatest.map(r => r.oi); const p = percentile(latest.oi, h); const md = median(h);
+              return h.length ? <> — P{p} vs history (median {md?.toLocaleString()})</> : null; })()}.
+            Specs (managed money) hold <strong>{latest.mm_l.toLocaleString()} long</strong> vs{" "}
+            <strong>{latest.mm_s.toLocaleString()} short</strong> → net <strong>{latest.mm_net > 0 ? "+" : ""}{latest.mm_net.toLocaleString()}</strong>
+            {(() => { const h = histAtLatest.map(r => r.mm_net); const p = percentile(latest.mm_net, h);
+              return h.length ? <> (P{p} vs history)</> : null; })()}.
+            Commercials are net <strong>{latest.comm_net > 0 ? "+" : ""}{latest.comm_net.toLocaleString()}</strong>.
+            September is <strong>{latest.share != null ? `${(latest.share * 100).toFixed(1)}%` : "—"}</strong> of all KC open interest.
+          </p>
+        </div>
+      )}
+
+      {/* §5 findings & next steps */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <h4 className="text-sm font-bold text-slate-100 mb-2">What the first pass shows — and where this goes next</h4>
+        <ul className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>The liquidation fingerprint is sharp and repeatable</strong>: spec (MM) net length in September
+            evaporates over the final ~4 pure-window weeks (2024: +13.9k → −2.4k → 0; 2025: +22.1k → +1.5k → 0),
+            while OI collapses ~95% into FND. Deviations from that glide path are the signal — length still on
+            late is forced-roll fuel; early evaporation says the roll is done and Sept pressure is spent.
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>Commercials tell the delivery story</strong>: in 2024 commercial net flipped <em>positive</em> into
+            the notice period (longs standing for delivery — consistent with the certified-stock rebuild that
+            followed); in 2025 they stayed net short to the end (shorts prepared to tender). Watching which way
+            {" "}{curKey} resolves reads delivery intentions ahead of the gradings data.
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            <strong>Next, once the CFTC backfill lands (2006→2023)</strong>: percentile bands become meaningful
+            (n≈20); then an event study — does abnormal Sept spec length at ~30d before FND predict the
+            Jul→Sep / Sep→Dec spread behaviour and gradings volume? Cross-wire with Research → Tender parity
+            (deliveries should cluster when parity is open <em>and</em> commercials hold the September long side).
+          </span></li>
+          <li className="flex gap-2"><span className="text-amber-500/70">•</span><span>
+            The same trick works on <strong>RC</strong> only if ICE publishes a crop-year split (it doesn&rsquo;t) — so
+            this stays a KC-specific edge.
+          </span></li>
+        </ul>
+      </div>
+    </div>
+  );
+}
