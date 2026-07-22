@@ -413,8 +413,18 @@ def _download_ice_df(year: int) -> pd.DataFrame:
     return pd.read_csv(io.StringIO(resp.content.decode("utf-8-sig")), low_memory=False)
 
 
-def _parse_cftc(df: pd.DataFrame) -> dict:
-    """Return {symbol: (report_date, fields)} for latest row per CFTC symbol."""
+# How many recent weekly reports each run re-parses and re-upserts. The yearly
+# CFTC/ICE downloads contain the FULL history, so re-reading a trailing window
+# makes every run self-healing: a week one run missed (holiday-delayed release,
+# ICE file lagging behind CFTC, a failed job) is backfilled automatically by the
+# next successful run instead of being lost forever. 8 weeks ≈ two months of
+# outage tolerance; upserts are idempotent so re-writing existing rows is a no-op.
+SELF_HEAL_WEEKS = 8
+
+
+def _parse_cftc(df: pd.DataFrame, weeks_back: int = SELF_HEAL_WEEKS) -> dict:
+    """Return {symbol: [(report_date, fields), ...]} newest-first for the last
+    `weeks_back` report rows per CFTC symbol."""
     results = {}
     for sym, spec in COMMODITY_SPECS.items():
         filt = spec.get("cftc_filter")
@@ -432,19 +442,21 @@ def _parse_cftc(df: pd.DataFrame) -> dict:
         rows = rows.copy()
         rows["_date_parsed"] = pd.to_datetime(rows[_CFTC_DATE_COL], format="%y%m%d", errors="coerce")
         rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
-        row = rows.iloc[0]
-        report_date = row["_date_parsed"].date()
-        results[sym] = (report_date, {
-            "mm_long":   _safe_int(row[_CFTC_MM_LONG]),
-            "mm_short":  _safe_int(row[_CFTC_MM_SHORT]),
-            "mm_spread": _safe_int(row[_CFTC_MM_SPREAD]),
-            "oi_total":  _safe_int(row[_CFTC_OI]),
-        })
+        results[sym] = [
+            (row["_date_parsed"].date(), {
+                "mm_long":   _safe_int(row[_CFTC_MM_LONG]),
+                "mm_short":  _safe_int(row[_CFTC_MM_SHORT]),
+                "mm_spread": _safe_int(row[_CFTC_MM_SPREAD]),
+                "oi_total":  _safe_int(row[_CFTC_OI]),
+            })
+            for _, row in rows.head(weeks_back).iterrows()
+        ]
     return results
 
 
-def _parse_ice(df: pd.DataFrame) -> dict:
-    """Return {symbol: (report_date, fields)} for latest row per ICE symbol."""
+def _parse_ice(df: pd.DataFrame, weeks_back: int = SELF_HEAL_WEEKS) -> dict:
+    """Return {symbol: [(report_date, fields), ...]} newest-first for the last
+    `weeks_back` report rows per ICE symbol."""
     results = {}
     for sym, spec in COMMODITY_SPECS.items():
         filt = spec.get("ice_filter")
@@ -458,37 +470,44 @@ def _parse_ice(df: pd.DataFrame) -> dict:
         rows = rows.copy()
         rows["_date_parsed"] = pd.to_datetime(rows[_ICE_DATE_COL], format="%y%m%d", errors="coerce")
         rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
-        row = rows.iloc[0]
-        report_date = row["_date_parsed"].date()
-        results[sym] = (report_date, {
-            "mm_long":   _safe_int(row[_ICE_MM_LONG]),
-            "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
-            "mm_spread": _safe_int(row[_ICE_MM_SPREAD]),
-            "oi_total":  _safe_int(row[_ICE_OI]),
-        })
+        results[sym] = [
+            (row["_date_parsed"].date(), {
+                "mm_long":   _safe_int(row[_ICE_MM_LONG]),
+                "mm_short":  _safe_int(row[_ICE_MM_SHORT]),
+                "mm_spread": _safe_int(row[_ICE_MM_SPREAD]),
+                "oi_total":  _safe_int(row[_ICE_OI]),
+            })
+            for _, row in rows.head(weeks_back).iterrows()
+        ]
     return results
 
 
 def _parse_full_symbol(df: pd.DataFrame, market_col: str, date_col: str,
-                       market_filter: str, has_nr_traders: bool = True):
+                       market_filter: str, has_nr_traders: bool = True,
+                       weeks_back: int = SELF_HEAL_WEEKS):
     """Extract full position breakdown + trader counts for one market filter.
-    Returns (report_date, fields_dict) or None if no rows matched.
+    Returns [(report_date, fields_dict), ...] newest-first for the last
+    `weeks_back` report rows, or [] if no rows matched.
     Works with both CFTC and ICE disaggregated CSV files (same column format).
     Only position/trader fields are returned — price fields are left for Excel import.
     """
     mask = df[market_col].str.contains(market_filter, na=False, regex=False)
     rows = df[mask]
     if rows.empty:
-        return None
+        return []
     exact = rows[rows[market_col].str.strip() == market_filter]
     if not exact.empty:
         rows = exact
     rows = rows.copy()
     rows["_date_parsed"] = pd.to_datetime(rows[date_col], format="%y%m%d", errors="coerce")
     rows = rows.dropna(subset=["_date_parsed"]).sort_values("_date_parsed", ascending=False)
-    row = rows.iloc[0]
-    report_date = row["_date_parsed"].date()
+    return [
+        (row["_date_parsed"].date(), _full_symbol_fields(row, has_nr_traders))
+        for _, row in rows.head(weeks_back).iterrows()
+    ]
 
+
+def _full_symbol_fields(row, has_nr_traders: bool) -> dict:
     fields = {
         "oi_total":      _row_int(row, _CFTC_OI),
         "pmpu_long":     _row_int(row, _COL_PMPU_LONG),
@@ -520,7 +539,7 @@ def _parse_full_symbol(df: pd.DataFrame, market_col: str, date_col: str,
         "t_nr_long":      (_row_int(row, _COL_T_NR_LONG)  or None) if has_nr_traders else None,
         "t_nr_short":     (_row_int(row, _COL_T_NR_SHORT) or None) if has_nr_traders else None,
     }
-    return report_date, fields
+    return fields
 
 
 def _fetch_stooq_prices(symbols_dates: list) -> dict:
@@ -712,7 +731,7 @@ def _backfill_archive_prices(db) -> None:
 def _fetch_and_upsert(db) -> None:
     from sqlalchemy import func
 
-    from models import CommodityCot
+    from models import CommodityCot, CommodityPrice
     from scraper.db import upsert_cot_weekly
     from scraper.db_macro import upsert_commodity_cot, upsert_commodity_price
 
@@ -745,23 +764,39 @@ def _fetch_and_upsert(db) -> None:
     print(f"[macro_cot] ICE rows: {len(ice_df)}", file=sys.stderr)
 
     _phase("parse_positions")
+    # {symbol: [(report_date, fields), ...]} newest-first over the trailing
+    # SELF_HEAL_WEEKS window — every run re-reads the recent history it already
+    # downloaded, so a week missed by an earlier run heals automatically.
     cot_data = {}
     cot_data.update(_parse_cftc(cftc_df))
     cot_data.update(_parse_ice(ice_df))
 
-    # Log latest report dates per symbol (helps diagnose stale data)
-    dates_seen = sorted({str(rd) for (rd, _) in cot_data.values()})
-    print(f"[macro_cot] report dates in this run: {dates_seen}", file=sys.stderr)
+    # Log report dates seen in the window (helps diagnose stale/lagging feeds)
+    dates_seen = sorted({str(rd) for rows_ in cot_data.values() for (rd, _) in rows_})
+    print(f"[macro_cot] report dates in this run ({SELF_HEAL_WEEKS}wk window): {dates_seen}", file=sys.stderr)
+
+    # ── Self-heal detection: which (symbol, date) rows are missing in the DB? ──
+    # E.g. 2026-06-30 lost the whole ICE complex (robusta/brent/gasoil/white
+    # sugar/cocoa London) because the ICE file lagged the holiday-shifted CFTC
+    # run and the old code only ever ingested the newest row per symbol.
+    all_pairs = {(sym, rd) for sym, rows_ in cot_data.items() for (rd, _) in rows_}
+    window_start = min((rd for (_, rd) in all_pairs), default=today)
+    existing_positions = set(
+        db.query(CommodityCot.symbol, CommodityCot.date)
+          .filter(CommodityCot.date >= window_start)
+          .all()
+    )
+    missing_positions = all_pairs - existing_positions
+
+    new_arabica_date = cot_data.get("arabica", [(None, None)])[0][0]
 
     # Guard: if downloaded arabica date is not newer than DB, CFTC hasn't
     # published yet. This is the normal state mid-week — CFTC posts ~15:30 ET on
     # the report week's Friday (or, when a US federal holiday falls in that week,
     # on the holiday-shifted business day). Don't fail — just no-op the upsert
-    # phase. We only escalate to a hard error when the *next* report is genuinely
-    # overdue against its holiday-aware expected release date, so a normal
-    # holiday delay (e.g. Juneteenth pushing Fri→Mon, a legit ~13-day gap) no
-    # longer false-alarms the way a fixed day-count threshold did.
-    new_arabica_date = cot_data.get("arabica", (None,))[0]
+    # phase, UNLESS the window has holes to heal. We only escalate to a hard
+    # error when the *next* report is genuinely overdue against its holiday-aware
+    # expected release date.
     if prev_arabica_date is not None and new_arabica_date is not None and new_arabica_date <= prev_arabica_date:
         from scraper.cot_calendar import cot_release_date, next_report_overdue
 
@@ -776,19 +811,33 @@ def _fetch_and_upsert(db) -> None:
                 f"the {next_report_tue} report was due {expected_release} and is "
                 "still missing — CFTC may be having a real outage, investigate."
             )
+        if not missing_positions:
+            print(
+                f"[macro_cot] no new COT data yet — DB has {prev_arabica_date}, "
+                f"downloaded {new_arabica_date} (gap {gap_days} d). Next report "
+                f"({next_report_tue}) is due {expected_release}; not published yet. "
+                "Window complete — skipping upsert.",
+                file=sys.stderr,
+            )
+            return
         print(
-            f"[macro_cot] no new COT data yet — DB has {prev_arabica_date}, "
-            f"downloaded {new_arabica_date} (gap {gap_days} d). Next report "
-            f"({next_report_tue}) is due {expected_release}; not published yet. "
-            "Skipping upsert.",
+            f"[macro_cot] no new COT data, but {len(missing_positions)} "
+            f"(symbol, date) rows are missing in the {SELF_HEAL_WEEKS}wk window "
+            f"— proceeding to self-heal: {sorted(missing_positions)[:10]}",
             file=sys.stderr,
         )
-        return
+    elif missing_positions - {(s, new_arabica_date) for s in cot_data}:
+        healed = sorted(p for p in missing_positions if p[1] != new_arabica_date)
+        print(f"[macro_cot] self-healing {len(healed)} older missing rows alongside "
+              f"the new week: {healed[:10]}", file=sys.stderr)
 
-    # Upsert COT rows into commodity_cot (all symbols)
-    _phase(f"upsert_commodity_cot({len(cot_data)} symbols)")
-    for sym, (report_date, fields) in cot_data.items():
-        upsert_commodity_cot(db, sym, report_date, fields)
+    # Upsert COT rows into commodity_cot — every (symbol, date) in the window.
+    # Idempotent: unchanged existing rows are simply overwritten in place.
+    total_rows = sum(len(v) for v in cot_data.values())
+    _phase(f"upsert_commodity_cot({len(cot_data)} symbols, {total_rows} rows)")
+    for sym, rows_ in cot_data.items():
+        for report_date, fields in rows_:
+            upsert_commodity_cot(db, sym, report_date, fields)
 
     # ── Upsert full positions + trader counts into cot_weekly for arabica/robusta ──
     # This keeps the Dry Powder chart current without requiring a manual Excel import.
@@ -799,10 +848,11 @@ def _fetch_and_upsert(db) -> None:
         COMMODITY_SPECS["arabica"]["cftc_filter"],
         has_nr_traders=True,
     )
-    if arabica_full:
-        ard, arf = arabica_full
+    for ard, arf in arabica_full:
         upsert_cot_weekly("ny", ard, arf)
-        print(f"[macro_cot] cot_weekly ny upserted for {ard}", file=sys.stderr)
+    if arabica_full:
+        print(f"[macro_cot] cot_weekly ny upserted for {len(arabica_full)} weeks "
+              f"(latest {arabica_full[0][0]})", file=sys.stderr)
     else:
         print("[macro_cot] WARNING: arabica full parse returned no data", file=sys.stderr)
 
@@ -811,43 +861,65 @@ def _fetch_and_upsert(db) -> None:
         COMMODITY_SPECS["robusta"]["ice_filter"],
         has_nr_traders=False,
     )
-    if robusta_full:
-        rbd, rbf = robusta_full
+    for rbd, rbf in robusta_full:
         upsert_cot_weekly("ldn", rbd, rbf)
-        print(f"[macro_cot] cot_weekly ldn upserted for {rbd}", file=sys.stderr)
+    if robusta_full:
+        print(f"[macro_cot] cot_weekly ldn upserted for {len(robusta_full)} weeks "
+              f"(latest {robusta_full[0][0]})", file=sys.stderr)
     else:
         print("[macro_cot] WARNING: robusta full parse returned no data", file=sys.stderr)
 
+    # ── Prices: (re)fetch every pair in the window that has no stored price ──
+    # Covers the newest week (no price row yet) AND any older holes, so price
+    # gaps heal alongside position gaps. Symbols with no price source (lumber)
+    # are excluded.
+    existing_prices = set(
+        db.query(CommodityPrice.symbol, CommodityPrice.date)
+          .filter(CommodityPrice.date >= window_start,
+                  CommodityPrice.close_price.isnot(None))
+          .all()
+    )
+    need_price = {
+        (sym, rd) for (sym, rd) in all_pairs - existing_prices
+        if COMMODITY_SPECS[sym].get("price_source")
+    }
+
     # Build yfinance fetch list (yfinance + yfinance_gbp both need price download)
     yfinance_pairs = [
-        (sym, cot_data[sym][0])
-        for sym in cot_data
+        (sym, rd) for (sym, rd) in need_price
         if COMMODITY_SPECS[sym]["price_source"] in ("yfinance", "yfinance_gbp")
     ]
+    # Proxy sources price off another symbol's close on the same date — fetch
+    # the underlying ticker for those dates too (it may already have a stored
+    # price for its own row while the proxied symbol's date still needs one).
+    for sym, rd in need_price:
+        spec = COMMODITY_SPECS[sym]
+        if spec["price_source"] == "proxy":
+            proxy_sym = spec["price_proxy"]
+            if COMMODITY_SPECS[proxy_sym]["price_source"] in ("yfinance", "yfinance_gbp"):
+                yfinance_pairs.append((proxy_sym, rd))
+    yfinance_pairs = sorted(set(yfinance_pairs))
     _phase(f"fetch_yfinance({len(yfinance_pairs)} pairs)")
     price_cache = _fetch_yfinance_prices(yfinance_pairs)
 
     # Build stooq fetch list
-    stooq_pairs = [
-        (sym, cot_data[sym][0])
-        for sym in cot_data
+    stooq_pairs = sorted(
+        (sym, rd) for (sym, rd) in need_price
         if COMMODITY_SPECS[sym]["price_source"] == "stooq"
-    ]
+    )
     _phase(f"fetch_stooq({len(stooq_pairs)} pairs)")
     stooq_cache = _fetch_stooq_prices(stooq_pairs)
 
     # Fetch GBP/USD rates for any yfinance_gbp symbols
     gbp_dates = {
-        cot_data[sym][0]
-        for sym in cot_data
+        rd for (sym, rd) in need_price
         if COMMODITY_SPECS[sym]["price_source"] == "yfinance_gbp"
     }
     _phase(f"fetch_gbpusd({len(gbp_dates)} dates)")
     gbpusd_cache = _fetch_gbpusd_rates(gbp_dates) if gbp_dates else {}
 
-    _phase(f"upsert_prices({len(cot_data)} symbols)")
-    for sym in cot_data:
-        report_date = cot_data[sym][0]
+    _phase(f"upsert_prices({len(need_price)} pairs)")
+    for sym, report_date in sorted(need_price):
         spec = COMMODITY_SPECS[sym]
         src  = spec["price_source"]
 
@@ -871,11 +943,11 @@ def _fetch_and_upsert(db) -> None:
 
         elif src == "proxy":
             proxy_sym = spec["price_proxy"]
-            # Use the proxy symbol's report_date if it has one, else current sym's date
-            proxy_date = cot_data.get(proxy_sym, (report_date,))[0]
-            proxy_price = price_cache.get((proxy_sym, proxy_date))
+            # The underlying ticker was fetched for this exact date above
+            # (yfinance looks back up to 6 days around it for holidays).
+            proxy_price = price_cache.get((proxy_sym, report_date))
             if proxy_price is None:
-                print(f"[macro_cot] WARNING: no proxy price for {sym} (proxy={proxy_sym})", file=sys.stderr)
+                print(f"[macro_cot] WARNING: no proxy price for {sym} on {report_date} (proxy={proxy_sym})", file=sys.stderr)
                 continue
             converted = proxy_price * spec["proxy_to_usd_per_mt_factor"]
             upsert_commodity_price(db, sym, report_date, converted)
