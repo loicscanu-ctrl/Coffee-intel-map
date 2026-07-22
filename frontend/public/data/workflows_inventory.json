@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-19T17:22:33.175524Z",
-  "count": 77,
+  "generated_at": "2026-07-22T08:04:51.322672Z",
+  "count": 78,
   "workflows": [
     {
       "file": "backfill-30yr-history.yml",
@@ -133,6 +133,17 @@
       "workflow_run_deps": [],
       "concurrency_group": null,
       "timeout_minutes": 30
+    },
+    {
+      "file": "backfill-sept-study.yml",
+      "name": "9.5 \u2013 Backfill September X-ray CFTC history (one-off)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
     },
     {
       "file": "backfill-vhi.yml",
@@ -1062,6 +1073,11 @@
         "file": "backfill-brent-intraday.yml",
         "name": "9.5 \u2013 Backfill Brent Overnight Anchors (one-off)",
         "version": "9.5"
+      },
+      {
+        "file": "backfill-sept-study.yml",
+        "name": "9.5 \u2013 Backfill September X-ray CFTC history (one-off)",
+        "version": "9.5"
       }
     ],
     "stale_curation": [],
@@ -1075,7 +1091,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 7,
+    "uncovered_workflows_count": 8,
     "stale_curation_count": 0
   }
 }
