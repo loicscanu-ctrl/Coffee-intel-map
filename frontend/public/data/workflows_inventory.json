@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-22T11:25:27.972750Z",
-  "count": 80,
+  "generated_at": "2026-07-22T15:07:00.542233Z",
+  "count": 81,
   "workflows": [
     {
       "file": "audit-cftc-markets.yml",
@@ -67,6 +67,17 @@
       "workflow_run_deps": [],
       "concurrency_group": "data-commit",
       "timeout_minutes": 25
+    },
+    {
+      "file": "backfill-cropyear-xray.yml",
+      "name": "9.7 \u2013 Backfill cross-commodity crop-year X-ray (one-off)",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": "data-commit",
+      "timeout_minutes": 15
     },
     {
       "file": "backfill-enso-thermocline.yml",
@@ -1107,6 +1118,11 @@
         "version": "9.6"
       },
       {
+        "file": "backfill-cropyear-xray.yml",
+        "name": "9.7 \u2013 Backfill cross-commodity crop-year X-ray (one-off)",
+        "version": "9.7"
+      },
+      {
         "file": "audit-cftc-markets.yml",
         "name": "9.9 \u2013 Audit CFTC markets",
         "version": "9.9"
@@ -1123,7 +1139,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 10,
+    "uncovered_workflows_count": 11,
     "stale_curation_count": 0
   }
 }
