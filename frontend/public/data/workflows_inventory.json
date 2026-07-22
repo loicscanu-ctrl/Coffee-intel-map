@@ -1,7 +1,18 @@
 {
-  "generated_at": "2026-07-22T11:17:39.344298Z",
-  "count": 79,
+  "generated_at": "2026-07-22T11:19:26.651639Z",
+  "count": 80,
   "workflows": [
+    {
+      "file": "audit-cftc-markets.yml",
+      "name": "9.9 \u2013 Audit CFTC markets",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "crons": [],
+      "workflow_run_deps": [],
+      "concurrency_group": null,
+      "timeout_minutes": 10
+    },
     {
       "file": "backfill-30yr-history.yml",
       "name": "0.9 \u2013 One-shot \u2014 Backfill 30Y daily weather history (1995-2024)",
@@ -1094,6 +1105,11 @@
         "file": "backfill-sept-spreads.yml",
         "name": "9.6 \u2013 Backfill KC Sept/Dec contract settles + event study (one-off)",
         "version": "9.6"
+      },
+      {
+        "file": "audit-cftc-markets.yml",
+        "name": "9.9 \u2013 Audit CFTC markets",
+        "version": "9.9"
       }
     ],
     "stale_curation": [],
@@ -1107,7 +1123,7 @@
       "various / manual",
       "various / manual"
     ],
-    "uncovered_workflows_count": 9,
+    "uncovered_workflows_count": 10,
     "stale_curation_count": 0
   }
 }
