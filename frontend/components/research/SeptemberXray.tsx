@@ -22,7 +22,22 @@ interface SeptYear {
   jul_fnd: string; jul_ltd: string; sept_fnd: string; sept_ltd: string;
   source: string; rows: SeptRow[];
 }
-interface SeptData { generated_at: string; current_year: number; years: Record<string, SeptYear> }
+interface StudyRow {
+  year: number; mm_net_30: number; mm_net_30_z?: number | null; oi_30: number; dtf_30: number;
+  oi_rem_7?: number | null; oi_rem_0?: number | null;
+  comm_net_7?: number | null; comm_flip?: boolean | null;
+  cert_build?: number | null;
+  uz_30?: number | null; uz_fnd?: number | null; uz_chg?: number | null; u_ret?: number | null;
+}
+interface StudyAgg { n: number; pearson: number | null; spearman: number | null; bottom_third_mean: number; top_third_mean: number }
+interface Study {
+  predictor: string;
+  outcomes: Record<string, StudyAgg | null>;
+  comm_flip_cert: { flip_mean: number | null; flip_n: number; noflip_mean: number | null; noflip_n: number };
+  rows: StudyRow[];
+  notes: string;
+}
+interface SeptData { generated_at: string; current_year: number; years: Record<string, SeptYear>; study?: Study }
 
 type MetricKey = "oi" | "mm_net" | "mm_l" | "mm_s" | "comm_net" | "comm_s" | "share";
 const METRICS: { key: MetricKey; label: string; pct?: boolean }[] = [
@@ -312,6 +327,145 @@ export default function SeptemberXray() {
           </p>
         </div>
       )}
+
+      {/* §6 the event study */}
+      {data.study && data.study.rows.length >= 10 && (() => {
+        const st = data.study!;
+        const OUTCOME_LABEL: Record<string, [string, string]> = {
+          uz_chg: ["Δ(Sept − Dec) spread into FND", "c/lb; negative = Sept weakened vs Dec (roll pressure)"],
+          cert_build: ["Certified-stock build, notice month", "bags, FND−3d → FND+28d"],
+          oi_rem_7: ["OI remaining at 7d before FND", "% of the 63d level"],
+          oi_rem_0: ["OI remaining at FND", "% of the 63d level"],
+        };
+        const curRow = st.rows.find(r => r.year === data.current_year);
+        const ranked = [...st.rows].filter(r => r.year !== data.current_year).sort((a, b) => b.mm_net_30 - a.mm_net_30);
+        const fmtK = (v: number | null | undefined, digits = 1) => v == null ? "·" : Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(digits)}k` : String(Math.round(v));
+        return (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+            <h4 className="text-sm font-bold text-slate-100 mb-1">The event study — does Sept spec length at ~30d predict the delivery window?</h4>
+            <p className="text-[10px] text-slate-500 mb-3">
+              Predictor: {st.predictor}. Outcomes measured per year, {st.rows.length - (curRow ? 1 : 0)} completed
+              Septembers. Small n — read direction, not significance.
+            </p>
+
+            {/* headline read, computed from the rows so it stays live */}
+            {(() => {
+              const done = ranked.filter(r => r.u_ret != null);
+              if (done.length < 9) return null;
+              const k = Math.max(1, Math.floor(done.length / 3));
+              const hi = done.slice(0, k), lo = done.slice(-k);
+              const mean = (a: (number | null | undefined)[]) => {
+                const v = a.filter((x): x is number => x != null);
+                return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null;
+              };
+              const hiRet = mean(hi.map(r => r.u_ret)), loRet = mean(lo.map(r => r.u_ret));
+              const flips = ranked.filter(r => r.comm_flip === true && r.cert_build != null);
+              const allFlipsDrew = flips.length > 0 && flips.every(r => (r.cert_build as number) < 0);
+              const bigBuilds = ranked.filter(r => (r.cert_build ?? 0) >= 100000);
+              const bigBuildsNoFlip = bigBuilds.length > 0 && bigBuilds.every(r => r.comm_flip === false);
+              return (
+                <div className="text-xs text-slate-300 leading-relaxed mb-3 space-y-1.5">
+                  <p>
+                    <strong className="text-slate-100">Crowded spec length is momentum, not washout fuel:</strong> the
+                    most-crowded third of Septembers saw the U contract move
+                    {" "}<strong className="text-amber-300">{hiRet != null && hiRet > 0 ? "+" : ""}{hiRet?.toFixed(1)}%</strong> into
+                    FND vs <strong className="text-indigo-300">{loRet != null && loRet > 0 ? "+" : ""}{loRet?.toFixed(1)}%</strong> for
+                    the least-crowded — the length tended to be <em>right</em> on flat price, while paying
+                    ~1 c/lb of Sept-vs-Dec slippage on the roll (see table).
+                  </p>
+                  {allFlipsDrew && (
+                    <p>
+                      <strong className="text-slate-100">The flip rule held in every case so far:</strong> all
+                      {" "}{flips.length} commercial-flip years drew certified stocks during notice
+                      {bigBuildsNoFlip && bigBuilds.length > 0 && <>, and every ≥100k-bag build ({bigBuilds.map(r => r.year).join(", ")}) happened in a no-flip year</>}.
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* aggregate table */}
+            <div className="overflow-x-auto mb-3">
+              <table className="text-[10px] w-full">
+                <thead>
+                  <tr className="text-slate-500 border-b border-slate-800">
+                    <th className="text-left pr-3 pb-1 font-medium">outcome</th>
+                    <th className="px-2 pb-1 text-right font-medium">n</th>
+                    <th className="px-2 pb-1 text-right font-medium">pearson</th>
+                    <th className="px-2 pb-1 text-right font-medium">spearman</th>
+                    <th className="px-2 pb-1 text-right font-medium">low-spec ⅓</th>
+                    <th className="px-2 pb-1 text-right font-medium">high-spec ⅓</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(st.outcomes).map(([k, agg]) => agg && (
+                    <tr key={k} className="border-b border-slate-800/60">
+                      <td className="pr-3 py-1 text-slate-300">
+                        {OUTCOME_LABEL[k]?.[0] ?? k}
+                        <span className="text-slate-600"> · {OUTCOME_LABEL[k]?.[1]}</span>
+                      </td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-400">{agg.n}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{agg.pearson ?? "·"}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{agg.spearman ?? "·"}</td>
+                      <td className="px-2 py-1 text-right font-mono text-indigo-300">{fmtK(agg.bottom_third_mean)}</td>
+                      <td className="px-2 py-1 text-right font-mono text-amber-300">{fmtK(agg.top_third_mean)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* the commercial-flip contrast */}
+            {st.comm_flip_cert.flip_mean != null && st.comm_flip_cert.noflip_mean != null && (
+              <div className="rounded border border-slate-700/60 bg-slate-950/40 p-2.5 mb-3 text-xs text-slate-300 leading-relaxed">
+                <strong className="text-slate-100">The delivery tell, quantified:</strong> in the {st.comm_flip_cert.flip_n} years
+                commercials flipped net <em>long</em> a week before FND, certified stocks moved
+                {" "}<strong className="text-indigo-300">{fmtK(st.comm_flip_cert.flip_mean, 0)} bags</strong> during the notice
+                month (a draw — warrants taken up); in the {st.comm_flip_cert.noflip_n} no-flip years they moved
+                {" "}<strong className="text-amber-300">+{fmtK(st.comm_flip_cert.noflip_mean, 0)} bags</strong> (a build — shorts
+                tendering). The COT flip reads warrant flow ~2 weeks ahead of the stock data.
+              </div>
+            )}
+
+            {/* per-year table, ranked by spec length */}
+            <div className="overflow-x-auto">
+              <table className="text-[10px] w-full">
+                <thead>
+                  <tr className="text-slate-500 border-b border-slate-800">
+                    <th className="text-left pr-2 pb-1 font-medium">year (by spec net @30d)</th>
+                    <th className="px-2 pb-1 text-right font-medium">MM net</th>
+                    <th className="px-2 pb-1 text-right font-medium">z</th>
+                    <th className="px-2 pb-1 text-right font-medium">Δ(U−Z) c/lb</th>
+                    <th className="px-2 pb-1 text-right font-medium">cert Δbags</th>
+                    <th className="px-2 pb-1 text-right font-medium">comm @7d</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {curRow && (
+                    <tr className="border-b border-amber-500/30 bg-amber-500/5">
+                      <td className="pr-2 py-1 text-amber-400 font-semibold">{curRow.year} (current)</td>
+                      <td className="px-2 py-1 text-right font-mono text-amber-300">{curRow.mm_net_30 > 0 ? "+" : ""}{fmtK(curRow.mm_net_30)}</td>
+                      <td className="px-2 py-1 text-right font-mono text-amber-300">{curRow.mm_net_30_z ?? "·"}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-500" colSpan={3}>in progress — resolves into FND</td>
+                    </tr>
+                  )}
+                  {ranked.map(r => (
+                    <tr key={r.year} className="border-b border-slate-800/60">
+                      <td className="pr-2 py-1 text-slate-300">{r.year}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{r.mm_net_30 > 0 ? "+" : ""}{fmtK(r.mm_net_30)}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-400">{r.mm_net_30_z ?? "·"}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{r.uz_chg == null ? "·" : `${r.uz_chg > 0 ? "+" : ""}${r.uz_chg.toFixed(1)}`}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{fmtK(r.cert_build, 0)}</td>
+                      <td className="px-2 py-1 text-right font-mono text-slate-200">{r.comm_flip == null ? "·" : r.comm_flip ? "LONG ✓" : fmtK(r.comm_net_7, 1)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[10px] text-slate-600 mt-2">{st.notes}</p>
+          </div>
+        );
+      })()}
 
       {/* §5 findings & next steps */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
