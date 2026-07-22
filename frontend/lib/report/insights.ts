@@ -881,6 +881,61 @@ const INSIGHTS: Record<string, Builder> = {
 };
 
 /**
+ * Selection-aware executive summary for the whole briefing.
+ *
+ * Reuses the per-chart builders: for every selected chart (registry order) it
+ * takes the FIRST sentence of that chart's auto-comment — the headline fact,
+ * before the interpretation clause — and groups the facts into one markdown
+ * bullet per report category (Price / Freight / Supply / Demand / Macro),
+ * capped at 3 facts per category so the summary stays executive-length.
+ *
+ * Same guarantees as getInsight: any builder failure just drops that chart's
+ * fact; an all-fail selection returns null and the box falls back to empty.
+ */
+const _firstSentence = (t: string): string => t.trim().split(/(?<=\.)\s+/)[0]?.trim() ?? "";
+
+export async function getExecutiveSummary(selectedIds: string[]): Promise<string | null> {
+  if (!selectedIds.length) return null;
+  const { REPORT_REGISTRY, REPORT_CATEGORIES } = await import("./registry");
+  const selected = new Set(selectedIds);
+
+  const factsByCat = new Map<string, string[]>();
+  const countByCat = new Map<string, number>();
+  for (const def of REPORT_REGISTRY) {
+    if (!selected.has(def.id)) continue;
+    countByCat.set(def.category, (countByCat.get(def.category) ?? 0) + 1);
+    const fn = INSIGHTS[def.id];
+    if (!fn) continue;
+    try {
+      const r = await fn();
+      if (r == null) continue;
+      const fact = typeof r === "string"
+        ? _firstSentence(r)
+        // Split-note charts (NY/London, Arabica/Robusta): one headline fact per side.
+        : Object.values(r).filter(Boolean).map(_firstSentence).filter(Boolean).join(" ");
+      if (!fact) continue;
+      const arr = factsByCat.get(def.category) ?? [];
+      arr.push(fact);
+      factsByCat.set(def.category, arr);
+    } catch {
+      continue;
+    }
+  }
+
+  const lines: string[] = [];
+  for (const cat of REPORT_CATEGORIES) {
+    const facts = factsByCat.get(cat);
+    if (!facts?.length) continue;
+    const shown = facts.slice(0, 3);
+    const extra = (countByCat.get(cat) ?? 0) - shown.length;
+    lines.push(
+      `- **${cat}:** ${shown.join(" ")}${extra > 0 ? ` *(+${extra} more visual${extra === 1 ? "" : "s"} in section)*` : ""}`,
+    );
+  }
+  return lines.length ? lines.join("\n") : null;
+}
+
+/**
  * Resolve the auto-comment for a note id (`chartId` or `chartId__noteKey`).
  * Returns null on any failure so the caller falls back to the empty placeholder.
  */
