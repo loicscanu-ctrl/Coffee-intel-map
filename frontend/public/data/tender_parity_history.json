@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T12:26:52.036876+00:00",
+  "generated_at": "2026-07-23T05:42:20.960169+00:00",
   "meta": {
     "adders_usd": 58.0,
     "container_mt": 21.6,
@@ -8128,6 +8128,94 @@
           "differential": -46.5,
           "parity_gap": -281.5,
           "tenderable": false
+        },
+        {
+          "date": "2026-07-16",
+          "farmgate_usd": 3701.4,
+          "at_port": 3801.4,
+          "freight": 270.0,
+          "tendering": 4129.4,
+          "rc": 3797.0,
+          "differential": 4.4,
+          "parity_gap": -332.4,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-17",
+          "farmgate_usd": 3668.1,
+          "at_port": 3768.1,
+          "freight": 270.0,
+          "tendering": 4096.1,
+          "rc": 3877.0,
+          "differential": -108.9,
+          "parity_gap": -219.1,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-18",
+          "farmgate_usd": 3724.0,
+          "at_port": 3824.0,
+          "freight": 270.0,
+          "tendering": 4152.0,
+          "rc": 3877.0,
+          "differential": -53.0,
+          "parity_gap": -275.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-19",
+          "farmgate_usd": 3720.3,
+          "at_port": 3820.3,
+          "freight": 265.7,
+          "tendering": 4144.1,
+          "rc": 3877.0,
+          "differential": -56.7,
+          "parity_gap": -267.1,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-20",
+          "farmgate_usd": 3732.4,
+          "at_port": 3832.4,
+          "freight": 265.7,
+          "tendering": 4156.1,
+          "rc": 3884.0,
+          "differential": -51.6,
+          "parity_gap": -272.1,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-21",
+          "farmgate_usd": 3747.2,
+          "at_port": 3847.2,
+          "freight": 265.7,
+          "tendering": 4171.0,
+          "rc": 3818.0,
+          "differential": 29.2,
+          "parity_gap": -353.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-22",
+          "farmgate_usd": 3673.9,
+          "at_port": 3773.9,
+          "freight": 265.7,
+          "tendering": 4097.7,
+          "rc": 3796.0,
+          "differential": -22.1,
+          "parity_gap": -301.7,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-23",
+          "farmgate_usd": 3662.5,
+          "at_port": 3762.5,
+          "freight": 265.7,
+          "tendering": 4086.3,
+          "rc": 3796.0,
+          "differential": -33.5,
+          "parity_gap": -290.3,
+          "tenderable": false
         }
       ]
     },
@@ -8828,6 +8916,94 @@
           "differential": -214.8,
           "parity_gap": 0.3,
           "tenderable": true
+        },
+        {
+          "date": "2026-07-16",
+          "farmgate_usd": 3471.6,
+          "at_port": 3671.6,
+          "freight": 156.6,
+          "tendering": 3886.2,
+          "rc": 3797.0,
+          "differential": -125.4,
+          "parity_gap": -89.2,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-17",
+          "farmgate_usd": 3423.5,
+          "at_port": 3623.5,
+          "freight": 156.6,
+          "tendering": 3838.1,
+          "rc": 3877.0,
+          "differential": -253.5,
+          "parity_gap": 38.9,
+          "tenderable": true
+        },
+        {
+          "date": "2026-07-18",
+          "farmgate_usd": 3456.9,
+          "at_port": 3656.9,
+          "freight": 156.6,
+          "tendering": 3871.5,
+          "rc": 3877.0,
+          "differential": -220.1,
+          "parity_gap": 5.5,
+          "tenderable": true
+        },
+        {
+          "date": "2026-07-19",
+          "farmgate_usd": 3456.2,
+          "at_port": 3656.2,
+          "freight": 154.1,
+          "tendering": 3868.4,
+          "rc": 3877.0,
+          "differential": -220.8,
+          "parity_gap": 8.6,
+          "tenderable": true
+        },
+        {
+          "date": "2026-07-20",
+          "farmgate_usd": 3456.3,
+          "at_port": 3656.3,
+          "freight": 154.1,
+          "tendering": 3868.4,
+          "rc": 3884.0,
+          "differential": -227.7,
+          "parity_gap": 15.6,
+          "tenderable": true
+        },
+        {
+          "date": "2026-07-21",
+          "farmgate_usd": 3461.5,
+          "at_port": 3661.5,
+          "freight": 154.1,
+          "tendering": 3873.6,
+          "rc": 3818.0,
+          "differential": -156.5,
+          "parity_gap": -55.6,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-22",
+          "farmgate_usd": 3442.8,
+          "at_port": 3642.8,
+          "freight": 154.1,
+          "tendering": 3855.0,
+          "rc": 3796.0,
+          "differential": -153.2,
+          "parity_gap": -59.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-23",
+          "farmgate_usd": 3410.1,
+          "at_port": 3610.1,
+          "freight": 154.1,
+          "tendering": 3822.2,
+          "rc": 3796.0,
+          "differential": -185.9,
+          "parity_gap": -26.2,
+          "tenderable": false
         }
       ]
     },
@@ -9527,6 +9703,94 @@
           "rc": 3849.0,
           "differential": 500.1,
           "parity_gap": -747.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-16",
+          "farmgate_usd": 4099.0,
+          "at_port": 4364.0,
+          "freight": 189.0,
+          "tendering": 4611.0,
+          "rc": 3797.0,
+          "differential": 567.0,
+          "parity_gap": -814.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-17",
+          "farmgate_usd": 4161.2,
+          "at_port": 4426.2,
+          "freight": 189.0,
+          "tendering": 4673.2,
+          "rc": 3877.0,
+          "differential": 549.2,
+          "parity_gap": -796.2,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-18",
+          "farmgate_usd": 4047.0,
+          "at_port": 4312.0,
+          "freight": 189.0,
+          "tendering": 4559.0,
+          "rc": 3877.0,
+          "differential": 435.0,
+          "parity_gap": -682.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-19",
+          "farmgate_usd": 4047.0,
+          "at_port": 4312.0,
+          "freight": 186.0,
+          "tendering": 4556.0,
+          "rc": 3877.0,
+          "differential": 435.0,
+          "parity_gap": -679.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-20",
+          "farmgate_usd": 4047.0,
+          "at_port": 4312.0,
+          "freight": 186.0,
+          "tendering": 4556.0,
+          "rc": 3884.0,
+          "differential": 428.0,
+          "parity_gap": -672.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-21",
+          "farmgate_usd": 4127.0,
+          "at_port": 4392.0,
+          "freight": 186.0,
+          "tendering": 4636.1,
+          "rc": 3818.0,
+          "differential": 574.0,
+          "parity_gap": -818.1,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-22",
+          "farmgate_usd": 4133.4,
+          "at_port": 4398.4,
+          "freight": 186.0,
+          "tendering": 4642.5,
+          "rc": 3796.0,
+          "differential": 602.4,
+          "parity_gap": -846.5,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-23",
+          "farmgate_usd": 4068.0,
+          "at_port": 4333.0,
+          "freight": 186.0,
+          "tendering": 4577.0,
+          "rc": 3796.0,
+          "differential": 537.0,
+          "parity_gap": -781.0,
           "tenderable": false
         }
       ]
