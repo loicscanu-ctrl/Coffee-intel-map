@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-07-23T05:42:19.306230Z",
+  "generated_at": "2026-07-23T21:15:53.960045Z",
   "tickers": [
     {
       "label": "KCU26",
-      "value": "316.65 (-5.45)",
+      "value": "309.40 (-7.25)",
       "category": "futures"
     },
     {
       "label": "RMU26",
-      "value": "3,796 (-22)",
+      "value": "3,708 (-88)",
       "category": "futures"
     },
     {
       "label": "B3 4/5 Sep '26",
-      "value": "380.40 USD/sac",
+      "value": "374.70 USD/sac",
       "category": "futures"
     },
     {
@@ -23,17 +23,17 @@
     },
     {
       "label": "CON T7",
-      "value": "1.040,00 BRL ($3,420)",
+      "value": "1.045,00 BRL ($3,437)",
       "category": "physical"
     },
     {
       "label": "UGA S15",
-      "value": "184.52 ($4,068)",
+      "value": "183.53 ($4,046)",
       "category": "physical"
     },
     {
       "label": "GT SHB",
-      "value": "Q2,174.94 ($6,289)",
+      "value": "Q2,122.67 ($6,138)",
       "category": "physical"
     },
     {
