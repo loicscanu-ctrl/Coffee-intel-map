@@ -31613,7 +31613,49 @@
           "var": "-1,12"
         }
       ]
+    },
+    {
+      "date": "2026-07-23",
+      "trimmed_mean": 1734.2,
+      "n": 7,
+      "municipios": [
+        {
+          "name": "Guaxupé/MG (Cooxupé)",
+          "price": 1736.0,
+          "var": "-1,14"
+        },
+        {
+          "name": "Poços de Caldas/MG (Café Poços)",
+          "price": 1740.0,
+          "var": "-1,69"
+        },
+        {
+          "name": "Patrocínio/MG (Expocaccer)",
+          "price": 1725.0,
+          "var": "-1,99"
+        },
+        {
+          "name": "Varginha/MG (Minasul)",
+          "price": 1770.0,
+          "var": "-1,67"
+        },
+        {
+          "name": "Machado/MG (Coopama)",
+          "price": 1570.0,
+          "var": "-3,68"
+        },
+        {
+          "name": "Campos Gerais/MG (Coopercam)",
+          "price": 1720.0,
+          "var": "-1,99"
+        },
+        {
+          "name": "Franca/SP (Cocapec)",
+          "price": 1750.0,
+          "var": "-1,13"
+        }
+      ]
     }
   ],
-  "updated": "2026-07-23T05:42:20.447550+00:00"
+  "updated": "2026-07-24T05:38:23.419444+00:00"
 }

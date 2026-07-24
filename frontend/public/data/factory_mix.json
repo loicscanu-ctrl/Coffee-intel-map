@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T05:42:18.625293Z",
+  "generated_at": "2026-07-24T05:38:21.653310Z",
   "source": "backend/seed/factories.json",
   "note": "Consumer-side capacity only (mills excluded). Capacity in kilo-tonnes/year, parsed best-effort.",
   "total_kt": 5731.1,

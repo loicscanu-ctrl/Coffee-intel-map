@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T05:42:20.960169+00:00",
+  "generated_at": "2026-07-24T05:38:24.011083+00:00",
   "meta": {
     "adders_usd": 58.0,
     "container_mt": 21.6,
@@ -8216,6 +8216,17 @@
           "differential": -33.5,
           "parity_gap": -290.3,
           "tenderable": false
+        },
+        {
+          "date": "2026-07-24",
+          "farmgate_usd": 3595.7,
+          "at_port": 3695.7,
+          "freight": 265.7,
+          "tendering": 4019.5,
+          "rc": 3708.0,
+          "differential": -12.3,
+          "parity_gap": -311.5,
+          "tenderable": false
         }
       ]
     },
@@ -9004,6 +9015,17 @@
           "differential": -185.9,
           "parity_gap": -26.2,
           "tenderable": false
+        },
+        {
+          "date": "2026-07-24",
+          "farmgate_usd": 3438.1,
+          "at_port": 3638.1,
+          "freight": 154.1,
+          "tendering": 3850.2,
+          "rc": 3708.0,
+          "differential": -69.9,
+          "parity_gap": -142.2,
+          "tenderable": false
         }
       ]
     },
@@ -9791,6 +9813,17 @@
           "rc": 3796.0,
           "differential": 537.0,
           "parity_gap": -781.0,
+          "tenderable": false
+        },
+        {
+          "date": "2026-07-24",
+          "farmgate_usd": 4046.1,
+          "at_port": 4311.1,
+          "freight": 186.0,
+          "tendering": 4555.2,
+          "rc": 3708.0,
+          "differential": 603.1,
+          "parity_gap": -847.2,
           "tenderable": false
         }
       ]
